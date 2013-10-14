@@ -1,0 +1,6 @@
+# object and library files
+*.o
+*.so
+# R temporary files
+*.Rhistory
+*.Rapp.history
