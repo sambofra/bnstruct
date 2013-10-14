@@ -1,0 +1,54 @@
+set.seed(0)
+ssize <- 5000
+A <- sample(2,ssize,replace=T)
+B <- A
+B[A==1] <- sample(2,sum(A==1),r=T,c(0.3,0.7))
+B[A==2] <- sample(2,sum(A==2),r=T,c(0.7,0.3))
+C <- A
+C[A==1] <- sample(2,sum(A==1),r=T,c(0.3,0.7))
+C[A==2] <- sample(2,sum(A==2),r=T,c(0.7,0.3))
+D <- A
+D[(B==1)&(C==1)] <- sample(2,sum((B==1)&(C==1)),r=T,c(0.5,0.5))
+D[(B==2)&(C==2)] <- sample(2,sum((B==2)&(C==2)),r=T,c(0.7,0.3))
+D[(B==1)&(C==2)] <- sample(2,sum((B==1)&(C==2)),r=T,c(0.3,0.7))
+D[(B==2)&(C==1)] <- sample(2,sum((B==2)&(C==1)),r=T,c(0.4,0.6))
+E <- A
+G <- A
+H <- A
+E <- sample(2,ssize,replace=T)
+G[(D==1)&(E==1)] <- sample(2,sum((D==1)&(E==1)),r=T,c(0.5,0.5))
+G[(D==2)&(E==2)] <- sample(2,sum((D==2)&(E==2)),r=T,c(0.3,0.7))
+G[(D==1)&(E==2)] <- sample(2,sum((D==1)&(E==2)),r=T,c(0.7,0.3))
+G[(D==2)&(E==1)] <- sample(2,sum((D==2)&(E==1)),r=T,c(0.4,0.6))
+H[(E==1)&(G==1)] <- sample(2,sum((E==1)&(G==1)),r=T,c(0.3,0.7))
+H[(E==2)&(G==2)] <- sample(2,sum((E==2)&(G==2)),r=T,c(0.7,0.3))
+H[(E==1)&(G==2)] <- sample(2,sum((E==1)&(G==2)),r=T,c(0.6,0.4))
+H[(E==2)&(G==1)] <- sample(2,sum((E==2)&(G==1)),r=T,c(0.4,0.6))
+
+I <- H
+I[H==1] <- sample(2,sum(H==1),r=T,c(0.3,0.7))
+I[H==2] <- sample(2,sum(H==2),r=T,c(0.7,0.3))
+J <- H
+J[H==1] <- sample(2,sum(H==1),r=T,c(0.3,0.7))
+J[H==2] <- sample(2,sum(H==2),r=T,c(0.7,0.3))
+K <- H
+K[(I==1)&(J==1)] <- sample(2,sum((I==1)&(J==1)),r=T,c(0.5,0.5))
+K[(I==2)&(J==2)] <- sample(2,sum((I==2)&(J==2)),r=T,c(0.7,0.3))
+K[(I==1)&(J==2)] <- sample(2,sum((I==1)&(J==2)),r=T,c(0.3,0.7))
+K[(I==2)&(J==1)] <- sample(2,sum((I==2)&(J==1)),r=T,c(0.4,0.6))
+L <- H
+M <- H
+N <- H
+L <- sample(2,ssize,replace=T)
+M[(K==1)&(L==1)] <- sample(2,sum((K==1)&(L==1)),r=T,c(0.5,0.5))
+M[(K==2)&(L==2)] <- sample(2,sum((K==2)&(L==2)),r=T,c(0.3,0.7))
+M[(K==1)&(L==2)] <- sample(2,sum((K==1)&(L==2)),r=T,c(0.7,0.3))
+M[(K==2)&(L==1)] <- sample(2,sum((K==2)&(L==1)),r=T,c(0.4,0.6))
+N[(L==1)&(M==1)] <- sample(2,sum((L==1)&(M==1)),r=T,c(0.3,0.7))
+N[(L==2)&(M==2)] <- sample(2,sum((L==2)&(M==2)),r=T,c(0.7,0.3))
+N[(L==1)&(M==2)] <- sample(2,sum((L==1)&(M==2)),r=T,c(0.6,0.4))
+N[(L==2)&(M==1)] <- sample(2,sum((L==2)&(M==1)),r=T,c(0.4,0.6))
+data <- cbind(A,B,C,D,E,G,H,I,J,K,L,M,N)
+sizes <- as.integer(rep(2,13))
+# data <- cbind(A,B,C,D,E,G,H)
+# node.sizes <- rep(2,7)

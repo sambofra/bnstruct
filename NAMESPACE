@@ -1,0 +1,13 @@
+export(
+  "sm",
+  "dag.to.cpdag",
+  "is.acyclic",
+  "boot.bn",
+  "quantize.matrix",
+  "knn.impute",
+  "stat.mode.ord",
+  "mmpc",
+  "g2",
+  "hc",
+  "plot.mat"
+)
