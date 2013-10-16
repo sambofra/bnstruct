@@ -1,9 +1,10 @@
 Package: bnstruct
 Type: Package
-Title: Bayesian network exact structure learning from data with missing values
+Title: Bayesian network structure learning from data with missing values
 Version: 1.0
 Date: 2012-02-13
 Depends: R (>= 2.10), bitops
+Suggests: Rgraphviz
 Author: Francesco Sambo
 Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
 Description: More about what it does (maybe more than one line)

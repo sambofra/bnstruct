@@ -305,16 +305,16 @@ double log_lik( unsigned int * d, unsigned int n_nodes, unsigned int n_cases, un
 		for( j = 0; j < n_pa + 1; j++ )
 		{
 			elmt = d[ i + strides[j] ];
-			//if( elmt == NA_INTEGER )
+			if( elmt == NA_INTEGER )
 			//{
 			//	n_na++;
-			//	break;
+				break;
 			//}
 			index += (elmt - 1) * cum_prod_sizes[j];
 		}
 		// check if NA encountered
-		//if( j < n_pa + 1 )
-		//	continue;
+		if( j < n_pa + 1 )
+			continue;
     
 		counts[index] += 1;			
 	}

@@ -10,7 +10,7 @@
 
 # Silander and Myllymaki complete search, BDeu score, high memory occupation.
 sm <- function(x, node.sizes, cont.nodes = NULL, max.fanin = NULL, 
-	layering = NULL, max.fanin.layers = NULL, iss = 1, cpc.mat = NULL ) 
+	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL ) 
 {
 	n.nodes <- ncol(x)
 	n.cases <- nrow(x)
@@ -70,8 +70,8 @@ sm <- function(x, node.sizes, cont.nodes = NULL, max.fanin = NULL,
       ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
                      PACKAGE = "bnstruct") > 0) ] <- FALSE
   
-  # aflml <- all.families.log.marginal.likelihood( data, node.sizes, ifm, iss )
-	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, iss, PACKAGE = "bnstruct" )
+  # aflml <- all.families.log.marginal.likelihood( data, node.sizes, ifm, ess )
+	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, ess, PACKAGE = "bnstruct" )
 	
 	# bps <- find.best.parents( aflml )
 	bps <- .Call("fbp", aflml = aflml, PACKAGE = "bnstruct");
@@ -129,31 +129,6 @@ sm <- function(x, node.sizes, cont.nodes = NULL, max.fanin = NULL,
 # 	
 # 	# turn NAs to 0s
 # 	quant[is.na(quant)] <- 0
-# 	return(quant)
-# }
-
-# quantize.with.na.matrix <- function(data, levels) 
-# {
-# 	nr <- nrow(data)
-# 	nc <- ncol(data)
-# 	
-# 	quant <- matrix(0,nr,nc)
-# 	
-# 	for( i in 1:nc )
-# 	{
-# 		if( levels[i] == 0 )	#already discrete
-# 			quant[,i] <- as.matrix(data[,i],nr,1)
-# 		else
-# 		{
-# 			quantiles <- quantile( data[,i], probs = (0:levels[i])/levels[i], na.rm = TRUE )
-# 			# cut the range using the quantiles as break points.
-# 			quant[,i] <- as.matrix( cut( data[,i], quantiles, labels=FALSE, include.lowest=TRUE),nr,1 )
-#  		}
-# 	}
-# 	
-# 	# turn NAs to 0s
-# 	quant[is.na(quant)] <- 0
-# 	storage.mode(quant) <- "integer"
 # 	return(quant)
 # }
 
@@ -243,7 +218,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 # 	return( hn )
 # }
 
-all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, iss )
+all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, ess )
 {
 	n.nodes <- ncol(data)
 	LM <- matrix( -Inf, n.nodes, 2^n.nodes )
@@ -256,15 +231,15 @@ all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, iss )
 		for( k in possible.families )
 		{
 			pa <- which( bitAnd(k-1,bitmask) > 0 )
-			# LM[i,k] <- log.likelihood.na( pa, i, node.sizes, iss, data)
-			LM[i,k] <- log.lik.na( node.sizes[c(i,pa)], iss, data[,c(i,pa)] ) 
+			# LM[i,k] <- log.likelihood.na( pa, i, node.sizes, ess, data)
+			LM[i,k] <- log.lik.na( node.sizes[c(i,pa)], ess, data[,c(i,pa)] ) 
 		}
 	}
 	
 	return(LM)
 }
 
-# log.lik.na <- function( node.sizes, iss, data )
+# log.lik.na <- function( node.sizes, ess, data )
 # {
 # 	n.nodes <- length(node.sizes)
 # 	
@@ -275,19 +250,19 @@ all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, iss )
 # 		na.rows <- .Call("na_rows_int", mat = data, PACKAGE = "bnstruct")
 # 		
 # 		# counts <- compute.counts( data, node.sizes )
-# 		# prior <- array( iss/prod.sizes, node.sizes ); # faster !
+# 		# prior <- array( ess/prod.sizes, node.sizes ); # faster !
 # 		counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
-# 		prior <- iss/prod.sizes;
+# 		prior <- ess/prod.sizes;
 # 		
 # 		# correct for NAs with maximum a posteriori estimate
 # 		n.na <- sum(na.rows)
-# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
 # 		
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
 # 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(prior) # faster!
 # 		# alpha_ij <- colSums( prior )
-# 		# alpha_ij <- array( iss/prod.sizes.pa, node.sizes[2:n.nodes] )
-# 		alpha_ij <- iss/prod.sizes.pa
+# 		# alpha_ij <- array( ess/prod.sizes.pa, node.sizes[2:n.nodes] )
+# 		alpha_ij <- ess/prod.sizes.pa
 # 		N_ij <- colSums( counts )
 # 		# return( LL + sum( lgamma(alpha_ij) - lgamma(alpha_ij+N_ij) ) )
 # 		return( LL + prod.sizes.pa*lgamma(alpha_ij) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
@@ -297,12 +272,12 @@ all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, iss )
 # 		na.rows <- as.integer(is.na(data))
 # 		# counts <- compute.counts( data, node.sizes )
 # 		counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
-# 		#prior <- rep( iss/node.sizes, node.sizes );
-# 		prior <- iss/node.sizes
+# 		#prior <- rep( ess/node.sizes, node.sizes );
+# 		prior <- ess/node.sizes
 # 
 # 		# correct for NAs with maximum a posteriori estimate
 # 		n.na <- sum(na.rows) 
-# 		counts <- counts + n.na * (counts + prior) / ( length(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( length(data) - n.na + ess )
 # 
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
 # 		LL <- sum(lgamma(prior+counts)) - node.sizes*lgamma(prior) # faster!
@@ -310,7 +285,7 @@ all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, iss )
 # 	}
 # }
 
-log.lik <- function( node.sizes, iss, data )
+log.lik <- function( node.sizes, ess, data )
 {
   n.nodes <- length(node.sizes)
   
@@ -321,20 +296,20 @@ log.lik <- function( node.sizes, iss, data )
     # na.rows <- .Call("na_rows_int", mat = data, PACKAGE = "bnstruct")
     
     # counts <- compute.counts( data, node.sizes )
-    # prior <- array( iss/prod.sizes, node.sizes ); # faster !
+    # prior <- array( ess/prod.sizes, node.sizes ); # faster !
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
     counts <- .Call("compute_counts", data, node.sizes, package = "bnstruct")
-    prior <- iss/prod.sizes;
+    prior <- ess/prod.sizes;
     
     # correct for NAs with maximum a posteriori estimate
     # n.na <- sum(na.rows)
-    # counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+    # counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
     
     # LL <- sum( lgamma(prior+counts) - lgamma(prior) )
     LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(prior) # faster!
     # alpha_ij <- colSums( prior )
-    # alpha_ij <- array( iss/prod.sizes.pa, node.sizes[2:n.nodes] )
-    alpha_ij <- iss/prod.sizes.pa
+    # alpha_ij <- array( ess/prod.sizes.pa, node.sizes[2:n.nodes] )
+    alpha_ij <- ess/prod.sizes.pa
     N_ij <- colSums( counts )
     # return( LL + sum( lgamma(alpha_ij) - lgamma(alpha_ij+N_ij) ) )
     return( LL + prod.sizes.pa*lgamma(alpha_ij) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
@@ -344,13 +319,13 @@ log.lik <- function( node.sizes, iss, data )
     # na.rows <- as.integer(is.na(data))
     # counts <- compute.counts( data, node.sizes )
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
-    # prior <- rep( iss/node.sizes, node.sizes );
+    # prior <- rep( ess/node.sizes, node.sizes );
     counts <- .Call("compute_counts", data, node.sizes, package = "bnstruct")
-    prior <- iss/node.sizes
+    prior <- ess/node.sizes
     
     # correct for NAs with maximum a posteriori estimate
     # n.na <- sum(na.rows) 
-    # counts <- counts + n.na * (counts + prior) / ( length(data) - n.na + iss )
+    # counts <- counts + n.na * (counts + prior) / ( length(data) - n.na + ess )
     
     # LL <- sum( lgamma(prior+counts) - lgamma(prior) )
     LL <- sum(lgamma(prior+counts)) - node.sizes*lgamma(prior) # faster!
@@ -359,70 +334,70 @@ log.lik <- function( node.sizes, iss, data )
 }
 
 
-# log.likelihood.na <- function( pa, ni, node.sizes, iss, data )
+# log.likelihood.na <- function( pa, ni, node.sizes, ess, data )
 # {
 # 	n.pa <- length(pa)
 # 	prod.sizes.pa <- prod(node.sizes[pa])
 # 	prod.sizes <- prod.sizes.pa * node.sizes[ni]
 # 	
 # 	counts <- compute.counts( data[,c(ni,pa)], node.sizes[c(ni,pa)] )
-# 	prior <- array( iss/prod.sizes, node.sizes[c(ni,pa)] );
+# 	prior <- array( ess/prod.sizes, node.sizes[c(ni,pa)] );
 # 	if( n.pa > 0 )
 # 	{
 # 		# correct for NAs with maximum a posteriori estimate
 # 		
 # 		n.na <- sum(.Call("na_rows", mat =data[,c(pa,ni)], PACKAGE = "bnstruct"))
-# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
 # 	
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
-# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(iss/prod.sizes) # faster!
+# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(ess/prod.sizes) # faster!
 # 		# alpha_ij <- colSums( prior )
-# 		alpha_ij <- array( iss/prod.sizes.pa, node.sizes[pa] );
+# 		alpha_ij <- array( ess/prod.sizes.pa, node.sizes[pa] );
 # 		N_ij <- colSums( counts )
 # 		# return( LL + sum( lgamma(alpha_ij) - lgamma(alpha_ij+N_ij) ) )
-# 		return( LL + prod.sizes.pa*lgamma(iss/prod.sizes.pa) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
+# 		return( LL + prod.sizes.pa*lgamma(ess/prod.sizes.pa) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
 # 	}
 # 	else
 # 	{
 # 		# correct for NAs with maximum a posteriori estimate
 # 		n.na <- sum(is.na(data[,ni])) 
-# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
 # 	
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
-# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(iss/prod.sizes) # faster!
+# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(ess/prod.sizes) # faster!
 # 		return( LL - lgamma(1+sum(counts)) )
 # 	}
 # }
 
-# log.likelihood.na.rows <- function( pa, ni, node.sizes, iss, data )
+# log.likelihood.na.rows <- function( pa, ni, node.sizes, ess, data )
 # {
 # 	n.pa <- length(pa)
 # 	prod.sizes.pa <- prod(node.sizes[pa])
 # 	prod.sizes <- prod.sizes.pa * node.sizes[ni]
 # 	
 # 	counts <- compute.counts( data[,c(pa,ni)], node.sizes[c(pa,ni)] )
-# 	prior <- array( iss/prod.sizes, node.sizes[c(pa,ni)] );
+# 	prior <- array( ess/prod.sizes, node.sizes[c(pa,ni)] );
 # 	if( n.pa > 0 )
 # 	{
 # 		# correct for NAs with maximum a posteriori estimate
 # 		n.na <- sum(rowSums(is.na(data[,c(pa,ni)]))>0)
-# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
 # 	
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
-# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(iss/prod.sizes) # faster!
+# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(ess/prod.sizes) # faster!
 # 		alpha_ij <- rowSums( prior, dims=length(pa) )
 # 		N_ij <- rowSums( counts, dims=length(pa) )
 # 		# return( LL + sum( lgamma(alpha_ij) - lgamma(alpha_ij+N_ij) ) )
-# 		return( LL + prod.sizes.pa*lgamma(iss/prod.sizes.pa) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
+# 		return( LL + prod.sizes.pa*lgamma(ess/prod.sizes.pa) - sum(lgamma(alpha_ij+N_ij)) ) # faster !
 # 	}
 # 	else
 # 	{
 # 		# correct for NAs with maximum a posteriori estimate
 # 		n.na <- sum(is.na(data[,ni])) 
-# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + iss )
+# 		counts <- counts + n.na * (counts + prior) / ( nrow(data) - n.na + ess )
 # 	
 # 		# LL <- sum( lgamma(prior+counts) - lgamma(prior) )
-# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(iss/prod.sizes) # faster!
+# 		LL <- sum(lgamma(prior+counts)) - prod.sizes*lgamma(ess/prod.sizes) # faster!
 # 		return( LL - lgamma(1+sum(counts)) )
 # 	}
 # }

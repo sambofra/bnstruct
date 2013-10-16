@@ -1,8 +1,8 @@
 library("bnstruct")
 
 # read data and set parameters
-B <- 10
-a <- read.delim("Child_data_na_5000.txt",na.strings="?",header=FALSE,sep="") + 1
+B <- 100
+a <- read.delim("Child_data_na_1000.txt",na.strings="?",header=FALSE,sep="") + 1
 node.sizes <- rep(0,ncol(a))
 for( i in 1:ncol(a) )
   node.sizes[i] <- length(unique(a[,i]))
@@ -27,22 +27,40 @@ max.fanin  <- 3 # threshold for the values of max.fanin.layers
 impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
 
 # test SM alone
-res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+res.sm <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+
+# plot
+setEPS()
+postscript("sm.eps")
+plot.mat(dag.to.cpdag(res.sm),names(a))
+dev.off()
 
 # test SM with bootstrap
-res.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, max.fanin, layering,
-               max.fanin.layers,iss=1, verbose=TRUE, k.impute=10)
+res.sm.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, 
+                       verbose=TRUE, k.impute=10, method = "sm",
+                       max.fanin = max.fanin, layering = layering,
+                       max.fanin.layers = max.fanin.layers )
 
-# test SM with MMPC
-cpc <- mmpc( impa, node.sizes, cont.nodes, 0.05 )
-res.cpc <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers,cpc.mat=cpc)
+# plot
+postscript("sm.boot.eps")
+plot.mat(res.sm.boot,names(a),0.25,B)
+dev.off()
 
-# test SM with MMPC and bootstrap
-max.fanin <- 19
-Rprof()
-res.boot.cpc <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, max.fanin, layering,
-               	max.fanin.layers,iss=1, verbose=TRUE, k.impute=10, chi.th = 0.05 ) 
-Rprof(NULL)
+# test MMHC alone
+cpc <- mmpc( impa, node.sizes, cont.nodes, 0.05, layering )
+res.mmhc <- hc( impa, node.sizes, cpc, cont.nodes )
 
-# test HC with MMPC
-res.hc.cpc <- hc(impa,node.sizes,cpc)
+# plot
+postscript("mmhc.eps")
+plot.mat(dag.to.cpdag(res.mmhc),names(a))
+dev.off()
+
+# test MMHC with bootstrap
+res.mmhc.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, 
+                         verbose=TRUE, k.impute=10, method = "mmhc",
+                         layering=layering)
+
+# plot
+postscript("mmhc.boot.eps")
+plot.mat(res.mmhc.boot,names(a),0.25,B)
+dev.off()

@@ -1,4 +1,4 @@
-hc <- function( data, node.sizes, cpc, ess = 1, tabu.tenure = 100, cont.nodes = NULL )
+hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100 )
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
@@ -113,7 +113,7 @@ hc <- function( data, node.sizes, cpc, ess = 1, tabu.tenure = 100, cont.nodes = 
     else
       curr.score.nodes[best.node] = curr.score.nodes[best.node] + next.score.diff[best.node]
     
-    print(c(tabu.pt,best.node,next.pert[best.node],sum(curr.score.nodes)))
+    # print(c(tabu.pt,best.node,next.pert[best.node],sum(curr.score.nodes)))
     
     if( global.best.score < sum(curr.score.nodes) ) # check for global best
     {
@@ -134,7 +134,9 @@ hc <- function( data, node.sizes, cpc, ess = 1, tabu.tenure = 100, cont.nodes = 
 }
 
 
-mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05 )
+mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
+						layering = NULL, layer.struct = NULL)
+						
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
@@ -148,34 +150,69 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05 )
   
   # data <- quantize.with.na.matrix( data, levels )
   data <- quantize.matrix( data, levels )
+    
+  # default values for layering
+  if( is.null(layering) )
+  {
+    layering <- rep.int( 1, n.nodes )
+    if( !is.null(layer.struct) )
+      stop( "Argument layer.struct without layering\n" )
+  }
+  n.layers <- length(unique(layering))
+  if( is.null(layer.struct) )
+  {
+    layer.struct <- matrix(1,n.layers,n.layers)
+    if(n.layers > 1)
+    {
+      layer.struct[lower.tri(layer.struct)] <- 0
+      layer.struct[1,1] <- 0 # default: no edges between nodes at level 1
+    }
+  }
+  # print(n.layers)
+  # print(layering)
+  # print(layer.struct)
   
-  cpcMat <- matrix(1, n.nodes, n.nodes)
-  allowed <- matrix(1, n.nodes, n.nodes)
-  diag(cpcMat) <- 0
-  diag(allowed) <- 0
+  # apply layering
+  layer.mat <- matrix(1, n.nodes, n.nodes) 
+  for( i in 1:n.layers )
+    for( j in 1:n.layers )
+      layer.mat[ layering==i, layering==j ] <- layer.struct[i,j]
+  diag(layer.mat) <- 0
+  
+  cpc.mat <- layer.mat | t(layer.mat) # constrain the cpc search
+  allowed <- cpc.mat
+  
+  # print(cpc.mat)
   
   # forward addition of nodes
   for( i in 1:n.nodes )
   {
-    cpcMat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
+    cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
     # cat("cpcMat ",i,": ",cpcMat[i,],"\n")
-    allowed[,i] <- allowed[,i] & t(cpcMat[i,])
+    allowed[,i] <- allowed[,i] & t(cpc.mat[i,])
   }
   
-  # print(cpcMat)
+  # print(cpc.mat)
   
   # backwards removal of nodes
   for( i in 1:n.nodes )
   {
-    cpcMat[i,] <- mmpc.bwd( data, node.sizes, cpcMat[i,], i, chi.th )
+    cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th )
     # cat("cpcMat ",i,": ",cpcMat[i,],"\n")
-    cpcMat[,i] <- cpcMat[,i] & t(cpcMat[i,])
+    cpc.mat[,i] <- cpc.mat[,i] & t(cpc.mat[i,])
   }
   
-  # symmetry enformcement
-  cpcMat = cpcMat * t(cpcMat)
+  # print(cpc.mat)
   
-  return( cpcMat )
+  # symmetry enformcement
+  cpc.mat = cpc.mat * t(cpc.mat)
+  
+  # further filter with layering
+  cpc.mat = cpc.mat * layer.mat
+  
+  # print(cpc.mat)
+  
+  return( cpc.mat )
 }
 
 mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
@@ -185,6 +222,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   n.cases <- nrow(data)
 
   # test without conditioning
+  # print(chi.th)
   minAssoc <- rep(0,n.nodes)
   for( y in 1:n.nodes )
     if( allowed[x,y] )
@@ -197,7 +235,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   
   m.ind <- which.max( minAssoc )
   cpc <- m.ind
-  cat(cpc,",\t",which( !allowed[x,] ),"\n")
+  # cat(cpc,",\t",which( !allowed[x,] ),"\n")
   allowed[x,m.ind] <- 0
   minAssoc[m.ind] <- 0
   
@@ -244,7 +282,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
     m.ind <- which.max( minAssoc )
     minAssoc[m.ind] <- 0
     cpc <- union( cpc, m.ind )
-    cat(cpc,",\t",which( !allowed[x,] ),"\n")
+    # cat(cpc,",\t",which( !allowed[x,] ),"\n")
     allowed[x,m.ind] <- 0
   }
   
@@ -255,8 +293,8 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
 
 mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
 {
-  cat("\n",x,":\n");
-  cat(which(cpc.vec!=0),"\n");
+#  cat("\n",x,":\n");
+#  cat(which(cpc.vec!=0),"\n");
   # not worth if cpc has less than 2 elmts
   if( sum(cpc.vec) < 2 )
     return( cpc.vec )
@@ -286,7 +324,7 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
           if( assoc == 0 ) # do not try with y anymore
           {
             cpc.vec[y] = 0
-            cat(which(cpc.vec!=0),"\n");
+#            cat(which(cpc.vec!=0),"\n");
             break
           }
           comb <- .Call("next_comb", comb, n, PACKAGE = "bnstruct" )

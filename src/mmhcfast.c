@@ -38,7 +38,7 @@ SEXP next_comb( SEXP sexp_comb, SEXP sexp_n )
 
 SEXP g2_stat( SEXP data, SEXP node_sizes )
 {
-	int i,j,k,index,sx,sy,sz,sxy,val,zx,zy,zz,zc,df;
+	int i,j,k,index,sx,sy,sz,sxy,val,zx,zy,zz,zc,df,elmt;
 	double stat = 0;
 	// inputs
 	int * d = INTEGER(data);
@@ -63,12 +63,21 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 	double py[ sx ];
 	double pz;
 	
-	// compute counts
+	// compute counts, skipping NAs
 	for( i = 0; i < n_cases; i++ )
 	{
 		index = 0;
 		for( j = 0; j < n_nodes; j++ )
-			index += (d[ i + j*n_cases ] - 1) * cum_prod_sizes[j];
+		{
+			elmt = d[ i + j*n_cases ];
+			if( elmt == NA_INTEGER )
+				break;
+			index += (elmt - 1) * cum_prod_sizes[j];
+		}
+		// check if NA encountered
+		if( j < n_nodes )
+			continue;
+			
 		counts[index]++;			
 	}	
 	
@@ -134,6 +143,7 @@ SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP ess )
   PROTECT( score = allocVector(REALSXP, 1) );
   *REAL(score) = log_lik( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
     *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) );
+  // log_lik defined in smfast.h
   
   UNPROTECT(1);
   return score;

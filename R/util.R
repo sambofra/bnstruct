@@ -51,6 +51,10 @@ quantize.matrix <- function(data, levels)
 # Plot a weighted connectivity matrix using Rgraphviz
 plot.mat <- function( mat, node.names = as.character(1:ncol(mat)), frac = 0.2, max.weight = max(mat) )
 {
+  # check for Rgraphviz
+  if (!require(Rgraphviz))
+    stop("this function requires the Rgraphviz package.")
+  
   # adjacency matrix
   mat.th <- mat
   mat.th[mat <  frac*max.weight] <- 0
