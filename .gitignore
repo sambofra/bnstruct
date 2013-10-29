@@ -4,3 +4,7 @@
 # R temporary files
 *.Rhistory
 *.Rapp.history
+.Rproj.user
+.Rbuildignore
+.RData
+bnstruct.Rproj

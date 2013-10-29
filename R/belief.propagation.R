@@ -1,4 +1,4 @@
-belief.propagation <- function(dgraph, cpts, ctree, cs)
+jt.belief.propagation <- function(dgraph, cpts, ctree, cs)
 {
   # Compute belief propagation for a given junction tree, from a given DAG
   # Starting from leaves of the junction tree, compute evidence by passing
@@ -32,7 +32,7 @@ belief.propagation <- function(dgraph, cpts, ctree, cs)
 #     }
 #     potentials[i] <- initial.potentials(cl, env, cpts)
 #     print("##########################################")
-  }
+#  }
   
   # root = argmax(sum of weights of edges insisting over each node)
   root <- which.max(rowSums(ctree))

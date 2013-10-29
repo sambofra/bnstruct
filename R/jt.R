@@ -1,11 +1,13 @@
-library("igraph")
+#library("igraph")
 
-junction.tree <- function(dgraph, cpts)
+junction.tree <- function(dgraph) #,cpts
 {
   # Calculate junction tree of a given graph.
   # Input parameter are the adjacency matrix of a directed graph, and the
   # conditional probability tables for the variables.
 
+  print("aaa")
+  
   graph <- moralization(dgraph)    # adj. matrix
   graph <- directed.to.undirected.graph(graph)   # adj. matrix
   graph <- triangulation(graph)   # adj. matrix
@@ -13,11 +15,13 @@ junction.tree <- function(dgraph, cpts)
   
   ctree <- ctout$clique.tree
   cs <- ctout$cliques
+  
+  print(ctree)
+  print(cs)
 
   # return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
   
-  # belief propagation
-  belief.propagation(dgraph, cpts, ctree, cs)
+  # jt.belief.propagation(dgraph, cpts, ctree, cs)
 }
 
 directed.to.undirected.graph <- function(dg)
@@ -34,7 +38,7 @@ directed.to.undirected.graph <- function(dg)
     {
       if (dg[i,j] == 1 && dg[j,i] == 0)
       {
-        print(paste(i,j,"add bidirectional edge"))
+        #print(paste(i,j,"add bidirectional edge"))
         dg[j,i] <- 1
       }
     }
@@ -68,7 +72,7 @@ moralization <- function(graph)
         {
           if (graph[found[j],found[k]] == 0 && graph[found[j],found[k]] == 0)
           {
-            print(paste(found[j],found[k],"share a child:",i))
+            #print(paste(found[j],found[k],"share a child:",i))
             moral[found[j],found[k]] <- 1
             moral[found[k],found[j]] <- 1
           }
@@ -123,9 +127,9 @@ triangulation <- function(graph)
   
   # manually add the edges to my original graph
   i <- 1
-  while(i <= nrow(graph))
+  while(i <= length(fill.in.edges))
   {
-    print(paste("adding edge",fill.in.edges[i],fill.in.edges[i+1]))
+    #print(paste("adding edge",fill.in.edges[i],fill.in.edges[i+1]))
     graph[fill.in.edges[i],fill.in.edges[i+1]] <- 1
     graph[fill.in.edges[i+1],fill.in.edges[i]] <- 1
     i <- i+2
