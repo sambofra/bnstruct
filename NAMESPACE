@@ -9,5 +9,14 @@ export(
   "mmpc",
   "g2",
   "hc",
-  "plot.mat"
+  "plot.mat",
+  "junction.tree",
+  "directed.to.undirected.graph",
+  "moralization",
+  "triangulation",
+  "clique.tree",
+  "belief.propagation",
+  "jt.propagation.order",
+  "reconstruct.dependencies.in.clique",
+  "marginalization"
 )
