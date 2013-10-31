@@ -1,5 +1,6 @@
 library("bnstruct")
 library("igraph")
+library("gRain")
 
 # read data and set parameters
 B <- 10
@@ -26,10 +27,10 @@ max.fanin.layers <- as.matrix(read.table(header=F,text="
 max.fanin  <- 3 # threshold for the values of max.fanin.layers
 
 # impute data 
-impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
+# impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
 
 # test SM alone
-res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+# res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
 
 #print(res.single)
 
@@ -39,7 +40,7 @@ res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
 
 # print(res.boot)
 
-junction.tree(res.single)
+# junction.tree(res.single)
 
 ###########################################################à
 #
@@ -101,6 +102,41 @@ junction.tree(res.single)
 # cpts[[6]][[2,1,2]] <- 0.8
 # cpts[[6]][[2,2,1]] <- 0.6
 # cpts[[6]][[2,2,2]] <- 0.2
+
+names <- c('a', 'b', 'c', 'd', 'e', 'f')
+pnames <- c(~a, ~b|a, ~c|a, ~d|b, ~e|c, ~f|d:e)
+
+yn <- c("yes", "no")
+
+cpts <- NULL
+cpts[[1]] <- cptable(names[1], values = c(10, 90), levels = yn)
+cpts[[2]] <- cptable(paste(names[2],',',names[1]), values = c(10, 90, 90, 10), levels = yn)
+# order of values: b|a, !b|a, b|!a, !b|!a
+#cpts[[2]] <- cptable(~b|a, values = c(10, 90, 90, 10), levels = yn)
+print(cpts[[2]])
+print(as.name(paste(names[2],'+',names[1])))
+cpts[[3]] <- cptable(~c|a, values = c(70, 30, 20, 80), levels = yn)
+cpts[[4]] <- cptable(~d|b, values = c(40, 60, 70, 30), levels = yn)
+cpts[[5]] <- cptable(~e|c, values = c(50, 50, 40, 60), levels = yn)
+cpts[[6]] <- cptable(~f|d:e, values = c(10, 90, 50, 50, 40, 60, 80, 20), levels = yn)
+
+plist <- compileCPT(cpts)
+print(plist)
+
+# print(ls(plist))
+# for (i in 1:length(ls(plist)))
+#   print(plist[[i]])
+
+# print(plist$a)
+# print(plist$b)
+
+net <- grain(plist)
+
+print(querygrain(net, nodes=c("c", "f"), type="joint"))
+
+#for (i in 1:length(plist))
+#  print(plist$names[i])
+
 # 
 # s <- c(1,2,3)
 # dims <- c(2,2,2)
