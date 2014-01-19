@@ -62,7 +62,7 @@ plot.mat <- function( mat, node.names = as.character(1:ncol(mat)), frac = 0.2, m
   # build graph
   g <- graphAM( mat.th, edgemode="directed")
   nodes(g) <- node.names
-  en <- edgeNames(g)
+  en <- edgeNames(g,recipEdges="distinct")
   g <- layoutGraph(g)
   # set edge darkness proportional to confidence
   conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
