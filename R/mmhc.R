@@ -1,4 +1,5 @@
-hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100 )
+hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100, 
+                init.net = NULL )
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
@@ -13,8 +14,18 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
   # data <- quantize.with.na.matrix( data, levels )
   data <- quantize.matrix( data, levels )
   
-  # start with empty matrix 
-  curr.g <- matrix(0L,n.nodes,n.nodes) # integers!  
+  # start with init.net if not NULL, otherwise with empty matrix
+  if( !is.null(init.net) )
+  {
+    curr.g <- init.net
+    # just to be sure 
+    storage.mode( curr.g ) <- "integer" 
+    # add init edges out of cpc
+    cpc <- cpc | init.net | t(init.net)
+  }
+  else
+    curr.g <- matrix(0L,n.nodes,n.nodes) # integers!  
+  
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
     curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, 
