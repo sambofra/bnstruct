@@ -2,10 +2,7 @@ library("bnstruct")
 
 # read data and set parameters
 B <- 100
-a <- read.delim("Child_data_na_1000.txt",na.strings="?",header=FALSE,sep="") + 1
-node.sizes <- rep(0,ncol(a))
-for( i in 1:ncol(a) )
-  node.sizes[i] <- length(unique(a[,i]))
+a <- read.delim("Child_data_na_5000.txt",na.strings="?",header=FALSE,sep="") + 1
 
 node.sizes <- c(2,6,3,2,3,4,3,3,2,2,3,3,5,2,2,3,3,2,5,2)
 names(a) <- list("BirthAsphyxia","Disease","Age","LVH","DuctFlow","CardiacMixing",
@@ -20,7 +17,7 @@ max.fanin.layers <- as.matrix(read.table(header=F,text="
   0  1  1  1  1
   0  0  8  7  7
   0  0  0 14  6
-  0  0  0  0 19"))
+  0  0  0  0 19")) # only used by SM
 max.fanin  <- 3 # threshold for the values of max.fanin.layers
 
 # impute data 
@@ -29,7 +26,7 @@ impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes
 # test SM alone
 res.sm <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
 
-# plot
+# plot, requires package Rgraphviz
 setEPS()
 postscript("sm.eps")
 plot.mat(dag.to.cpdag(res.sm),names(a))
