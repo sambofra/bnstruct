@@ -212,3 +212,116 @@ topological.sort <- function(dag)
 	
 	return(order)
 }
+
+fast.bincombinations <- function(p)
+{
+  # computes all the combinations of p elements
+  # many many thanks to
+  # http://stackoverflow.com/questions/13891604
+  vapply(X = seq_len(p),
+         FUN = function(i)rep(rep(0L:1L, each = 2^(p-i)), times = 2^(i-1)),
+         FUN.VALUE = integer(2^(p)))
+}
+
+PriorityQueue <- function() {
+  # with many thanks to RosettaCode
+  # http://rosettacode.org/wiki/Priority_queue#R
+  keys <<- values <<- NULL
+  insert <- function(key, value) {
+    temp <- c(keys, key)
+    ord <- order(temp)
+    keys <<- temp[ord]
+    values <<- c(values, list(value))[ord]
+  }
+  pop <- function() {
+    head <- values[[1]]
+    values <<- values[-1]
+    keys <<- keys[-1]
+    return(head)
+  }
+  empty <- function() length(keys) == 0
+  list(insert = insert, pop = pop, empty = empty)
+}
+
+
+Stack <- function()
+{
+  # won't work for lists or matrices or other complex structures, but for me, now, seems ok
+  elements <<- NULL
+  num.els <<- 0
+  push <- function(element)
+  {
+    num.els <<- num.els + 1
+    elements[[num.els]] <<- element
+  }
+  pop <- function()
+  {
+    if (num.els == 0)
+    {
+      ret <- NULL
+    } else {      
+      ret <- elements[[num.els]]
+      elements <<- elements[-num.els]
+      num.els <<- num.els - 1
+    }
+    return(ret)
+  }
+  empty <- function()
+  {
+    elements <<- NULL
+    num.els <<- 0
+  }
+  size <- function() {
+    return(num.els)
+  }
+  find <- function(target) {
+    res <- which(c(elements) == target)
+    if (length(res) == 0) res <- NULL # just because I'm not sure how to handle integer(0)
+    return(list("result" = res, "count" = length(res)))
+  }
+  get.elements <- function(){
+    return(elements)
+  }
+  list(push = push, pop = pop, empty = empty, size = size, find = find, get.elements = get.elements)
+}
+
+Queue <- function()
+{
+  # won't work for lists or matrices or other complex structures, but for me, now, seems ok
+  elements <<- NULL
+  num.els <<- 0
+  push <- function(element)
+  {
+    num.els <<- num.els + 1
+    elements[[num.els]] <<- element
+  }
+  pop <- function()
+  {
+    if (num.els == 0)
+    {
+      ret <- NULL
+    } else {      
+      ret <- elements[[num.els]]
+      elements <<- elements[-1]
+      num.els <<- num.els - 1
+    }
+    return(ret)
+  }
+  empty <- function()
+  {
+    elements <<- NULL
+    num.els <<- 0
+  }
+  size <- function() {
+    return(num.els)
+  }
+  find <- function(target) {
+    res <- which(c(elements) == target)
+    if (length(res) == 0) res <- NULL # just because I'm not sure how to handle integer(0)
+    return(list("result" = res, "count" = length(res)))
+  }
+  get.elements <- function(){
+    return(elements)
+  }
+  list(push = push, pop = pop, empty = empty, size = size, find = find, get.elements = get.elements)
+}

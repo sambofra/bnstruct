@@ -18,150 +18,175 @@ orientation.init <- function(cplex.problem, graph, data)
   # get cpcs
   print("creating indicator variables for CPCs, with their score...")
   cpcs          <- NULL
-  combs         <- NULL
   cpcs.vars     <- NULL
   cpcs.scores   <- NULL
-  really.in     <- c()
-  in.position   <- c()
-  position.ind  <- 1
+  combinations  <- NULL
+  offsets       <- c()
   start.cpcs.vs <- c()
   k             <- 1
   temp.sum      <- 1
   last.start    <- 1
   overall.dcj   <- c()
+  total.counter <- 0
   
   # iterate through nodes
   for(i in 1:ncol(graph))
   {
     print(paste("- evaluating node",i))
-    combs[[i]]              <- as.list(as.list(1), as.list(2)) # sporcotrucco^(tm), otherwise may fail abruptly if first node is disconnected
+    # combinations[[i]]       <- as.list(as.list(1), as.list(2)) # sporcotrucco^(tm), otherwise may fail abruptly if first node is disconnected
     cpcs[[i]]               <- as.list(c(which(graph[,i] > 0)))
     storage.mode(cpcs[[i]]) <- "integer"
-    combinations            <- fast.bincombinations(length(cpcs[[i]]))
     
-    if (length(cpcs[[i]]) == 0) # need in case of node separated from rest of network
-    {
-      combinations <- as.matrix(c(0), c(1, 1))
-    }
+    len.cpc   <- length(cpcs[[i]])
+    num.combs <- 2 ** len.cpc
     
-    cat("  (has",length(cpcs[[i]]), "possible parents, and therefore", nrow(combinations),"candidate parent sets to evaluate)\n")
+    # combinations            <- fast.bincombinations(length(cpcs[[i]]))
     
-    combs[[i]]     <- combinations
+    cat("  (has",len.cpc, "possible parents, and therefore up to", num.combs ,"candidate parent sets to evaluate)\n")
+    
     cpcs.vars[[k]] <- as.list(c())
     
-    # array of flags: 1 if relative cpc has to be evaluated or can be pruned
-    # a cpc can be pruned if all of its proper subsets have to be pruned (without evaluating score)
-    # or if its score is lower than than the scores of all its proper subsets
-    # evaluation can be limited to the (|cpc|-1)-sized subsets
-    dc.j.pruning.flag <- rep(1, nrow(combinations))
+    # local.is.here contains the list of subsets in the current round that have not been pruned by the De Campos & Ji pruning
+    local.is.here  <- c()
+    local.cnt      <- 0
     
-    for (j in 1L:nrow(combinations))
-    {
-      cat(j,"/",nrow(combinations),"\n")
-      subset               <- c(cpcs[[i]][which(combinations[j,] > 0)])
-      storage.mode(subset) <- "integer"
-      cat("subset : ",subset,"\n")
-      # print(subset-1L)
-      cpcs.vars[[k]] <- as.list(c(unlist(subset)))
-      storage.mode(cpcs.vars[[k]]) <- "integer"
-      
-      # apply an early DeCampos&Ji pruning: compute score only if really needed ; otherwise, set to 0 and set variable to denied
-      if (length(subset) >= 2)
-      {
-        # look for already discarded subsets: then the variable can already be discarded
-        flag <- 1
-        discard <- 0
-        for (l in 1:length(combinations[j,]))
-        {
-          if (combinations[j,l]>0)
-          {
-            offset <- 0
-            for (m in 1:length(combinations[j,]))
-            {
-              if (m == l)
-                offset <- 2*offset
-              else
-                offset <- 2*offset + combinations[j,m]
-            }
-            offset <- offset + 1
-            cat("(",offset,",",last.start,",", dc.j.pruning.flag[offset+last.start-1], ") ") 
-            if (!is.element(offset+last.start-1, really.in))
-            {
-              flag <- 0
-              discard <- 1
-              # cat("**", offset, offset+last.start-1, "\n")
-              # readLines(file("stdin"),1)
-              break
-            }
-          }
-          cat("\n")
-        }
-        if (flag == 1)
-        {
-          # if CPC cannot be discarded yet, compute its score, and evaluate against all of its subsets
-          score <- .Call( "score_node", data, node.sizes, i-1L, subset-1L, 
+    bigger.cps.size <- 0
+    
+    # empty set: treat apart
+    comb   <- rep(0, len.cpc)
+    subset <- c(cpcs[[i]][which(comb > 0)])
+    storage.mode(subset) <- "integer"
+    combinations[[k]]    <- as.list(unlist(comb))
+    cpcs.vars[[k]]       <- as.list(c(unlist(subset)))
+    storage.mode(cpcs.vars[[k]]) <- "integer"
+    score        <- .Call( "score_node", data, node.sizes, i-1L, subset-1L, 
                            ess = 1, PACKAGE = "bnstruct" );
-          for (l in 1:length(combinations[j,]))
+    
+    local.is.here    <- c(local.is.here, 1)
+    local.cnt        <- local.cnt + 1
+    cpcs.scores[[k]] <- score
+    k <- k + 1
+    
+    inserted.in.last.round <- 1
+    to.be.inserted <- 0
+    
+    if (len.cpc > 0)
+    {
+      for (j in 1L:len.cpc)
+      {
+        print(j)
+        start.num = 2 ** j - 1
+        last.num  = 2 ** len.cpc - 1 - (2 ** (len.cpc - j) - 1) + 1
+        curr.num  = start.num
+        
+        inserted.in.last.round <- 0
+        
+        while (curr.num <= last.num)
+        {
+          comb <- as.integer(rev(intToBits(curr.num)[c(1:len.cpc)]))
+          subset <- c(cpcs[[i]][which(comb > 0)])
+          #cat(curr.num, " ", comb, " ", subset , " \n")
+          storage.mode(subset) <- "integer"
+          # insert: if is not the case, it will be overwritten
+          combinations[[k]] <- as.list(unlist(comb))
+          cpcs.vars[[k]] <- as.list(c(unlist(subset)))
+          storage.mode(cpcs.vars[[k]]) <- "integer"
+          
+          # look for already discarded subsets: then the variable can already be discarded
+          flag <- 1
+          discard <- 0
+          missed  <- 0
+          for (l in 1:length(comb))
           {
-            if (combinations[j,l]>0)
+            if (comb[l] > 0)
             {
               offset <- 0
-              discard <- 0
-              for (m in 1:length(combinations[j,]))
+              for (m in 1:length(comb))
               {
                 if (m == l)
                   offset <- 2*offset
                 else
-                  offset <- 2*offset + combinations[j,m]
+                  offset <- 2*offset + comb[m]
               }
               offset <- offset + 1
-              if (dc.j.pruning.flag[offset] == 1 && cpcs.scores[[offset+last.start-1]] > score ) 
-              {
-                dc.j.pruning.flag[j] <- 0
-                discard <- 1
-                break
-              }
+              if (!is.element(offset, local.is.here))
+                missed <- missed + 1
             }
-          } 
-          if (discard == 0)
-          {
-            really.in    <- c(really.in, j+last.start-1)
-            in.position  <- c(in.position, position.ind)
-            position.ind <- position.ind + 1
           }
+          if (missed*1L == j)
+          {
+            flag <- 0
+            discard <- 1
+            #break
+          }
+          if (flag == 1)
+          {
+            # if CPC cannot be discarded yet, compute its score, and evaluate against all of its subsets
+            score <- .Call( "score_node", data, node.sizes, i-1L, subset-1L, 
+                            ess = 1, PACKAGE = "bnstruct" );
+            for (l in 1:length(comb))
+            {
+              if (comb[l] > 0)
+              {
+                offset  <- 0
+                discard <- 0
+                for (m in 1:length(comb))
+                {
+                  if (m == l)
+                    offset <- 2*offset
+                  else
+                    offset <- 2*offset + comb[m]
+                }
+                offset <- offset + 1
+                if (is.element(offset, local.is.here))
+                {
+                  check.at <- which(local.is.here == offset)
+                  if (cpcs.scores[[check.at+last.start-1]] > score)# && j >= 2L)
+                  {
+                    discard <- 1
+                    break
+                  }
+                }
+              }
+            } 
+            if (discard == 0)
+            {
+              to.be.inserted <- 1
+            }
+          }
+          
+          if (to.be.inserted == 1)
+          {
+            local.is.here    <- c(local.is.here, curr.num+1)
+            local.cnt        <- local.cnt + 1
+            cpcs.scores[[k]] <- score
+            k <- k + 1
+            to.be.inserted <- 0
+            inserted.in.last.round <- inserted.in.last.round + 1
+          }
+          
+          curr.num = .Call("nextLexicalBitComb", as.integer(curr.num*1L), PACKAGE = "bnstruct")*1L
         }
-        else # if flag = 0, discard immediately
+
+        cat(inserted.in.last.round, "/", choose(len.cpc,j), "\n")
+        if (inserted.in.last.round == 0)
         {
-          dc.j.pruning.flag[j] <- 0
-          score <- 0
+          j <- len.cpc + 1
+          break
         }
       }
-      else # if length (subset) <= 1
-      {
-        # normal scoring
-        score        <- .Call( "score_node", data, node.sizes, i-1L, subset-1L, 
-                               ess = 1, PACKAGE = "bnstruct" );
-        really.in    <- c(really.in, j+last.start-1)
-        in.position  <- c(in.position, position.ind)
-        position.ind <- position.ind + 1   
-      }
-      
-      cpcs.scores[[k]] <- score# 1+runif(1, -1, 0)
-      k <- k + 1
     }
-    start.cpcs.vs <- c(start.cpcs.vs, temp.sum*1L)
-    last.start    <- last.start + length(dc.j.pruning.flag)
-    temp.sum      <- temp.sum + nrow(combinations)
-    overall.dcj   <- c(overall.dcj, dc.j.pruning.flag)
+
+    start.cpcs.vs <- c(start.cpcs.vs, last.start*1L)
+    
+    total.counter <- total.counter + local.cnt
+    last.start    <- last.start + local.cnt
+    offsets       <- c(offsets, local.cnt)
   }
   
-  start.edge.vs <- temp.sum*1L
-  num.vars      <- temp.sum + num.nodes * num.nodes - 1L
+  start.edge.vs <- last.start*1L
+  num.vars      <- (total.counter + num.nodes * num.nodes)*1L
   storage.mode(start.cpcs.vs) <- "integer"
-  
-  # cat(length(overall.dcj), "=?=", start.edge.vs-1,"\n")
-  # print(overall.dcj)
-  # readLines(file("stdin"), 1)
   
   print("done")
   
@@ -171,21 +196,21 @@ orientation.init <- function(cplex.problem, graph, data)
   # num of columns : variables
   nc <- num.vars # remember that R counts from 1, cplex from 0... 
   # num of rows : constraints : nothing for now, to be added with addRows
-  nr <- 1 #(num.nodes * num.nodes - num.nodes)/2 + 2*(temp.sum-1) # stiamo larghi
+  nr <- 1
   # lower bounds = 0 for all
   lb <- c(rep(0, num.vars))
   # upper bounds = 1 for all; then set to 0 the ub for the edges forbidden by the MMPC step
   ub <- c(rep(1, num.vars))
-  ub[which(edge.ind.vars == 0)+start.edge.vs-1] <- 0
+  ub[which(edge.ind.vars == 0) + start.edge.vs - 1] <- 0
   
   # objective function coefficients: the scores associated to I(W->v) vars
   obj <- c(c(unlist(cpcs.scores)), rep(0, num.nodes * num.nodes))
 
   # it's a max problem
   setObjDirCPLEX(env, prob, CPX_MAX)
-  
-  # create CPLEX variables
-  ctype = c(rep('C', num.vars - num.nodes*num.nodes), rep('B', num.nodes*num.nodes))
+    
+  # create CPLEX variables (B/B or C/B)
+  ctype = c(rep('B', total.counter), rep('B', num.nodes*num.nodes))
   newColsCPLEX(env, prob, num.vars, obj, lb, ub, ctype, NULL)
   
   # constraints: I(u->v) + I(v->u) = 1
@@ -221,30 +246,13 @@ orientation.init <- function(cplex.problem, graph, data)
   ind <- ind + start.edge.vs - 2
   addRowsCPLEX(env, prob, 0, nr, nnz, beg, ind, val, rhs, sen, NULL, NULL)
   print("   directionality constraints added")
-  
-  
-  # decampos+ji: remove useless variables
-  remove <- c(setdiff((1:length(overall.dcj)),really.in))
-  print(remove)
-  readLines(file("stdin"),1)
-  chgColTypeCPLEX(cplex.problem$env,
-                  cplex.problem$prob,
-                  length(remove),
-                  c(remove)-1,
-                  rep('B',length(remove)))
-  chgBndsCPLEX(cplex.problem$env,
-               cplex.problem$prob,
-               length(remove),
-               c(remove)-1,
-               rep('B', length(remove)),
-               rep(0, length(remove)))
 
   # constraints I(W->v) = prod...
   print(" - adding bounding constraints...")
   for (i in 1:num.nodes)
   {
     nnz <- length(cpcs[[i]]) + 1
-    print(paste(i, " ", nrow(combs[[i]])))
+    #print(paste(i, " ", nrow(combs[[i]])))
     if (nnz == 1)
     {
       chgBndsCPLEX(cplex.problem$env,
@@ -256,20 +264,17 @@ orientation.init <- function(cplex.problem, graph, data)
     }
     else
     {
-      for (j in 1:nrow(combs[[i]]))
+      for (j in 1:offsets[i])
       {
-        if (is.element(j + start.cpcs.vs[[i]]-1, really.in))
-        {
-          tmp <- build.bounding.constraint(num.nodes, i, cpcs[[i]],combs[[i]][j,],j,
-                                           start.cpcs.vs[[i]], start.edge.vs)
-          addRowsCPLEX(env, prob, 0, 1, nnz, tmp$beg, tmp$ind, tmp$uval,
-                       tmp$urhs, tmp$usen, NULL, NULL)
-          addRowsCPLEX(env, prob, 0, 1, nnz, tmp$beg, tmp$ind, tmp$lval,
-                       tmp$lrhs, tmp$lsen, NULL, NULL)          
-        }
+        tmp <- build.bounding.constraint(num.nodes, i, cpcs[[i]],combinations[[j+start.cpcs.vs[i]-1]],j,
+                                         start.cpcs.vs[[i]], start.edge.vs)
+        addRowsCPLEX(env, prob, 0, 1, nnz, tmp$beg, tmp$ind, tmp$uval,
+                     tmp$urhs, tmp$usen, NULL, NULL)
+        addRowsCPLEX(env, prob, 0, 1, nnz, tmp$beg, tmp$ind, tmp$lval,
+                     tmp$lrhs, tmp$lsen, NULL, NULL)          
       }
       # need to impose at least one candidate parent set for each node
-      at.least.one <- c(1:nrow(combs[[i]])) + start.cpcs.vs[[i]] - 1
+      at.least.one <- c(1:offsets[i]) + start.cpcs.vs[[i]] - 1
       addRowsCPLEX(env, prob, 0, 1, length(at.least.one), c(0), at.least.one-1, rep(1, length(at.least.one)),
                    c(1), c('E'), NULL, NULL) # only one
     }
@@ -277,15 +282,18 @@ orientation.init <- function(cplex.problem, graph, data)
   print("   bounding constraints added")
   
   print("done")
+
+  cpcs.scores <- c(unlist(cpcs.scores))
   
   return(list("cpcs"            = cpcs,
-              "combinations"    = combs,
+              "combinations"    = combinations,
+              "offsets"         = offsets,
               "cpcs.vars"       = cpcs.vars,
               "edge.vars"       = edge.ind.vars,
               "start.cpcs.vars" = start.cpcs.vs, # remember: start counting from 1
               "start.edge.vars" = start.edge.vs, # idem
               "num.vars"        = num.vars,
-              "num.cpcs.vars"   = temp.sum - 1,
+              "num.cpcs.vars"   = total.counter,
               "cpcs.scores"     = cpcs.scores))
 }
 
@@ -295,11 +303,7 @@ decampos.ji.pruning <- function(num.nodes, cplex.problem, initialization)
   # for every CPC, compare against all of its subsets
   print("De Campos & Ji pruning")
   remove  <- c()
-  offsets <- c()
-  for (i in 1:num.nodes)
-  {
-    offsets <- c(offsets, nrow(initialization$combinations[[i]]))
-  }
+  offsets <- initialization$offsets
   ranges <- c(c(initialization$start.cpcs.vars), initialization$start.edge.vars)
   for (i in 1:num.nodes)
   {
@@ -313,8 +317,6 @@ decampos.ji.pruning <- function(num.nodes, cplex.problem, initialization)
             !is.element(FALSE, is.element(c(unlist(initialization$cpcs.vars[[k]])),
                                           c(unlist(initialization$cpcs.vars[[j]])))))
         {
-          #cat(k,"", c(unlist(initialization$cpcs.vars[[k]])), "", initialization$cpcs.scores[k],
-          #    "",j, "", c(unlist(initialization$cpcs.vars[[j]])), "",initialization$cpcs.scores[j], "\n")
           remove <- c(remove, j)
         }
       }
@@ -339,7 +341,7 @@ decampos.ji.pruning <- function(num.nodes, cplex.problem, initialization)
   return(remove)
 }
 
-build.bounding.constraint <- function(num.nodes, node, cpc, combination,
+build.bounding.constraint <- function(num.nodes, node, cpc, comb,
                                       comb.ind, start.cpc, start.edge.vs)
 {
   # Builds the variables cplex needs to add a bounding constraint
@@ -368,19 +370,18 @@ build.bounding.constraint <- function(num.nodes, node, cpc, combination,
   lrhs <- c(0)
   lsen <- c('L')
   # now iteratively build up the whole constraints
-  #print("node")
-  #print(node)
-  #print("cpc")
   cpc <- c(unlist(cpc))
-  #print(cpc)
-  combination <- c(unlist(combination))
+  comb <- c(unlist(comb))
+  if (is.element(FALSE, is.element(1, comb))) # weird, but...
+    combination <- c(unlist(rep(0, length(cpc))))
+  else
+    combination <- comb
   tmp.ind <- c()
   tmp.val <- c()
   if (length(cpc) >= 1)
     for (i in 1:length(cpc))
     {
       tmp.ind <- c(tmp.ind, (cpc[i]-1)*num.nodes+node + start.edge.vs - 1)
-      #print((cpc[i]-1)*num.nodes+node)
       if (combination[i] == 1)
       {
         tmp.val <- c(tmp.val, -1)
@@ -397,9 +398,6 @@ build.bounding.constraint <- function(num.nodes, node, cpc, combination,
   lval <- c(lval, tmp.val)
   uval <- c(uval, tmp.val)
   ind  <- c(ind, tmp.ind) - 1
-  #print(ind)
-  #print(lval)
-  #print(uval)
   return(list("beg"  = beg,
               "ind"  = ind,
               "uval" = uval,
@@ -454,19 +452,6 @@ solve.cplex.problem <- function(cplex.problem, initialization, starting.sol)
   {
     num.iters <- num.iters + 1
     
-    # add starting.sol with CPXaddmipstarts or CPXchgmipstarts
-#     if (length(starting.sol) > 0)
-#     {
-#       setIntParmCPLEX(cplex.problem$env, CPX_PARAM_ADVIND, 2)
-#       status = chgMIPstartsCPLEX(cplex.problem$env, cplex.problem$prob, 1, c(0), length(starting.sol), c(0),
-#                                  c(1:length(starting.sol))-1, starting.sol, NULL)
-#       if (status != 0)
-#       {
-#         status = addMIPstartsCPLEX(cplex.problem$env, cplex.problem$prob, 1, c(0), length(starting.sol), c(0),
-#                                    c(1:length(starting.sol))-1, starting.sol, NULL, NULL)
-#       }
-#     }
-    
     mipoptCPLEX(env, prob)
     sol <- solutionCPLEX(env, prob)
     #print(sol)
@@ -482,31 +467,9 @@ solve.cplex.problem <- function(cplex.problem, initialization, starting.sol)
     {
       x   <- sol$x
       z   <- sol$objval
-      evs <- x[start.edge.vars:(start.edge.vars+num.nodes*num.nodes-1)]
+      evs <- x[start.edge.vars:length(x)]
       iwv <- x[1:(start.edge.vars-1)]
-      
-      {
-#         print("------")
-#         q1 <- length(which(iwv == 0))
-#         q2 <- length(which(iwv == 1))
-#         q3 <- length(iwv)
-#         q4 <- q3 - q2 - q1
-#         print(q1)
-#         print(q2)
-#         print(q3)
-#         print(q4)
-#         print(".")
-#         q1 <- length(which(evs == 0))
-#         q2 <- length(which(evs == 1))
-#         q3 <- length(evs)
-#         q4 <- q3 - q2 - q1
-#         print(q1)
-#         print(q2)
-#         print(q3)
-#         print(q4)
-#         print("------")
-      }
-      
+        
       # for CPLEX numerical issues, che non si sa mai
       evs   <- matrix(lapply(evs, FUN = function(x){
                                           if(x >= 0.999){
@@ -518,7 +481,7 @@ solve.cplex.problem <- function(cplex.problem, initialization, starting.sol)
                       ), c(num.nodes, num.nodes))
       storage.mode(evs) <- "integer"
       dir.g <- matrix(evs, c(num.nodes, num.nodes), byrow=TRUE)
-      print(dir.g)
+      #print(dir.g)
       
       #plot.mat(dir.g)
       
@@ -580,6 +543,35 @@ solve.cplex.problem <- function(cplex.problem, initialization, starting.sol)
               "score" = z,
               "solx"  = x,
               "cplex.status" = stat))
+}
+
+solve.cplex.callbacks <- function(num.nodes, cplex.problem, initialization)
+{
+  final <- .Call( "solve_BNSL_with_callbacks",
+                  cplexPointer(cplex.problem$env),
+                  cplexPointer(cplex.problem$prob),
+                  num.nodes*1L,
+                  initialization$cpcs,
+                  initialization$combinations,
+                  initialization$cpcs.vars,
+                  initialization$edge.vars,
+                  as.integer(c(initialization$start.cpcs.vars)-1L),
+                  as.integer(c(initialization$start.edge.vars)),
+                  as.integer(initialization$num.vars),
+                  as.integer(initialization$num.cpcs.vars),
+                  as.numeric(initialization$cpcs.scores),
+                  PACKAGE = "bnstruct" );
+    
+  final.cpcs <- final[c(1:(initialization$start.edge.vars-1))]
+  final.dag  <- matrix(c(final[(c(1:(num.nodes*num.nodes)) + initialization$start.edge.vars - 1)]),
+                       nrow = num.nodes, ncol = num.nodes, byrow = TRUE)
+  
+  # print(which(final.cpcs == 1))
+  final.score <- sum(initialization$cpcs.scores[which(final.cpcs == 1)])
+  
+  return(list("dag"   = final.dag,
+              "score" = final.score,
+              "solx"  = final))
 }
 
 solve.and.full.rounding <- function(num.nodes, cplex.problem, initialization)
@@ -654,9 +646,6 @@ solve.and.full.rounding <- function(num.nodes, cplex.problem, initialization)
       addRowsCPLEX(cplex.problem$env, cplex.problem$prob, 0, 1, num.edges,
                    c(0), c(which(t(out$dag) > 0) + initialization$start.edge.vars - 2),
                    rep(1, num.edges), c(num.edges - 1), c('L'), NULL, NULL)
-#       addRowsCPLEX(cplex.problem$env, cplex.problem$prob, 0, 1, num.edges,
-#                    c(0), c(which(out$dag > 0) + initialization$start.edge.vars - 2),
-#                    rep(1, num.edges), c(num.edges - 1), c('L'), NULL, NULL)
       chgColTypeCPLEX(cplex.problem$env,
                       cplex.problem$prob,
                       length(rs$cpcs.ind.vars),
@@ -679,224 +668,6 @@ solve.and.full.rounding <- function(num.nodes, cplex.problem, initialization)
   return(list("dag"   = best.dag,
               "cpcs"  = best.sol,
               "score" = best.score))
-}
-
-old.solve.and.local.rounding <- function(graph, cplex.problem, initialization)
-{
-  num.nodes <- nrow(graph)
-  bak <- rep(0, num.nodes*num.nodes)
-  best.score <- -Inf
-  best.dag   <- rep(0, num.nodes*num.nodes)
-  best.sol   <- c()
-  while (TRUE)
-  {
-    writeProbCPLEX(cplex.problem$env, cplex.problem$prob, "final_prob.lp")
-    out <- solve.cplex.problem(cplex.problem, initialization)
-    
-    fract <- which(out$solx > 0.001 & out$solx < 0.999)
-    
-    print("-----------------------------------------------------------------------------")
-    print(fract)
-    print(out$score)
-    print(shd(best.dag, out$dag))
-    
-    if(length(fract) == 0) break
-    if(shd(best.dag, out$dag) == 0)
-    {
-      print("eureka!")
-      # break
-    }
-    
-    # fix the already integer variables
-    ind <- c(1:(initialization$start.edge.vars-1))
-    x   <- out$solx
-    q1  <- which(x[ind] == 0)
-    lq1 <- length(q1)
-    q2  <- which(x[ind] == 1)
-    lq2 <- length(q2)
-    print(q2)
-    #print(initialization$start.edge.vars)
-    
-#     chgColTypeCPLEX(cplex.problem$env,
-#                     cplex.problem$prob,
-#                     lq1,
-#                     c(x[q1])-1,
-#                     rep('B',lq1))
-    chgColTypeCPLEX(cplex.problem$env,
-                    cplex.problem$prob,
-                    lq2,
-                    c(x[q2])-1,
-                    rep('B',lq2))
-#     print(ind[q1])
-#     print(length(ind[q1]))
-#    chgBndsCPLEX(cplex.problem$env,
-#                  cplex.problem$prob,
-#                  lq1,
-#                  c(ind[q1])-1,
-#                  rep('B', lq1),
-#                  rep(0, lq1))
-    chgBndsCPLEX(cplex.problem$env,
-                 cplex.problem$prob,
-                 lq2,
-                 c(ind[q2])-1,
-                 rep('B', lq2),
-                 rep(1, lq2))
-    
-    rs <- recompute.score.from.lp.sol(out$dag, initialization)
-    print(initialization$start.edge.vars)
-    print(initialization$start.cpcs.vars)
-    offs <- c()
-    for (i in 1:num.nodes)
-    {
-      offs <- c(offs, nrow(initialization$combinations[[i]]))
-    }
-    print(offs)
-    cat("rs$score", rs$score, "\n")
-    print(rs$cpcs.ind.vars)
-    # readLines(file("stdin"),1)
-    if (rs$score >= best.score) {
-      best.score <- rs$score
-      best.sol   <- rs$cpcs.ind.vars
-      best.dag   <- out$dag
-    } else {
-      cat(rs$score, "<", best.score,", currently the best score\n")
-      print("adding tabu cuts")
-      num.edges <- length(which(t(out$dag) > 0))
-      addRowsCPLEX(cplex.problem$env, cplex.problem$prob, 0, 1, num.edges,
-                   c(0), c(which(t(out$dag) > 0) + initialization$start.edge.vars - 2),
-                   rep(1, num.edges), c(num.edges - 1), c('L'), NULL, NULL)
-      chgColTypeCPLEX(cplex.problem$env,
-                      cplex.problem$prob,
-                      length(rs$cpcs.ind.vars),
-                      c(rs$cpcs.ind.vars)-1,
-                      rep('B',length(rs$cpcs.ind.vars)))
-    }
-    
-    print("rounding")
-    chgColTypeCPLEX(cplex.problem$env,
-                    cplex.problem$prob,
-                    length(fract),
-                    fract-1,
-                    rep('B',length(fract)))
-    
-    setIntParmCPLEX(cplex.problem$env, CPX_PARAM_MIRCUTS, 2)
-    
-    #bak <- out$dag
-  }
-  return(list("dag"   = best.dag,
-              "cpcs"  = best.sol,
-              "score" = best.score))
-}
-
-solve.and.local.rounding <- function(graph, cplex.problem, initialization)
-{
-#   num.nodes  <- nrow(graph)
-#   bak        <- rep(0, num.nodes*num.nodes)
-#   best.score <- -Inf
-#   best.dag   <- rep(0, num.nodes*num.nodes)
-#   best.sol   <- c()
-#   while (TRUE)
-#   {
-#     writeProbCPLEX(cplex.problem$env, cplex.problem$prob, "final_prob.lp")
-#     out <- solve.cplex.problem(cplex.problem, initialization)
-#     
-#     fract <- which(out$solx > 0.001 & out$solx < 0.999)
-#     
-#     print("-----------------------------------------------------------------------------")
-#     print(fract)
-#     print(out$solx[fract])
-#     print(out$score)
-#     print(shd(best.dag, out$dag))
-#     
-#     if(length(fract) == 0) {
-#       print("SOLUZIONE INTERA")
-#       break
-#     }
-#     if(shd(best.dag, out$dag) == 0)
-#     {
-#       print("eureka!")
-#       # break
-#     }
-#     
-#     # raise the highest variables the already integer variables
-#     ind <- c(1:(initialization$start.edge.vars-1))
-#     cpcs.vars.range <- c(unlist(initialization$start.cpcs.vars), initialization$start.edge.vars)
-#     raised <- c()
-#     for (i in 1:num.nodes)
-#     {
-#       i.fract <- c(fract[which(fract >= cpcs.vars.range[i] & fract < cpcs.vars.range[i+1])])
-#       m <- which.max(out$solx[i.fract])
-#       print("**")
-#       cat(i.fract, "|", m, "| ", i.fract[m],"|",out$solx[i.fract[m]], "\n")
-#       cat(".. ", out$solx[i.fract], "|", out$solx[i.fract[m]], "\n")
-#       print(which(out$solx[i.fract] == out$solx[i.fract[m]]))
-#       print(length(which(out$solx[i.fract] == out$solx[i.fract[m]])))
-#       
-#       if(length(which(out$solx[i.fract] == out$solx[i.fract[m]])) == 1)
-#       {
-#         cat("#",i.fract[m] ,"",ind[i.fract[m]],"\n")
-#         chgColTypeCPLEX(cplex.problem$env,
-#                         cplex.problem$prob,
-#                         1,
-#                         c(i.fract[m])-1,
-#                         c('B'))
-#         chgBndsCPLEX(cplex.problem$env,
-#                      cplex.problem$prob,
-#                      1,
-#                      c(i.fract[m])-1,
-#                      c('B'),
-#                      c(1))
-#         raised <- c(raised, i.fract[m])
-#         break
-#       }
-#     }
-#     print("raised")
-#     print(raised)
-#     
-#     rs <- recompute.score.from.lp.sol(out$dag, initialization)
-#     print(initialization$start.edge.vars)
-#     print(initialization$start.cpcs.vars)
-#     offs <- c()
-#     for (i in 1:num.nodes)
-#     {
-#       offs <- c(offs, nrow(initialization$combinations[[i]]))
-#     }
-#     print(offs)
-#     cat("rs$score", rs$score, "\n")
-#     print(rs$cpcs.ind.vars)
-#     # readLines(file("stdin"),1)
-#     if (rs$score >= best.score) {
-#       best.score <- rs$score
-#       best.sol   <- rs$cpcs.ind.vars
-#       best.dag   <- out$dag
-#     } else {
-#       cat(rs$score, "<", best.score,", currently the best score\n")
-#       print("adding tabu cuts")
-#       num.edges <- length(which(t(out$dag) > 0))
-#       addRowsCPLEX(cplex.problem$env, cplex.problem$prob, 0, 1, num.edges,
-#                    c(0), c(which(t(out$dag) > 0) + initialization$start.edge.vars - 2),
-#                    rep(1, num.edges), c(num.edges - 1), c('L'), NULL, NULL)
-#       chgColTypeCPLEX(cplex.problem$env,
-#                       cplex.problem$prob,
-#                       length(rs$cpcs.ind.vars),
-#                       c(rs$cpcs.ind.vars)-1,
-#                       rep('B',length(rs$cpcs.ind.vars)))
-#     }
-#     
-#     print("rounding")
-#     chgColTypeCPLEX(cplex.problem$env,
-#                     cplex.problem$prob,
-#                     length(fract),
-#                     fract-1,
-#                     rep('B',length(fract)))
-#     
-#     setIntParmCPLEX(cplex.problem$env, CPX_PARAM_MIRCUTS, 2)
-#     
-#     #bak <- out$dag
-#   }
-#   return(list("dag"   = best.dag,
-#               "cpcs"  = best.sol,
-#               "score" = best.score))
 }
 
 create.cplex.problem <- function(name = "EdgeOrientation")
@@ -924,50 +695,23 @@ recompute.score.from.lp.sol <- function(graph, initialization)
   overall.score <- 0
   start.cpcs.vs <- initialization$start.cpcs.vars
   cpcs.vars     <- initialization$cpcs.vars
-  offsets       <- c()
+  offsets       <- initialization$offsets
+  
+  
   for (i in 1:num.nodes)
   {
-    offsets <- c(offsets, nrow(initialization$combinations[[i]]))
-  }
-  for (i in 1:num.nodes)
-  {
-    p       <- c(unlist(initialization$cpcs[[i]]))
-    offset  <- 0
-    if (length(p) > 0)
+    selected.ps   <- c(which(graph[,i] > 0))
+
+    for (j in 1:offsets[i])
     {
-      for (j in 1:length(p))
+      if (!is.element(FALSE, is.element(selected.ps, c(unlist(cpcs.vars[[j + start.cpcs.vs[[i]] -1]])))) &&
+          !is.element(FALSE, is.element(c(unlist(cpcs.vars[[j + start.cpcs.vs[[i]] -1]])), selected.ps)))
       {
-        offset <- 2*offset + graph[p[j],i]
+        overall.score      <- overall.score + scores[start.cpcs.vs[[i]] + j - 1]
+        real.ind.vars[[i]] <- start.cpcs.vs[[i]] + j - 1 #cpcs.vars[[start.cpcs.vs[[i]] + offset]]
       }
     }
-    # cat(i, " ", start.cpcs.vs[[i]] + offset, " ", scores[start.cpcs.vs[[i]] + offset],"\n")
-    overall.score      <- overall.score + scores[start.cpcs.vs[[i]] + offset]
-    real.ind.vars[[i]] <- start.cpcs.vs[[i]] + offset #cpcs.vars[[start.cpcs.vs[[i]] + offset]]
   }
   return(list("score"         = overall.score,
               "cpcs.ind.vars" = c(unlist(real.ind.vars))))
-}
-
-meek.orientation <- function(graph)
-{
-#   # orientation of edges according to the Meek rules
-#   num.nodes <- nrow(graph)
-#   for (i in 1:num.nodes)
-#   {
-#     ni <- unlist(which(graph[,i] > 0))
-#     for (j in 1:length(ni))
-#     {
-#       nj <- unlist(which(graph[,ni[j]] > 0))
-#       
-#       for (k in 1:length(nj))
-#       {
-#         if (nj[k] == i) next; # undirected edge : cannot direct
-#         if (graph[nj[k],ni[j]] == 1) next; # undirected edge : cannot direct
-#         if (graph[i,nj[k]] == 1 && graph[nj[k],i] == 1) {
-#           # undirected edge that can be directed with rule 2
-#           graph[nj[k],i] == 0
-#         }
-#       }
-#     }
-#   }
 }

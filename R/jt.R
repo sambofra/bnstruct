@@ -1,6 +1,6 @@
 #library("igraph")
 
-junction.tree <- function(dgraph) #,cpts
+junction.tree <- function(dgraph, cpts, jpts, dnames, marginals, node.sizes)
 {
   # Calculate junction tree of a given graph.
   # Input parameter are the adjacency matrix of a directed graph, and the
@@ -21,7 +21,7 @@ junction.tree <- function(dgraph) #,cpts
 
   # return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
   
-  # jt.belief.propagation(dgraph, cpts, ctree, cs)
+  jt.belief.propagation(dgraph, cpts, jpts, dnames, marginals, ctree, cs, node.sizes)
 }
 
 directed.to.undirected.graph <- function(dg)

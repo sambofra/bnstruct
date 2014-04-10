@@ -19,7 +19,7 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
   for( i in 1L:n.nodes )
     curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, 
                                   ess, PACKAGE = "bnstruct" )
-
+  
   # global best solution
   global.best.g <- curr.g
   global.best.score <- sum(curr.score.nodes)
@@ -188,17 +188,17 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   for( i in 1:n.nodes )
   {
     cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
-    # cat("cpcMat ",i,": ",cpcMat[i,],"\n")
+    cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     allowed[,i] <- allowed[,i] & t(cpc.mat[i,])
   }
   
-  # print(cpc.mat)
+  print(cpc.mat)
   
   # backwards removal of nodes
   for( i in 1:n.nodes )
   {
     cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th )
-    # cat("cpcMat ",i,": ",cpcMat[i,],"\n")
+    cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     cpc.mat[,i] <- cpc.mat[,i] & t(cpc.mat[i,])
   }
   
@@ -223,15 +223,26 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
 
   # test without conditioning
   # print(chi.th)
+  # print("before minAssoc")
   minAssoc <- rep(0,n.nodes)
-  for( y in 1:n.nodes )
-    if( allowed[x,y] )
+  for( y in 1:n.nodes ){
+    #print(paste("node",y))
+    #print(paste("allowed?",allowed[x,y]))
+    if( allowed[x,y] ) {
+      #print("is allowed")
       minAssoc[y] <- g2( data, node.sizes, x, y, chi.th )
+      #print("done")
+    }
+  }
   allowed[x,minAssoc==0] <- 0 # remove already independent nodes
+  
+  #print("after removing already independent nodes")
   
   m <- max( minAssoc )
   if( m == 0 )
     return(rep(0,n.nodes))
+  
+  #print("hasn'r returned after first chance")
   
   m.ind <- which.max( minAssoc )
   cpc <- m.ind
@@ -239,11 +250,15 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   allowed[x,m.ind] <- 0
   minAssoc[m.ind] <- 0
   
+  #print("before cycle")
+  
   while( sum(allowed[x,]) > 0 )
   {
+    #print(paste("sum(allowed) ecc:",sum(allowed[x,])))
     # try to add one node to the cpc
     for( y in 1:n.nodes )
     {
+      # print(paste("node",y))
       if( allowed[x,y] )
       {
         # condition on all possible combinations of cpc elements, 
@@ -267,7 +282,9 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
               allowed[x,y] = 0
               break
             }
+            #print("before next comb")
 				    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
+            #print("after next comb")
           }
           if( allowed[x,y] == 0 ) # came out from the break
             break
@@ -285,6 +302,8 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
     # cat(cpc,",\t",which( !allowed[x,] ),"\n")
     allowed[x,m.ind] <- 0
   }
+  
+  #print("after cycle")
   
   cpc.vec <- rep(0,n.nodes)
   cpc.vec[cpc] <- 1
@@ -341,8 +360,15 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
 g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c() )
 {
   # if less than 5 counts per cell on average, cannot exclude dependence
+  
+  #print("<5 counts per cell?")
+  #if( dim(data)[1]/prod(sizes[c(x,y,z)]) < 5 )
+    #print("yes")
+  
   if( dim(data)[1]/prod(sizes[c(x,y,z)]) < 5 )
     return( chi.th )
+  
+  #print("no, go on")
 
   # tab <- compute.counts( data[,c(x,y,z)], sizes[c(x,y,z)] )
 #   tab <- .Call("compute_counts", data = data[,c(x,y,z)], node_sizes = sizes[c(x,y,z)], 
@@ -377,10 +403,11 @@ g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c() )
 #   
 #   return( max(pchisq(2*sum(s),df) - 1+chi.th, 0) )
   
+  #print("before calling g2_stat")
   stat <- .Call("g2_stat", data = data[,c(x,y,z)], node_sizes = sizes[c(x,y,z)], 
                  PACKAGE = "bnstruct")
-  
-  # print(stat)
+  #print("stat:")
+  #print(stat)
   
   # sanity check
   if( stat[2] < 0 )

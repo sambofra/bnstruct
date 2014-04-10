@@ -56,29 +56,39 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 	int cum_prod_sizes[n_nodes+1]; 
 	cum_prod_sizes[0] = 1;
 	for( i = 1; i < n_nodes + 1; i++ )
+  {
+    //printf(".. %d %d %d\n", i, ns[i-1], cum_prod_sizes[i-1]);
 		cum_prod_sizes[i] = cum_prod_sizes[i-1] * ns[i-1];
+  }
 	
-	int * counts = (int*) calloc( cum_prod_sizes[n_nodes], sizeof(int) );
+  //printf("cum_prod_sizes[n_nodes] : %d\n", cum_prod_sizes[n_nodes]);
+	int * counts = (int*) calloc( cum_prod_sizes[n_nodes] , sizeof(int) );
+  //memset(counts, 0, cum_prod_sizes[n_nodes] * sizeof(int));
+  //getchar();
 	double px[ sy ];
 	double py[ sx ];
 	double pz;
 	
 	// compute counts, skipping NAs
+  //printf("n_cases = %d\n", n_cases);
 	for( i = 0; i < n_cases; i++ )
 	{
 		index = 0;
 		for( j = 0; j < n_nodes; j++ )
 		{
 			elmt = d[ i + j*n_cases ];
+      //printf("element [%d] (%d %d): %d ; ", i + j*n_cases, i, j, elmt);
 			if( elmt == NA_INTEGER )
 				break;
 			index += (elmt - 1) * cum_prod_sizes[j];
+      //printf("index = %d\n", index);
 		}
 		// check if NA encountered
 		if( j < n_nodes )
 			continue;
 			
-		counts[index]++;			
+		counts[index]++;
+    // printf("counts %d updated : %d\n", index, counts[index]);
 	}	
 	
 	// compute stat
@@ -92,6 +102,7 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 			py[j] = 0;
 		pz = 0;
 		
+    //printf("sy = %d, sx = %d\n", sy, sx);
 		for( j = 0; j < sy; j++ )
 			for( k = 0; k < sx; k++ )
 			{
@@ -102,6 +113,7 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 			}
 			
 		// check for zeros
+    //printf("sy = %d, sx = %d\n", sy, sx);
 		for( j = 0; j < sx; j++ )
 			if( py[j] == 0 )
 				zy++;
@@ -112,6 +124,7 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 			zz++;
 		
 		// accumulate on stat
+    //printf("sy = %d, sx = %d\n", sy, sx);
 		for( j = 0; j < sy; j++ )
 			for( k = 0; k < sx; k++ )
 			{
@@ -121,9 +134,12 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 				else
 					zc++;
 			}
+      //printf("stat = %f ; zc = %d\n", stat, zc);
 	}
 	
+  //printf("before the only free() of the method...\n");
 	free( counts );
+  //printf("free done\n");
 	
 	df = (sz*sxy - zc) + (sz - zz) - (sz*sx - zx) - (sz*sy - zy);
 	
