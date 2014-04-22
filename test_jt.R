@@ -4,7 +4,7 @@ library("gRain")
 
 # read data and set parameters
 B <- 10
-a <- read.delim("Child_data_na_5000.txt",na.strings="?",header=FALSE,sep="") + 1
+a <- read.delim("networks/asia/asia_10000_1.data",na.strings="?",header=FALSE,sep="") + 1
 
 node.sizes <- rep(0,ncol(a))
 for( i in 1:ncol(a) )
@@ -27,10 +27,10 @@ max.fanin.layers <- as.matrix(read.table(header=F,text="
 max.fanin  <- 3 # threshold for the values of max.fanin.layers
 
 # impute data 
-# impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
+impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
 
 # test SM alone
-# res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
 
 #print(res.single)
 
@@ -40,7 +40,9 @@ max.fanin  <- 3 # threshold for the values of max.fanin.layers
 
 # print(res.boot)
 
-# junction.tree(res.single)
+#print(junction.tree(res.single))
+
+#print("--------")
 
 ###########################################################à
 #

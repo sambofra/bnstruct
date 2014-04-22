@@ -19,7 +19,7 @@ junction.tree <- function(dgraph, cpts, jpts, dnames, marginals, node.sizes)
   print(ctree)
   print(cs)
 
-  # return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
+  return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
   
   jt.belief.propagation(dgraph, cpts, jpts, dnames, marginals, ctree, cs, node.sizes)
 }
