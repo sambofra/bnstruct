@@ -3,44 +3,42 @@ library("igraph")
 library("gRain")
 
 # read data and set parameters
-B <- 10
-a <- read.delim("Child_data_na_5000.txt",na.strings="?",header=FALSE,sep="") + 1
 
-node.sizes <- rep(0,ncol(a))
-for( i in 1:ncol(a) )
-  node.sizes[i] <- length(unique(a[,i]))
+args       <- commandArgs(trailingOnly = TRUE)
+input.file <- args[1]
 
-node.sizes <- c(2,6,3,2,3,4,3,3,2,2,3,3,5,2,2,3,3,2,5,2)
-names(a) <- list("BirthAsphyxia","Disease","Age","LVH","DuctFlow","CardiacMixing",
-                 "LungParench","LungFlow","Sick","HypDistrib","HypoxiaInO2","CO2",
-                 "ChestXray","Grunting","LVHReport","LowerBodyO2","RUQO2","CO2Report",
-                 "XrayReport","GruntingReport")
-cont.nodes <- c()
-k.impute <- 10
-layering   <- c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5)
-max.fanin.layers <- as.matrix(read.table(header=F,text="
-  0  1  1  1  1
-  0  1  1  1  1
-  0  0  8  7  7
-  0  0  0 14  6
-  0  0  0  0 19"))
-max.fanin  <- 3 # threshold for the values of max.fanin.layers
+instance.name <- unlist(strsplit(input.file, "\\."))[1]
+data          <- read.dataset(filename = input.file, imputation = FALSE)
 
-# impute data 
-# impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
+num.nodes  <- data$num.nodes
+node.sizes <- data$node.sizes
+num.items  <- data$num.items
+impa       <- data$dataset
 
-# test SM alone
-# res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+cpcs.table <- mmpc(impa, node.sizes, chi.th=0.05)
+res.mmhc <- hc( impa, node.sizes, cpcs.table, c() )
 
-#print(res.single)
+res.mmhc  <- matrix(c(0, 1, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 1, 0, 0,
+                      0, 0, 0, 1, 1, 0, 0, 0,
+                      0, 0, 0, 0, 0, 1, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 1,
+                      0, 0, 0, 0, 0, 0, 1, 1,
+                      0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0), nrow = 8, ncol = 8, byrow=TRUE)
 
-# test SM with bootstrap
-# res.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, max.fanin, layering,
-#                    max.fanin.layers,iss=1, verbose=TRUE, k.impute=10)
+print(res.mmhc)
+jt <- junction.tree(res.mmhc)
 
-# print(res.boot)
+jjpts <- multinomial.map(impa, node.sizes, res.mmhc, ess=1)
+jpts <- jjpts$jpts
+#print(jpts)
+#print("marginals")
+#print(jjpts$marginals)
 
-# junction.tree(res.single)
+belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, jjpts$marginals, node.sizes)
+
+break
 
 ###########################################################à
 #

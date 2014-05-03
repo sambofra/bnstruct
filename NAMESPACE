@@ -11,5 +11,8 @@ export(
   "hc",
   "plot.mat",
   "junction.tree",
-  "jt.belief.propagation"
+  "belief.propagation",
+  "read.dataset",
+  "multinomial.mle",
+  "multinomial.map"
 )
