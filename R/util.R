@@ -1,3 +1,66 @@
+# Convert a CPT outputted by learn.params for a fancy print
+fancy.cpt <- function( cpt )
+{
+  d <- dim(cpt)
+  dn <- dimnames(cpt)
+  if( length(dn) <= 2 )
+    return( cpt )
+  new.dn <- list(apply(expand.grid(dn[1:(length(dn)-1)],stringsAsFactors=T),
+                  1,paste,collapse=", "),dn[[length(dn)]])
+  names(new.dn) <- list(paste(names(dn[1:(length(dn)-1)]),collapse=","),
+                        names(dn)[length(dn)])
+  dim( cpt ) <- c(prod(d[1:(length(d)-1)]),d[length(d)])
+  dimnames(cpt) <- new.dn
+  return( cpt )
+}
+
+# Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
+# CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
+# so that the sum over the last dimension is always 1
+learn.params <- function(data, dag, node.sizes, ess = 1)
+{
+	# just to play safe
+	storage.mode(data) <- "integer"
+	storage.mode(dag) <- "integer"
+	storage.mode(node.sizes) <- "integer"
+	
+	n.nodes <- dim(data)[2]
+	cpts <- vector("list",n.nodes)
+  var.names <- colnames(data)
+  d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
+	# print(d.names)
+	# esimate a cpt for each family from data
+	for ( i in 1:n.nodes )
+	{
+		family <- c( which(dag[,i]!=0), i )
+		counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
+			PACKAGE = "bnstruct" )
+		cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
+    dimnames(cpts[[i]]) <- d.names[family]
+	}
+	names( cpts ) <- as.list(var.names)
+	return( cpts )
+}
+
+counts.to.probs <- function( counts )
+{
+  d <- dim(counts)
+  if( length(d) == 1 )
+    return( counts / sum(counts) )
+  else
+  {
+    # last dimension on the columns, everything else on the rows
+    tmp.d <- c( prod(d[1:(length(d)-1)]), d[length(d)] )
+    dim(counts) <- tmp.d
+    # normalization
+    nor <- rowSums( counts )
+    nor <- nor + (nor == 0) # for the next division
+    counts <- counts / array(nor,tmp.d)
+    dim(counts) <- d
+    return( counts )
+  }
+}
+
 # Compute Structural Hamming Distance between graphs g1 and g2
 shd <- function(g1, g2)
 {
@@ -45,6 +108,27 @@ quantize.matrix <- function(data, levels)
   }
   
   storage.mode(quant) <- "integer"
+  colnames(quant) <- colnames(data)
+  return(quant)
+}
+
+# Compute quantiles for each column i of the continuous matrix data, 
+# given numbers of levels equal to levels[i]
+# 
+# levels[i] == 0 if the column is already discrete
+#
+quantiles.matrix <- function(data, levels) 
+{
+  nr <- nrow(data)
+  nc <- ncol(data)
+  
+  quant <- vector("list",nc)
+  
+  for( i in 1:nc )
+    if( levels[i] != 0 )
+      quant[[i]] <- quantile( data[,i], probs = (0:levels[i])/levels[i], na.rm = TRUE )
+  
+  names(quant) <- colnames(data)
   return(quant)
 }
 
@@ -70,6 +154,9 @@ plot.mat <- function( mat, node.names = as.character(1:ncol(mat)), frac = 0.2,
   col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
   names(col) <- en
   edgeRenderInfo(g) <- list(col=col,lwd=2)
+  node.fill <- as.list(node.col)
+  names(node.fill) <- node.names
+  nodeRenderInfo(g) <- list(fill=node.fill)
   renderGraph(g)
 }
 

@@ -137,18 +137,6 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 	return result;
 }
 
-SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP ess )
-{
-  SEXP score;
-  PROTECT( score = allocVector(REALSXP, 1) );
-  *REAL(score) = log_lik( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
-    *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) );
-  // log_lik defined in smfast.h
-  
-  UNPROTECT(1);
-  return score;
-}
-
 SEXP in_tabu( SEXP mat, SEXP tabu )
 {
   int n_nodes = ncols(mat);
@@ -177,75 +165,6 @@ SEXP in_tabu( SEXP mat, SEXP tabu )
     }
   }
   
-  UNPROTECT(1);
-  return test ;
-}
-
-SEXP is_acyclic( SEXP graph )
-{
-  int n_nodes = nrows(graph);
-  int * g = INTEGER(graph);
-  int rem[n_nodes];
-  int leaves[n_nodes];
-  int rem_count = 0;
-  int i,j,flag,aleaf;
-  
-  // allocate and protect output
-  SEXP test;
-  PROTECT( test = allocVector(INTSXP, 1) );
-  
-  for( i = 0; i < n_nodes; i++ )
-  {
-    rem[i] = 0;
-    leaves[i] = 0;
-  }
-  
-  int gtemp[n_nodes * n_nodes]; 
-  for (i = 0; i < n_nodes * n_nodes; i++)
-    gtemp[i] = g[i];
-  
-  while( rem_count < n_nodes ) // still some edges to remove
-  {
-    aleaf = 0;
-    // find leaves among non-removed nodes
-    for( i = 0; i < n_nodes; i++ )
-      if( !rem[i] )
-      {
-        flag = gtemp[i];
-        for( j = 1; j < n_nodes; j++ )
-          flag |= gtemp[j*n_nodes + i];
-        if( !flag ) // a leaf
-        {
-          // printf("Leaf: %d\n",i);
-          aleaf = 1;
-          leaves[i] = 1;
-          rem[i] = 1;
-          rem_count++;
-        }
-      }
-    
-    // test for leaves
-    if( !aleaf )
-    {
-      *INTEGER(test) = 0;
-      UNPROTECT(1);
-      return test ;
-    }
-    else // remove edges incident on leaves
-    {
-      for(j = 0; j < n_nodes; j++)
-        if( leaves[j] )
-        {
-          leaves[j] = 0; // reset for next iteration
-          for( i = 0; i < n_nodes; i++ )
-            gtemp[j * n_nodes + i] = 0;
-        }
-    }
-    // printf("Next\n");
-  }
-  
-  // acyclic
-  *INTEGER(test) = 1;
   UNPROTECT(1);
   return test ;
 }

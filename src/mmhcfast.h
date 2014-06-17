@@ -16,17 +16,8 @@ SEXP next_comb( SEXP sexp_comb, SEXP sexp_n );
 */
 SEXP g2_stat( SEXP data, SEXP node_sizes );
 
-/* compute the BDEu score of node _ni_, with parents _pars_, from dataset
-   _data_ and with equivalent sample size _ess_
-*/
-SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP ess );
-
 /* check if matrix _mat_ is in tabu list
 */
 SEXP in_tabu( SEXP mat, SEXP tabu );
-
-/* test wether the graph _g_ is acyclic
-*/
-SEXP is_acyclic( SEXP g );
 
 #endif
