@@ -14,7 +14,9 @@ junction.tree <- function(dgraph) #,cpts
   ctree <- ctout$clique.tree
   cs <- ctout$cliques
   
+  print("junction tree")
   print(ctree)
+  print("cliques")
   print(cs)
 
   return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))

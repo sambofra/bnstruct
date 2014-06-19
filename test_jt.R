@@ -36,7 +36,30 @@ jpts <- jjpts$jpts
 #print("marginals")
 #print(jjpts$marginals)
 
-belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, jjpts$marginals, node.sizes)
+cpts <- NULL
+cpts[[1]] <- array(c(0.01, 0.99), dim=c(1,2))
+cpts[[2]] <- array(c(0.05, 0.01, 0.95, 0.99), dim=c(2,2))
+cpts[[3]] <- array(c(0.5, 0.5), dim=c(1,2))
+cpts[[4]] <- array(c(0.1, 0.01, 0.9, 0.99), dim=c(2,2))
+cpts[[5]] <- array(c(0.6, 0.3, 0.4, 0.7), dim=c(2,2))
+cpts[[6]] <- array(c(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0), dim=c(2,2,2))
+cpts[[7]] <- array(c(0.98, 0.05, 0.02, 0.95), dim=c(2,2))
+cpts[[8]] <- array(c(0.9, 0.8, 0.7, 0.1, 0.1, 0.2, 0.3, 0.9), dim=c(2,2,2))
+
+dim.vars <- NULL
+dim.vars[[1]] <- as.list(c(1))
+dim.vars[[2]] <- as.list(c(2,1))
+dim.vars[[3]] <- as.list(c(3))
+dim.vars[[4]] <- as.list(c(4,3))
+dim.vars[[5]] <- as.list(c(5,3))
+dim.vars[[6]] <- as.list(c(6,4,2))
+dim.vars[[7]] <- as.list(c(7,6))
+dim.vars[[8]] <- as.list(c(8,5,6))
+
+print(cpts)
+print(dim.vars)
+
+belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, cpts, dim.vars, c(7,8), c(1,1), node.sizes)
 
 break
 
