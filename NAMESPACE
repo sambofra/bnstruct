@@ -10,6 +10,7 @@ export(
   "g2",
   "hc",
   "plot.mat",
+  "learn.params",
   "junction.tree",
   "belief.propagation",
   "read.dataset",
