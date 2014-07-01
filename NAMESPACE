@@ -15,5 +15,6 @@ export(
   "belief.propagation",
   "read.dataset",
   "multinomial.mle",
-  "multinomial.map"
+  "multinomial.map",
+  "bp.query"
 )
