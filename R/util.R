@@ -149,14 +149,24 @@ plot.mat <- function( mat, node.names = as.character(1:ncol(mat)), frac = 0.2,
   nodes(g) <- node.names
   en <- edgeNames(g,recipEdges="distinct")
   g <- layoutGraph(g)
+  
   # set edge darkness proportional to confidence
   conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
   col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
   names(col) <- en
-  edgeRenderInfo(g) <- list(col=col,lwd=2)
+  
+  # remove arrowheads from undirected edges
+  ahs <- edgeRenderInfo(g)$arrowhead
+  ats <- edgeRenderInfo(g)$arrowtail
+  dirs <- edgeRenderInfo(g)$direction
+  ahs[dirs=="both"] <- ats[dirs=="both"] <- "none"
+  edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
+  
+  # node colors
   node.fill <- as.list(node.col)
   names(node.fill) <- node.names
   nodeRenderInfo(g) <- list(fill=node.fill)
+  
   renderGraph(g)
 }
 
