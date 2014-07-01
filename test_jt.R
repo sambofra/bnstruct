@@ -1,45 +1,115 @@
 library("bnstruct")
 library("igraph")
+library("gRain")
 
 # read data and set parameters
-B <- 10
-a <- read.delim("Child_data_na_5000.txt",na.strings="?",header=FALSE,sep="") + 1
 
-node.sizes <- rep(0,ncol(a))
-for( i in 1:ncol(a) )
-  node.sizes[i] <- length(unique(a[,i]))
+args       <- commandArgs(trailingOnly = TRUE)
+input.file <- args[1]
 
-node.sizes <- c(2,6,3,2,3,4,3,3,2,2,3,3,5,2,2,3,3,2,5,2)
-names(a) <- list("BirthAsphyxia","Disease","Age","LVH","DuctFlow","CardiacMixing",
-                 "LungParench","LungFlow","Sick","HypDistrib","HypoxiaInO2","CO2",
-                 "ChestXray","Grunting","LVHReport","LowerBodyO2","RUQO2","CO2Report",
-                 "XrayReport","GruntingReport")
-cont.nodes <- c()
-k.impute <- 10
-layering   <- c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5)
-max.fanin.layers <- as.matrix(read.table(header=F,text="
-  0  1  1  1  1
-  0  1  1  1  1
-  0  0  8  7  7
-  0  0  0 14  6
-  0  0  0  0 19"))
-max.fanin  <- 3 # threshold for the values of max.fanin.layers
+instance.name <- unlist(strsplit(input.file, "\\."))[1]
+data          <- read.dataset(filename = input.file, imputation = FALSE)
 
-# impute data 
-impa <- knn.impute(as.matrix(a),k.impute,setdiff(1:length(node.sizes),cont.nodes))
+num.nodes  <- data$num.nodes
+node.sizes <- data$node.sizes
+num.items  <- data$num.items
+impa       <- data$dataset
 
-# test SM alone
-res.single <- sm(impa,node.sizes,cont.nodes,max.fanin,layering,max.fanin.layers)
+cpcs.table <- mmpc(impa, node.sizes, chi.th=0.05)
+res.mmhc <- hc( impa, node.sizes, cpcs.table, c() )
 
-#print(res.single)
+res.mmhc  <- matrix(c(0, 1, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 1, 0, 0,
+                      0, 0, 0, 1, 1, 0, 0, 0,
+                      0, 0, 0, 0, 0, 1, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 1,
+                      0, 0, 0, 0, 0, 0, 1, 1,
+                      0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0), nrow = 8, ncol = 8, byrow=TRUE)
+res.mmhc <- matrix(c(0,1,1,0,0,0,
+                     0,0,0,1,0,0,
+                     0,0,0,0,1,0,
+                     0,0,0,0,0,1,
+                     0,0,0,0,0,1,
+                     0,0,0,0,0,0), nrow=6, ncol=6, byrow=TRUE)
 
-# test SM with bootstrap
-# res.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, max.fanin, layering,
-#                    max.fanin.layers,iss=1, verbose=TRUE, k.impute=10)
+print(res.mmhc)
+jt <- junction.tree(res.mmhc)
 
-# print(res.boot)
+# jjpts <- multinomial.map(impa, node.sizes, res.mmhc, ess=1)
+# jpts <- jjpts$jpts
+# print(jpts)
+# print("marginals")
+# print(jjpts$marginals)
 
-junction.tree(res.single)
+cpts <- NULL
+cpts[[1]] <- array(c(0.01, 0.99), dim=c(1,2))
+cpts[[2]] <- array(c(0.05, 0.95, 0.01, 0.99), dim=c(2,2))
+cpts[[3]] <- array(c(0.5, 0.5), dim=c(1,2))
+cpts[[4]] <- array(c(0.1, 0.9, 0.01, 0.99), dim=c(2,2))
+cpts[[5]] <- array(c(0.6, 0.4, 0.3, 0.7), dim=c(2,2))
+cpts[[6]] <- array(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5), dim=c(2,2,2))
+cpts[[7]] <- array(c(0.98, 0.02, 0.05, 0.95), dim=c(2,2))
+cpts[[8]] <- array(c(0.9, 0.1, 0.8, 0.2, 0.7, 0.3, 0.1, 0.9), dim=c(2,2,2))
+
+dim.vars <- NULL
+dim.vars[[1]] <- as.list(c(1))
+dim.vars[[2]] <- as.list(c(2,1))
+dim.vars[[3]] <- as.list(c(3))
+dim.vars[[4]] <- as.list(c(4,3))
+dim.vars[[5]] <- as.list(c(5,3))
+dim.vars[[6]] <- as.list(c(6,2,4))
+dim.vars[[7]] <- as.list(c(7,6))
+dim.vars[[8]] <- as.list(c(8,5,6))
+
+cpts <- NULL
+cpts[[1]] <- array(c(0.1, 0.9), dim=c(1,2))
+cpts[[2]] <- array(c(0.1, 0.9, 0.9, 0.1), dim=c(2,2))
+cpts[[3]] <- array(c(0.7, 0.3, 0.2, 0.8), dim=c(2,2))
+cpts[[4]] <- array(c(0.4, 0.6, 0.7, 0.3), dim=c(2,2))
+cpts[[5]] <- array(c(0.5, 0.5, 0.4, 0.6), dim=c(2,2))
+cpts[[6]] <- array(c(0.1, 0.9, 0.4, 0.6, 0.5, 0.5, 0.8, 0.2), dim=c(2,2,2))
+
+dim.vars <- NULL
+dim.vars[[1]] <- as.list(c(1))
+dim.vars[[2]] <- as.list(c(2,1))
+dim.vars[[3]] <- as.list(c(3,1))
+dim.vars[[4]] <- as.list(c(4,2))
+dim.vars[[5]] <- as.list(c(5,3))
+dim.vars[[6]] <- as.list(c(6,4,5))
+
+
+print(cpts)
+print(dim.vars)
+
+jt$triangulated.graph <- array(c(0,1,1,0,0,0,
+                                 1,0,1,1,0,0,
+                                 1,1,0,1,1,0,
+                                 0,1,1,0,1,1,
+                                 0,0,1,1,0,1,
+                                 0,0,0,1,1,0), dim=c(6,6))
+
+jt$jtree <- array(c(0,2,0,0,
+                    2,0,2,0,
+                    0,2,0,2,
+                    0,0,2,0),dim=c(4,4))
+
+jt$cliques <- list(as.list(c(1,2,3)),
+                   as.list(c(2,3,4)),
+                   as.list(c(3,4,5)),
+                   as.list(c(4,5,6)))
+
+node.sizes <- c(2,2,2,2,2,2)
+
+jpts <- belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, cpts, dim.vars, c(), c(), node.sizes)
+
+print("ciao")
+for (i in 1:num.nodes)
+{
+  print(bp.query(jpts, jt$cliques, i))
+}
+
+break
 
 ###########################################################à
 #
@@ -101,6 +171,41 @@ junction.tree(res.single)
 # cpts[[6]][[2,1,2]] <- 0.8
 # cpts[[6]][[2,2,1]] <- 0.6
 # cpts[[6]][[2,2,2]] <- 0.2
+
+names <- c('a', 'b', 'c', 'd', 'e', 'f')
+pnames <- c(~a, ~b|a, ~c|a, ~d|b, ~e|c, ~f|d:e)
+
+yn <- c("yes", "no")
+
+cpts <- NULL
+cpts[[1]] <- cptable(names[1], values = c(10, 90), levels = yn)
+cpts[[2]] <- cptable(paste(names[2],',',names[1]), values = c(10, 90, 90, 10), levels = yn)
+# order of values: b|a, !b|a, b|!a, !b|!a
+#cpts[[2]] <- cptable(~b|a, values = c(10, 90, 90, 10), levels = yn)
+print(cpts[[2]])
+print(as.name(paste(names[2],'+',names[1])))
+cpts[[3]] <- cptable(~c|a, values = c(70, 30, 20, 80), levels = yn)
+cpts[[4]] <- cptable(~d|b, values = c(40, 60, 70, 30), levels = yn)
+cpts[[5]] <- cptable(~e|c, values = c(50, 50, 40, 60), levels = yn)
+cpts[[6]] <- cptable(~f|d:e, values = c(10, 90, 50, 50, 40, 60, 80, 20), levels = yn)
+
+plist <- compileCPT(cpts)
+print(plist)
+
+# print(ls(plist))
+# for (i in 1:length(ls(plist)))
+#   print(plist[[i]])
+
+# print(plist$a)
+# print(plist$b)
+
+net <- grain(plist)
+
+print(querygrain(net, nodes=c("c", "f"), type="joint"))
+
+#for (i in 1:length(plist))
+#  print(plist$names[i])
+
 # 
 # s <- c(1,2,3)
 # dims <- c(2,2,2)

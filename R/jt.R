@@ -6,8 +6,6 @@ junction.tree <- function(dgraph) #,cpts
   # Input parameter are the adjacency matrix of a directed graph, and the
   # conditional probability tables for the variables.
 
-  print("aaa")
-  
   graph <- moralization(dgraph)    # adj. matrix
   graph <- directed.to.undirected.graph(graph)   # adj. matrix
   graph <- triangulation(graph)   # adj. matrix
@@ -16,10 +14,12 @@ junction.tree <- function(dgraph) #,cpts
   ctree <- ctout$clique.tree
   cs <- ctout$cliques
   
+  print("junction tree")
   print(ctree)
+  print("cliques")
   print(cs)
 
-  # return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
+  return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
   
   # jt.belief.propagation(dgraph, cpts, ctree, cs)
 }
@@ -178,16 +178,18 @@ clique.tree <- function(graph)
     {
       # why the previous sorting (cs[i] <- list(sort(unlist(cs[i])))) has no effect?
       # print(paste(i,j,cs[i],cs[j],intersect(sort(unlist(cs[i])),sort(unlist(cs[j])))))
+      # cat(unlist(cs[i])," ",unlist(cs[j])," ", length(intersect(sort(unlist(cs[i])),sort(unlist(cs[j])))), "\n")
       ctree[i,j] <- length(intersect(sort(unlist(cs[i])),sort(unlist(cs[j]))))
-      compl[i,j] <- min(length(unlist(cs[i])),length(unlist(cs[j]))) - ctree[i,j]
+      compl[i,j] <- -ctree[i,j]#min(length(unlist(cs[i])),length(unlist(cs[j]))) - ctree[i,j]
     }
-  
-  ig <- graph.adjacency(compl, "undirected", weighted=TRUE, diag=TRUE,
+  #print(ctree)
+  #print(compl)
+  ig <- graph.adjacency(compl, "undirected", weighted=TRUE, diag=FALSE,
                         add.colnames=NULL, add.rownames=NA)  
   # compute max-spanning tree using the complementary graph, and get adjacency matrix
   ig.mst <- minimum.spanning.tree(ig)
-  mst <- get.adjacency(ig.mst, type="both", attr=NULL, edges=FALSE, names=TRUE,
-                          sparse=getIgraphOpt("sparsematrices"))  
+  mst <- get.adjacency(ig.mst, type="both", attr=NULL, edges=FALSE)#, names=TRUE,)
+                          #sparse=getIgraphOpt("sparsematrices"))  
   # 'edges=TRUE' + get.edgelist may help with order...
   # print(mst)
   
