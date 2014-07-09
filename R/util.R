@@ -14,33 +14,33 @@ fancy.cpt <- function( cpt )
   return( cpt )
 }
 
-# Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
-# CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
-# so that the sum over the last dimension is always 1
-learn.params <- function(data, dag, node.sizes, ess = 1)
-{
-	# just to play safe
-	storage.mode(data) <- "integer"
-	storage.mode(dag) <- "integer"
-	storage.mode(node.sizes) <- "integer"
-	
-	n.nodes <- dim(data)[2]
-	cpts <- vector("list",n.nodes)
-  var.names <- colnames(data)
-  d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
-	# print(d.names)
-	# esimate a cpt for each family from data
-	for ( i in 1:n.nodes )
-	{
-		family <- c( which(dag[,i]!=0), i )
-		counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
-			PACKAGE = "bnstruct" )
-		cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
-    dimnames(cpts[[i]]) <- d.names[family]
-	}
-	names( cpts ) <- as.list(var.names)
-	return( cpts )
-}
+# # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
+# # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
+# # so that the sum over the last dimension is always 1
+# learn.params <- function(data, dag, node.sizes, ess = 1)
+# {
+# 	# just to play safe
+# 	storage.mode(data) <- "integer"
+# 	storage.mode(dag) <- "integer"
+# 	storage.mode(node.sizes) <- "integer"
+# 	
+# 	n.nodes <- dim(data)[2]
+# 	cpts <- vector("list",n.nodes)
+#   var.names <- colnames(data)
+#   d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
+# 	# print(d.names)
+# 	# esimate a cpt for each family from data
+# 	for ( i in 1:n.nodes )
+# 	{
+# 		family <- c( which(dag[,i]!=0), i )
+# 		counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
+# 			PACKAGE = "bnstruct" )
+# 		cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
+#     dimnames(cpts[[i]]) <- d.names[family]
+# 	}
+# 	names( cpts ) <- as.list(var.names)
+# 	return( cpts )
+# }
 
 counts.to.probs <- function( counts )
 {

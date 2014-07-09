@@ -1,12 +1,29 @@
 #include "util.h"
 
-SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP ess )
+SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess )
 {
   SEXP score;
   PROTECT( score = allocVector(REALSXP, 1) );
-  *REAL(score) = log_lik( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
-    *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) );
   
+  switch ((int)(*REAL(func)))
+  {
+    case 0 : *REAL(score) = bdeu_score( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
+                                          *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) );
+             break;
+                
+    case 1 : *REAL(score) = log_likelihood( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
+                                              *INTEGER(ni), INTEGER(pars), length(pars), 0.5*log(nrows(data)) );
+             break;
+    
+    case 2 : *REAL(score) = log_likelihood( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
+                                              *INTEGER(ni), INTEGER(pars), length(pars), 1.0 );
+             break;
+  }
+  
+  /*printf("%f vs %f\n", *REAL(score), bdeu_score( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
+                                          *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) ));
+  */
+
   UNPROTECT(1);
   return score;
 }
@@ -80,7 +97,7 @@ SEXP is_acyclic( SEXP graph )
   return test ;
 }
 
-double log_lik( unsigned int * d, unsigned int n_nodes, unsigned int n_cases, unsigned int * ns, 
+double bdeu_score( unsigned int * d, unsigned int n_nodes, unsigned int n_cases, unsigned int * ns, 
 	unsigned int ni, unsigned int * pa, unsigned int n_pa, double alpha )
 {
 	int i, j, index, elmt, stride;
@@ -236,4 +253,89 @@ SEXP compute_counts( SEXP data, SEXP node_sizes )
 	
 	UNPROTECT(1);
 	return result;
+}
+
+/*
+ * LL(G|D) - f(|D|)|B| 
+ * |B| = \sum_{i=1}^{|V|} (r_i - 1) * q_i
+ */
+double log_likelihood ( unsigned int * d, unsigned int n_nodes, unsigned int n_cases, unsigned int * ns, 
+  unsigned int ni, unsigned int * pa, unsigned int n_pa, double penalty )
+{
+	int i, j, index, elmt, stride;
+	double acc, logl;
+	
+	// utility vectors
+	int cum_prod_sizes[n_pa+2]; 
+	cum_prod_sizes[0] = 1;
+	cum_prod_sizes[1] = ns[ni];
+	for( i = 0; i < n_pa; i++ )
+		cum_prod_sizes[i+2] = cum_prod_sizes[i+1] * ns[pa[i]];
+	
+	int strides[n_pa + 1];
+	strides[0] = ni * n_cases;
+	for( i = 0; i < n_pa; i++ )
+		strides[i+1] = pa[i] * n_cases;
+	
+	// utility variables
+	int prod_sizes = cum_prod_sizes[n_pa+1];
+	int prod_sizes_pa = prod_sizes / ns[ni];
+	// int n_na = 0;
+	
+	// vector holding counts (LARGE)
+	double * counts = calloc( prod_sizes, sizeof(double) ); 
+	
+	// compute counts, skipping NAs
+	for( i = 0; i < n_cases; i++ )
+	{
+		index = 0;
+		// sum using strides
+		for( j = 0; j < n_pa + 1; j++ )
+		{
+			elmt = d[ i + strides[j] ];
+			if( elmt == NA_INTEGER )
+			//{
+			//	n_na++;
+				break;
+			//}
+			index += (elmt - 1) * cum_prod_sizes[j];
+		}
+		// check if NA encountered
+		if( j < n_pa + 1 )
+			continue;
+    
+		counts[index] += 1;			
+	}
+	
+	// correct for NAs
+	//for( i = 0; i < prod_sizes; i++ )
+	//	counts[i] += n_na * (counts[i] + prior) / ( n_cases - n_na + alpha );
+		
+	// compute log likelihood
+  logl = 0.0;
+	
+	for( i = 0; i < prod_sizes_pa; i++ )
+	{
+		stride = i * ns[ni];
+		acc    = counts[stride];
+    
+		for( j = 1; j < ns[ni]; j++ )
+    {
+			acc  += counts[stride + j];
+    }
+    
+    acc = log(acc + 1);
+    
+    for ( j = 1 ; j < ns[ni] ; j++ )
+    {
+      logl += counts[stride + j] * (log(counts[stride + j] + 1) - acc);
+    }
+
+	}
+  
+  logl -= penalty * prod_sizes_pa * (ns[ni] - 1);
+  
+  free( counts );
+	
+	return logl;
 }

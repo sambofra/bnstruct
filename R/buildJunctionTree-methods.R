@@ -1,28 +1,30 @@
-# #library("igraph")
-# 
-# junction.tree <- function(dgraph) #,cpts
-# {
-#   # Calculate junction tree of a given graph.
-#   # Input parameter are the adjacency matrix of a directed graph, and the
-#   # conditional probability tables for the variables.
-# 
-#   graph <- moralization(dgraph)    # adj. matrix
-#   graph <- directed.to.undirected.graph(graph)   # adj. matrix
-#   graph <- triangulation(graph)   # adj. matrix
-#   ctout <- clique.tree(graph)     # (adj. matrix, list of lists of nodes)
-#   
-#   ctree <- ctout$clique.tree
-#   cs <- ctout$cliques
-#   
-#   print("junction tree")
-#   print(ctree)
-#   print("cliques")
-#   print(cs)
-# 
-#   return(list("jtree" = ctree, "cliques" = cs, "triangulated.graph" = graph))
-#   
-#   # jt.belief.propagation(dgraph, cpts, ctree, cs)
-# }
+setMethod("build.junction.tree",
+          c("JunctionTree", "matrix"),
+          function(object, dgraph) {
+            # Calculate junction tree of a given graph.
+            # Input parameter is the adjacency matrix of a directed graph.
+            
+            graph <- moralization(dgraph)    # adj. matrix
+            graph <- directed.to.undirected.graph(graph)   # adj. matrix
+            graph <- triangulation(graph)   # adj. matrix
+            ctout <- clique.tree(graph)     # (adj. matrix, list of lists of nodes)
+            
+            ctree <- ctout$clique.tree
+            cs    <- ctout$cliques
+            
+            print("junction tree")
+            print(ctree)
+            print("cliques")
+            print(cs)
+            
+            object@junction.tree      <- ctree
+            object@num.nodes          <- length(cs)
+            object@cliques            <- cs
+            object@triangulated.graph <- graph
+            object
+          }
+)
+
 
 directed.to.undirected.graph <- function(dg)
 {
@@ -63,7 +65,7 @@ moralization <- function(graph)
   for (i in 1:N)
   {
     found <- which(graph[,i] == 1)
-
+    
     if (length(found) > 1) # got the parents, check 'moral edge'
     {
       for (j in 1:(length(found)-1))
@@ -111,7 +113,7 @@ triangulation <- function(graph)
   
   # create igraph object from adjacency matrix
   ig <- graph.adjacency(graph, "undirected", weighted=NULL, diag=TRUE,
-                          add.colnames=NULL, add.rownames=NA)
+                        add.colnames=NULL, add.rownames=NA)
   
   # All of the following could be replaced (I hope) with
   # > is.chordal(ig, newgraph=TRUE)$newgraph
@@ -121,7 +123,7 @@ triangulation <- function(graph)
   # for what I understand, the result is a list of the form a b c d ...
   # meaning that the fill-in edges are (a,b), (c,d), ...
   fill.in.edges <- is.chordal(ig, fillin=TRUE)$fillin
-
+  
   #print("fill in edges")
   #print(fill.in.edges)
   
@@ -189,11 +191,11 @@ clique.tree <- function(graph)
   # compute max-spanning tree using the complementary graph, and get adjacency matrix
   ig.mst <- minimum.spanning.tree(ig)
   mst <- get.adjacency(ig.mst, type="both", attr=NULL, edges=FALSE)#, names=TRUE,)
-                          #sparse=getIgraphOpt("sparsematrices"))  
+  #sparse=getIgraphOpt("sparsematrices"))  
   # 'edges=TRUE' + get.edgelist may help with order...
   # print(mst)
   
-
+  
   # convert mst adjacency matrix to a format we can use elsewhere
   mst <- matrix(data = mst, nrow = num.cliques, ncol = num.cliques, byrow = TRUE)
   

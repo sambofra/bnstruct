@@ -3,9 +3,16 @@ Type: Package
 Title: Bayesian network structure learning from data with missing values
 Version: 1.0
 Date: 2012-02-13
-Depends: R (>= 2.10), bitops
+Depends: R (>= 2.10), bitops, igraph
 Suggests: Rgraphviz
 Author: Francesco Sambo
 Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
 Description: More about what it does (maybe more than one line)
 License: GPL (>=2)
+Collate: AllClasses.R AllGenerics.R buildJunctionTree-methods.R
+          beliefPropagation-methods.R BN-methods.R
+          JunctionTree-methods.R BNDataset-methods.R
+          belief.propagation.R  learn-methods.R
+          boot.bn.R cpdag.R imputation.R init.R
+          io.R jt.R mmhc.R parameter.learning.R sm.R util.R
+          zzz.R

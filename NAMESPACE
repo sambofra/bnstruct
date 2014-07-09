@@ -1,3 +1,5 @@
+import(igraph)
+
 export(
   "sm",
   "dag.to.cpdag",
@@ -11,10 +13,35 @@ export(
   "hc",
   "plot.mat",
   "learn.params",
-  "junction.tree",
-  "belief.propagation",
   "read.dataset",
   "multinomial.mle",
   "multinomial.map",
   "bp.query"
+)
+
+exportClasses(
+  "BN",
+  "JunctionTree",
+  "BNDataset"
+)
+
+# constructors
+export(
+  "BN",
+  "JunctionTree",
+  "BNDataset"
+)
+
+exportMethods(
+  "belief.propagation",
+  #
+  "build.junction.tree",
+  #
+  "has.data",
+  "has.raw.data",
+  "has.imputed.data",
+  "get.data",
+  "get.raw.data",
+  "get.imputed.data",
+  "print.BNDataset"
 )

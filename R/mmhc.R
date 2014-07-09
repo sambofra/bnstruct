@@ -4,6 +4,8 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
   
+  scoring.algo <- 1
+  
   # just to be sure
   storage.mode( node.sizes ) <- "integer"
   
@@ -28,7 +30,7 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
   
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
-    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, 
+    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, scoring.algo,
                                   ess, PACKAGE = "bnstruct" )
 
   # global best solution
@@ -64,7 +66,7 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
             {
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\n')
               s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L, 
-                               ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
+                               scoring.algo, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
           else if( curr.g[node,par] == 0L ) # edge addition
@@ -76,8 +78,8 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
               # print("here\n");
               
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\n')
-              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L, 
-                               ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
+              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
+                               scoring.algo, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
           else # edge reversal
@@ -87,10 +89,10 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
             if( .Call("is_acyclic", next.g, PACKAGE = "bnstruct") & !.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
             {
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\t',par-1L,'\t',which(next.g[,par]!=0)-1L,'\n')
-              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L, 
-                               ess, PACKAGE = "bnstruct" ) + 
-                        .Call( "score_node", data, node.sizes, par-1L, which(next.g[,par]!=0)-1L, 
-                               ess, PACKAGE = "bnstruct" ) -
+              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
+                               scoring.algo, ess, PACKAGE = "bnstruct" ) + 
+                        .Call( "score_node", data, node.sizes, par-1L, which(next.g[,par]!=0)-1L,
+                               scoring.algo, ess, PACKAGE = "bnstruct" ) -
                         ( curr.score.nodes[node] + curr.score.nodes[par] )
             }
           }
@@ -117,9 +119,9 @@ hc <- function( data, node.sizes, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 
       curr.g[best.node,next.pert[best.node]] = 0L;
       # cat(node.sizes,'\t',best.node-1L,'\t',which(curr.g[,best.node]!=0)-1L,'\t',next.pert[best.node]-1L,'\t',which(curr.g[,next.pert[best.node]]!=0)-1L,'\n')
       curr.score.nodes[best.node] <- .Call( "score_node", data, node.sizes, best.node-1L, 
-                                            which(curr.g[,best.node]!=0)-1L, ess, PACKAGE = "bnstruct" )
+                                            which(curr.g[,best.node]!=0)-1L, scoring.algo, ess, PACKAGE = "bnstruct" )
       curr.score.nodes[next.pert[best.node]] <- .Call( "score_node", data, node.sizes, next.pert[best.node]-1L, 
-                                            which(curr.g[,next.pert[best.node]]!=0)-1L, ess, PACKAGE = "bnstruct" )
+                                            which(curr.g[,next.pert[best.node]]!=0)-1L, scoring.algo, ess, PACKAGE = "bnstruct" )
     }
     else
       curr.score.nodes[best.node] = curr.score.nodes[best.node] + next.score.diff[best.node]

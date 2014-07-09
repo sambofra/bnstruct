@@ -177,7 +177,7 @@ SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP i
 				// Rprintf("get bits\n");
 				n_pa = get_bits( j, pa, n_nodes );
 				// Rprintf("log lik, node %d, n parents %d\n",i,n_pa);
-				aflml[pos] = log_lik( d, n_nodes, n_ex, ns, i, pa, n_pa, alpha );
+				aflml[pos] = bdeu_score( d, n_nodes, n_ex, ns, i, pa, n_pa, alpha );
 				// Rprintf("end\n");
 			}
 		}

@@ -4,6 +4,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <math.h>
+#include "util.h"
 
 /* find best parents */
 SEXP fbp( SEXP aflml );

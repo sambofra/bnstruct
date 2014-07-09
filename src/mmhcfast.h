@@ -5,6 +5,7 @@
 #include <Rinternals.h>
 #include <math.h>
 #include "smfast.h"
+#include "util.h"
 
 /* generate the next combinations of length(sexp_comb) indices drawn
    from 1:sexp_n, or 0^m if no next combination 

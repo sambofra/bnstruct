@@ -1,6 +1,6 @@
 library("bnstruct")
 library("igraph")
-library("gRain")
+#library("gRain")
 
 # read data and set parameters
 
@@ -26,12 +26,6 @@ res.mmhc  <- matrix(c(0, 1, 0, 0, 0, 0, 0, 0,
                       0, 0, 0, 0, 0, 0, 1, 1,
                       0, 0, 0, 0, 0, 0, 0, 0,
                       0, 0, 0, 0, 0, 0, 0, 0), nrow = 8, ncol = 8, byrow=TRUE)
-res.mmhc <- matrix(c(0,1,1,0,0,0,
-                     0,0,0,1,0,0,
-                     0,0,0,0,1,0,
-                     0,0,0,0,0,1,
-                     0,0,0,0,0,1,
-                     0,0,0,0,0,0), nrow=6, ncol=6, byrow=TRUE)
 
 print(res.mmhc)
 jt <- junction.tree(res.mmhc)
@@ -42,15 +36,6 @@ jt <- junction.tree(res.mmhc)
 # print("marginals")
 # print(jjpts$marginals)
 
-cpts <- NULL
-cpts[[1]] <- array(c(0.01, 0.99), dim=c(1,2))
-cpts[[2]] <- array(c(0.05, 0.95, 0.01, 0.99), dim=c(2,2))
-cpts[[3]] <- array(c(0.5, 0.5), dim=c(1,2))
-cpts[[4]] <- array(c(0.1, 0.9, 0.01, 0.99), dim=c(2,2))
-cpts[[5]] <- array(c(0.6, 0.4, 0.3, 0.7), dim=c(2,2))
-cpts[[6]] <- array(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5), dim=c(2,2,2))
-cpts[[7]] <- array(c(0.98, 0.02, 0.05, 0.95), dim=c(2,2))
-cpts[[8]] <- array(c(0.9, 0.1, 0.8, 0.2, 0.7, 0.3, 0.1, 0.9), dim=c(2,2,2))
 
 dim.vars <- NULL
 dim.vars[[1]] <- as.list(c(1))
@@ -63,12 +48,32 @@ dim.vars[[7]] <- as.list(c(7,6))
 dim.vars[[8]] <- as.list(c(8,5,6))
 
 cpts <- NULL
-cpts[[1]] <- array(c(0.1, 0.9), dim=c(1,2))
-cpts[[2]] <- array(c(0.1, 0.9, 0.9, 0.1), dim=c(2,2))
-cpts[[3]] <- array(c(0.7, 0.3, 0.2, 0.8), dim=c(2,2))
-cpts[[4]] <- array(c(0.4, 0.6, 0.7, 0.3), dim=c(2,2))
-cpts[[5]] <- array(c(0.5, 0.5, 0.4, 0.6), dim=c(2,2))
-cpts[[6]] <- array(c(0.1, 0.9, 0.4, 0.6, 0.5, 0.5, 0.8, 0.2), dim=c(2,2,2))
+cpts[[1]] <- array(c(0.01, 0.99), dim=c(1,2), dimnames=c(unlist(dim.vars[[1]])))
+cpts[[2]] <- array(c(0.05, 0.95, 0.01, 0.99), dim=c(2,2), dimnames=c(unlist(dim.vars[[2]])))
+cpts[[3]] <- array(c(0.5, 0.5), dim=c(1,2), dimnames=c(unlist(dim.vars[[3]])))
+cpts[[4]] <- array(c(0.1, 0.9, 0.01, 0.99), dim=c(2,2), dimnames=c(unlist(dim.vars[[4]])))
+cpts[[5]] <- array(c(0.6, 0.4, 0.3, 0.7), dim=c(2,2), dimnames=c(unlist(dim.vars[[5]])))
+cpts[[6]] <- array(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5), dim=c(2,2,2), dimnames=c(unlist(dim.vars[[6]])))
+cpts[[7]] <- array(c(0.98, 0.02, 0.05, 0.95), dim=c(2,2), dimnames=c(unlist(dim.vars[[7]])))
+cpts[[8]] <- array(c(0.9, 0.1, 0.8, 0.2, 0.7, 0.3, 0.1, 0.9), dim=c(2,2,2), dimnames=c(unlist(dim.vars[[8]])))
+
+
+
+#dimnames(cpts[[1]]) <- dim.vars[[1]]
+
+# for (i in 1:6)
+#   print(dimnames(cpts[[i]]))
+# 
+# readLines(file("stdin"),1)
+
+res.mmhc <- matrix(c(0,1,1,0,0,0,
+                     0,0,0,1,0,0,
+                     0,0,0,0,1,0,
+                     0,0,0,0,0,1,
+                     0,0,0,0,0,1,
+                     0,0,0,0,0,0), nrow=6, ncol=6, byrow=TRUE)
+
+node.sizes <- c(2,2,2,2,2,2)
 
 dim.vars <- NULL
 dim.vars[[1]] <- as.list(c(1))
@@ -78,9 +83,30 @@ dim.vars[[4]] <- as.list(c(4,2))
 dim.vars[[5]] <- as.list(c(5,3))
 dim.vars[[6]] <- as.list(c(6,4,5))
 
+dim.names <- c("A", "B", "C", "D", "E", "F")
+
+cpts <- NULL
+cpts[[1]] <- array(c(0.1, 0.9), dim=c(2), dimnames=list(c(1,2)))
+names(dimnames(cpts[[1]])) <- c("A")
+cpts[[2]] <- array(c(0.1, 0.9, 0.9, 0.1), dim=c(2,2), dimnames=list(c(1,2), c(1,2)))
+names(dimnames(cpts[[2]])) <- c("B","A")
+cpts[[3]] <- array(c(0.7, 0.3, 0.2, 0.8), dim=c(2,2), dimnames=list(c(1,2), c(1,2)))
+names(dimnames(cpts[[3]])) <- c("C","A")
+cpts[[4]] <- array(c(0.4, 0.6, 0.7, 0.3), dim=c(2,2), dimnames=list(c(1,2), c(1,2)))
+names(dimnames(cpts[[4]])) <- c("D","B")
+cpts[[5]] <- array(c(0.5, 0.5, 0.4, 0.6), dim=c(2,2), dimnames=list("E" = c(1,2), "C"=c(1,2)))
+cpts[[6]] <- array(c(0.1, 0.9, 0.4, 0.6, 0.5, 0.5, 0.8, 0.2), dim=c(2,2,2), dimnames=list("F" = c(1,2), "D"=c(1,2), "E"=c(1,2)))
+  
+# cpts <- NULL
+# cpts[[1]] <- array(c(0.1, 0.9), dim=c(1,2))
+# cpts[[2]] <- array(c(0.1, 0.9, 0.9, 0.1), dim=c(2,2))
+# cpts[[3]] <- array(c(0.7, 0.3, 0.2, 0.8), dim=c(2,2))
+# cpts[[4]] <- array(c(0.4, 0.6, 0.7, 0.3), dim=c(2,2))
+# cpts[[5]] <- array(c(0.5, 0.5, 0.4, 0.6), dim=c(2,2))
+# cpts[[6]] <- array(c(0.1, 0.9, 0.4, 0.6, 0.5, 0.5, 0.8, 0.2), dim=c(2,2,2))
 
 print(cpts)
-print(dim.vars)
+readLines(file("stdin"),1)
 
 jt$triangulated.graph <- array(c(0,1,1,0,0,0,
                                  1,0,1,1,0,0,
@@ -99,14 +125,13 @@ jt$cliques <- list(as.list(c(1,2,3)),
                    as.list(c(3,4,5)),
                    as.list(c(4,5,6)))
 
-node.sizes <- c(2,2,2,2,2,2)
 
-jpts <- belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, cpts, dim.vars, c(), c(), node.sizes)
+jpts <- belief.propagation(jt$triangulated.graph, jt$jtree, jt$cliques, cpts, dim.names, c(), c(), node.sizes)
 
 print("ciao")
-for (i in 1:num.nodes)
+for (i in 1:6)
 {
-  print(bp.query(jpts, jt$cliques, i))
+  print(bp.query(jpts, jt$cliques, paste(i)))
 }
 
 break
