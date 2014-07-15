@@ -7,24 +7,27 @@
 # node.sizes : number of values each variable can take
 # cpts       : list of Conditional Probability Tables
 # dag        : matrix representing the DAG of the network as adjacency matrix
+# wpdag      : weighted partially directed acyclic graph as adjacency matrix
 ###############################################################################
 
 setClass("BN",
          representation(
            name       = "character",
            num.nodes  = "numeric",
-           variables  = "vector",
+           variables  = "character",
            node.sizes = "vector",
            cpts       = "list",
-           dag        = "matrix"
+           dag        = "matrix",
+           wpdag      = "matrix"
          ),
          prototype(
            name       = "empty",
            num.nodes  = 0,
-           variables  = c(),
-           node.sizes = c(),
+           variables  = c(""),
+           node.sizes = c(0),
            cpts       = list(NULL),
-           dag        = matrix(c(0))
+           dag        = matrix(c(0)),
+           wpdag      = matrix(c(0))
          )
         )
 
@@ -50,27 +53,39 @@ setClass("BN",
 setClass("BNDataset",
          representation(
            name          = "character",
-           file          = "character",
-           variables     = "vector",
+           header.file   = "character",
+           data.file     = "character",
+           variables     = "character",
+           node.sizes    = "numeric",
            num.variables = "numeric",
            num.items     = "numeric",
            has.rawdata   = "logical",
            has.impdata   = "logical",
            raw.data      = "matrix",
            imputation    = "logical",
-           imputed.data  = "matrix"
+           imputed.data  = "matrix",
+           has.boots     = "logical",
+           boots         = "list",
+           has.imp.boots = "logical",
+           imp.boots     = "list"
          ),
          prototype(
-           name          = "empty",
-           file          = "/dev/null",
-           variables     = c(),
+           name          = "",
+           header.file   = "",
+           data.file     = "",
+           variables     = c(""),
+           node.sizes    = c(0),
            num.variables = 0,
            num.items     = 0,
            has.rawdata   = FALSE,
            has.impdata   = FALSE,
            raw.data      = matrix(c(0)),
            imputation    = FALSE,
-           imputed.data  = matrix(c(0))
+           imputed.data  = matrix(c(0)),
+           has.boots     = FALSE,
+           boots         = list(NULL),
+           has.imp.boots = FALSE,
+           imp.boots     = list(NULL)
          )
         )
 
@@ -101,3 +116,25 @@ setClass("JunctionTree",
            triangulated.graph = matrix(c(0))
          )
         )
+
+
+###############################################################################
+# Dataset bootstrap iterator
+# 
+# dataset : dataset
+# current : current element returned
+# imputed : use imputed data, if available
+###############################################################################
+
+# setClass("BootstrapIterator",
+#          representation(
+#            dataset : "BNDataset",
+#            current : "numeric",
+#            imputed : "logical"
+#          ),
+#          prototype(
+#            dataset : NULL,
+#            current : -1,
+#            imputed : FALSE
+#          )
+#         )

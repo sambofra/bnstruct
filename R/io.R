@@ -4,56 +4,56 @@
 # 3rd row : number of items in dataset (1 value)
 # following rows : dataset
 # returns list containing all of the above in four elements
-read.dataset <- function(filename = NULL, na.string.symbol = "?",
-                         header.flag = FALSE, sep.symbol = "",
-                         imputation = FALSE, k.impute = 10)
-{
-  #   if (filename == NULL)
-  #   {
-  #     stop("no file to read, no party")
-  #   }
-  # read & transform everything into integers
-  a <- read.delim(filename, na.strings = na.string.symbol, header = header.flag, sep = sep.symbol)
-  a <- as.matrix(a)
-  num.nodes  <- a[1,1]*1L
-  node.sizes <- c(a[2,])
-  num.items  <- a[3,1]*1L
-  dataset    <- a[-c(1,2,3),] + 1
-  
-  storage.mode(node.sizes) <- "integer"
-  storage.mode(dataset)    <- "integer"
-  
-  cont.nodes <- c()
-  if (imputation)
-  {
-    requires.imputation <- FALSE
-    for( i in 1:num.nodes ) {
-      if (any(is.na(dataset[,i])))
-      {
-        requires.imputation <- TRUE
-      }
-    }
-    # impute data 
-    if (requires.imputation) {
-      print("imputation")
-      dataset <- knn.impute(dataset,k.impute,setdiff(1:num.nodes,cont.nodes))
-      storage.mode(dataset) <- "integer" # again, who knows...
-    }
-  }
-  
-  # quantize data of continuous nodes 
-  levels <- rep( 0, num.nodes )
-  levels[cont.nodes] <- node.sizes[cont.nodes]
-  
-  # data <- quantize.with.na.matrix( data, levels )
-  data <- quantize.matrix( dataset, levels )
-  storage.mode(dataset) <- "integer" # again^2, who knows...
-  
-  return(list("num.nodes"  = num.nodes,
-              "node.sizes" = node.sizes,
-              "num.items"  = num.items,
-              "dataset"    = dataset))
-}
+# read.dataset <- function(filename = NULL, na.string.symbol = "?",
+#                          header.flag = FALSE, sep.symbol = "",
+#                          imputation = FALSE, k.impute = 10)
+# {
+#   #   if (filename == NULL)
+#   #   {
+#   #     stop("no file to read, no party")
+#   #   }
+#   # read & transform everything into integers
+#   a <- read.delim(filename, na.strings = na.string.symbol, header = header.flag, sep = sep.symbol)
+#   a <- as.matrix(a)
+#   num.nodes  <- a[1,1]*1L
+#   node.sizes <- c(a[2,])
+#   num.items  <- a[3,1]*1L
+#   dataset    <- a[-c(1,2,3),] + 1
+#   
+#   storage.mode(node.sizes) <- "integer"
+#   storage.mode(dataset)    <- "integer"
+#   
+#   cont.nodes <- c()
+#   if (imputation)
+#   {
+#     requires.imputation <- FALSE
+#     for( i in 1:num.nodes ) {
+#       if (any(is.na(dataset[,i])))
+#       {
+#         requires.imputation <- TRUE
+#       }
+#     }
+#     # impute data 
+#     if (requires.imputation) {
+#       print("imputation")
+#       dataset <- knn.impute(dataset,k.impute,setdiff(1:num.nodes,cont.nodes))
+#       storage.mode(dataset) <- "integer" # again, who knows...
+#     }
+#   }
+#   
+#   # quantize data of continuous nodes 
+#   levels <- rep( 0, num.nodes )
+#   levels[cont.nodes] <- node.sizes[cont.nodes]
+#   
+#   # data <- quantize.with.na.matrix( data, levels )
+#   data <- quantize.matrix( dataset, levels )
+#   storage.mode(dataset) <- "integer" # again^2, who knows...
+#   
+#   return(list("num.nodes"  = num.nodes,
+#               "node.sizes" = node.sizes,
+#               "num.items"  = num.items,
+#               "dataset"    = dataset))
+# }
 
 factors.to.graph <- function(factors, sep = '(')
 {

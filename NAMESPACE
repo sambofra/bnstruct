@@ -1,47 +1,61 @@
 import(igraph)
+#import(iterators)
 
 export(
   "sm",
-  "dag.to.cpdag",
+  #"dag.to.cpdag",
   "is.acyclic",
-  "boot.bn",
+  #"boot.bn",
   "quantize.matrix",
-  "knn.impute",
+  #"knn.impute",
   "stat.mode.ord",
   "mmpc",
   "g2",
   "hc",
-  "plot.mat",
+  #"plot.mat",
   "learn.params",
-  "read.dataset",
+  #"read.dataset",
   "multinomial.mle",
   "multinomial.map",
+  "factors.to.graph",
+  "graph.to.factors",
   "bp.query"
 )
 
 exportClasses(
   "BN",
   "JunctionTree",
-  "BNDataset"
+  "BNDataset"#,
+  #"BootstrapIterator"
 )
 
 # constructors
 export(
   "BN",
   "JunctionTree",
-  "BNDataset"
+  "BNDataset"#,
+  #"BootstrapIterator"
 )
 
 exportMethods(
+  # BN
+  "print.BN",
   "belief.propagation",
-  #
+  "learn.structure",
+  "plot.BN",
+  "save.to.eps",
+  # JunctionTree
+  "print.JunctionTree",
   "build.junction.tree",
-  #
+  # BNDataset
   "has.data",
   "has.raw.data",
   "has.imputed.data",
   "get.data",
   "get.raw.data",
   "get.imputed.data",
-  "print.BNDataset"
+  "print.BNDataset",
+  "read.dataset",
+  "impute",
+  "bootstrap"
 )
