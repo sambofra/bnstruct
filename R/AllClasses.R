@@ -10,6 +10,23 @@
 # wpdag      : weighted partially directed acyclic graph as adjacency matrix
 ###############################################################################
 
+#' BN class.
+#' 
+#' @section Slots:
+#' \describe{
+#'   \item{\code{name}:}{name of the network}
+#'   \item{\code{num.nodes}:}{number of nodes in the network}
+#'   \item{\code{variables}:}{names of the variables in the network}
+#'   \item{\code{node.sizes}:}{cardinality of each variable of the network}
+#'   \item{\code{cpts}:}{list of conditional probability tables of the network}
+#'   \item{\code{dag}:}{adjacency matrix of the network}
+#'   \item{\code{wpdag}:}{weighted partially dag}
+#' }
+#' 
+#' @name BN
+#' @rdname BN
+#' @aliases BN-class
+#' @exportClass BN
 setClass("BN",
          representation(
            name       = "character",
@@ -21,7 +38,7 @@ setClass("BN",
            wpdag      = "matrix"
          ),
          prototype(
-           name       = "empty",
+           name       = "",
            num.nodes  = 0,
            variables  = c(""),
            node.sizes = c(0),
@@ -50,6 +67,38 @@ setClass("BN",
 #                 has.impdata == TRUE
 ###############################################################################
 
+#' BNDataset class.
+#' 
+#' Contains the all of the data that can be extracted from a given dataset:
+#' raw data, imputed data, raw and imputed data with bootstrap.
+#' 
+#' Dataset should be provided in the following format... (describe)
+#' 
+#' @section Slots:
+#' \describe{
+#'   \item{\code{name}:}{name of the dataset}
+#'   \item{\code{header.file}:}{name and location of the header file}
+#'   \item{\code{data.file}:}{name and location of the data file}
+#'   \item{\code{variables}:}{names of the variables in the network}
+#'   \item{\code{node.sizes}:}{cardinality of each variable of the network}
+#'   \item{\code{num.variables}:}{number of variables (columns) in the dataset}
+#'   \item{\code{num.items}:}{number of observations (rows) in the dataset}
+#'   \item{\code{has.rawdata}:}{TRUE if the dataset contains data read from a file}
+#'   \item{\code{has.impdata}:}{TRUE if the dataset contains imputed data (computed from raw data)}
+#'   \item{\code{raw.data}:}{matrix containing raw data}
+#'   \item{\code{imputation}:}{TRUE if it dataset contains imputed data}
+#'   \item{\code{imputed.data}:}{matrix containing imputed data}
+#'   \item{\code{has.boots}:}{dataset has bootstrap samples}
+#'   \item{\code{boots}:}{list of bootstrap samples}
+#'   \item{\code{has.imp.boots}:}{dataset has imputed bootstrap samples}
+#'   \item{\code{imp.boots}:}{list of imputed bootstrap samples}
+#'   \item{\code{num.boots}:}{number of bootstrap samples}
+#' }
+#' 
+#' @name BNDataset
+#' @rdname BNDataset
+#' @aliases BNDataset-class
+#' @exportClass BNDataset
 setClass("BNDataset",
          representation(
            name          = "character",
@@ -67,7 +116,8 @@ setClass("BNDataset",
            has.boots     = "logical",
            boots         = "list",
            has.imp.boots = "logical",
-           imp.boots     = "list"
+           imp.boots     = "list",
+           num.boots     = "numeric"
          ),
          prototype(
            name          = "",
@@ -85,7 +135,8 @@ setClass("BNDataset",
            has.boots     = FALSE,
            boots         = list(NULL),
            has.imp.boots = FALSE,
-           imp.boots     = list(NULL)
+           imp.boots     = list(NULL),
+           num.boots     = 0
          )
         )
 
@@ -100,6 +151,21 @@ setClass("BNDataset",
 # triangulated.graph : the triangulated graph as adjacency matrix
 ###############################################################################
 
+#' InferenceEngine class.
+#' 
+#' @section Slots:
+#' \describe{
+#'   \item{\code{junction.tree}:}{junction tree adjacency matrix}
+#'   \item{\code{num.nodes}:}{number of nodes in the junction tree}
+#'   \item{\code{bn}:}{\link{BN} object it refers to}
+#'   \item{\code{cliques}:}{list of cliques composing the nodes of the junction tree}
+#'   \item{\code{triangulated.graph}:}{adjacency matrix of the original triangulated graph}
+#' }
+#' 
+#' @name JunctionTree
+#' @rdname JunctionTree
+#' @aliases JunctionTree-class
+#' @exportClass JunctionTree
 setClass("JunctionTree",
          representation(
            junction.tree      = "matrix",

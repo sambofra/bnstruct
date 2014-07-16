@@ -1,3 +1,8 @@
+#' Constructor for \link{JunctionTree} object
+#' 
+#' @name JunctionTree
+#' @rdname JunctionTree-class
+#' @export JunctionTree
 JunctionTree <- function(...) new("JunctionTree", ...)
 
 # validator

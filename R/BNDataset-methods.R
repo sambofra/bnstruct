@@ -1,3 +1,8 @@
+#' Constructor for \link{BNDataset} object
+#' 
+#' @name BNDataset
+#' @rdname BNDataset-class
+#' @export BNDataset
 BNDataset <- function(...)
 {
   dataset <- new("BNDataset", ...)
@@ -170,6 +175,7 @@ setMethod("bootstrap",
           {
             # assumes raw data is ok
             object@has.boots <- TRUE
+            object@num.boots <- num.boots
             
             set.seed(seed)
             if (num.boots >= 1)

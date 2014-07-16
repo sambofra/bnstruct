@@ -1,6 +1,6 @@
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
-          function(object, header, dataset, imputation = FALSE, header.flag = FALSE,
+          function(object, header, dataset, imputation = FALSE,
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
                    bootstrap = FALSE, num.boots = 100, seed = 0)
           {
@@ -11,7 +11,8 @@ setMethod("read.dataset",
             # how to manage 3rd row?
             
             a <- read.delim(dataset, na.strings = na.string.symbol,
-                            header = header.flag, sep = sep.symbol) + 1
+                            header = FALSE, sep = sep.symbol) + 1
+            # ↑ header is FALSE by default, given our file format. Otherwise, add header.flag = TRUE in parameters
             object@raw.data      <- as.matrix(a)
             object@num.variables <- ncol(object@raw.data)
             object@num.items     <- nrow(object@raw.data)

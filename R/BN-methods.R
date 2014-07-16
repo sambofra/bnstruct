@@ -1,4 +1,8 @@
-#BN <- function(name = "empty", num.nodes = 0, node.sizes = c(), cpts = list(NULL), variables = c(""), dag = matrix(c(0)))
+#' Constructor for \link{BN} object
+#' 
+#' @name BN
+#' @rdname BN-class
+#' @export BN
 BN <- function(...)
 {
   object <- new("BN", ...)
