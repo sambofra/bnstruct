@@ -1,8 +1,20 @@
-#' Constructor for \link{BN} object
+#' Constructor method of \code{\link{BN}} class.
+#'
+#' @name BN
+#' @rdname BN-class
+setMethod("initialize",
+          "BN",
+          function(.Object, ...)  
+          {
+            validObject(.Object)      
+            .Object
+          })
+
+#' Wrapper for \code{\link{BN}} object
 #' 
 #' @name BN
 #' @rdname BN-class
-#' @export BN
+#' @export
 BN <- function(...)
 {
   object <- new("BN", ...)
@@ -30,6 +42,11 @@ setValidity("BN",
               {
                 retval <- c(retval, "incoherent number of variables in WPDAG")
               }
+              if(object@num.nodes > 0 && length(object@discreteness) > 1 &&
+                 length(object@discreteness) != object@num.nodes)
+              {
+                retval <- c(retval, "incoherent number of variable statuses")
+              }
               
               if (is.null(retval)) return (TRUE)
               return (retval)
@@ -37,41 +54,47 @@ setValidity("BN",
 )
 
 # redefition of print() for BN objects
+#' @rdname print-methods
+#' @aliases print.BN
 setMethod("print.BN",
           "BN",
-          function(object, ...)
+          function(x, ...)
           {
             str <- "\nBayesian Network "
-            str <- paste(str, object@name, sep = '')
+            str <- paste(str, x@name, sep = '')
             str <- paste(str, " with ", sep = '')
-            str <- paste(str, object@num.nodes, sep = '')
+            str <- paste(str, x@num.nodes, sep = '')
             str <- paste(str, " nodes\n", sep = '')
-            str <- paste(str, paste(object@variables, sep=" ", collapse=', '))
+            str <- paste(str, paste(x@variables, sep=" ", collapse=', '))
             message(str)
             
-            if (object@num.nodes > 0)
+            if (x@num.nodes > 0)
             {
-              colnames(object@dag) <- object@variables
-              rownames(object@dag) <- object@variables
+              colnames(x@dag) <- x@variables
+              rownames(x@dag) <- x@variables
               
               message('\nAdjacency matrix:')
-              print(object@dag)
+              print(x@dag)
               
               message("\nConditional probability tables:")
-              print(object@cpts)
+              print(x@cpts)
               
             }
             
           })
 
 # plot adjacency matrix
+#' @rdname plot-methods
+#' @aliases plot.BN,BN-methods
 setMethod("plot.BN",
           c("BN"),
           # Plot a weighted connectivity matrix using Rgraphviz
-          function( object, use.node.names = TRUE, frac = 0.2, 
-                    max.weight = max(object@dag), node.col = rep('white',ncol(object@dag)),
+          function( x, use.node.names = TRUE, frac = 0.2, 
+                    max.weight = max(x@dag), node.col = rep('white',ncol(x@dag)),
                     plot.wpdag = FALSE)
           {
+            object <- x
+            
             # check for Rgraphviz
             if (!require(Rgraphviz))
               stop("this function requires the Rgraphviz package.")
@@ -117,6 +140,8 @@ setMethod("plot.BN",
           })
 
 # save BN as eps file
+#' @rdname save.to.eps-methods
+#' @aliases save.to.eps
 setMethod("save.to.eps",
           c("BN", "character"),
           function(object, filename)

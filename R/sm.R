@@ -298,7 +298,7 @@ log.lik <- function( node.sizes, ess, data )
     # counts <- compute.counts( data, node.sizes )
     # prior <- array( ess/prod.sizes, node.sizes ); # faster !
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
-    counts <- .Call("compute_counts", data, node.sizes, package = "bnstruct")
+    counts <- .Call("compute_counts", data, node.sizes, PACKAGE = "bnstruct")
     prior <- ess/prod.sizes;
     
     # correct for NAs with maximum a posteriori estimate
@@ -320,7 +320,7 @@ log.lik <- function( node.sizes, ess, data )
     # counts <- compute.counts( data, node.sizes )
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
     # prior <- rep( ess/node.sizes, node.sizes );
-    counts <- .Call("compute_counts", data, node.sizes, package = "bnstruct")
+    counts <- .Call("compute_counts", data, node.sizes, PACKAGE = "bnstruct")
     prior <- ess/node.sizes
     
     # correct for NAs with maximum a posteriori estimate

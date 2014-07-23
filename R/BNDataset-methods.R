@@ -1,8 +1,19 @@
-#' Constructor for \link{BNDataset} object
+#' Constructor method of \code{\link{BNDataset}} class.
+#'
+#' @name BNDataset
+#' @rdname BNDataset-class
+setMethod("initialize",
+          "BNDataset", function(.Object, ...)  
+          {
+            validObject(.Object)      
+            .Object
+          })
+
+#' Wrapper for \code{\link{BNDataset}} object
 #' 
 #' @name BNDataset
 #' @rdname BNDataset-class
-#' @export BNDataset
+#' @export 
 BNDataset <- function(...)
 {
   dataset <- new("BNDataset", ...)
@@ -51,6 +62,11 @@ setValidity("BNDataset",
               {
                 retval <- c(retval, "incoherent number of variables in imputed dataset")
               }
+              if(object@num.variables > 0 && length(object@discreteness) > 1 &&
+                   length(object@discreteness) != object@num.variables)
+              {
+                retval <- c(retval, "incoherent number of variable statuses")
+              }
               
               if (is.null(retval)) return (TRUE)
               return (retval)
@@ -58,6 +74,8 @@ setValidity("BNDataset",
 )
 
 # check if any data available
+#' @rdname has.data-methods
+#' @aliases has.data
 setMethod("has.data",
           "BNDataset",
           function(object)
@@ -65,6 +83,8 @@ setMethod("has.data",
             return (has.raw.data(object) || object@has.imputed.data(object))
           })
 
+#' @rdname has.raw.data-methods
+#' @aliases has.raw.data
 setMethod("has.raw.data",
           "BNDataset",
           function(object)
@@ -72,6 +92,8 @@ setMethod("has.raw.data",
             object@has.rawdata
           })
 
+#' @rdname has.imputed.data-methods
+#' @aliases has.imputed.data
 setMethod("has.imputed.data",
           "BNDataset",
           function(object)
@@ -81,6 +103,8 @@ setMethod("has.imputed.data",
 
 # get() method for data
 # imputed data, if any, is preferred over raw data because more complete
+#' @rdname get.data-methods
+#' @aliases get.data
 setMethod("get.data",
           "BNDataset",
           function(object)
@@ -90,6 +114,8 @@ setMethod("get.data",
             return (get.imputed.data(object))
           })
 
+#' @rdname get.raw.data-methods
+#' @aliases get.raw.data
 setMethod("get.raw.data",
           "BNDataset",
           function(object)
@@ -99,6 +125,8 @@ setMethod("get.raw.data",
             return (NULL)
           })
 
+#' @rdname get.imputed.data-methods
+#' @aliases get.imputed.data
 setMethod("get.imputed.data",
           "BNDataset",
           function(object)
@@ -109,10 +137,13 @@ setMethod("get.imputed.data",
           })
 
 # redefition of print() for BNDataset objects
+#' @rdname print-methods
+#' @aliases print.BNDataset,BNDataset,ANY
 setMethod("print.BNDataset",
           "BNDataset",
-          function(object, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
+          function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
           {
+            object <- x
             str <- "\nDataset"
             
             if (object@name != "")
@@ -158,6 +189,8 @@ setMethod("print.BNDataset",
             
           })
 
+#' @rdname impute-methods
+#' @aliases impute
 setMethod("impute",
           "BNDataset",
           function(object, k.impute = 10)
@@ -169,9 +202,11 @@ setMethod("impute",
             object
           })
 
+#' @rdname bootstrap-methods
+#' @aliases bootstrap
 setMethod("bootstrap",
           "BNDataset",
-          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
+          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10, na.string.symbol = '?')
           {
             # assumes raw data is ok
             object@has.boots <- TRUE
@@ -200,4 +235,33 @@ setMethod("bootstrap",
               }
             }
             object
+          })
+
+
+#' @rdname get.boot-methods
+#' @aliases get.boot
+setMethod("get.boot",
+          c("BNDataset", "numeric"),
+          function(dataset, index, imputed = TRUE)
+          {
+            if (!(dataset@has.boots || dataset@has.imp.boots))
+            {
+              message('WARNING: No bootstrap samples available for dataset.\n')
+              return(NULL)
+            }
+            
+            if (index <= 0 || index > dataset@num.boots)
+            {
+              message('WARNING: index out of range for dataset.\n')
+              return(NULL)
+            }
+            
+            if (imputed && dataset@has.imp.boots)
+              return(dataset@imp.boots[[index]])
+            
+            if (dataset@has.boots)
+              return(dataset@boots[[index]])
+            
+            # if !has.boots && !imputed && has.imp.boots - though I don't know if this will ever happen
+            return(NULL)
           })

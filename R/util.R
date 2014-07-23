@@ -42,25 +42,6 @@ fancy.cpt <- function( cpt )
 # 	return( cpts )
 # }
 
-counts.to.probs <- function( counts )
-{
-  d <- dim(counts)
-  if( length(d) == 1 )
-    return( counts / sum(counts) )
-  else
-  {
-    # last dimension on the columns, everything else on the rows
-    tmp.d <- c( prod(d[1:(length(d)-1)]), d[length(d)] )
-    dim(counts) <- tmp.d
-    # normalization
-    nor <- rowSums( counts )
-    nor <- nor + (nor == 0) # for the next division
-    counts <- counts / array(nor,tmp.d)
-    dim(counts) <- d
-    return( counts )
-  }
-}
-
 # Compute Structural Hamming Distance between graphs g1 and g2
 shd <- function(g1, g2)
 {

@@ -1,3 +1,5 @@
+#' @rdname learn.params-methods
+#' @aliases learn.params
 setMethod("learn.params",
           c("BN", "BNDataset"),
           function(bn, dataset, ess = 1)
@@ -16,13 +18,11 @@ setMethod("learn.params",
             node.sizes <- bn@node.sizes
             dag        <- bn@dag
             n.nodes    <- bn@num.nodes
-            print(dag)
             
             #n.nodes <- dataset@num.items #dim(data)[2]
-            cpts <- vector("list",n.nodes)
+            cpts <- list("list",n.nodes)
             var.names <- c(unlist(bn@variables))  # colnames(data)
             d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
-            # print(d.names)
             # esimate a cpt for each family from data
             for ( i in 1:n.nodes )
             {
@@ -30,9 +30,20 @@ setMethod("learn.params",
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
               cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
-              dimnames(cpts[[i]]) <- d.names[family]
+              dms <- NULL
+              dns <- NULL
+              for (j in 1:length(family))
+              {
+                dms[[j]] <- as.list(c(1:node.sizes[family[j]]))
+                dns[[j]] <- c(var.names[family[j]])
+              }
+              
+              dimnames(cpts[[i]])          <- dms
+              names( dimnames(cpts[[i]]) ) <- dns
+                
             }
-            names( cpts ) <- as.list(var.names)
+            names(cpts) <- var.names
+            
             #return( cpts )
             
             bn@cpts <- cpts
@@ -40,9 +51,11 @@ setMethod("learn.params",
           }
 )
 
+#' @rdname learn.structure-methods
+#' @aliases learn.structure
 setMethod("learn.structure",
           c("BN", "BNDataset"),
-          function(bn, dataset, algo = "mmhc", alpha = 0.05, bootstrap = FALSE,
+          function(bn, dataset, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = bn@num.nodes, cont.nodes = c(), raw.data = FALSE)
           {
@@ -74,15 +87,39 @@ setMethod("learn.structure",
               }
               else
               {                
+#                 print(node.sizes)
+#                 print(cont.nodes)
+#                 print(max.fanin)
+#                 print(layering)
+#                 print(max.fanin.layers)
                 bn@dag  <- sm(data, node.sizes, cont.nodes, max.fanin, layering, max.fanin.layers)
               }
               return(bn)
             }
             
-            # if (algo == "mmhc") default
+            # if (algo == "mmhc") # default
             {
               cpc    <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
               bn@dag <- hc( data, node.sizes, cpc, cont.nodes )
               return(bn)
             }
           })
+
+counts.to.probs <- function( counts )
+{
+  d <- dim(counts)
+  if( length(d) == 1 )
+    return( counts / sum(counts) )
+  else
+  {
+    # last dimension on the columns, everything else on the rows
+    tmp.d <- c( prod(d[1:(length(d)-1)]), d[length(d)] )
+    dim(counts) <- tmp.d
+    # normalization
+    nor <- rowSums( counts )
+    nor <- nor + (nor == 0) # for the next division
+    counts <- counts / array(nor,tmp.d)
+    dim(counts) <- d
+    return( counts )
+  }
+}

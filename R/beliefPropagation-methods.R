@@ -1,28 +1,16 @@
+#' @rdname belief.propagation-methods
+#' @aliases belief.propagation
 setMethod("belief.propagation",
-          c("BN","JunctionTree"),
-          function(bn, jt, observed.vars = c(), observed.vals = c()){
-            #belief.propagation <- function()
-            {
-              # Takes a junction tree and the conditional probabilities of the original BN,
-              # and compute the belief propagation.
-              # If needed, insert the observed values.
-              #
-              # graph         : adjacency matrix
-              # ctree         : clique tree as computed by junction.tree()
-              # orig.cliques  : list of cliques
-              # cpts          : list of conditional probability tables
-              # dim.vars      : list of variables contained in the cliques of the clique tree
-              # observed.vars : list of observed variables
-              # observed.vals : list of observed values, w.r.t. observed.vars
-              # node.sizes    : node sizes
-              
+          c("InferenceEngine", "BN"),
+          function(ie, bn, observed.vars = c(), observed.vals = c()){
+            {              
               num.nodes  <- bn@num.nodes
-              num.cliqs  <- jt@num.nodes
+              num.cliqs  <- ie@num.nodes
               
               # cliques contains the variables that compose each clique
-              cliques    <- jt@cliques
+              cliques    <- ie@cliques
               
-              ctree      <- jt@junction.tree
+              ctree      <- ie@junction.tree
               
               cpts       <- bn@cpts
               dim.vars   <- lapply(1:num.nodes,
@@ -39,7 +27,6 @@ setMethod("belief.propagation",
 
               
               node.sizes <- bn@node.sizes
-              print(node.sizes)
               
               observed.vars <- c(unlist(observed.vars))
               observed.vals <- c(unlist(observed.vals))
@@ -110,8 +97,8 @@ setMethod("belief.propagation",
                   potentials[[target.clique]]           <- out$potential
                   dimensions.contained[[target.clique]] <- out$vars
                 }
+
               }
-              
               
               # INCORPORATE EVIDENCE
               # If there are any observed variables, insert the knowledge.
@@ -125,59 +112,82 @@ setMethod("belief.propagation",
               #   the permutation the correct number of times. 
               #   TODO restore order using sort.dimensions()
               
-              if (length(observed.vars) > 0)
-              {
-                observed.vars <- c(unlist(observed.vars))
-                for (var in 1:length(unlist(observed.vars)))
-                {
-                  # look for one clique containing the variable
-                  target.clique <- which.min(lapply(1:num.cliqs,
-                                                    function(x) {
-                                                      which(is.element(
-                                                        unlist(dimensions.contained[[x]]),
-                                                        unlist(observed.vars)[var]
-                                                      ) == TRUE)
-                                                    }
-                  ))
-                  # construct new order for aperm()
-                  num.of.vars <- length(unlist(dimensions.contained[[target.clique]]))
-                  position    <- which(unlist(dimensions.contained[[target.clique]]) == observed.vars[var])
-                  new.order   <- c(c(1:num.of.vars)[-position], position)
-                  how.many.repeats <- length(which(new.order-c(1:num.of.vars) != 0)) - 1 # -1 as the first is the aperm() we're computing now
-                  potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
-                  
-                  # set to zero entries corresponding to non-observed values
-                  num.vals <- node.sizes[observed.vars[var]]
-                  step     <- prod(node.sizes[c(unlist(dimensions.contained[[target.clique]]))[1:(length(dimensions.contained[[target.clique]]))-1]])
-                  
-                  for (i in 1:num.vals)
-                  {
-                    if (i != unlist(observed.vals)[var])
-                    {
-                      potentials[[target.clique]][(i-1)*step + (1:step)] <- 0
-                    }
-                  }
-                  
-                  # restore order (if needed)
-                  # IIRC there should be some permutation algebra result for this
-                  if (how.many.repeats > 0)
-                  {
-                    for (i in 1:how.many.repeats)
-                    {
-                      potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
-                    }
-                  }
-                }
-              }
+#               if (length(observed.vars) > 0)
+#               {
+#                 observed.vars <- c(unlist(observed.vars))
+#                 for (var in 1:length(observed.vars))
+#                 {
+#                   # look for one clique containing the variable
+#                   target.clique <- which.min(lapply(1:num.cliqs,
+#                                                     function(x) {
+#                                                       which(is.element(
+#                                                         unlist(dimensions.contained[[x]]),
+#                                                         unlist(observed.vars)[var]
+#                                                       ) == TRUE)
+#                                                     }
+#                   ))
+#                   # construct new order for aperm()
+#                   num.of.vars <- length(unlist(dimensions.contained[[target.clique]]))
+#                   position    <- which(unlist(dimensions.contained[[target.clique]]) == observed.vars[var])
+#                   print(observed.vars[var])
+#                   print(unlist(dimensions.contained[[target.clique]]))
+#                   print(position)
+#                   new.order   <- c(c(1:num.of.vars)[-position], position)
+#                   how.many.repeats <- length(which(new.order-c(1:num.of.vars) != 0)) - 1 # -1 as the first is the aperm() we're computing now
+#                   #print(class(potentials[[target.clique]]))
+#                   potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
+#                   
+#                   # set to zero entries corresponding to non-observed values
+#                   num.vals <- node.sizes[observed.vars[var]]
+#                   #step     <- prod(node.sizes[c(unlist(dimensions.contained[[target.clique]]))[-position]])
+#                   step <- length(potentials[[target.clique]]) / num.vals
+#                   
+#                   bak.dims <- dim(potentials[[target.clique]])
+#                   print(bak.dims)
+# print(length(potentials[[target.clique]]))
+#                   #potentials[[target.clique]][1:length(potentials[[target.clique]])] <- 0
+#                   for (i in 1:num.vals)
+#                   {
+#                     if (i != unlist(observed.vals)[var])
+#                     {
+#                       potentials[[target.clique]][(i-1)*step + (1:step)] <- 0
+#                     }
+#                     else
+#                     {
+#                       # potentials[[target.clique]][(i-1)*step + (1:step)] <- 1
+#                     }
+#                   }
+#                   #potentials[[target.clique]][((unlist(observed.vals))[var]-1)*step + (1:step)] <- 1
+# 
+#   ssum <- sum(potentials[[target.clique]])
+# # 
+# for (j in 1:step)
+#   potentials[[target.clique]][((unlist(observed.vals)[var])-1)*step + j] <- potentials[[target.clique]][((unlist(observed.vals)[var])-1)*step + j] / ssum
+# 
+# print(length(potentials[[target.clique]]))
+#                   dim(potentials[[target.clique]]) <- bak.dims
+# print(potentials[[target.clique]])
+# readLines(file("stdin"),1)
+#                   
+#                   # restore order (if needed)
+#                   # IIRC there should be some permutation algebra result for this
+#                   if (how.many.repeats > 0)
+#                   {
+#                     for (i in 1:how.many.repeats)
+#                     {
+#                       print(class(potentials[[target.clique]]))
+#                       potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
+#                       print("___")
+#                     }
+#                   }
+#                 }
+#               }
               
               
               # compute processing order from leaves to root
               process.order <<- c()
               parents.list  <<- c()
-              proc.order(root, c(), ctree)
-              #   print(process.order)
-              #   print(parents.list)
-              
+              proc.order(root, c(), ctree)              
               
               # MESSAGE PASSING FROM LEAVES TO ROOT
               
@@ -195,7 +205,7 @@ setMethod("belief.propagation",
               # the variables not in the separator, then store the message and multiply it
               # for the cpt contained in the neighbour clique, overwriting the corresponding
               # potential and associated variables.
-              for (clique in 1:(num.cliqs-1))
+              for (clique in 1:(length(process.order)-1))
               {
                 out <- compute.message(potentials[[process.order[clique]]],
                                        dimensions.contained[[process.order[clique]]],
@@ -205,6 +215,8 @@ setMethod("belief.propagation",
                 msg.pots[[process.order[clique]]] <- out$potential
                 msg.vars[[process.order[clique]]] <- out$vars
                 
+                bk <- potentials[[parents.list[clique]]]
+                bkd <- dimensions.contained[[parents.list[clique]]]
                 out <- mult(potentials[[parents.list[clique]]],
                             dimensions.contained[[parents.list[clique]]],
                             msg.pots[[process.order[clique]]],
@@ -212,8 +224,9 @@ setMethod("belief.propagation",
                             node.sizes)
                 potentials[[parents.list[clique]]]           <- out$potential
                 dimensions.contained[[parents.list[clique]]] <- out$vars
+                
               }
-              
+                            
               # Upward step is thus completed. Now go backward from root to leaves.
               # This step is done by taking the CPT of the root node and dividing it (for each child)
               # by the message received from the corresponding child, then marginalize the variables
@@ -221,15 +234,15 @@ setMethod("belief.propagation",
               # in the upward step are not needed anymore after the division, they can be overwritten.
               # Then multiply the cpt of the child for the message computed, and iterate by treating
               # each (internal) node as root.
-              for (clique in (num.cliqs-1):1)
-              {
+              for (clique in (length(process.order)-1):1)
+              {                
                 out <- divide(potentials[[parents.list[clique]]],
                               dimensions.contained[[parents.list[clique]]],
                               msg.pots[[process.order[clique]]],
                               msg.vars[[process.order[clique]]],
                               node.sizes)
                 msg.pots[[process.order[clique]]] <- out$potential
-                msg.vars[[process.order[clique]]] <- as.list(out$vars)
+                msg.vars[[process.order[clique]]] <- out$vars
                 
                 out  <- compute.message(msg.pots[[process.order[clique]]],
                                         msg.vars[[process.order[clique]]],
@@ -254,12 +267,12 @@ setMethod("belief.propagation",
                 dmns <- list(NULL)
                 for (i in length(dimensions.contained[[x]]))
                 {
-                  dmns[[i]] <- c(1,2)
+                  dmns[[i]] <- c(1:bn@node.sizes[dimensions.contained[[x]][[i]]])
                 }
                 dimnames(potentials[[x]])        <- dmns
                 names(dimnames(potentials[[x]])) <- as.list(bn@variables[c(unlist(dimensions.contained[[x]]))])
               }
-              return(bn)
+              return(potentials)
             }
           })
 
@@ -310,11 +323,11 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
     {
       msg  <- marginalize(pot, dp, var)
       pot  <- msg$potential
-      dp   <- as.list(msg$vars)
+      dp   <- msg$vars
     }
   }
   
-  return(list("potential"=pot, "vars"=dp))
+  return(list("potential"=pot, "vars"=as.list(dp)))
 }
 
 
@@ -326,7 +339,7 @@ marginalize <- function(pot, vars, marg.var)
   # vars     : variables associated to pot
   # marg.var : variable to be marginalizes
   
-  marg.dim <- which(unlist(vars) == marg.var)
+  marg.dim <- which(c(unlist(vars)) == marg.var)
   
   # get dimensions, compute dimensions for the soon-to-be-created prob. table
   # and number of the values that it will contain
@@ -345,18 +358,18 @@ marginalize <- function(pot, vars, marg.var)
   
   # switch dimensions, make prob.table  a linear array,
   cpt  <- aperm(pot, new.order)
-  marg <- array(cpt)
+  marg <- c(unlist(cpt))
   
   # the marginalization is now done by summing consecutive values
-  marg <- tapply(marg, rep(1:new.num.vals, each=length.of.run), sum)  
+  marg <- tapply(marg, rep(1:new.num.vals, each=length.of.run), sum)
   
   # apply new dimensions to resulting list (if needed)
   if (length(new.order.names) > 0)
   {
-    marg <- array(marg, new.dims, c(unlist(new.order.names)))
+    marg <- array(marg, new.dims)
   }
   
-  return(list("potential"=marg, "vars"=new.order.names))
+  return(list("potential"=marg, "vars"=as.list(new.order.names)))
 }
 
 
@@ -380,7 +393,7 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # Handles cases such as P(AB) x P(C|AB) ==> P(C|AB) x P(AB)
   # Not really needed, but easier to understand.
   if ((length(setdiff(vars1, vars2)) == 0 &&
-         length(setdiff(vars2, vars1)) > 0     )        
+       length(setdiff(vars2, vars1)) > 0     )        
   )
   {
     tmp   <- vars1
@@ -402,25 +415,22 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   cpt2  <- out$potential
   vars2 <- c(unlist(out$vars))
   
-#   print("eh?")
-#   print(vars1)
-#   print(vars2)
-#   
   # Proper multiplication starts here.
   # It works like this:
-  # - look for the common variablesin vars1 and vars2;
+  # - look for the common variables in vars1 and vars2;
   common.vars <- c(intersect(vars1, vars2))
   common1 <- match  (vars1, common.vars)
-  common1 <- common1[!is.na(common1)]
+  common1 <- which(!is.na(common1), TRUE)
   common2 <- match  (vars2, common.vars)
-  common2 <- common2[!is.na(common2)]
+  common2 <- which(!is.na(common2), TRUE)
+
   
   # - if the cpts share no common variables, we can multiply them with an outer product;
   if (length(common.vars) == 0)
   {
-    cpt1 <- cpt1 %o% cpt2
+    cpt1 <- as.vector(cpt1) %o% as.vector(cpt2)
   }
-  else
+ else
     # otherwise, we have to manage the shared variables: consider P(C|A) x P(AB); unlisting the cpts we obtain
     # [ac !ac a!c !a!c], and
     # [ab !ab a!b !a!b]
@@ -440,67 +450,68 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # to reach the final number of elements (the ``proper number'' is the product of the size of
   # the variables not shared among the two cpt2); then we can finally compute the
   # element-wise product of cpt1 and cpt2;
-{
-  if (length(vars1) > 1)
   {
-    new.order <- c(c(c(1:length(vars1))[common1]),
-                   c(c(1:length(vars1))[-common1]))
-    cpt1      <- aperm(cpt1, new.order)
-    vars1     <- vars1[new.order]
+    if (length(vars1) > 1)
+    {
+      new.order <- c(c(c(1:length(vars1))[common1]),
+                     c(c(1:length(vars1))[-common1]))
+      cpt1      <- aperm(cpt1, new.order)
+      vars1     <- vars1[new.order]
+      common1 <- match  (vars1, common.vars)
+      common1 <- which(!is.na(common1), TRUE)
+    }
+    
+    # [a b c] ==> [a a b b c c]
+    if (length(vars2[-common2]) > 0)
+    {
+      cpt1  <- c(sapply(c(cpt1),
+                        function(x){
+                          rep(x, 
+                              prod(node.sizes[vars2[-common2]])
+                          )
+                        }
+      ))
+    }
+    
+    if(length(vars2) > 1)
+    {
+      new.order <- c(c(c(1:length(vars2))[-common2]),
+                     c(c(1:length(vars2))[common2]))
+      cpt2      <- aperm(cpt2, new.order)
+      vars2     <- vars2[new.order]
+      common2 <- match  (vars2, common.vars)
+      common2 <- which(!is.na(common2), TRUE)
+    }
+    
+    # [a b c] ==> [a b c a b c]
+    cpt2  <- c(rep(c(unlist(cpt2)),
+                   prod(node.sizes[vars1[-common1]])
+    ))
+    
+    # - point-wise product
+    cpt1 <- c(unlist(cpt1)) * c(unlist(cpt2))
+    
   }
   
-  # [a b c] ==> [a a b b c c]
-  cpt1  <- c(sapply(c(cpt1),
-                    function(x){
-                      rep(x, 
-                          prod(node.sizes[vars2[-common2]])
-                      )
-                    }
-  ))
   
-  if(length(vars2) > 1)
+  # - compute variables for the resulting cpt; if there were no shared variables, then
+  #   it suffices to concatenate 
+  if (length(common.vars) > 0)
   {
-    new.order <- c(c(c(1:length(vars2))[-common2]),
-                   c(c(1:length(vars2))[common2]))
-    cpt2      <- aperm(cpt2, new.order)
-    vars2     <- vars2[new.order]
+    new.where <- which(vars2 == common.vars)
+    vars1     <- as.list(c(c(unlist(vars2)[-new.where]),
+                           c(unlist(vars1))))
+  }
+  else
+  {
+    vars1 <- as.list(c(c(vars1), c(vars2)))
   }
   
-  # [a b c] ==> [a b c a b c]
-  cpt2  <- c(rep(c(unlist(cpt2)),
-                 prod(
-                   node.sizes[vars1[-common1]]
-                 )
-  ))
+  cpt1 <- array(c(cpt1), c(node.sizes[unlist(vars1)]))
+
+  out  <- sort.dimensions(cpt1, vars1)
   
-  # - point-wise product
-  cpt1 <- c(unlist(cpt1)) * c(unlist(cpt2))
-  
-}
-
-
-# - compute variables for the resulting cpt; if there were no shared variables, then
-#   it suffices to concatenate 
-if (length(intersect(unlist(vars1),unlist(vars2))) > 0)
-{
-  new.where <- which(vars2 == common.vars)
-  vars1     <- as.list(c(c(unlist(vars2)[-new.where]),
-                         c(unlist(vars1))))
-}
-else
-{
-  #vars1 <- as.list(rev(c(unlist(vars2)), (c(unlist(vars1)))))
-  vars1 <- as.list(c(c(
-    rev(c(vars1)),
-    (c(vars2))))
-  )
-}
-
-cpt1 <- array(c(cpt1), c(node.sizes[unlist(vars1)]))
-
-out  <- sort.dimensions(cpt1, vars1)
-
-return(list("potential"=out$potential, "vars"=out$vars))
+  return(list("potential"=out$potential, "vars"=out$vars))
 }
 
 
@@ -551,7 +562,7 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - look for the common variables (all of the variables in vars2, some of them in vars1);
   common.vars <- c(intersect(vars1, vars2))
   common1 <- match(vars1, common.vars)
-  common1 <- common1[!is.na(common1)]
+  common1 <- which(!is.na(common1), TRUE)# common1[!is.na(common1)]
   
   # - permute array dimensions for cpt1 putting the common variables in the first dimensions;
   if (length(vars1) > 1)
@@ -561,6 +572,8 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     ))
     vars1 <- c(vars1[c(c(1:length(vars1))[common1])],
                vars1[c(c(1:length(vars1))[-common1])])
+    common1 <- match  (vars1, common.vars)
+    common1 <- which(!is.na(common1), TRUE) # common1[!is.na(common1)]
   }
   
   # - unlist cpt2 and repeat it as many times as needed (product of cardinality
@@ -587,7 +600,7 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   cpt1 <- array(c(cpt1), c(node.sizes[unlist(vars1)]))
   out  <- sort.dimensions(cpt1, vars1)
   
-  return(list("potential"=out$potential, "vars"=out$vars))
+  return(list("potential"=out$potential, "vars"=as.list(out$vars)))
 }
 
 sort.dimensions <- function(cpt, vars)

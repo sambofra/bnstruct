@@ -1,5 +1,7 @@
+#' @rdname build.junction.tree-methods
+#' @aliases build.junction.tree,InferenceEngine-methods
 setMethod("build.junction.tree",
-          c("JunctionTree", "matrix"),
+          c("InferenceEngine", "matrix"),
           function(object, dgraph) {
             # Calculate junction tree of a given graph.
             # Input parameter is the adjacency matrix of a directed graph.
@@ -12,10 +14,10 @@ setMethod("build.junction.tree",
             ctree <- ctout$clique.tree
             cs    <- ctout$cliques
             
-            print("junction tree")
-            print(ctree)
-            print("cliques")
-            print(cs)
+#             print("junction tree")
+#             print(ctree)
+#             print("cliques")
+#             print(cs)
             
             object@junction.tree      <- ctree
             object@num.nodes          <- length(cs)

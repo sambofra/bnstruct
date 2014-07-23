@@ -17,34 +17,40 @@
 #'   \item{\code{name}:}{name of the network}
 #'   \item{\code{num.nodes}:}{number of nodes in the network}
 #'   \item{\code{variables}:}{names of the variables in the network}
-#'   \item{\code{node.sizes}:}{cardinality of each variable of the network}
+#'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
+#'   \item{\code{node.sizes}:}{if variable \code{i} is discrete, \code{node.sizes[i]} contains the cardinality of \code{i},
+#'      if \code{i} is instead discrete the value is the number of states variable \code{i} takes when discretized}
 #'   \item{\code{cpts}:}{list of conditional probability tables of the network}
 #'   \item{\code{dag}:}{adjacency matrix of the network}
 #'   \item{\code{wpdag}:}{weighted partially dag}
 #' }
 #' 
-#' @name BN
-#' @rdname BN
-#' @aliases BN-class
+#' @name BN-class
+#' @rdname BN-class
+#' @docType class
+#' @aliases BN,BN-class
+#' 
 #' @exportClass BN
 setClass("BN",
          representation(
-           name       = "character",
-           num.nodes  = "numeric",
-           variables  = "character",
-           node.sizes = "vector",
-           cpts       = "list",
-           dag        = "matrix",
-           wpdag      = "matrix"
+           name         = "character",
+           num.nodes    = "numeric",
+           variables    = "character",
+           discreteness = "logical",
+           node.sizes   = "vector",
+           cpts         = "list",
+           dag          = "matrix",
+           wpdag        = "matrix"
          ),
          prototype(
-           name       = "",
-           num.nodes  = 0,
-           variables  = c(""),
-           node.sizes = c(0),
-           cpts       = list(NULL),
-           dag        = matrix(c(0)),
-           wpdag      = matrix(c(0))
+           name         = "",
+           num.nodes    = 0,
+           variables    = c(""),
+           discreteness = c(TRUE),
+           node.sizes   = c(0),
+           cpts         = list(NULL),
+           dag          = matrix(c(0)),
+           wpdag        = matrix(c(0))
          )
         )
 
@@ -82,6 +88,7 @@ setClass("BN",
 #'   \item{\code{variables}:}{names of the variables in the network}
 #'   \item{\code{node.sizes}:}{cardinality of each variable of the network}
 #'   \item{\code{num.variables}:}{number of variables (columns) in the dataset}
+#'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
 #'   \item{\code{num.items}:}{number of observations (rows) in the dataset}
 #'   \item{\code{has.rawdata}:}{TRUE if the dataset contains data read from a file}
 #'   \item{\code{has.impdata}:}{TRUE if the dataset contains imputed data (computed from raw data)}
@@ -95,9 +102,11 @@ setClass("BN",
 #'   \item{\code{num.boots}:}{number of bootstrap samples}
 #' }
 #' 
-#' @name BNDataset
-#' @rdname BNDataset
-#' @aliases BNDataset-class
+#' @name BNDataset-class
+#' @rdname BNDataset-class
+#' @docType class
+#' @aliases BNDataset,BNDataset-class
+#'
 #' @exportClass BNDataset
 setClass("BNDataset",
          representation(
@@ -107,6 +116,7 @@ setClass("BNDataset",
            variables     = "character",
            node.sizes    = "numeric",
            num.variables = "numeric",
+           discreteness  = "logical",
            num.items     = "numeric",
            has.rawdata   = "logical",
            has.impdata   = "logical",
@@ -126,6 +136,7 @@ setClass("BNDataset",
            variables     = c(""),
            node.sizes    = c(0),
            num.variables = 0,
+           discreteness  = c(TRUE),
            num.items     = 0,
            has.rawdata   = FALSE,
            has.impdata   = FALSE,
@@ -155,52 +166,31 @@ setClass("BNDataset",
 #' 
 #' @section Slots:
 #' \describe{
-#'   \item{\code{junction.tree}:}{junction tree adjacency matrix}
-#'   \item{\code{num.nodes}:}{number of nodes in the junction tree}
-#'   \item{\code{bn}:}{\link{BN} object it refers to}
-#'   \item{\code{cliques}:}{list of cliques composing the nodes of the junction tree}
-#'   \item{\code{triangulated.graph}:}{adjacency matrix of the original triangulated graph}
+#'   \item{\code{junction.tree}:}{junction tree adjacency matrix.}
+#'   \item{\code{num.nodes}:}{number of nodes in the junction tree.}
+#'   \item{\code{cliques}:}{list of cliques composing the nodes of the junction tree.}
+#'   \item{\code{triangulated.graph}:}{adjacency matrix of the original triangulated graph.}
+#'   \item{\code{jpts}:}{inferred joint probability tables.}
 #' }
 #' 
-#' @name JunctionTree
-#' @rdname JunctionTree
-#' @aliases JunctionTree-class
-#' @exportClass JunctionTree
-setClass("JunctionTree",
+#' 
+#' @name InferenceEngine-class
+#' @rdname InferenceEngine-class
+#' 
+#' @exportClass InferenceEngine
+setClass("InferenceEngine",
          representation(
            junction.tree      = "matrix",
            num.nodes          = "numeric",
-           bn                 = "BN",
            cliques            = "list",
-           triangulated.graph = "matrix"
+           triangulated.graph = "matrix",
+           jpts               = "list"
          ),
          prototype(
            junction.tree      = matrix(c(0)),
            num.nodes          = 0,
-           bn                 = NULL,
            cliques            = list(NULL),
-           triangulated.graph = matrix(c(0))
+           triangulated.graph = matrix(c(0)),
+           jpts               = list(NULL)
          )
         )
-
-
-###############################################################################
-# Dataset bootstrap iterator
-# 
-# dataset : dataset
-# current : current element returned
-# imputed : use imputed data, if available
-###############################################################################
-
-# setClass("BootstrapIterator",
-#          representation(
-#            dataset : "BNDataset",
-#            current : "numeric",
-#            imputed : "logical"
-#          ),
-#          prototype(
-#            dataset : NULL,
-#            current : -1,
-#            imputed : FALSE
-#          )
-#         )
