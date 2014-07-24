@@ -47,18 +47,18 @@ net <- learn.params(net, mydata)
  
 print(net)
 unlist(lapply(net@cpts, sum))
-readLines(file("stdin"),1)
+# readLines(file("stdin"),1)
 
 
 print(net)
-readLines(file("stdin"),1)
+# readLines(file("stdin"),1)
 
 inf.eng <- InferenceEngine()
 inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
 
-jpts <- belief.propagation(inf.eng, net, c(2), c(1))
+jpts <- belief.propagation(inf.eng, net, c("Smoke"), c(1))
 
 print("-------------------------------------------------------------------------------------------")
 

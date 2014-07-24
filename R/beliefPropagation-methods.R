@@ -104,84 +104,47 @@ setMethod("belief.propagation",
               # If there are any observed variables, insert the knowledge.
               # Each observation is inserted by setting to zero all of the combinations that
               # do not match the observation. This is done this way:
-              # - for each observed variable, permute the dimensions of the cpt in order to
-              #   put the observed variable as last dimension.
-              #   This way, if the cpt is unrolled, the values of the obs.var. will be contiguous.;
-              # - we can now zero entire runs of consecutive values;
-              # - finally we restore the original order of the dimensions by repeating
-              #   the permutation the correct number of times. 
-              #   TODO restore order using sort.dimensions()
+              # - find a clique that contains the observed variable
+              # - create a probability table for the observed variable, with only one non-zero entry,
+              #   the one corresponding to the observed value
+              # - multiply the table of the clique for the newly created table
+              # - normalize after belief propagation
               
-#               if (length(observed.vars) > 0)
-#               {
-#                 observed.vars <- c(unlist(observed.vars))
-#                 for (var in 1:length(observed.vars))
-#                 {
-#                   # look for one clique containing the variable
-#                   target.clique <- which.min(lapply(1:num.cliqs,
-#                                                     function(x) {
-#                                                       which(is.element(
-#                                                         unlist(dimensions.contained[[x]]),
-#                                                         unlist(observed.vars)[var]
-#                                                       ) == TRUE)
-#                                                     }
-#                   ))
-#                   # construct new order for aperm()
-#                   num.of.vars <- length(unlist(dimensions.contained[[target.clique]]))
-#                   position    <- which(unlist(dimensions.contained[[target.clique]]) == observed.vars[var])
-#                   print(observed.vars[var])
-#                   print(unlist(dimensions.contained[[target.clique]]))
-#                   print(position)
-#                   new.order   <- c(c(1:num.of.vars)[-position], position)
-#                   how.many.repeats <- length(which(new.order-c(1:num.of.vars) != 0)) - 1 # -1 as the first is the aperm() we're computing now
-#                   #print(class(potentials[[target.clique]]))
-#                   potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
-#                   
-#                   # set to zero entries corresponding to non-observed values
-#                   num.vals <- node.sizes[observed.vars[var]]
-#                   #step     <- prod(node.sizes[c(unlist(dimensions.contained[[target.clique]]))[-position]])
-#                   step <- length(potentials[[target.clique]]) / num.vals
-#                   
-#                   bak.dims <- dim(potentials[[target.clique]])
-#                   print(bak.dims)
-# print(length(potentials[[target.clique]]))
-#                   #potentials[[target.clique]][1:length(potentials[[target.clique]])] <- 0
-#                   for (i in 1:num.vals)
-#                   {
-#                     if (i != unlist(observed.vals)[var])
-#                     {
-#                       potentials[[target.clique]][(i-1)*step + (1:step)] <- 0
-#                     }
-#                     else
-#                     {
-#                       # potentials[[target.clique]][(i-1)*step + (1:step)] <- 1
-#                     }
-#                   }
-#                   #potentials[[target.clique]][((unlist(observed.vals))[var]-1)*step + (1:step)] <- 1
-# 
-#   ssum <- sum(potentials[[target.clique]])
-# # 
-# for (j in 1:step)
-#   potentials[[target.clique]][((unlist(observed.vals)[var])-1)*step + j] <- potentials[[target.clique]][((unlist(observed.vals)[var])-1)*step + j] / ssum
-# 
-# print(length(potentials[[target.clique]]))
-#                   dim(potentials[[target.clique]]) <- bak.dims
-# print(potentials[[target.clique]])
-# readLines(file("stdin"),1)
-#                   
-#                   # restore order (if needed)
-#                   # IIRC there should be some permutation algebra result for this
-#                   if (how.many.repeats > 0)
-#                   {
-#                     for (i in 1:how.many.repeats)
-#                     {
-#                       print(class(potentials[[target.clique]]))
-#                       potentials[[target.clique]] <- aperm(potentials[[target.clique]], new.order)
-#                       print("___")
-#                     }
-#                   }
-#                 }
-#               }
+              if (length(observed.vars) > 0)
+              {
+                observed.vars <- c(unlist(observed.vars))
+                if (class(observed.vars) == "character")
+                  observed.vars <- which(observed.vars == bn@variables)
+                for (var in 1:length(observed.vars))
+                {
+                  # look for one clique containing the variable
+                  target.clique <- which.min(lapply(1:num.cliqs,
+                                                    function(x) {
+                                                      which(is.element(
+                                                        unlist(dimensions.contained[[x]]),
+                                                        unlist(observed.vars)[var]
+                                                      ) == TRUE)
+                                                    }
+                  ))
+                  
+                  tmp                     <- rep(0, node.sizes[observed.vars[var]])
+                  if (observed.vals[var] <= 0 || observed.vals[var] > node.sizes[observed.vars[var]])
+                  {
+                    message(cat("Variable", observed.vars[var], "cannot take value", observed.vals[var], ", skipping..."))
+                  }
+                  else
+                  {
+                    tmp[observed.vals[var]] <- 1
+                    out <- mult(potentials[[target.clique]],
+                                dimensions.contained[[target.clique]],
+                                tmp,
+                                observed.vars[var],
+                                node.sizes)
+                    potentials[[target.clique]]           <- out$potential
+                    dimensions.contained[[target.clique]] <- out$vars
+                  }
+                }
+              }
               
               
               # compute processing order from leaves to root
@@ -262,8 +225,10 @@ setMethod("belief.propagation",
                 dimensions.contained[[process.order[clique]]] <- out$vars
               }
               
-              # Finally add dimension names and return the potentials computed (will be all JPTs).
+              # Finally, normalize and add dimension names and return the potentials computed (will be all JPTs).
               for (x in 1:num.cliqs) {
+                s <- sum(potentials[[x]])
+                potentials[[x]] <- potentials[[x]] / s
                 dmns <- list(NULL)
                 for (i in length(dimensions.contained[[x]]))
                 {
