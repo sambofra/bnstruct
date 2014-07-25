@@ -43,7 +43,7 @@ cpts[[8]] <- array(c(0.9, 0.1, 0.8, 0.2, 0.7, 0.3, 0.1, 0.9), dim=c(2,2,2), dimn
 slot(net, "cpts") <- cpts
 
 # net <- learn.structure(net, mydata, algo="mmhc")
-net <- learn.params(net, mydata)
+#net <- learn.params(net, mydata)
  
 print(net)
 unlist(lapply(net@cpts, sum))
@@ -58,10 +58,12 @@ inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
 
-jpts <- belief.propagation(inf.eng, net, c("Smoke"), c(1))
+jpts <- belief.propagation(inf.eng, net, c("Asia", "X-ray", "Dyspnea"), c(2,1,1))
 
 print("-------------------------------------------------------------------------------------------")
 
 print(jpts)
 
-unlist(lapply(jpts, sum))
+unlist(lapply(jpts@cpts, sum))
+
+get.most.probable.values(jpts)

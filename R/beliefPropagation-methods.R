@@ -2,7 +2,7 @@
 #' @aliases belief.propagation
 setMethod("belief.propagation",
           c("InferenceEngine", "BN"),
-          function(ie, bn, observed.vars = c(), observed.vals = c()){
+          function(ie, bn, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
             {              
               num.nodes  <- bn@num.nodes
               num.cliqs  <- ie@num.nodes
@@ -113,27 +113,31 @@ setMethod("belief.propagation",
               if (length(observed.vars) > 0)
               {
                 observed.vars <- c(unlist(observed.vars))
-                if (class(observed.vars) == "character")
-                  observed.vars <- which(observed.vars == bn@variables)
+                
+                print(observed.vars)
+                if (class(observed.vars) == "character") # hope that the user gives coherent input...
+                  observed.vars <- sapply(observed.vars, function(x) which(x == bn@variables))
+                
                 for (var in 1:length(observed.vars))
                 {
-                  # look for one clique containing the variable
-                  target.clique <- which.min(lapply(1:num.cliqs,
-                                                    function(x) {
-                                                      which(is.element(
-                                                        unlist(dimensions.contained[[x]]),
-                                                        unlist(observed.vars)[var]
-                                                      ) == TRUE)
-                                                    }
-                  ))
                   
-                  tmp                     <- rep(0, node.sizes[observed.vars[var]])
                   if (observed.vals[var] <= 0 || observed.vals[var] > node.sizes[observed.vars[var]])
                   {
                     message(cat("Variable", observed.vars[var], "cannot take value", observed.vals[var], ", skipping..."))
                   }
                   else
                   {
+                    # look for one clique containing the variable
+                    target.clique <- which.min(lapply(1:num.cliqs,
+                                                      function(x) {
+                                                        which(is.element(
+                                                          unlist(dimensions.contained[[x]]),
+                                                          unlist(observed.vars)[var]
+                                                        ) == TRUE)
+                                                      }
+                    ))
+
+                    tmp <- rep(0, node.sizes[observed.vars[var]])
                     tmp[observed.vals[var]] <- 1
                     out <- mult(potentials[[target.clique]],
                                 dimensions.contained[[target.clique]],
@@ -237,7 +241,106 @@ setMethod("belief.propagation",
                 dimnames(potentials[[x]])        <- dmns
                 names(dimnames(potentials[[x]])) <- as.list(bn@variables[c(unlist(dimensions.contained[[x]]))])
               }
-              return(potentials)
+              
+              if (return.potentials)
+                return(potentials)
+              
+              ###################
+              # Now create new BN with updated beliefs
+              ###################
+              #
+              # To buil new conditional probability tables for the original network,
+              # starting from the updated beliefs, we proceed this way:
+              # for each node of the BN:
+              # - if it is an observed variable, construct a prob.table containing only
+              #   one variable (the one of the node) with one only non-zero (in fact, 1)
+              #   entry, the one corresponding to the observed value
+              # - if it is a non-observed variable, find a clique that contains the variables
+              #   of the original cpt (it must exist, because of the moralization - we have
+              #   already used this property), sum out the possible other variables introduced
+              #   by the triangulation, and divide the JPT by the JPT of the parent nodes
+              #   (e.g.: if we want P(C|A,B), and we start from P(ABCD), we sum out D, then we
+              #   obtain P(AB) by summing out C, and then we compute P(ABC)/P(AB) = P(C|A,B)).
+              #   Easy peasy.
+              
+              nbn <- BN()
+              slot(nbn, "name")       <- bn@name
+              slot(nbn, "num.nodes")  <- bn@num.nodes
+              slot(nbn, "variables")  <- bn@variables
+              slot(nbn, "node.sizes") <- bn@node.sizes
+              slot(nbn, "dag")        <- bn@dag
+              ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
+              
+              for (node in 1:num.nodes)
+              {
+                mpos <- match(node, observed.vars)
+                if (!is.na(mpos))
+                # works also when observed.vars == c()
+                # in that case, the `else` branch will be the chosen one for every variable
+                {
+                  ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
+                                         c(node.sizes[observed.vars[mpos]]))
+                  ncpts[[node]][observed.vals[mpos]] <- 1
+                  dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
+                  names(dimnames(ncpts[[node]])) <- as.list(nbn@variables[observed.vars[mpos]])
+                }
+                else
+                {
+                  target.clique <- which.min(lapply(1:num.cliqs,
+                                                    function(x){
+                                                      length(
+                                                        which(unlist(
+                                                          is.element(
+                                                            c(unlist(dim.vars[[node]])),
+                                                            c(unlist(dimensions.contained[[x]]))
+                                                          )
+                                                        ) == FALSE) == 0)
+                                                    }
+                  ))
+                  
+                  pot <- potentials[[target.clique]]
+                  dms <- c(unlist(dimensions.contained[[target.clique]]))
+                  vs  <- c(unlist(dim.vars[[node]]))
+                  
+                  others <- setdiff(dms,vs)
+                  for (var in others)
+                  {
+                    out <- marginalize(pot, dms, var)
+                    pot <- out$potential
+                    dms <- c(unlist(out$vars))
+                  }
+                  
+                  if (length(vs) > 1)
+                  {
+                    pot.bak <- pot
+                    dms.bak <- dms
+                    
+                    out <- marginalize(pot, dms, node)
+                    out <- divide(pot.bak,
+                                  dms.bak,
+                                  out$potential,
+                                  out$vars,
+                                  node.sizes)
+                    
+                    pot <- out$potential
+                    dms <- c(unlist(out$vars))
+                  }
+                  
+                  dmns <- list(NULL)
+                  for (i in length(dms))
+                  {
+                    dmns[[i]] <- c(1:bn@node.sizes[dms[i]])
+                  }
+                  dimnames(pot)        <- dmns
+                  names(dimnames(pot)) <- as.list(nbn@variables[dms])
+                  ncpts[[node]] <- pot
+                }
+                
+              }
+              
+              slot(nbn, "cpts") <- ncpts
+              
+              return(nbn)
             }
           })
 
@@ -600,31 +703,4 @@ sort.dimensions <- function(cpt, vars)
     }
   }
   return(list("potential"=cpt, "vars"=vars))
-}
-
-
-bp.query <- function(potentials, cliques, query.var)
-{
-  clique <- which.min(lapply(1:length(cliques),
-                             function(x){
-                               length(
-                                 which(unlist(
-                                   is.element(
-                                     query.var,
-                                     unlist(cliques[[x]])
-                                   )
-                                 ) == FALSE) == 0)
-                             }
-  ))
-  
-  pot  <- potentials[[clique]]
-  vars <-c(unlist(cliques[[clique]]))
-  
-  for (var in setdiff(vars, c(unlist(query.var))))
-  {
-    marg  <- marginalize(pot, vars, var)
-    pot   <- marg$potential
-    vars  <- marg$vars
-  }
-  return(pot)
 }

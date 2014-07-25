@@ -53,6 +53,72 @@ setValidity("BN",
             }
 )
 
+#' @rdname get.most.probable.values-methods
+#' @aliases get.most.probable.values
+setMethod("get.most.probable.values",
+          "BN",
+          function(bn, ...)
+          {
+            dag  <- bn@dag
+            cpts <- bn@cpts
+            num.nodes <- bn@num.nodes
+            variables <- bn@variables
+            node.sizes <- bn@node.sizes
+
+            mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
+
+            sorted.nodes <- topological.sort(dag)
+            
+            dim.vars   <- lapply(1:num.nodes,
+                                 function(x)
+                                   as.list(
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(cpts[[x]]))
+                                       )),
+                                       c(variables)
+                                     )
+                                   )
+            )
+            
+            
+            for (node in sorted.nodes)
+            {
+              pot  <- cpts[[node]]
+              vars <- c(unlist(dim.vars[[node]]))
+
+              # sum out parent variables
+              if (length(dim.vars[[node]]) > 1)
+              {
+                # find the dimensions corresponding to the current variable
+                for (parent in setdiff(vars, node))
+                {
+                  out  <- marginalize(pot, vars, parent)
+                  pot  <- out$potential
+                  vars <- out$vars
+                }
+              }
+              
+              wm        <- which.max(pot)
+              mpv[node] <- wm
+              
+              # propagate information from parent nodes to children
+              children <- which(dag[node,] > 0)
+              if (length(children) > 0)
+              {
+                for (child in children)
+                {
+                  out <- mult(pot, c(node),
+                              cpts[[child]], dim.vars[[child]],
+                              node.sizes)
+                  cpts[[child]]     <- out$potential
+                  dim.vars[[child]] <- out$vars
+                }
+              }
+            }
+            print(mpv)
+          })
+
 # redefition of print() for BN objects
 #' @rdname print-methods
 #' @aliases print.BN

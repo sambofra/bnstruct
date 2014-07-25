@@ -43,6 +43,20 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.structure"))
 
+#' Return an array containing the most probable values for each variable, according to the CPTS.
+#' In case of ties take the first value.
+#' 
+#' @name get.most.probable.values
+#' @rdname get.most.probable.values-methods
+#' 
+#' @param bn a \code{\link{BN}} object.
+#' @param ... potential further arguments of methods.
+#' 
+#' @return array containing, in each position, the most probable value for the corresponding variable.
+#' 
+#' @exportMethod get.most.probable.values
+setGeneric("get.most.probable.values", function(bn,...) standardGeneric("get.most.probable.values"))
+
 #' Print a \code{\link{BN}} object to stdout.
 #' 
 #' By default shows only generic infos like name an variables, not the 
@@ -286,9 +300,11 @@ setGeneric("print.InferenceEngine", function(x, ...) standardGeneric("print.Infe
 #' @param ie an \code{\link{InferenceEngine}} object.
 #' @param bn a \code{\link{BN}} object.
 #' @param observed.vars list of observed variables.
-#' @param observed.vals values taken by variables listed in \code{observed.vars}
+#' @param observed.vals values taken by variables listed in \code{observed.vars}.
+#' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
 #' @param ... potential further arguments of methods.
-#' @return modified \code{\link{InferenceEngine}} object containing computed probabilities.
+#' 
+#' @return a new \code{\link{BN}} object with updated probabilities.
 #' 
 #' @exportMethod belief.propagation
 setGeneric("belief.propagation", function(ie, bn, ...) standardGeneric("belief.propagation"))
