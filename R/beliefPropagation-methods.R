@@ -4,15 +4,18 @@ setMethod("belief.propagation",
           c("InferenceEngine", "BN"),
           function(ie, bn, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
             {              
-              num.nodes  <- bn@num.nodes
-              num.cliqs  <- ie@num.nodes
+              num.nodes  <- num.nodes(bn)
+              num.cliqs  <- num.nodes(ie)
               
               # cliques contains the variables that compose each clique
-              cliques    <- ie@cliques
+              cliques    <- jt.cliques(ie)
               
-              ctree      <- ie@junction.tree
+              ctree      <- junction.tree(ie)
               
-              cpts       <- bn@cpts
+              cpts       <- cpts(bn)
+              
+              variables  <- variables(bn)
+              
               dim.vars   <- lapply(1:num.nodes,
                                    function(x)
                                      as.list(
@@ -20,13 +23,13 @@ setMethod("belief.propagation",
                                          c(unlist(
                                           names(dimnames(cpts[[x]]))
                                          )),
-                                         c(bn@variables)
+                                         variables
                                        )
                                    )
                             )
 
               
-              node.sizes <- bn@node.sizes
+              node.sizes <- node.sizes(bn)
               
               observed.vars <- c(unlist(observed.vars))
               observed.vals <- c(unlist(observed.vals))
@@ -114,13 +117,11 @@ setMethod("belief.propagation",
               {
                 observed.vars <- c(unlist(observed.vars))
                 
-                print(observed.vars)
                 if (class(observed.vars) == "character") # hope that the user gives coherent input...
-                  observed.vars <- sapply(observed.vars, function(x) which(x == bn@variables))
+                  observed.vars <- sapply(observed.vars, function(x) which(x == variables))
                 
                 for (var in 1:length(observed.vars))
                 {
-                  
                   if (observed.vals[var] <= 0 || observed.vals[var] > node.sizes[observed.vars[var]])
                   {
                     message(cat("Variable", observed.vars[var], "cannot take value", observed.vals[var], ", skipping..."))
@@ -236,10 +237,10 @@ setMethod("belief.propagation",
                 dmns <- list(NULL)
                 for (i in length(dimensions.contained[[x]]))
                 {
-                  dmns[[i]] <- c(1:bn@node.sizes[dimensions.contained[[x]][[i]]])
+                  dmns[[i]] <- c(1:node.sizes[dimensions.contained[[x]][[i]]])
                 }
                 dimnames(potentials[[x]])        <- dmns
-                names(dimnames(potentials[[x]])) <- as.list(bn@variables[c(unlist(dimensions.contained[[x]]))])
+                names(dimnames(potentials[[x]])) <- as.list(variables[c(unlist(dimensions.contained[[x]]))])
               }
               
               if (return.potentials)
@@ -259,16 +260,18 @@ setMethod("belief.propagation",
               #   of the original cpt (it must exist, because of the moralization - we have
               #   already used this property), sum out the possible other variables introduced
               #   by the triangulation, and divide the JPT by the JPT of the parent nodes
-              #   (e.g.: if we want P(C|A,B), and we start from P(ABCD), we sum out D, then we
+              #   (e.g.: if we start from P(ABCD) and want P(C|A,B), we sum out D, then we
               #   obtain P(AB) by summing out C, and then we compute P(ABC)/P(AB) = P(C|A,B)).
               #   Easy peasy.
               
               nbn <- BN()
-              slot(nbn, "name")       <- bn@name
-              slot(nbn, "num.nodes")  <- bn@num.nodes
-              slot(nbn, "variables")  <- bn@variables
-              slot(nbn, "node.sizes") <- bn@node.sizes
-              slot(nbn, "dag")        <- bn@dag
+              name(nbn)         <- name(bn)
+              num.nodes(nbn)    <- num.nodes(bn)
+              variables(nbn)    <- variables(bn)
+              node.sizes(nbn)   <- node.sizes(bn)
+              discreteness(nbn) <- discreteness(bn)
+              dag(nbn)          <- dag(bn)
+              wpdag(nbn)        <- wpdag(bn)
               ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
               
               for (node in 1:num.nodes)
@@ -282,7 +285,7 @@ setMethod("belief.propagation",
                                          c(node.sizes[observed.vars[mpos]]))
                   ncpts[[node]][observed.vals[mpos]] <- 1
                   dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
-                  names(dimnames(ncpts[[node]])) <- as.list(nbn@variables[observed.vars[mpos]])
+                  names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
                 }
                 else
                 {
@@ -329,16 +332,16 @@ setMethod("belief.propagation",
                   dmns <- list(NULL)
                   for (i in length(dms))
                   {
-                    dmns[[i]] <- c(1:bn@node.sizes[dms[i]])
+                    dmns[[i]] <- c(1:node.sizes[dms[i]])
                   }
                   dimnames(pot)        <- dmns
-                  names(dimnames(pot)) <- as.list(nbn@variables[dms])
+                  names(dimnames(pot)) <- as.list(variables[dms])
                   ncpts[[node]] <- pot
                 }
                 
               }
               
-              slot(nbn, "cpts") <- ncpts
+              cpts(nbn) <- ncpts
               
               return(nbn)
             }
@@ -566,7 +569,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   #   it suffices to concatenate 
   if (length(common.vars) > 0)
   {
-    new.where <- which(vars2 == common.vars)
+    # new.where <- which(vars2 == common.vars)
+    new.where <- which(is.na(match(vars2, common.vars)) == FALSE) # ugly, but should be more robust
     vars1     <- as.list(c(c(unlist(vars2)[-new.where]),
                            c(unlist(vars1))))
   }

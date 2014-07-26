@@ -23,25 +23,25 @@ net <- learn.params(net, mydata)
 # 
 print(net)
 lapply(net@cpts, sum)
-readLines(file("stdin"),1)
+# readLines(file("stdin"),1)
 
 print(net)
 
-readLines(file("stdin"),1)
+# readLines(file("stdin"),1)
 
 inf.eng <- InferenceEngine()
 inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
-readLines(file("stdin"),1)
+# readLines(file("stdin"),1)
 
 jpts <- belief.propagation(inf.eng, net, c(3:20), rep(1,18))
 
 print("-------------------------------------------------------------------------------------------")
 
 print(jpts)
-bak <- jpts
+# bak <- jpts
 
-print(sum(c(unlist(jpts))))
-unlist(lapply(jpts, sum))
-readLines(file("stdin"),1)
+# print(sum(c(unlist(jpts))))
+# unlist(lapply(jpts, sum))
+# readLines(file("stdin"),1)

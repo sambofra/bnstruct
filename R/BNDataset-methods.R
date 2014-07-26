@@ -73,6 +73,137 @@ setValidity("BNDataset",
             }
 )
 
+#' @rdname accessors-methods
+#' @aliases name
+setMethod("name", "BNDataset", function(x) { slot(x, "name") } )
+
+
+#' @rdname accessors-methods
+#' @aliases num.variables
+setMethod("num.variables", "BNDataset", function(x) { slot(x, "num.variables") } )
+
+
+#' @rdname accessors-methods
+#' @aliases variables
+setMethod("variables", "BNDataset", function(x) { slot(x, "variables") } )
+
+
+#' @rdname accessors-methods
+#' @aliases discreteness
+setMethod("discreteness",
+          "BNDataset",
+          function(x)
+          {
+            vs  <- slot(x, "discreteness")
+            nvs <- rep('c', length(vs))
+            nvs[which(vs == TRUE)] <- 'd'
+            nvs
+          })
+
+
+#' @rdname accessors-methods
+#' @aliases node.sizes
+setMethod("node.sizes", "BNDataset", function(x) { slot(x, "node.sizes") } )
+
+
+#' @aliases header.file
+#' @rdname accessors-methods
+setMethod("header.file", "BNDataset", function(x) slot(x, "header.file"))
+
+
+#' @aliases data.file
+#' @rdname accessors-methods
+setMethod("data.file", "BNDataset", function(x) slot(x, "data.file"))
+
+
+#' @aliases num.variables
+#' @rdname accessors-methods
+setMethod("num.variables","BNDataset", function(x) slot(x, "num.variables"))
+
+
+#' @name num.items
+#' @rdname accessors-methods
+setMethod("num.items", "BNDataset", function(x) slot(x, "num.items"))
+
+
+#' @aliases has.boots
+#' @rdname accessors-methods
+setMethod("has.boots", "BNDataset", function(x) slot(x, "has.boots"))
+
+
+#' @aliases has.imp.boots
+#' @rdname accessors-methods
+setMethod("has.imp.boots", "BNDataset", function(x) slot(x, "has.imp.boots"))
+
+
+#' @aliases boots
+#' @rdname accessors-methods
+setMethod("boots", "BNDataset", function(x) slot(x, "boots"))
+
+
+#' @aliases imp.boots
+#' @rdname accessors-methods
+setMethod("imp.boots", "BNDataset", function(x) slot(x, "imp.boots"))
+
+
+#' @aliases num.boots
+#' @rdname accessors-methods
+setMethod("num.boots", "BNDataset", function(x) slot(x, "num.boots"))
+
+
+# @name name
+# @rdname mutators-methods
+# @aliases name
+setReplaceMethod("name",
+                 signature(x="BNDataset", value="character"),
+                 function(x, value)
+                 {
+                   slot(x, "name") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name variables
+# @rdname mutators-methods
+# @aliases variables
+setReplaceMethod("variables",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "variables")  <- value
+                   num.variables(x)      <- length(value)
+                   validObject(x)
+                   x
+                 })
+
+
+# @name discreteness
+# @rdname mutators-methods
+# @aliases discreteness
+setReplaceMethod("discreteness",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                   validObject(x)
+                   x
+                 })
+
+
+# @name node.sizes
+# @aliases node.sizes
+# @rdname mutators-methods
+setReplaceMethod("node.sizes",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "node.sizes") <- value
+                   validObject(x)
+                   x
+                 })
+
+
 # check if any data available
 #' @rdname has.data-methods
 #' @aliases has.data
@@ -136,6 +267,104 @@ setMethod("get.imputed.data",
             return (NULL)
           })
 
+
+# @aliases header.file
+# @rdname mutators-methods
+setReplaceMethod("header.file",
+                 "BNDataset",
+                 function(x, value)
+                  {
+                    slot(x, "header.file") <- value
+                    x
+                  })
+
+
+# @aliases data.file
+# @rdname mutators-methods
+setReplaceMethod("data.file",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "data.file") <- value
+                   x
+                 })
+
+
+# @aliases num.variables
+# @rdname mutators-methods
+setReplaceMethod("num.variables",
+                 "BNDataset",
+                 function(x, value)
+                  {
+                    slot(x, "num.variables") <- value
+                    validObject
+                    x
+                  })
+
+
+# @aliases num.items
+# @rdname mutators-methods
+setReplaceMethod("num.items",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                  slot(x, "num.items") <- value
+                  validObject(x)
+                  x
+                 })
+
+
+# @aliases boots
+# @rdname mutators-methods
+setReplaceMethod("boots",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                  slot(x, "boots")     <- value
+                  slot(x, "num.boots") <- length(value)
+                  slot(x, "has.boots") <- TRUE
+                  validObject(x)
+                  x
+                 })
+
+
+# @aliases imp.boots
+# @rdname mutators-methods
+setReplaceMethod("imp.boots",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "imp.boots")     <- value
+                   slot(x, "num.boots")     <- length(value)
+                   slot(x, "has.imp.boots") <- TRUE
+                   validObject(x)
+                   x
+                 })
+
+
+setReplaceMethod("raw.data",
+                 "BNDataset",
+                 function(object, value)
+                 {
+                   slot(object, "raw.data")    <- value
+                   slot(object, "has.rawdata") <- TRUE
+                   validObject(object)
+                   object
+                 })
+
+
+setReplaceMethod("imputed.data",
+                 "BNDataset",
+                 function(object, value)
+                 {
+                   slot(object, "imputed.data") <- value
+                   slot(object, "has.impdata")  <- TRUE
+                   slot(object, "imputation")   <- TRUE
+                   validObject(object)
+                   object
+                 })
+
+
 # redefition of print() for BNDataset objects
 #' @rdname print-methods
 #' @aliases print.BNDataset,BNDataset,ANY
@@ -174,16 +403,16 @@ setMethod("print.BNDataset",
               str <- paste(str, "currently empty", sep='')
             }
             str <- paste(str, ".\n", sep = '')
-            message(str)
+            cat(str)
             
             if (show.raw.data == TRUE && has.raw.data(object))
             {
-              message("Raw data:\n")
+              cat("Raw data:\n")
               print(get.raw.data(object))
             }
             if (show.imputed.data == TRUE && has.imputed.data(object))
             {
-              message("Imputed data:\n")
+              cat("Imputed data:\n")
               print(get.imputed.data(object))
             }
             

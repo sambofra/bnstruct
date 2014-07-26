@@ -6,21 +6,20 @@ setMethod("read.dataset",
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
                    bootstrap = FALSE, num.boots = 100, seed = 0)
           {
-            ls                  <- readLines(header)
-            object@variables    <- c(unlist(strsplit(ls[1], split = " ")))
-            lns                 <- c(unlist(strsplit(ls[2], split = " ")))
-            object@node.sizes   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
-            lds                 <- c(unlist(strsplit(ls[3], split = " ")))
-            object@discreteness <- sapply(1:length(lds), FUN=function(x){ !is.na(match(lds[x],c('d',"D"))) })
+            ls                   <- readLines(header)
+            variables(object)    <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
+            lns                  <- c(unlist(strsplit(ls[2], split = " ")))
+            node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
+            lds                  <- c(unlist(strsplit(ls[3], split = " ")))
+            discreteness(object) <- sapply(1:length(lds), FUN=function(x){ !is.na(match(lds[x],c('d',"D"))) })
             
             a <- read.delim(dataset, na.strings = na.string.symbol,
                             header = header.flag, sep = sep.symbol) + 1
-            object@raw.data      <- as.matrix(a)
-            object@num.variables <- ncol(object@raw.data)
-            object@num.items     <- nrow(object@raw.data)
-            object@has.rawdata   <- TRUE
+            raw.data(object)      <- as.matrix(a)
+            num.variables(object) <- ncol(object@raw.data)
+            num.items(object)     <- nrow(object@raw.data)
             
-            if (object@num.variables != length(object@variables))
+            if (num.variables(object) != length(variables(object)))
             {
               message(paste(c("Incoherent number of variables between files ",
                               header," and ",dataset,"\n"), sep=''))
@@ -28,30 +27,25 @@ setMethod("read.dataset",
             }
             
             # quantize if needed
-            if (!is.na(match(FALSE,c(unlist(object@discreteness)))))
+            if (!is.na(match(FALSE,c(unlist(discreteness(object))))))
             {
-              object@raw.data <- quantize.matrix(object@raw.data, object@node.sizes)
+              raw.data(object) <- quantize.matrix(get.raw.data(object), node.sizes(object))
             }
-            
-            object@imputation    <- imputation
-            object@has.impdata   <- imputation
             
             if (imputation)
             {
               # perform imputation
-              object@imputed.data <- knn.impute(object@raw.data, k.impute,
-                                                setdiff(1:length(object@node.sizes), c()))
+              imputed.data(object) <- knn.impute(get.raw.data(object), k.impute,
+                                                setdiff(1:length(node.sizes(object)), c()))
             }
-            
-            object@has.boots <- bootstrap
             
             set.seed(seed)
             if (bootstrap && num.boots >= 1)
             {
-              boot.sample <- matrix(sample.int(object@num.items,
-                                               size = num.boots * object@num.items,
+              boot.sample <- matrix(sample.int(num.items(object),
+                                               size = num.boots * num.items(object),
                                                replace=TRUE),
-                                    object@num.items, num.boots)
+                                    num.items(object), num.boots)
               
               if (imputation)
                 object@has.imp.boots <- TRUE
@@ -63,7 +57,7 @@ setMethod("read.dataset",
                 if (imputation)
                   object@imp.boots[[i]] <- knn.impute(object@boots[[i]],
                                                       k.impute,
-                                                      setdiff(1:length(object@node.sizes),c()) )
+                                                      setdiff(1:length(node.sizes(object)),c()) )
                 
               }
             }

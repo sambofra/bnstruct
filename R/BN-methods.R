@@ -4,9 +4,29 @@
 #' @rdname BN-class
 setMethod("initialize",
           "BN",
-          function(.Object, ...)  
+          function(.Object, dataset = NULL,
+                   algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   layering = c(), max.fanin.layers = NULL,
+                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
           {
-            validObject(.Object)      
+            if (!is.null(dataset))
+            {
+              name(.Object)         <- name(dataset)
+              num.nodes(.Object)    <- num.variables(dataset)
+              variables(.Object)    <- variables(dataset)
+              node.sizes(.Object)   <- node.sizes(dataset)
+              discreteness(.Object) <- discreteness(dataset)
+              validObject(.Object)
+
+              .Object <- learn.structure(.Object, dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                         layering = layering, max.fanin.layers = max.fanin.layers,
+                                         max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
+              
+              validObject(.Object)
+
+              .Object <- learn.params(.Object, dataset, ess = ess)
+            }
+            validObject(.Object)
             .Object
           })
 
@@ -15,9 +35,13 @@ setMethod("initialize",
 #' @name BN
 #' @rdname BN-class
 #' @export
-BN <- function(...)
+BN <- function(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
+               layering = c(), max.fanin.layers = NULL,
+               max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
 {
-  object <- new("BN", ...)
+  object <- new("BN", dataset = dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
+                layering = layering, max.fanin.layers = max.fanin.layers,
+                max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
   object
 }
 
@@ -26,24 +50,24 @@ setValidity("BN",
             function(object)
             {
               retval <- NULL
-              if (object@num.nodes > 0 && length(object@variables) > 1 && length(object@variables) != object@num.nodes)
+              if (num.nodes(object) > 0 && length(variables(object)) > 1 && length(variables(object)) != num.nodes(object))
               {
                 retval <- c(retval, "incoherent number of variable names")
               }
-              if (object@num.nodes > 0 && length(object@dag) > 1 &&
-                  (ncol(object@dag) != object@num.nodes ||
-                   nrow(object@dag) != object@num.nodes   ))
+              if (num.nodes(object) > 0 && length(dag(object)) > 1 &&
+                  (ncol(dag(object)) != num.nodes(object) ||
+                   nrow(dag(object)) != num.nodes(object)   ))
               {
                 retval <- c(retval, "incoherent number of variables in DAG")
               }
-              if (object@num.nodes > 0 && length(object@wpdag) > 1 &&
-                  (ncol(object@wpdag) != object@num.nodes ||
-                   nrow(object@wpdag) != object@num.nodes   ))
+              if (num.nodes(object) > 0 && length(wpdag(object)) > 1 &&
+                  (ncol(wpdag(object)) != num.nodes(object) ||
+                   nrow(wpdag(object)) != num.nodes(object)   ))
               {
                 retval <- c(retval, "incoherent number of variables in WPDAG")
               }
-              if(object@num.nodes > 0 && length(object@discreteness) > 1 &&
-                 length(object@discreteness) != object@num.nodes)
+              if(num.nodes(object) > 0 && length(discreteness(object)) > 1 &&
+                 length(discreteness(object)) != num.nodes(object))
               {
                 retval <- c(retval, "incoherent number of variable statuses")
               }
@@ -53,17 +77,172 @@ setValidity("BN",
             }
 )
 
+# getters and setters
+
+#' @rdname accessors-methods
+#' @aliases name
+setMethod("name", "BN", function(x) { slot(x, "name") } )
+
+
+#' @rdname accessors-methods
+#' @aliases num.nodes
+setMethod("num.nodes", "BN", function(x) { slot(x, "num.nodes") } )
+
+
+#' @rdname accessors-methods
+#' @aliases variables
+setMethod("variables", "BN", function(x) { slot(x, "variables") } )
+
+
+#' @rdname accessors-methods
+#' @aliases discreteness
+setMethod("discreteness",
+          "BN",
+          function(x)
+          {
+            vs  <- slot(x, "discreteness")
+            nvs <- rep('c', length(vs))
+            nvs[which(vs == TRUE)] <- 'd'
+            nvs
+          })
+
+
+#' @rdname accessors-methods
+#' @aliases node.sizes
+setMethod("node.sizes", "BN", function(x) { slot(x, "node.sizes") } )
+
+
+#' @rdname accessors-methods
+#' @aliases cpts
+setMethod("cpts", "BN", function(x) { slot(x, "cpts") } )
+
+
+#' @rdname accessors-methods
+#' @aliases dag
+setMethod("dag", "BN", function(x) { slot(x, "dag") } )
+
+
+#' @rdname accessors-methods
+#' @aliases wpdag
+setMethod("wpdag", "BN", function(x) { slot(x, "wpdag") } )
+
+
+# @name name
+# @rdname mutators-methods
+# @aliases name
+setReplaceMethod("name",
+                 signature(x="BN", value="character"),
+                 function(x, value)
+                 {
+                   slot(x, "name") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name num.nodes
+# @rdname mutators-methods
+# @aliases num.nodes
+setReplaceMethod("num.nodes",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "num.nodes") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name variables
+# @rdname mutators-methods
+# @aliases variables
+setReplaceMethod("variables",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "variables")  <- value
+                   num.nodes(x) <- length(value)
+                   validObject(x)
+                   x
+                 })
+
+
+# @name discreteness
+# @rdname mutators-methods
+# @aliases discreteness
+setReplaceMethod("discreteness",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                   validObject(x)
+                   x
+                 })
+
+
+# @name node.sizes
+# @aliases node.sizes
+# @rdname mutators-methods
+setReplaceMethod("node.sizes",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "node.sizes") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name cpts
+# @aliases cpts
+# @rdname mutators-methods
+setReplaceMethod("cpts",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "cpts") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name dag
+# @aliases dag
+# @rdname mutators-methods
+setReplaceMethod("dag",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "dag") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name wpdag
+# @alises wpdag
+# @rdname mutators-methods
+setReplaceMethod("wpdag",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "wpdag") <- value
+                   validObject(x)
+                   x
+                 })
+
+
 #' @rdname get.most.probable.values-methods
 #' @aliases get.most.probable.values
 setMethod("get.most.probable.values",
           "BN",
           function(bn, ...)
           {
-            dag  <- bn@dag
-            cpts <- bn@cpts
-            num.nodes <- bn@num.nodes
-            variables <- bn@variables
-            node.sizes <- bn@node.sizes
+            dag  <- dag(bn)
+            cpts <- cpts(bn)
+            num.nodes <- num.nodes(bn)
+            variables <- variables(bn)
+            node.sizes <- node.sizes(bn)
 
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
 
@@ -116,7 +295,7 @@ setMethod("get.most.probable.values",
                 }
               }
             }
-            print(mpv)
+            return(mpv)
           })
 
 # redefition of print() for BN objects
@@ -127,23 +306,23 @@ setMethod("print.BN",
           function(x, ...)
           {
             str <- "\nBayesian Network "
-            str <- paste(str, x@name, sep = '')
+            str <- paste(str, name(x), sep = '')
             str <- paste(str, " with ", sep = '')
-            str <- paste(str, x@num.nodes, sep = '')
+            str <- paste(str, num.nodes(x), sep = '')
             str <- paste(str, " nodes\n", sep = '')
-            str <- paste(str, paste(x@variables, sep=" ", collapse=', '))
-            message(str)
+            str <- paste(str, paste(variables(x), sep=" ", collapse=', '))
+            cat(str)
             
-            if (x@num.nodes > 0)
+            if (num.nodes(x) > 0 && length(dag(x)) > 1)
             {
-              colnames(x@dag) <- x@variables
-              rownames(x@dag) <- x@variables
+              colnames(dag(x)) <- variables(x)
+              rownames(dag(x)) <- variables(x)
               
-              message('\nAdjacency matrix:')
-              print(x@dag)
+              cat('\nAdjacency matrix:')
+              print(dag(x))
               
-              message("\nConditional probability tables:")
-              print(x@cpts)
+              cat("\nConditional probability tables:")
+              print(cpts(x))
               
             }
             
@@ -156,10 +335,9 @@ setMethod("plot.BN",
           c("BN"),
           # Plot a weighted connectivity matrix using Rgraphviz
           function( x, use.node.names = TRUE, frac = 0.2, 
-                    max.weight = max(x@dag), node.col = rep('white',ncol(x@dag)),
+                    max.weight = max(dag(x)), node.col = rep('white',ncol(dag(x))),
                     plot.wpdag = FALSE)
           {
-            object <- x
             
             # check for Rgraphviz
             if (!require(Rgraphviz))
@@ -167,18 +345,21 @@ setMethod("plot.BN",
             
             # adjacency matrix
             if (plot.wpdag)
-              mat <- object@wpdag
+              mat <- wpdag(x)
             else
-              mat <- object@dag
+              mat <- dag(x)
+            
+            num.nodes <- num.nodes(x)
+            variables <- variables(x)
             
             mat.th <- mat
             mat.th[mat <  frac*max.weight] <- 0
             mat.th[mat >= frac*max.weight] <- 1
             # node names
-            if (use.node.names && length(object@variables) > 0)
-              node.names <- object@variables
+            if (use.node.names && length(variables) > 0)
+              node.names <- variables
             else
-              node.names <- as.character(1:object@num.nodes)
+              node.names <- as.character(1:num.nodes)
             # build graph
             g <- graphAM( mat.th, edgemode="directed")
             nodes(g) <- node.names
@@ -225,7 +406,7 @@ setMethod("save.to.eps",
 
 dag.to.cpdag <- function(object, layering = NULL)
 {
-  return(abs(label.edges(object@dag, layering)))
+  return(abs(label.edges(dag(object), layering)))
 }
 
 label.edges <- function(dag, layering = NULL)

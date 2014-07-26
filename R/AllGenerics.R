@@ -5,6 +5,7 @@
 
 ###############################################################################
 
+
 #' Learn the parameters of a \link{BN} object according to a \link{BNDataset}
 #' using MAP (Maximum A Posteriori) estimation.
 #' 
@@ -19,6 +20,7 @@
 #' 
 #' @exportMethod learn.params
 setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.params"))
+
 
 #' Learn the structure of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
 #' 
@@ -43,6 +45,7 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.structure"))
 
+
 #' Return an array containing the most probable values for each variable, according to the CPTS.
 #' In case of ties take the first value.
 #' 
@@ -57,6 +60,7 @@ setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.
 #' @exportMethod get.most.probable.values
 setGeneric("get.most.probable.values", function(bn,...) standardGeneric("get.most.probable.values"))
 
+
 #' Print a \code{\link{BN}} object to stdout.
 #' 
 #' By default shows only generic infos like name an variables, not the 
@@ -70,6 +74,7 @@ setGeneric("get.most.probable.values", function(bn,...) standardGeneric("get.mos
 #' 
 #' @exportMethod print.BN
 setGeneric("print.BN", function(x, ...) standardGeneric("print.BN"))
+
 
 #' Plot a \code{\link{BN}} as a picture.
 #' 
@@ -86,6 +91,7 @@ setGeneric("print.BN", function(x, ...) standardGeneric("print.BN"))
 #' 
 #' @exportMethod plot.BN
 setGeneric("plot.BN", function(x, ...) standardGeneric("plot.BN"))
+
 
 #' Save a \code{\link{BN}} picture as \code{.eps} file
 #' 
@@ -105,6 +111,7 @@ setGeneric("save.to.eps", function(object, filename) standardGeneric("save.to.ep
 ## BNDataset generics
 
 ###############################################################################
+
 
 #' Check whether a \code{\link{BNDataset}} object actually contains raw or imputed data.
 #' 
@@ -168,6 +175,31 @@ setGeneric("get.raw.data", function(object) standardGeneric("get.raw.data"))
 #' 
 #' @exportMethod get.imputed.data
 setGeneric("get.imputed.data", function(object) standardGeneric("get.imputed.data"))
+
+
+#' Insert raw data in a \code{\link{BNDataset}} object.
+#' 
+#' @name raw.data
+#' @rdname raw.data-methods
+#' 
+#' @param object a \code{\link{BNDataset}}.
+#' @param value a matrix of integers containing a dataset.
+#' 
+#' @exportMethod raw.data<-
+setGeneric("raw.data<-", function(object, value) standardGeneric("raw.data<-"))
+
+
+#' Insert imputed data in a \code{\link{BNDataset}} object.
+#' 
+#' @name imputed.data
+#' @rdname imputed.data-methods
+#' 
+#' @param object a \code{\link{BNDataset}}.
+#' @param value a matrix of integers containing a dataset.
+#' 
+#' @exportMethod imputed.data<-
+setGeneric("imputed.data<-", function(object, value) standardGeneric("imputed.data<-"))
+
 
 #' Print a \code{\link{BNDataset}} object to stdout.
 #' 
@@ -263,7 +295,7 @@ setGeneric("get.boot", function(dataset, index, ...) standardGeneric("get.boot")
 ###############################################################################
 ###############################################################################
 
-## Junction Tree generics
+## InferenceEngine generics
 
 ###############################################################################
 
@@ -312,4 +344,490 @@ setGeneric("belief.propagation", function(ie, bn, ...) standardGeneric("belief.p
 # setGeneric("save.to.eps", function(object, filename) standardGeneric("save.to.eps")) # to implement (?)
 
 
-## BootstrapIterator generics
+###############################################################################
+###############################################################################
+
+## Accessors and mutators
+
+###############################################################################
+
+#' get name of an  object.
+#' 
+#' @name name
+#' @aliases name
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return name of the desired object.
+#' 
+#' @exportMethod name
+setGeneric("name", function(x) standardGeneric("name"))
+
+
+#' get number of nodes of an object.
+#' 
+#' @name num.nodes
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return number of nodes of the desired object.
+#' 
+#' @exportMethod num.nodes
+setGeneric("num.nodes", function(x) standardGeneric("num.nodes"))
+
+
+#' get variables of an object.
+#' 
+#' @name variables
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return vector of the variables names of the desired object.
+#' 
+#' @exportMethod variables
+setGeneric("variables", function(x) standardGeneric("variables"))
+
+
+#' get status (discrete or continuous) of the variables of an object.
+#' 
+#' @name discreteness
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return vector contaning, for each variable of the desired object,
+#'         \code{c} if the variable is continue, and \code{d} if the variable is discrete.
+#' 
+#' @exportMethod discreteness
+setGeneric("discreteness", function(x) standardGeneric("discreteness"))
+
+
+#' get size of the variables of an object. It is the actual cardinality
+#' of discrete variables, and the cardinality of the discretized variable for continuous variables.
+#' 
+#' @name node.sizes
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return vector contaning the size of each variable of the desired object.
+#' 
+#' @exportMethod node.sizes
+setGeneric("node.sizes", function(x) standardGeneric("node.sizes"))
+
+
+#' get the list of conditional probability tables of an object.
+#' 
+#' @name cpts
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return list of the conditional probability tables of the desired object.
+#' 
+#' @exportMethod cpts
+setGeneric("cpts", function(x) standardGeneric("cpts"))
+
+
+#' get adjacency matrix of an object.
+#' 
+#' @name dag
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return matrix containing the adjacency matrix of the directed acyclic graph representing
+#'         the structure of the object.
+#' 
+#' @exportMethod dag
+setGeneric("dag", function(x) standardGeneric("dag"))
+
+
+#' get WPDAG of an object, when available (e.g. when bootstrap on dataset is performed).
+#' 
+#' @name wpdag
+#' @rdname accessors-methods
+#' 
+#' @param x an object.
+#' 
+#' @return matrix contaning the WPDAG of the desired object.
+#' 
+#' @exportMethod wpdag
+setGeneric("wpdag", function(x) standardGeneric("wpdag"))
+
+
+#' get header file of a \code{\link{BNDataset}}.
+#' 
+#' @name header.file
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}}.
+#' 
+#' @return header filename of the dataset.
+#' 
+#' @exportMethod header.file
+setGeneric("header.file", function(x) standardGeneric("header.file"))
+
+
+#' get data file of a \code{\link{BNDataset}}.
+#' 
+#' @name data.file
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}}.
+#' 
+#' @return data filename of the dataset.
+#' 
+#' @exportMethod data.file
+setGeneric("data.file", function(x) standardGeneric("data.file"))
+
+
+#' get number of variables of a \code{\link{BNDataset}}.
+#' 
+#' @name num.variables
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return number of variables of the desired dataset.
+#' 
+#' @exportMethod num.variables
+setGeneric("num.variables", function(x) standardGeneric("num.variables"))
+
+
+#' get number of items of a \code{\link{BNDataset}}.
+#' 
+#' @name num.items
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return number of items of the desired dataset.
+#' 
+#' @exportMethod num.items
+setGeneric("num.items", function(x) standardGeneric("num.items"))
+
+# has.rawdata
+# has.impdata
+# raw.data
+# imputation
+# imputed.data
+# already have methods (see above)
+
+
+#' check whether a \code{\link{BNDataset}} has bootstrap samples or not.
+#' 
+#' @name has.boots
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return \code{TRUE} if dataset has bootstrap samples.
+#' 
+#' @exportMethod has.boots
+setGeneric("has.boots", function(x) standardGeneric("has.boots"))
+
+
+#' check whether a \code{\link{BNDataset}} has bootstrap samples from imputed data or not.
+#' 
+#' @name has.imp.boots
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return \code{TRUE} if dataset has bootstrap samples from imputed data.
+#' 
+#' @exportMethod has.imp.boots
+setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
+
+
+#' get list of bootstrap samples of a \code{\link{BNDataset}}.
+#' 
+#' @name boots
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return the list of bootstrap samples.
+#' 
+#' @exportMethod boots
+setGeneric("boots", function(x) standardGeneric("boots"))
+
+
+#' get list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.
+#' 
+#' @name imp.boots
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return the list of bootstrap samples from imputed data.
+#' 
+#' @exportMethod imp.boots
+setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))
+
+
+#' get number of bootstrap samples of a \code{\link{BNDataset}}.
+#' 
+#' @name num.boots
+#' @rdname accessors-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return the number of bootstrap samples.
+#' 
+#' @exportMethod num.boots
+setGeneric("num.boots", function(x) standardGeneric("num.boots"))
+
+
+#' get the junction tree of an \code{\link{InferenceEngine}}.
+#' 
+#' @name junction.tree
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the junction tree contained in the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod junction.tree
+setGeneric("junction.tree", function(x) standardGeneric("junction.tree"))
+
+
+#' get the list of cliques of the junction tree of an \code{\link{InferenceEngine}}.
+#' 
+#' @name jt.cliques
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the list of cliques of the junction tree contained in the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod jt.cliques
+setGeneric("jt.cliques", function(x) standardGeneric("jt.cliques"))
+
+
+#' get the list of joint probability tables compiled by an \code{\link{InferenceEngine}}.
+#' 
+#' @name jpts
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the list of joint probability tables compiled by the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod jpts
+setGeneric("jpts", function(x) standardGeneric("jpts"))
+
+
+###############################################################################
+
+
+#' set name of an object.
+#' 
+#' @name name
+#' @rdname mutators-methods
+#' @docType methods
+#' 
+#' @param x an object.
+#' @param value the new name of the object.
+#' 
+#' @exportMethod name<-
+setGeneric("name<-", function(x, value) standardGeneric("name<-"))
+
+
+#' set number of nodes of an object.
+#' 
+#' @name num.nodes
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value the number of nodes in the object.
+#' 
+#' @exportMethod num.nodes<-
+setGeneric("num.nodes<-", function(x, value) standardGeneric("num.nodes<-"))
+
+
+#' set variables of an object.
+#' 
+#' @name variables
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value vector containing the variable names of the object.
+#'        Overwrites \code{num.nodes} slot if non-matching.
+#' 
+#' @exportMethod variables<-
+setGeneric("variables<-", function(x, value) standardGeneric("variables<-"))
+
+
+#' set status (discrete or continuous) of the variables of an object.
+#' 
+#' @name discreteness
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively).
+#' 
+#' @exportMethod discreteness<-
+setGeneric("discreteness<-", function(x, value) standardGeneric("discreteness<-"))
+
+
+#' set size of the variables of an object. It represents the actual cardinality
+#' of discrete variables, and the cardinality of the discretized variable for continuous variables.
+#' 
+#' @name node.sizes
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value vector contaning the size of each variable of the object.
+#' 
+#' @exportMethod node.sizes<-
+setGeneric("node.sizes<-", function(x, value) standardGeneric("node.sizes<-"))
+
+
+#' set the list of conditional probability tables of an object.
+#' 
+#' @name cpts
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value list of the conditional probability tables of the object.
+#' 
+#' @exportMethod cpts<-
+setGeneric("cpts<-", function(x, value) standardGeneric("cpts<-"))
+
+
+#' set adjacency matrix of an object.
+#' 
+#' @name dag
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value matrix containing the adjacency matrix of the directed acyclic graph representing
+#'         the structure of the object.
+#' 
+#' @exportMethod dag<-
+setGeneric("dag<-", function(x, value) standardGeneric("dag<-"))
+
+
+#' set WPDAG of the object.
+#' 
+#' @name wpdag
+#' @rdname mutators-methods
+#' 
+#' @param x an object.
+#' @param value matrix contaning the WPDAG of the object.
+#' 
+#' @exportMethod wpdag<-
+setGeneric("wpdag<-", function(x, value) standardGeneric("wpdag<-"))
+
+
+#' set header file of a \code{\link{BNDataset}}.
+#' 
+#' @name header.file
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}}.
+#' @param value header filename.
+#' 
+#' @exportMethod header.file<-
+setGeneric("header.file<-", function(x, value) standardGeneric("header.file<-"))
+
+
+#' set data file of a \code{\link{BNDataset}}.
+#' 
+#' @name data.file
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}}.
+#' @param value data filename.
+#' 
+#' @exportMethod data.file<-
+setGeneric("data.file<-", function(x, value) standardGeneric("data.file<-"))
+
+
+#' set number of variables of a \code{\link{BNDataset}}.
+#' 
+#' @name num.variables
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' @param value number of variables of the dataset.
+#' 
+#' @exportMethod num.variables<-
+setGeneric("num.variables<-", function(x, value) standardGeneric("num.variables<-"))
+
+
+#' set number of items of a \code{\link{BNDataset}}.
+#' 
+#' @name num.items
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' @param value number of items of the desired dataset.
+#' 
+#' @exportMethod num.items<-
+setGeneric("num.items<-", function(x, value) standardGeneric("num.items<-"))
+
+
+#' set list of bootstrap samples of a \code{\link{BNDataset}}.
+#' 
+#' @name boots
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' @param value the list of bootstrap samples.
+#' 
+#' @exportMethod boots<-
+setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
+
+
+#' set list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.
+#' 
+#' @name imp.boots
+#' @rdname mutators-methods
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' @param value the list of bootstrap samples from imputed data.
+#' 
+#' @exportMethod imp.boots<-
+setGeneric("imp.boots<-", function(x, value) standardGeneric("imp.boots<-"))
+
+
+#' set the junction tree of an \code{\link{InferenceEngine}}.
+#' 
+#' @name junction.tree
+#' @rdname mutators-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the junction tree to be inserted in the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod junction.tree<-
+setGeneric("junction.tree<-", function(x, value) standardGeneric("junction.tree<-"))
+
+
+#' set the list of cliques of the junction tree of an \code{\link{InferenceEngine}}.
+#' 
+#' @name jt.cliques
+#' @rdname mutators-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the list of cliques of the junction tree contained in the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod jt.cliques<-
+setGeneric("jt.cliques<-", function(x, value) standardGeneric("jt.cliques<-"))
+
+
+#' set the list of joint probability tables compiled by an \code{\link{InferenceEngine}}.
+#' 
+#' @name jpts
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the list of joint probability tables compiled by the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod jpts<-
+setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))

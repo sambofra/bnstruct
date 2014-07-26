@@ -37,7 +37,7 @@ setClass("BN",
            num.nodes    = "numeric",
            variables    = "character",
            discreteness = "logical",
-           node.sizes   = "vector",
+           node.sizes   = "numeric",
            cpts         = "list",
            dag          = "matrix",
            wpdag        = "matrix"

@@ -26,19 +26,79 @@ setValidity("InferenceEngine",
             function(object)
             {
               retval <- NULL
-              if (object@num.nodes > 0 && length(object@cliques) != object@num.nodes)
+              if (num.nodes(object) > 0 && length(jt.cliques(object)) > 1 &&
+                  length(jt.cliques(object)) != num.nodes(object))
               {
                 retval <- c(retval, "incoherent number of cliques")
               }
-              if (object@num.nodes > 0 && (ncol(object@junction.tree) != object@num.nodes ||
-                                             nrow(object@junction.tree) != object@num.nodes   ))
-              {
-                retval <- c(retval, "incoherent number of variables in Junction Tree")
-              }
+#               if (num.nodes(object) > 0 && length(c(junction.tree(object))) > 1 && 
+#                  (ncol(junction.tree(object)) != num.nodes(object) ||
+#                   nrow(junction.tree(object)) != num.nodes(object)   ))
+#               {
+#                 retval <- c(retval, "incoherent number of variables in Junction Tree")
+#               }
               if (is.null(retval)) return (TRUE)
               return (retval)
             }
 )
+
+
+setMethod("num.nodes", "InferenceEngine", function(x) slot(x, "num.nodes"))
+
+setMethod("junction.tree", "InferenceEngine", function(x) slot(x, "junction.tree"))
+
+setMethod("jt.cliques", "InferenceEngine", function(x) slot(x, "cliques"))
+
+setMethod("jpts", "InferenceEngine", function(x) slot(x, "jpts"))
+
+
+setReplaceMethod("num.nodes",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "num.nodes") <- value
+                   validObject(x)
+                   x
+                 })
+
+
+# @name junction.tree
+# @rdname mutators-methods
+setReplaceMethod("junction.tree",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "junction.tree") <- value
+                   slot(x, "num.nodes")     <- length(value)
+                   validObject(x)
+                   x
+                 })
+
+
+# @name cliques
+# @rdname mutators-methods
+setReplaceMethod("jt.cliques",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "cliques")   <- value
+                   slot(x, "num.nodes") <- length(value)
+                   validObject(x)
+                   x
+                 })
+
+
+# @name jpts
+# @rdname accessors-methods
+setReplaceMethod("jpts",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "jpts") <- value
+                   validObject(x)
+                   x
+                 })
+
 
 # redefition of print() for InferenceEngine objects
 #' @rdname print.InferenceEngine-methods
@@ -51,19 +111,19 @@ setMethod("print.InferenceEngine",
             {
               str <- "\nJunction Tree "
               str <- paste(str, "with ", sep = '')
-              str <- paste(str, x@num.nodes, sep = '')
+              str <- paste(str, num.nodes(x), sep = '')
               str <- paste(str, " cliques", sep = '')
-              message(str)
+              cat(str)
               
-              if (x@num.nodes > 0)
+              if (num.nodes(x) > 0)
               {          
                 str <- ""
                 clnames <- NULL
-                for (i in 1:x@num.nodes)
+                for (i in 1:num.nodes(x))
                 {
                   clname <- ''
                   clname <- paste(clname, '(', sep = '')
-                  clname <- paste(clname, paste(sort(x@cliques[[i]]), sep="", collapse=','))
+                  clname <- paste(clname, paste(sort(jt.cliques(x)[[i]]), sep="", collapse=','))
                   clname <- paste(clname, ')', sep = '')
                   clnames[[i]] <- clname
                   str <- paste(str, clname, sep = ' ')
@@ -71,9 +131,8 @@ setMethod("print.InferenceEngine",
                 colnames(x@junction.tree) <- clnames
                 rownames(x@junction.tree) <- clnames
                 
-                message(str, '\n\nAdjacency matrix:')
-                print(x@junction.tree)
-                message("")
+                cat(str, '\n\nAdjacency matrix:')
+                print(junction.tree(x))
               }
             }
             

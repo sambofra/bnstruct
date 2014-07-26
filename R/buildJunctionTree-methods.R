@@ -14,15 +14,12 @@ setMethod("build.junction.tree",
             ctree <- ctout$clique.tree
             cs    <- ctout$cliques
             
-#             print("junction tree")
-#             print(ctree)
-#             print("cliques")
-#             print(cs)
+            junction.tree(object)      <- ctree
+            #num.nodes(object)          <- length(cs)
+            jt.cliques(object)         <- cs
+            # triangulated.graph(object) <- graph
             
-            object@junction.tree      <- ctree
-            object@num.nodes          <- length(cs)
-            object@cliques            <- cs
-            object@triangulated.graph <- graph
+            validObject(object)
             object
           }
 )
@@ -154,7 +151,7 @@ clique.tree <- function(graph)
                         add.colnames=NULL, add.rownames=NA)  
   
   # get list containing all the maximal cliques in the graph
-  cliques(ig, min=NULL, max=NULL)
+  igraph::cliques(ig, min=NULL, max=NULL)
   cs <- maximal.cliques(ig)
   # print("---")
   # print(cs)

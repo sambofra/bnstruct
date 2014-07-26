@@ -5,9 +5,10 @@ setMethod("learn.params",
           function(bn, dataset, ess = 1)
           #learn.params <- function(data, dag, node.sizes, ess = 1)
           {
-          # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
-          # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
-          # so that the sum over the last dimension is always 1
+            # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
+            # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
+            # so that the sum over the last dimension is always 1
+
             # just to play safe
             data <- get.data(dataset)
             
@@ -15,13 +16,14 @@ setMethod("learn.params",
             storage.mode(bn@dag) <- "integer"
             storage.mode(bn@node.sizes) <- "integer"
             
-            node.sizes <- bn@node.sizes
-            dag        <- bn@dag
-            n.nodes    <- bn@num.nodes
+            node.sizes <- node.sizes(bn)
+            dag        <- dag(bn)
+            n.nodes    <- num.nodes(bn)
+            variables  <- variables(bn)
             
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)
-            var.names <- c(unlist(bn@variables))  # colnames(data)
+            var.names <- c(unlist(variables))  # colnames(data)
             d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
             # esimate a cpt for each family from data
             for ( i in 1:n.nodes )
@@ -46,7 +48,7 @@ setMethod("learn.params",
             
             #return( cpts )
             
-            bn@cpts <- cpts
+            cpts(bn) <- cpts
             bn
           }
 )
@@ -57,13 +59,15 @@ setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
-                   max.fanin = bn@num.nodes, cont.nodes = c(), raw.data = FALSE)
+                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE)
           {
-            bn@num.nodes  <- dataset@num.variables
-            bn@node.sizes <- dataset@node.sizes
-            bn@variables  <- dataset@variables
+            num.nodes(bn)  <- num.variables(dataset)
+            node.sizes(bn) <- node.sizes(dataset)
+            variables(bn)  <- variables(dataset)
+            validObject(bn)
             
-            node.sizes <- bn@node.sizes
+            node.sizes <- node.sizes(bn)
+            
             if (bootstrap)
             {
               # todo
@@ -92,7 +96,7 @@ setMethod("learn.structure",
 #                 print(max.fanin)
 #                 print(layering)
 #                 print(max.fanin.layers)
-                bn@dag  <- sm(data, node.sizes, cont.nodes, max.fanin, layering, max.fanin.layers)
+                dag(bn)  <- sm(data, node.sizes, cont.nodes, max.fanin, layering, max.fanin.layers)
               }
               return(bn)
             }
@@ -100,7 +104,7 @@ setMethod("learn.structure",
             # if (algo == "mmhc") # default
             {
               cpc    <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
-              bn@dag <- hc( data, node.sizes, cpc, cont.nodes )
+              dag(bn) <- hc( data, node.sizes, cpc, cont.nodes )
               return(bn)
             }
           })
