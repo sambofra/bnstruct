@@ -52,13 +52,13 @@ setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.
 #' @name get.most.probable.values
 #' @rdname get.most.probable.values-methods
 #' 
-#' @param bn a \code{\link{BN}} object.
+#' @param bn a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
 #' @param ... potential further arguments of methods.
 #' 
 #' @return array containing, in each position, the most probable value for the corresponding variable.
 #' 
 #' @exportMethod get.most.probable.values
-setGeneric("get.most.probable.values", function(bn,...) standardGeneric("get.most.probable.values"))
+setGeneric("get.most.probable.values", function(x,...) standardGeneric("get.most.probable.values"))
 
 
 #' Print a \code{\link{BN}} object to stdout.
@@ -341,7 +341,18 @@ setGeneric("print.InferenceEngine", function(x, ...) standardGeneric("print.Infe
 #' @exportMethod belief.propagation
 setGeneric("belief.propagation", function(ie, bn, ...) standardGeneric("belief.propagation"))
 
-# setGeneric("save.to.eps", function(object, filename) standardGeneric("save.to.eps")) # to implement (?)
+
+#' Test if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.
+#' 
+#' @name test.updated.bn
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return \code{TRUE} if an updated network is contained in the InferenceEngine, \code{FALSE} otherwise.
+#' 
+#' @export test.updated.bn
+setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 
 
 ###############################################################################
@@ -622,6 +633,35 @@ setGeneric("jt.cliques", function(x) standardGeneric("jt.cliques"))
 setGeneric("jpts", function(x) standardGeneric("jpts"))
 
 
+#' get the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#' 
+#' @name bn
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param updated.bn \code{TRUE} if the network to be returned is the updated one,
+#'        \code{FALSE} to obtain the original one.
+#' 
+#' @return the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#'         Updated network is the default choice.
+#' 
+#' @exportMethod bn
+setGeneric("bn", function(x, ...) standardGeneric("bn"))
+
+
+#' get the list of observations of an \code{\link{InferenceEngine}}.
+#' 
+#' @name observations
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the list of observations of the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod observations
+setGeneric("observations", function(x) standardGeneric("observations"))
+
+
 ###############################################################################
 
 
@@ -831,3 +871,44 @@ setGeneric("jt.cliques<-", function(x, value) standardGeneric("jt.cliques<-"))
 #' 
 #' @exportMethod jpts<-
 setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))
+
+
+#' set the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#' 
+#' @name bn
+#' @rdname mutators-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param updated.bn \code{TRUE} if the network to be returned is the updated one,
+#'        \code{FALSE} to obtain the original one.
+#' @param value the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#'         Updated network is the default choice.
+#' 
+#' @exportMethod bn<-
+setGeneric("bn<-", function(x, ..., value) standardGeneric("bn<-"))
+
+
+#' set the list of observations of an \code{\link{InferenceEngine}}.
+#' Replace previous list of observations, if present.
+#' 
+#' @name observations
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the list of observations of the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod observations<-
+setGeneric("observations<-", function(x, value) standardGeneric("observations<-"))
+
+
+#' add evidence to the list of observations of an \code{\link{InferenceEngine}}.
+#' 
+#' @name add.observations
+#' @rdname accessors-methods
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the list of observations of the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod add.observations<-
+setGeneric("add.observations<-", function(x, value) standardGeneric("add.observations<-"))
+

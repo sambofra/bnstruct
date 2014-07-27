@@ -49,10 +49,15 @@ setClass("BN",
            discreteness = c(TRUE),
            node.sizes   = c(0),
            cpts         = list(NULL),
-           dag          = matrix(c(0)),
-           wpdag        = matrix(c(0))
+           dag          = matrix(),
+           wpdag        = matrix()
          )
         )
+
+
+# Create new class union to allow the embedding of a BN in a slot of another class,
+# allowing it to take the default value of NULL.
+setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 
 
 ###############################################################################
@@ -184,13 +189,21 @@ setClass("InferenceEngine",
            num.nodes          = "numeric",
            cliques            = "list",
            triangulated.graph = "matrix",
-           jpts               = "list"
+           jpts               = "list",
+           bn                 = "BNOrNULL",
+           updated.bn         = "BNOrNULL",
+           observed.vars      = "vector",
+           observed.vals      = "vector"
          ),
          prototype(
-           junction.tree      = matrix(c(0)),
+           junction.tree      = matrix(),
            num.nodes          = 0,
            cliques            = list(NULL),
-           triangulated.graph = matrix(c(0)),
-           jpts               = list(NULL)
+           triangulated.graph = matrix(),
+           jpts               = list(NULL),
+           bn                 = NULL,
+           updated.bn         = NULL,
+           observed.vars      = vector(),
+           observed.vals      = vector()
          )
         )

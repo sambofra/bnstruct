@@ -56,12 +56,14 @@ net <- BN(mydata, algo = "mmhc")
 print(net)
 readLines(file("stdin"),1)
 
-inf.eng <- InferenceEngine()
-inf.eng <- build.junction.tree(inf.eng, net@dag)
+inf.eng <- InferenceEngine(net)
+#inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
 
-jpts <- belief.propagation(inf.eng, net, c("Asia", "X-ray", "Dyspnea"), c(2,1,1))
+# net, c("Asia", "X-ray", "Dyspnea"), c(2,1,1)
+observations(inf.eng) <- list(c("Asia", "X-ray", "Dyspnea"), c(2,1,1))
+jpts <- belief.propagation(inf.eng)
 
 print("-------------------------------------------------------------------------------------------")
 

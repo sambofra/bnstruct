@@ -1,3 +1,11 @@
+setMethod("belief.propagation",
+          c("InferenceEngine"),
+          function(ie, return.potentials = FALSE)
+          {
+            obs <- observations(ie)
+            belief.propagation(ie, bn(ie, updated.bn = FALSE), obs$observed.vars, obs$observed.vals, return.potentials)
+          })
+
 #' @rdname belief.propagation-methods
 #' @aliases belief.propagation
 setMethod("belief.propagation",

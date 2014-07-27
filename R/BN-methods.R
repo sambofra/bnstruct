@@ -236,8 +236,9 @@ setReplaceMethod("wpdag",
 #' @aliases get.most.probable.values
 setMethod("get.most.probable.values",
           "BN",
-          function(bn, ...)
+          function(x, ...)
           {
+            bn   <- x
             dag  <- dag(bn)
             cpts <- cpts(bn)
             num.nodes <- num.nodes(bn)

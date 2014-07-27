@@ -3,7 +3,7 @@
 #' @name InferenceEngine
 #' @rdname InferenceEngine-class
 setMethod("initialize",
-          "InferenceEngine",
+          c("InferenceEngine"),
           function(.Object, ...)  
           {
             validObject(.Object)      
@@ -15,9 +15,20 @@ setMethod("initialize",
 #' @name InferenceEngine
 #' @rdname InferenceEngine-class
 #' @export
-InferenceEngine <- function(...)
+InferenceEngine <- function(bn = NULL, observations = NULL, ...)
 {
-  object <- new("InferenceEngine", ...)
+  object <- new("InferenceEngine", bn, observations, ...)
+  
+  if (!is.null(bn))
+    bn(object, updated.bn = FALSE) <- bn
+  
+  if (!is.null(observations))
+    observations(object) <- observations
+  
+  if (!is.null(bn))
+  {
+    object <- build.junction.tree(object, dag(bn))
+  }
   object
 }
 
@@ -37,6 +48,14 @@ setValidity("InferenceEngine",
 #               {
 #                 retval <- c(retval, "incoherent number of variables in Junction Tree")
 #               }
+
+              obs <- observations(object)
+
+              if (length(obs[[1]]) != length(obs[[2]]))
+              {
+                retval <- c(retval, "incoherent number of observed variables and values")
+              }
+
               if (is.null(retval)) return (TRUE)
               return (retval)
             }
@@ -50,6 +69,36 @@ setMethod("junction.tree", "InferenceEngine", function(x) slot(x, "junction.tree
 setMethod("jt.cliques", "InferenceEngine", function(x) slot(x, "cliques"))
 
 setMethod("jpts", "InferenceEngine", function(x) slot(x, "jpts"))
+
+setMethod("bn",
+           "InferenceEngine",
+           function(x, updated.bn = TRUE)
+           {
+             if (updated.bn && !is.null(slot(x, "updated.bn")))
+               return(slot(x, "updated.bn"))
+             
+             if (updated.bn && is.null(slot(x, "updated.bn")) && !is.null(slot(x, "bn")))
+             {
+               message("Updated network not yet computed, returning the original one.")
+               return(slot(x, "bn"))
+             }
+             
+             if (is.null(slot(x, "bn")))
+             {
+               message("No network present.")
+               return(NULL)
+             }
+             
+             return(slot(x, "bn"))
+           })
+
+
+setMethod("observations",
+          "InferenceEngine",
+          function(x)
+          {
+            return(list("observed.vars" = slot(x, "observed.vars"), "observed.vals" = slot(x, "observed.vals")))
+          })
 
 
 setReplaceMethod("num.nodes",
@@ -98,6 +147,64 @@ setReplaceMethod("jpts",
                    validObject(x)
                    x
                  })
+
+
+setReplaceMethod("bn",
+                 "InferenceEngine",
+                 function(x, updated.bn = TRUE, value)
+                 {
+                   if (class(value) != "BN")
+                   {
+                     message("Value argument is not a BN object.\nLeaving InferenceEngine untouched.")
+                     return(x)
+                   }
+                   
+                   if (updated.bn)
+                     slot(x, "updated.bn") <- value
+                   else
+                     slot(x, "bn") <- value
+
+                   validObject(x)
+                   x
+                 })
+
+
+# I assume that the user knows what he/she does...
+setReplaceMethod("observations",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "observed.vars") <- c(unlist(value[[1]]))
+                   slot(x, "observed.vals") <- c(unlist(value[[2]]))
+                   validObject(x)
+                   x
+                 })
+
+
+setReplaceMethod("add.observations",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   slot(x, "observed.vars") <- c(slot(x, "observed.vars"), c(unlist(value[[1]])))
+                   slot(x, "observed.vals") <- c(slot(x, "observed.vals"), c(unlist(value[[2]])))
+                   validObject(x)
+                   x
+                 })
+
+
+setMethod("test.updated.bn",
+          "InferenceEngine",
+          function(x)
+            !is.null(slot(x, "updated.bn"))
+          )
+
+# TODO replace with method based on cliques, should be much faster
+setMethod("get.most.probable.values",
+          "InferenceEngine",
+          function(x, ...)
+          {
+            get.most.probable.values(bn(x))
+          })
 
 
 # redefition of print() for InferenceEngine objects
