@@ -336,10 +336,10 @@ setGeneric("print.InferenceEngine", function(x, ...) standardGeneric("print.Infe
 #' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
 #' @param ... potential further arguments of methods.
 #' 
-#' @return a new \code{\link{BN}} object with updated probabilities.
+#' @return updated \code{\link{InferenceEngine}} object.
 #' 
 #' @exportMethod belief.propagation
-setGeneric("belief.propagation", function(ie, bn, ...) standardGeneric("belief.propagation"))
+setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propagation"))
 
 
 #' Test if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.

@@ -1,18 +1,22 @@
-setMethod("belief.propagation",
-          c("InferenceEngine"),
-          function(ie, return.potentials = FALSE)
-          {
-            obs <- observations(ie)
-            belief.propagation(ie, bn(ie, updated.bn = FALSE), obs$observed.vars, obs$observed.vals, return.potentials)
-          })
-
 #' @rdname belief.propagation-methods
 #' @aliases belief.propagation
 setMethod("belief.propagation",
-          c("InferenceEngine", "BN"),
-          function(ie, bn, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
-            {              
-              num.nodes  <- num.nodes(bn)
+          c("InferenceEngine"),
+          function(ie, net = NULL, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
+            {
+              if (is.null(net))
+              {
+                net <- bn(ie, updated.bn = FALSE)
+              }
+              
+              if (length(observed.vars) == 0)
+              {
+                obs <- observations(ie)
+                observed.vars <- obs$observed.vars
+                observed.vals <- obs$observed.vals
+              }
+              
+              num.nodes  <- num.nodes(net)
               num.cliqs  <- num.nodes(ie)
               
               # cliques contains the variables that compose each clique
@@ -20,9 +24,9 @@ setMethod("belief.propagation",
               
               ctree      <- junction.tree(ie)
               
-              cpts       <- cpts(bn)
+              cpts       <- cpts(net)
               
-              variables  <- variables(bn)
+              variables  <- variables(net)
               
               dim.vars   <- lapply(1:num.nodes,
                                    function(x)
@@ -37,7 +41,7 @@ setMethod("belief.propagation",
                             )
 
               
-              node.sizes <- node.sizes(bn)
+              node.sizes <- node.sizes(net)
               
               observed.vars <- c(unlist(observed.vars))
               observed.vals <- c(unlist(observed.vals))
@@ -272,14 +276,16 @@ setMethod("belief.propagation",
               #   obtain P(AB) by summing out C, and then we compute P(ABC)/P(AB) = P(C|A,B)).
               #   Easy peasy.
               
+              
+              
               nbn <- BN()
-              name(nbn)         <- name(bn)
-              num.nodes(nbn)    <- num.nodes(bn)
-              variables(nbn)    <- variables(bn)
-              node.sizes(nbn)   <- node.sizes(bn)
-              discreteness(nbn) <- discreteness(bn)
-              dag(nbn)          <- dag(bn)
-              wpdag(nbn)        <- wpdag(bn)
+              name(nbn)         <- name(net)
+              num.nodes(nbn)    <- num.nodes(net)
+              variables(nbn)    <- variables(net)
+              node.sizes(nbn)   <- node.sizes(net)
+              discreteness(nbn) <- discreteness(net)
+              dag(nbn)          <- dag(net)
+              wpdag(nbn)        <- wpdag(net)
               ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
               
               for (node in 1:num.nodes)
@@ -351,9 +357,11 @@ setMethod("belief.propagation",
               
               cpts(nbn) <- ncpts
               
-              return(nbn)
+              bn(ie, updated.bn = TRUE) <- nbn
+              return(ie)
             }
           })
+
 
 proc.order <- function(node, from, adj)
 {

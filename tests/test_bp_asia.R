@@ -54,25 +54,16 @@ net <- BN(mydata, algo = "mmhc")
 
 
 print(net)
-readLines(file("stdin"),1)
 
 inf.eng <- InferenceEngine(net)
 #inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
 
-# net, c("Asia", "X-ray", "Dyspnea"), c(2,1,1)
-observations(inf.eng) <- list(c("Asia", "X-ray", "Dyspnea"), c(2,1,1))
-jpts <- belief.propagation(inf.eng)
+observations(inf.eng) <- list(c("Asia", "X-ray", "Dyspnea"), c(1,1,1))
+inf.eng <- belief.propagation(inf.eng)
 
 print("-------------------------------------------------------------------------------------------")
 
-print(jpts)
-
-unlist(lapply(jpts@cpts, sum))
-
-get.most.probable.values(jpts)
-
-
-print(name(jpts))
-print(name(mydata))
+get.most.probable.values(net)
+get.most.probable.values(inf.eng)

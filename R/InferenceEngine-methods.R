@@ -150,7 +150,7 @@ setReplaceMethod("jpts",
 
 
 setReplaceMethod("bn",
-                 "InferenceEngine",
+                 c("InferenceEngine"),
                  function(x, updated.bn = TRUE, value)
                  {
                    if (class(value) != "BN")
