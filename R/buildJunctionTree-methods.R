@@ -1,10 +1,12 @@
-#' @rdname build.junction.tree-methods
-#' @aliases build.junction.tree,InferenceEngine-methods
+#' @rdname build.junction.tree
+#' @aliases build.junction.tree,InferenceEngine
 setMethod("build.junction.tree",
-          c("InferenceEngine", "matrix"),
-          function(object, dgraph) {
+          c("InferenceEngine"),
+          function(object, ...) {
             # Calculate junction tree of a given graph.
             # Input parameter is the adjacency matrix of a directed graph.
+            
+            dgraph <- dag(bn(object, updated.bn = FALSE))
             
             graph <- moralization(dgraph)    # adj. matrix
             graph <- directed.to.undirected.graph(graph)   # adj. matrix

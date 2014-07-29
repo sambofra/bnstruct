@@ -1,5 +1,5 @@
-#' @rdname learn.params-methods
-#' @aliases learn.params
+#' @rdname learn.params
+#' @aliases learn.params,BN,BNDataset
 setMethod("learn.params",
           c("BN", "BNDataset"),
           function(bn, dataset, ess = 1)
@@ -53,8 +53,8 @@ setMethod("learn.params",
           }
 )
 
-#' @rdname learn.structure-methods
-#' @aliases learn.structure
+#' @rdname learn.structure
+#' @aliases learn.structure,BN,BNDataset
 setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,

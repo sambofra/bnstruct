@@ -1,18 +1,16 @@
 #' Constructor method of \code{\link{BNDataset}} class.
 #'
 #' @name BNDataset
-#' @rdname BNDataset-class
 setMethod("initialize",
           "BNDataset", function(.Object, ...)  
           {
             validObject(.Object)      
-            .Object
+            return(.Object)
           })
 
 #' Wrapper for \code{\link{BNDataset}} object
 #' 
 #' @name BNDataset
-#' @rdname BNDataset-class
 #' @export 
 BNDataset <- function(...)
 {
@@ -42,7 +40,7 @@ BNDataset <- function(...)
       colnames(dataset@imputed.data) <- dataset@variables
 #   }
     
-  dataset
+return(dataset)
 }
 
 # validator
@@ -69,27 +67,24 @@ setValidity("BNDataset",
               }
               
               if (is.null(retval)) return (TRUE)
-              return (retval)
+              return(retval)
             }
 )
 
-#' @rdname accessors-methods
-#' @aliases name
-setMethod("name", "BNDataset", function(x) { slot(x, "name") } )
+#' @rdname name
+#' @aliases name,BNDataset
+setMethod("name", "BNDataset", function(x) { return(slot(x, "name")) } )
 
+#' @rdname num.variables
+#' @aliases num.variables,BNDataset
+setMethod("num.variables", "BNDataset", function(x) { return(slot(x, "num.variables")) } )
 
-#' @rdname accessors-methods
-#' @aliases num.variables
-setMethod("num.variables", "BNDataset", function(x) { slot(x, "num.variables") } )
+#' @rdname variables
+#' @aliases variables,BNDataset
+setMethod("variables", "BNDataset", function(x) { return(slot(x, "variables")) } )
 
-
-#' @rdname accessors-methods
-#' @aliases variables
-setMethod("variables", "BNDataset", function(x) { slot(x, "variables") } )
-
-
-#' @rdname accessors-methods
-#' @aliases discreteness
+#' @rdname discreteness
+#' @aliases discreteness,BNDataset
 setMethod("discreteness",
           "BNDataset",
           function(x)
@@ -97,76 +92,70 @@ setMethod("discreteness",
             vs  <- slot(x, "discreteness")
             nvs <- rep('c', length(vs))
             nvs[which(vs == TRUE)] <- 'd'
-            nvs
+            return(nvs)
           })
 
-
-#' @rdname accessors-methods
-#' @aliases node.sizes
-setMethod("node.sizes", "BNDataset", function(x) { slot(x, "node.sizes") } )
-
-
-#' @aliases header.file
-#' @rdname accessors-methods
-setMethod("header.file", "BNDataset", function(x) slot(x, "header.file"))
+#' @rdname node.sizes
+#' @aliases node.sizes,BNDataset
+setMethod("node.sizes", "BNDataset", function(x) { return(slot(x, "node.sizes")) } )
 
 
-#' @aliases data.file
-#' @rdname accessors-methods
-setMethod("data.file", "BNDataset", function(x) slot(x, "data.file"))
+#' @rdname header.file
+#' @aliases header.file,BNDataset
+setMethod("header.file", "BNDataset", function(x) return(slot(x, "header.file")))
 
 
-#' @aliases num.variables
-#' @rdname accessors-methods
-setMethod("num.variables","BNDataset", function(x) slot(x, "num.variables"))
+#' @rdname data.file
+#' @aliases data.file,BNDataset
+setMethod("data.file", "BNDataset", function(x) return(slot(x, "data.file")))
+
+#' @rdname num.variables
+#' @aliases num.variables,BNDataset
+setMethod("num.variables","BNDataset", function(x) return(slot(x, "num.variables")))
+
+#' @rdname num.items
+#' @aliases num.items,BNDataset
+setMethod("num.items", "BNDataset", function(x) return(slot(x, "num.items")))
+
+#' @rdname has.boots
+#' @aliases has.boots,BNDataset
+setMethod("has.boots", "BNDataset", function(x) return(slot(x, "has.boots")))
+
+#' @rdname has.imp.boots
+#' @aliases has.imp.boots,BNDataset
+setMethod("has.imp.boots", "BNDataset", function(x) return(slot(x, "has.imp.boots")))
+
+#' @rdname boots
+#' @aliases boots,BNDataset
+setMethod("boots", "BNDataset", function(x) return(slot(x, "boots")))
+
+#' @rdname imp.boots
+#' @aliases imp.boots,BNDataset
+setMethod("imp.boots", "BNDataset", function(x) return(slot(x, "imp.boots")))
+
+#' @rdname num.boots
+#' @aliases num.boots,BNDataset
+setMethod("num.boots", "BNDataset", function(x) return(slot(x, "num.boots")))
 
 
-#' @name num.items
-#' @rdname accessors-methods
-setMethod("num.items", "BNDataset", function(x) slot(x, "num.items"))
-
-
-#' @aliases has.boots
-#' @rdname accessors-methods
-setMethod("has.boots", "BNDataset", function(x) slot(x, "has.boots"))
-
-
-#' @aliases has.imp.boots
-#' @rdname accessors-methods
-setMethod("has.imp.boots", "BNDataset", function(x) slot(x, "has.imp.boots"))
-
-
-#' @aliases boots
-#' @rdname accessors-methods
-setMethod("boots", "BNDataset", function(x) slot(x, "boots"))
-
-
-#' @aliases imp.boots
-#' @rdname accessors-methods
-setMethod("imp.boots", "BNDataset", function(x) slot(x, "imp.boots"))
-
-
-#' @aliases num.boots
-#' @rdname accessors-methods
-setMethod("num.boots", "BNDataset", function(x) slot(x, "num.boots"))
-
-
-# @name name
-# @rdname mutators-methods
-# @aliases name
+#' @name name<-
+#' @aliases name<-,BNDataset-method
+#' @docType methods
+#' @rdname name-set
 setReplaceMethod("name",
-                 signature(x="BNDataset", value="character"),
+                 "BNDataset",
                  function(x, value)
                  {
                    slot(x, "name") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name variables
-# @rdname mutators-methods
-# @aliases variables
+#' @name variables<-
+#' @aliases variables<-,BNDataset-method
+#' @docType methods
+#' @rdname variables-set
 setReplaceMethod("variables",
                  "BNDataset",
                  function(x, value)
@@ -174,148 +163,162 @@ setReplaceMethod("variables",
                    slot(x, "variables")  <- value
                    num.variables(x)      <- length(value)
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name discreteness
-# @rdname mutators-methods
-# @aliases discreteness
+#' @name discreteness<-
+#' @aliases discreteness<-,BNDataset-method
+#' @docType methods
+#' @rdname discreteness-set
 setReplaceMethod("discreteness",
                  "BNDataset",
                  function(x, value)
                  {
                    slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name node.sizes
-# @aliases node.sizes
-# @rdname mutators-methods
+#' @name node.sizes<-
+#' @aliases node.sizes<-,BNDataset-method
+#' @docType methods
+#' @rdname node.sizes-set
 setReplaceMethod("node.sizes",
                  "BNDataset",
                  function(x, value)
                  {
                    slot(x, "node.sizes") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# check if any data available
-#' @rdname has.data-methods
-#' @aliases has.data
+#' @aliases has.data,BNDataset
+#' @rdname has.data
 setMethod("has.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            return (has.raw.data(object) || object@has.imputed.data(object))
+            return (has.raw.data(x) || has.imputed.data(x))
           })
 
-#' @rdname has.raw.data-methods
-#' @aliases has.raw.data
+
+#' @rdname has.raw.data
+#' @aliases has.raw.data,BNDataset
 setMethod("has.raw.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            object@has.rawdata
+            return(x@has.rawdata)
           })
 
-#' @rdname has.imputed.data-methods
-#' @aliases has.imputed.data
+
+#' @rdname has.imputed.data
+#' @aliases has.imputed.data,BNDataset
 setMethod("has.imputed.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            object@has.impdata
+            return(x@has.impdata)
           })
 
-# get() method for data
-# imputed data, if any, is preferred over raw data because more complete
-#' @rdname get.data-methods
-#' @aliases get.data
+
+#' @rdname get.data
+#' @aliases get.data,BNDataset
 setMethod("get.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            if (has.imputed.data(object) == FALSE)
-              return (get.raw.data(object))
-            return (get.imputed.data(object))
+            if (has.imputed.data(x) == FALSE)
+              return (get.raw.data(x))
+            return (get.imputed.data(x))
           })
 
-#' @rdname get.raw.data-methods
-#' @aliases get.raw.data
+
+#' @rdname get.raw.data
+#' @aliases get.raw.data,BNDataset
 setMethod("get.raw.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            if (has.raw.data(object))
-              return (object@raw.data)
+            if (has.raw.data(x))
+              return (x@raw.data)
             return (NULL)
           })
 
-#' @rdname get.imputed.data-methods
-#' @aliases get.imputed.data
+
+#' @rdname get.imputed.data
+#' @aliases get.imputed.data,BNDataset
 setMethod("get.imputed.data",
           "BNDataset",
-          function(object)
+          function(x)
           {
-            if (has.imputed.data(object))
-              return (object@imputed.data)
+            if (has.imputed.data(x))
+              return (x@imputed.data)
             return (NULL)
           })
 
 
-# @aliases header.file
-# @rdname mutators-methods
+#' @name header.file<-
+#' @aliases header.file<-,BNDataset-method
+#' @docType methods
+#' @rdname header.file-set
 setReplaceMethod("header.file",
                  "BNDataset",
                  function(x, value)
                   {
                     slot(x, "header.file") <- value
-                    x
+                    return(x)
                   })
 
 
-# @aliases data.file
-# @rdname mutators-methods
+#' @name data.file<-
+#' @aliases data.file<-,BNDataset-method
+#' @docType methods
+#' @rdname data.file-set
 setReplaceMethod("data.file",
                  "BNDataset",
                  function(x, value)
                  {
                    slot(x, "data.file") <- value
-                   x
+                   return(x)
                  })
 
 
-# @aliases num.variables
-# @rdname mutators-methods
+#' @name num.variables<-
+#' @aliases num.variables<-,BNDataset-method
+#' @docType methods
+#' @rdname num.variables-set
 setReplaceMethod("num.variables",
                  "BNDataset",
                  function(x, value)
                   {
                     slot(x, "num.variables") <- value
-                    validObject
-                    x
+                    validObject(x)
+                    return(x)
                   })
 
 
-# @aliases num.items
-# @rdname mutators-methods
+#' @name num.items<-
+#' @aliases num.items<-,BNDataset-method
+#' @docType methods
+#' @rdname num.items-set
 setReplaceMethod("num.items",
                  "BNDataset",
                  function(x, value)
                  {
                   slot(x, "num.items") <- value
                   validObject(x)
-                  x
+                  return(x)
                  })
 
 
-# @aliases boots
-# @rdname mutators-methods
+#' @name boots<-
+#' @aliases boots<-,BNDataset-method
+#' @docType methods
+#' @rdname boots-set
 setReplaceMethod("boots",
                  "BNDataset",
                  function(x, value)
@@ -324,12 +327,14 @@ setReplaceMethod("boots",
                   slot(x, "num.boots") <- length(value)
                   slot(x, "has.boots") <- TRUE
                   validObject(x)
-                  x
+                  return(x)
                  })
 
 
-# @aliases imp.boots
-# @rdname mutators-methods
+#' @name imp.boots<-
+#' @aliases imp.boots<-,BNDataset-method
+#' @docType methods
+#' @rdname imp.boots-set
 setReplaceMethod("imp.boots",
                  "BNDataset",
                  function(x, value)
@@ -338,37 +343,45 @@ setReplaceMethod("imp.boots",
                    slot(x, "num.boots")     <- length(value)
                    slot(x, "has.imp.boots") <- TRUE
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
+#' @name raw.data<-
+#' @aliases raw.data<-,BNDataset-method
+#' @docType methods
+#' @rdname raw.data-set
 setReplaceMethod("raw.data",
                  "BNDataset",
-                 function(object, value)
+                 function(x, value)
                  {
-                   slot(object, "raw.data")    <- value
-                   slot(object, "has.rawdata") <- TRUE
-                   validObject(object)
-                   object
+                   slot(x, "raw.data")    <- value
+                   slot(x, "has.rawdata") <- TRUE
+                   validObject(x)
+                   return(x)
                  })
 
 
+#' @name imputed.data<-
+#' @aliases imputed.data<-,BNDataset-method
+#' @docType methods
+#' @rdname imputed.data-set
 setReplaceMethod("imputed.data",
                  "BNDataset",
-                 function(object, value)
+                 function(x, value)
                  {
-                   slot(object, "imputed.data") <- value
-                   slot(object, "has.impdata")  <- TRUE
-                   slot(object, "imputation")   <- TRUE
-                   validObject(object)
-                   object
+                   slot(x, "imputed.data") <- value
+                   slot(x, "has.impdata")  <- TRUE
+                   slot(x, "imputation")   <- TRUE
+                   validObject(x)
+                   return(x)
                  })
 
 
 # redefition of print() for BNDataset objects
-#' @rdname print-methods
-#' @aliases print.BNDataset,BNDataset,ANY
-setMethod("print.BNDataset",
+#' @rdname print
+#' @aliases print,BNDataset
+setMethod("print",
           "BNDataset",
           function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
           {
@@ -418,8 +431,8 @@ setMethod("print.BNDataset",
             
           })
 
-#' @rdname impute-methods
-#' @aliases impute
+#' @rdname impute
+#' @aliases impute,BNDataset
 setMethod("impute",
           "BNDataset",
           function(object, k.impute = 10)
@@ -428,14 +441,14 @@ setMethod("impute",
             object@imputed.data <- knn.impute(object@raw.data, k.impute,
                                               setdiff(1:length(object@node.sizes), c()))
             object@has.impdata  <- TRUE
-            object
+            return(object)
           })
 
-#' @rdname bootstrap-methods
-#' @aliases bootstrap
+#' @rdname bootstrap
+#' @aliases bootstrap,BNDataset
 setMethod("bootstrap",
           "BNDataset",
-          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10, na.string.symbol = '?')
+          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10, na.string.symbol = '?', ...)
           {
             # assumes raw data is ok
             object@has.boots <- TRUE
@@ -463,15 +476,15 @@ setMethod("bootstrap",
                 
               }
             }
-            object
+            return(object)
           })
 
 
-#' @rdname get.boot-methods
-#' @aliases get.boot
+#' @rdname get.boot
+#' @aliases get.boot,BNDataset
 setMethod("get.boot",
           c("BNDataset", "numeric"),
-          function(dataset, index, imputed = TRUE)
+          function(dataset, index, imputed = TRUE, ...)
           {
             if (!(dataset@has.boots || dataset@has.imp.boots))
             {

@@ -10,5 +10,5 @@
 .onUnload = function(lib) 
 {
   library.dynam.unload("bnstruct", libpath = lib)
-  reassignInPackage("cliques", pgkName="igraph", "jt.cliques")
+#  reassignInPackage("cliques", pgkName="igraph", "jt.cliques")
 }#.ONUNLOAD

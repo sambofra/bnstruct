@@ -1,7 +1,6 @@
 #' Constructor method of \code{\link{InferenceEngine}} class.
 #'
 #' @name InferenceEngine
-#' @rdname InferenceEngine-class
 setMethod("initialize",
           c("InferenceEngine"),
           function(.Object, ...)  
@@ -13,7 +12,6 @@ setMethod("initialize",
 #' Wrapper for \code{\link{InferenceEngine}} object
 #' 
 #' @name InferenceEngine
-#' @rdname InferenceEngine-class
 #' @export
 InferenceEngine <- function(bn = NULL, observations = NULL, ...)
 {
@@ -62,14 +60,24 @@ setValidity("InferenceEngine",
 )
 
 
+#' @rdname num.nodes
+#' @aliases num.nodes,InferenceEngine
 setMethod("num.nodes", "InferenceEngine", function(x) slot(x, "num.nodes"))
 
+#' @rdname junction.tree
+#' @aliases junction.tree,InferenceEngine
 setMethod("junction.tree", "InferenceEngine", function(x) slot(x, "junction.tree"))
 
+#' @rdname jt.cliques
+#' @aliases jt.cliques,InferenceEngine
 setMethod("jt.cliques", "InferenceEngine", function(x) slot(x, "cliques"))
 
+#' @rdname jpts
+#' @aliases jpts,InferenceEngine
 setMethod("jpts", "InferenceEngine", function(x) slot(x, "jpts"))
 
+#' @rdname bn-method
+#' @aliases bn,InferenceEngine
 setMethod("bn",
            "InferenceEngine",
            function(x, updated.bn = TRUE)
@@ -93,6 +101,8 @@ setMethod("bn",
            })
 
 
+#' @rdname observations
+#' @aliases observations,InferenceEngine
 setMethod("observations",
           "InferenceEngine",
           function(x)
@@ -101,6 +111,10 @@ setMethod("observations",
           })
 
 
+#' @name num.nodes<-
+#' @aliases num.nodes<-,InferenceEngine-method
+#' @docType methods
+#' @rdname num.nodes-set
 setReplaceMethod("num.nodes",
                  "InferenceEngine",
                  function(x, value)
@@ -111,8 +125,10 @@ setReplaceMethod("num.nodes",
                  })
 
 
-# @name junction.tree
-# @rdname mutators-methods
+#' @name junction.tree<-
+#' @aliases junction.tree<-,InferenceEngine-method
+#' @docType methods
+#' @rdname junction.tree-set
 setReplaceMethod("junction.tree",
                  "InferenceEngine",
                  function(x, value)
@@ -124,8 +140,10 @@ setReplaceMethod("junction.tree",
                  })
 
 
-# @name cliques
-# @rdname mutators-methods
+#' @name jt.cliques<-
+#' @aliases jt.cliques<-,InferenceEngine-method
+#' @docType methods
+#' @rdname jt.cliques-set
 setReplaceMethod("jt.cliques",
                  "InferenceEngine",
                  function(x, value)
@@ -137,8 +155,10 @@ setReplaceMethod("jt.cliques",
                  })
 
 
-# @name jpts
-# @rdname accessors-methods
+#' @name jpts<-
+#' @aliases jpts<-,InferenceEngine-method
+#' @docType methods
+#' @rdname jpts-set
 setReplaceMethod("jpts",
                  "InferenceEngine",
                  function(x, value)
@@ -149,6 +169,10 @@ setReplaceMethod("jpts",
                  })
 
 
+#' @name bn<-
+#' @aliases bn<-,InferenceEngine-method
+#' @docType methods
+#' @rdname bn-set
 setReplaceMethod("bn",
                  c("InferenceEngine"),
                  function(x, updated.bn = TRUE, value)
@@ -170,6 +194,10 @@ setReplaceMethod("bn",
 
 
 # I assume that the user knows what he/she does...
+#' @name observations<-
+#' @aliases observations<-,InferenceEngine-method
+#' @docType methods
+#' @rdname observations-set
 setReplaceMethod("observations",
                  "InferenceEngine",
                  function(x, value)
@@ -181,6 +209,10 @@ setReplaceMethod("observations",
                  })
 
 
+#' @name add.observations<-
+#' @aliases add.observations<-,InferenceEngine-method
+#' @docType methods
+#' @rdname add.observations-set
 setReplaceMethod("add.observations",
                  "InferenceEngine",
                  function(x, value)
@@ -192,13 +224,29 @@ setReplaceMethod("add.observations",
                  })
 
 
+#' @rdname test.updated.bn
+#' @aliases test.updated.bn,InferenceEngine
 setMethod("test.updated.bn",
           "InferenceEngine",
           function(x)
             !is.null(slot(x, "updated.bn"))
           )
 
+#' @rdname layering
+#' @aliases layering,InferenceEngine
+setMethod("layering",
+          "InferenceEngine",
+          function(x, updated.bn = TRUE, ...)
+          {
+            layers <- topological.sort(dag(bn(x, updated.bn)))
+            layers <- array(layers, dimnames = variables(bn(x, updated.bn)))
+            layers
+          })
+
+
 # TODO replace with method based on cliques, should be much faster
+#' @rdname get.most.probable.values
+#' @aliases get.most.probable.values,InferenceEngine
 setMethod("get.most.probable.values",
           "InferenceEngine",
           function(x, ...)
@@ -208,13 +256,13 @@ setMethod("get.most.probable.values",
 
 
 # redefition of print() for InferenceEngine objects
-#' @rdname print.InferenceEngine-methods
-#' @aliases print.InferenceEngine,InferenceEngine-methods
-setMethod("print.InferenceEngine",
+#' @rdname print
+#' @aliases print,InferenceEngine
+setMethod("print",
           "InferenceEngine",
-          function(x, container = "jt", ...)
+          function(x, engine = "jt", ...)
           {
-            if (container == 'jt')
+            if (engine == 'jt')
             {
               str <- "\nJunction Tree "
               str <- paste(str, "with ", sep = '')

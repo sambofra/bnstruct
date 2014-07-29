@@ -1,5 +1,5 @@
-#' @rdname belief.propagation-methods
-#' @aliases belief.propagation
+#' @rdname belief.propagation
+#' @aliases belief.propagation,InferenceEngine
 setMethod("belief.propagation",
           c("InferenceEngine"),
           function(ie, net = NULL, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){

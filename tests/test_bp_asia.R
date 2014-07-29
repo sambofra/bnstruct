@@ -1,11 +1,9 @@
 library("bnstruct")
 
 mydata <- BNDataset(name = "Asia")
-mydata <- read.dataset(mydata, "inst/extdata/asia_10000.header", "inst/extdata/asia_10000.data", imputation = FALSE, bootstrap=FALSE)
+mydata <- read.dataset(mydata, "../bnstruct/extdata/asia_10000.header", "../bnstruct/extdata/asia_10000.data", imputation = FALSE, bootstrap=FALSE)
 mydata@name <- "Asia"
 print(mydata)
-
-readLines(file("stdin"),1)
 
 net <- BN(mydata, algo = "mmhc")
 # set.name(net) <- "Asia"
@@ -42,7 +40,7 @@ net <- BN(mydata, algo = "mmhc")
 # cpts[[6]] <- array(c(1,0,1,0,1,0,0,1), dim=c(2,2,2), dimnames=list("Either" = c(1,2), "Tubercolosys" = c(1,2), "LungCancer" = c(1,2)))
 # cpts[[7]] <- array(c(0.98, 0.02, 0.05, 0.95), dim=c(2,2), dimnames=list("X-ray" = c(1,2), "Either" = c(1,2)))
 # cpts[[8]] <- array(c(0.9, 0.1, 0.8, 0.2, 0.7, 0.3, 0.1, 0.9), dim=c(2,2,2), dimnames=list("Dyspnea" = c(1,2), "Bronchitis" = c(1,2), "Either" = c(1,2)))
-# 
+# # 
 # slot(net, "cpts") <- cpts
 
 # net <- learn.structure(net, mydata, algo="mmhc")

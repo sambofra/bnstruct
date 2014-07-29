@@ -6,12 +6,14 @@ Date: 2012-02-13
 Depends:
     R (>= 2.10),
     bitops,
-    igraph
+    igraph,
+    Matrix,
+    methods
 Suggests:
     Rgraphviz,
     iterators
 Author: Francesco Sambo
 Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
 Description: More about what it does (maybe more than one line)
-License: GPL (>=2)
+License: GPL (>=2) | file LICENSE
 Encoding: UTF-8

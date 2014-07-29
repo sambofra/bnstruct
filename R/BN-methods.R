@@ -1,7 +1,4 @@
 #' Constructor method of \code{\link{BN}} class.
-#'
-#' @name BN
-#' @rdname BN-class
 setMethod("initialize",
           "BN",
           function(.Object, dataset = NULL,
@@ -27,13 +24,12 @@ setMethod("initialize",
               .Object <- learn.params(.Object, dataset, ess = ess)
             }
             validObject(.Object)
-            .Object
+            return(.Object)
           })
 
 #' Wrapper for \code{\link{BN}} object
 #' 
 #' @name BN
-#' @rdname BN-class
 #' @export
 BN <- function(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
                layering = c(), max.fanin.layers = NULL,
@@ -42,7 +38,7 @@ BN <- function(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap =
   object <- new("BN", dataset = dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
                 layering = layering, max.fanin.layers = max.fanin.layers,
                 max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
-  object
+  return(object)
 }
 
 # validator
@@ -73,29 +69,26 @@ setValidity("BN",
               }
               
               if (is.null(retval)) return (TRUE)
-              return (retval)
+              return(retval)
             }
 )
 
 # getters and setters
 
-#' @rdname accessors-methods
-#' @aliases name
-setMethod("name", "BN", function(x) { slot(x, "name") } )
+#' @aliases name,BN
+#' @rdname name
+setMethod("name", "BN", function(x) { return(slot(x, "name")) } )
 
+#' @aliases num.nodes,BN
+#' @rdname num.nodes
+setMethod("num.nodes", "BN", function(x) { return(slot(x, "num.nodes")) } )
 
-#' @rdname accessors-methods
-#' @aliases num.nodes
-setMethod("num.nodes", "BN", function(x) { slot(x, "num.nodes") } )
+#' @aliases variables,BN
+#' @rdname variables
+setMethod("variables", "BN", function(x) { return(slot(x, "variables")) } )
 
-
-#' @rdname accessors-methods
-#' @aliases variables
-setMethod("variables", "BN", function(x) { slot(x, "variables") } )
-
-
-#' @rdname accessors-methods
-#' @aliases discreteness
+#' @aliases discreteness,BN
+#' @rdname discreteness
 setMethod("discreteness",
           "BN",
           function(x)
@@ -103,59 +96,56 @@ setMethod("discreteness",
             vs  <- slot(x, "discreteness")
             nvs <- rep('c', length(vs))
             nvs[which(vs == TRUE)] <- 'd'
-            nvs
+            return(nvs)
           })
 
+#' @aliases node.sizes,BN
+#' @rdname node.sizes
+setMethod("node.sizes", "BN", function(x) { return(slot(x, "node.sizes")) } )
 
-#' @rdname accessors-methods
-#' @aliases node.sizes
-setMethod("node.sizes", "BN", function(x) { slot(x, "node.sizes") } )
+#' @aliases cpts,BN
+#' @rdname cpts
+setMethod("cpts", "BN", function(x) { return(slot(x, "cpts")) } )
 
+#' @aliases dag,BN
+#' @rdname dag
+setMethod("dag", "BN", function(x) { return(slot(x, "dag")) } )
 
-#' @rdname accessors-methods
-#' @aliases cpts
-setMethod("cpts", "BN", function(x) { slot(x, "cpts") } )
+#' @aliases wpdag,BN
+#' @rdname wpdag
+setMethod("wpdag", "BN", function(x) { return(slot(x, "wpdag")) } )
 
-
-#' @rdname accessors-methods
-#' @aliases dag
-setMethod("dag", "BN", function(x) { slot(x, "dag") } )
-
-
-#' @rdname accessors-methods
-#' @aliases wpdag
-setMethod("wpdag", "BN", function(x) { slot(x, "wpdag") } )
-
-
-# @name name
-# @rdname mutators-methods
-# @aliases name
+#' @name name<-
+#' @aliases name<-,BN-method
+#' @docType methods
+#' @rdname name-set
 setReplaceMethod("name",
-                 signature(x="BN", value="character"),
+                 "BN",
                  function(x, value)
                  {
                    slot(x, "name") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
-
-# @name num.nodes
-# @rdname mutators-methods
-# @aliases num.nodes
+#' @name num.nodes<-
+#' @aliases num.nodes<-,BN-method
+#' @docType methods
+#' @rdname num.nodes-set
 setReplaceMethod("num.nodes",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "num.nodes") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name variables
-# @rdname mutators-methods
-# @aliases variables
+#' @name variables<-
+#' @aliases variables<-,BN-method
+#' @docType methods
+#' @rdname variables-set
 setReplaceMethod("variables",
                  "BN",
                  function(x, value)
@@ -163,77 +153,95 @@ setReplaceMethod("variables",
                    slot(x, "variables")  <- value
                    num.nodes(x) <- length(value)
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name discreteness
-# @rdname mutators-methods
-# @aliases discreteness
+#' @name discreteness<-
+#' @aliases discreteness<-,BN-method
+#' @docType methods
+#' @rdname discreteness-set
 setReplaceMethod("discreteness",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name node.sizes
-# @aliases node.sizes
-# @rdname mutators-methods
+#' @name node.sizes<-
+#' @aliases node.sizes<-,BN-method
+#' @docType methods
+#' @rdname node.sizes-set
 setReplaceMethod("node.sizes",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "node.sizes") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name cpts
-# @aliases cpts
-# @rdname mutators-methods
+#' @name cpts<-
+#' @aliases cpts<-,BN-method
+#' @docType methods
+#' @rdname cpts-set
 setReplaceMethod("cpts",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "cpts") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name dag
-# @aliases dag
-# @rdname mutators-methods
+#' @name dag<-
+#' @aliases dag<-,BN-method
+#' @docType methods
+#' @rdname dag-set
 setReplaceMethod("dag",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "dag") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-# @name wpdag
-# @alises wpdag
-# @rdname mutators-methods
+#' @name wpdag<-
+#' @aliases wpdag<-,BN-method
+#' @docType methods
+#' @rdname wpdag-set
 setReplaceMethod("wpdag",
                  "BN",
                  function(x, value)
                  {
                    slot(x, "wpdag") <- value
                    validObject(x)
-                   x
+                   return(x)
                  })
 
 
-#' @rdname get.most.probable.values-methods
-#' @aliases get.most.probable.values
+#' @name layering
+#' @aliases layering
+#' @rdname layering
+setMethod("layering",
+          "BN",
+          function(x, ...)
+          {
+            layers <- topological.sort(dag(x))
+            layers <- array(layers, dimnames = variables(x))
+            return(layers)
+          })
+
+
+#' @aliases get.most.probable.values,BN
+#' @rdname get.most.probable.values
 setMethod("get.most.probable.values",
           "BN",
           function(x, ...)
@@ -300,9 +308,9 @@ setMethod("get.most.probable.values",
           })
 
 # redefition of print() for BN objects
-#' @rdname print-methods
-#' @aliases print.BN
-setMethod("print.BN",
+#' @rdname print
+#' @aliases print,BN
+setMethod("print",
           "BN",
           function(x, ...)
           {
@@ -330,9 +338,9 @@ setMethod("print.BN",
           })
 
 # plot adjacency matrix
-#' @rdname plot-methods
-#' @aliases plot.BN,BN-methods
-setMethod("plot.BN",
+#' @rdname plot
+#' @aliases plot,BN
+setMethod("plot",
           c("BN"),
           # Plot a weighted connectivity matrix using Rgraphviz
           function( x, use.node.names = TRUE, frac = 0.2, 
@@ -388,27 +396,27 @@ setMethod("plot.BN",
           })
 
 # save BN as eps file
-#' @rdname save.to.eps-methods
-#' @aliases save.to.eps
+#' @rdname save.to.eps
+#' @aliases save.to.eps,BN,character
 setMethod("save.to.eps",
           c("BN", "character"),
-          function(object, filename)
+          function(x, filename)
           {
             # problem: I wanted to set filename=NULL in the declaration, but I cannot manage to
             # make it work in case of missing filename...
             
             # problem 2: cannot make dag.to.cpdag work...
-            
             postscript(filename)
-            #plot(dag.to.cpdag(object))
-            plot(object)
+            plot(x)
             dev.off()
           })
+
 
 dag.to.cpdag <- function(object, layering = NULL)
 {
   return(abs(label.edges(dag(object), layering)))
 }
+
 
 label.edges <- function(dag, layering = NULL)
 {
