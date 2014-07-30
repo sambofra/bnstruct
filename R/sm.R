@@ -218,26 +218,26 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 # 	return( hn )
 # }
 
-all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, ess )
-{
-	n.nodes <- ncol(data)
-	LM <- matrix( -Inf, n.nodes, 2^n.nodes )
-	bitmask <- 2^(0:(n.nodes-1))
-	
-	for( i in 1:n.nodes )
-	{
-		# select possible parent sets and compute log-likelihood
-		possible.families <- which(ifm[i,])
-		for( k in possible.families )
-		{
-			pa <- which( bitAnd(k-1,bitmask) > 0 )
-			# LM[i,k] <- log.likelihood.na( pa, i, node.sizes, ess, data)
-			LM[i,k] <- log.lik.na( node.sizes[c(i,pa)], ess, data[,c(i,pa)] ) 
-		}
-	}
-	
-	return(LM)
-}
+# all.families.log.marginal.likelihood <- function( data, node.sizes, ifm, ess )
+# {
+# 	n.nodes <- ncol(data)
+# 	LM <- matrix( -Inf, n.nodes, 2^n.nodes )
+# 	bitmask <- 2^(0:(n.nodes-1))
+# 	
+# 	for( i in 1:n.nodes )
+# 	{
+# 		# select possible parent sets and compute log-likelihood
+# 		possible.families <- which(ifm[i,])
+# 		for( k in possible.families )
+# 		{
+# 			pa <- which( bitAnd(k-1,bitmask) > 0 )
+# 			# LM[i,k] <- log.likelihood.na( pa, i, node.sizes, ess, data)
+# 			LM[i,k] <- log.lik.na( node.sizes[c(i,pa)], ess, data[,c(i,pa)] ) 
+# 		}
+# 	}
+# 	
+# 	return(LM)
+# }
 
 # log.lik.na <- function( node.sizes, ess, data )
 # {

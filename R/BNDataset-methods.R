@@ -25,10 +25,6 @@ setMethod("initialize",
 #' 
 #' @return BNDataset object.
 #' 
-#' @usage
-#' BNDataset()
-#' BNDataset(...)
-#' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()

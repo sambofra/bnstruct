@@ -29,10 +29,6 @@ setMethod("initialize",
 #' }
 #' @param ... potential further arguments of methods.
 #' 
-#' @usage
-#' InferenceEngine()
-#' InferenceEngine(bn, observations, ...)
-#' 
 #' @return InferenceEngine object.
 #' 
 #' @examples
@@ -209,7 +205,7 @@ setReplaceMethod("jpts",
 #' @rdname bn-set
 setReplaceMethod("bn",
                  c("InferenceEngine"),
-                 function(x, updated.bn = TRUE, value)
+                 function(x, updated.bn = TRUE, ..., value)
                  {
                    if (class(value) != "BN")
                    {

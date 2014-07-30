@@ -1,10 +1,3 @@
-# generic initialization
-# ' @name initialize
-# ' @rdname initialize
-# ' 
-# ' @param ... ignored.
-#setGeneric("initialize", function(x, ...) standardGeneric("initialize"))
-
 ###############################################################################
 ###############################################################################
 
@@ -27,8 +20,6 @@
 #' @param ... potential further arguments of methods.
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
-#' 
-#' @usage learn.params(bn, dataset, ess = 1)
 #' 
 #' @examples
 #' \dontrun{
@@ -73,10 +64,6 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
-#' @usage learn.structure(bn, dataset, algo="mmhc", alpha=0.05, ess=1, bootstrap=FALSE,
-#'           layering=c(), max.fanin.layers=NULL,
-#'           max.fanin=num.variables(dataset), cont.nodes=c(), raw.data=FALSE, ...)
-#' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset(name = "MyDataset")
@@ -108,11 +95,6 @@ setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.
 #' @param updated.bn \code{TRUE} if \code{x} is an InferenceEngine and the updated network is chosen (kept only for compatibility with other methods).
 #' @param ... potential further arguments for methods.
 #' 
-#' @usage
-#' layering(x) # x is a BN
-#' layering(x, ...)
-#' layering(x, updated.bn=TRUE, ...) # x is an InferenceEngine
-#' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset(name="MyDataset")
@@ -139,10 +121,6 @@ setGeneric("layering", function(x, ...) standardGeneric("layering"))
 #' @param ... potential further arguments of methods.
 #' 
 #' @return array containing, in each position, the most probable value for the corresponding variable.
-#' 
-#' @usage
-#' get.most.probable.values(x)
-#' get.most.probable.values(x, ...)
 #' 
 #' @examples
 #' \dontrun{
@@ -173,8 +151,6 @@ setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.mos
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' @param ... potential further arguments of methods.
 #' 
-#' @usage plot(x, use.node.names, frac, max.weight,node.col, plot.wpdag, ...)
-#' 
 #' @examples
 #' \dontrun{
 #' plot(x, use.node.names=TRUE, frac=0.2, max.weight=1,
@@ -194,9 +170,6 @@ setGeneric("plot", function(x, ...) standardGeneric("plot"))
 #' 
 #' @param x a \code{\link{BN}} object
 #' @param filename name (with path, if needed) of the file to be created
-#' 
-#' @usage
-#' save.to.eps(x, filename)
 #' 
 #' @examples
 #' \dontrun{
@@ -226,8 +199,6 @@ setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage has.data(x)
-#' 
 #' @examples
 #' \dontrun{
 #' x <- BNDataset()
@@ -251,8 +222,6 @@ setGeneric("has.data", function(x) standardGeneric("has.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage has.raw.data(x)
-#' 
 #' @examples
 #' \dontrun{
 #' x <- BNDataset()
@@ -275,8 +244,6 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' @rdname has.imputed.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
-#' 
-#' @usage has.imputed.data(x)
 #' 
 #' @examples
 #' \dontrun{
@@ -307,8 +274,6 @@ setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage get.data(x)
-#' 
 #' @examples
 #' \dontrun{
 #' x <- BNDataset()
@@ -333,8 +298,6 @@ setGeneric("get.data", function(x) standardGeneric("get.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage get.raw.data(x)
-#' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.imputed.data}}
 #' 
 #' @exportMethod get.raw.data
@@ -349,8 +312,6 @@ setGeneric("get.raw.data", function(x) standardGeneric("get.raw.data"))
 #' @rdname get.imputed.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
-#' 
-#' @usage get.imputed.data(x)
 #' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}
 #' 
@@ -370,9 +331,6 @@ setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @usage
-#' raw.data(x) <- value
-#' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod raw.data<-
@@ -390,9 +348,6 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
-#' 
-#' @usage
-#' imputed.data(x) <- value
 #' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
 #' 
@@ -420,16 +375,10 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param seed random seed (useful only if bootstrap == TRUE).
 #' @param ... potential further arguments of methods.
 #' 
-#' @usage
-#' # object is a BNDataset object
-#' read.dataset(object, header = "file.header", dataset = "file.data",
-#'          imputation=FALSE, header.flag=FALSE, na.string.symbol='?', sep.symbol='',
-#'          k.impute = 10, bootstrap = FALSE, num.boots = 100, seed = 0, ...)
-#'          
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
 #' }
 #' 
 #' @exportMethod read.dataset
@@ -444,10 +393,6 @@ setGeneric("read.dataset", function(object, header, dataset, ...) standardGeneri
 #' @param object the \code{\link{BNDataset}} object.
 #' @param k.impute radius for imputation.
 #' @param ... potential further arguments of methods.
-#' 
-#' @usage
-#' # object is a BNDataset object
-#' impute(object, k.impute = 10, ...)
 #' 
 #' @examples
 #' \dontrun{
@@ -475,10 +420,6 @@ setGeneric("impute", function(object, ...) standardGeneric("impute"))
 #' @param k.impute radius for imputation (useful only if imputation == TRUE).
 #' @param ... potential further arguments of methods.
 #' 
-#' @usage
-#' bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
-#'           k.impute = 10, na.string.symbol = '?', ...)
-#'           
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
@@ -501,9 +442,6 @@ setGeneric("bootstrap", function(object, ...) standardGeneric("bootstrap"))
 #' @param index the index of the requested sample.
 #' @param imputed \code{TRUE} if samples from imputed dataset are to be used.
 #' @param ... potential further arguments of methods (ignored).
-#' 
-#' @usage
-#' get.boot(dataset, index = 1, imputed = TRUE, ...)
 #' 
 #' @examples
 #' \dontrun{
@@ -540,9 +478,6 @@ setGeneric("get.boot", function(dataset, index, imputed, ...) standardGeneric("g
 #' @param object an \code{\link{InferenceEngine}} object.
 #' @param ... potential further arguments for methods.
 #' 
-#' @usage
-#' build.junction.tree(object, ...)
-#' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
@@ -573,12 +508,6 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' 
 #' @return updated \code{\link{InferenceEngine}} object.
 #' 
-#' @usage
-#' belief.propagation(ie)
-#' belief.propagation(ie, net=bn, return.potentials=TRUE)
-#' belief.propagation(ie, net=bn, observed.vars=c("A","G","X"), observed.vals=c(1,2,1))
-#' belief.propagation(ie, observed.vars=c("A", "G", "X"), observed.vals=c(1,2,1))
-#' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
@@ -606,9 +535,6 @@ setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propa
 #' @param x an \code{\link{InferenceEngine}}.
 #' 
 #' @return \code{TRUE} if an updated network is contained in the InferenceEngine, \code{FALSE} otherwise.
-#' 
-#' @usage
-#' test.updated.bn(x)
 #' 
 #' @examples
 #' \dontrun{
@@ -645,9 +571,6 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' 
 #' @return name of the object.
 #' 
-#' @usage
-#' name(x)
-#' 
 #' @exportMethod name
 setGeneric("name", function(x) standardGeneric("name"))
 
@@ -663,8 +586,6 @@ setGeneric("name", function(x) standardGeneric("name"))
 #' 
 #' @return number of nodes of the desired object.
 #' 
-#' @usage num.nodes(x)
-#' 
 #' @exportMethod num.nodes
 setGeneric("num.nodes", function(x) standardGeneric("num.nodes"))
 
@@ -679,8 +600,6 @@ setGeneric("num.nodes", function(x) standardGeneric("num.nodes"))
 #' @param x an object.
 #' 
 #' @return vector of the variables names of the desired object.
-#' 
-#' @usage variables(x)
 #' 
 #' @exportMethod variables
 setGeneric("variables", function(x) standardGeneric("variables"))
@@ -699,8 +618,6 @@ setGeneric("variables", function(x) standardGeneric("variables"))
 #' @return vector contaning, for each variable of the desired object,
 #'         \code{c} if the variable is continue, and \code{d} if the variable is discrete.
 #' 
-#' @usage discreteness(x)
-#' 
 #' @exportMethod discreteness
 setGeneric("discreteness", function(x) standardGeneric("discreteness"))
 
@@ -716,8 +633,6 @@ setGeneric("discreteness", function(x) standardGeneric("discreteness"))
 #' @param x an object.
 #' 
 #' @return vector contaning the size of each variable of the desired object.
-#' 
-#' @usage node.sizes(x)
 #' 
 #' @exportMethod node.sizes
 setGeneric("node.sizes", function(x) standardGeneric("node.sizes"))
@@ -742,8 +657,6 @@ setGeneric("node.sizes", function(x) standardGeneric("node.sizes"))
 #' 
 #' @return list of the conditional probability tables of the desired object.
 #' 
-#' @usage cpts(x)
-#' 
 #' @exportMethod cpts
 setGeneric("cpts", function(x) standardGeneric("cpts"))
 
@@ -759,8 +672,6 @@ setGeneric("cpts", function(x) standardGeneric("cpts"))
 #' 
 #' @return matrix containing the adjacency matrix of the directed acyclic graph representing
 #'         the structure of the object.
-#'         
-#' @usage dag(x)
 #' 
 #' @exportMethod dag
 setGeneric("dag", function(x) standardGeneric("dag"))
@@ -776,8 +687,6 @@ setGeneric("dag", function(x) standardGeneric("dag"))
 #' @param x an object.
 #' 
 #' @return matrix contaning the WPDAG of the object.
-#' 
-#' @usage wpdag(x)
 #' 
 #' @exportMethod wpdag
 setGeneric("wpdag", function(x) standardGeneric("wpdag"))
@@ -803,8 +712,6 @@ setGeneric("wpdag", function(x) standardGeneric("wpdag"))
 #' 
 #' @seealso \code{\link{data.file}}
 #' 
-#' @usage header.file(x)
-#' 
 #' @exportMethod header.file
 setGeneric("header.file", function(x) standardGeneric("header.file"))
 
@@ -825,8 +732,6 @@ setGeneric("header.file", function(x) standardGeneric("header.file"))
 #' 
 #' @seealso \code{\link{data.file}}
 #' 
-#' @usage data.file(x)
-#' 
 #' @exportMethod data.file
 setGeneric("data.file", function(x) standardGeneric("data.file"))
 
@@ -845,8 +750,6 @@ setGeneric("data.file", function(x) standardGeneric("data.file"))
 #' 
 #' @seealso \code{\link{num.nodes}}
 #' 
-#' @usage num.variables(x)
-#' 
 #' @exportMethod num.variables
 setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 
@@ -861,8 +764,6 @@ setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 #' @param x a \code{\link{BNDataset}} object.
 #' 
 #' @return number of items of the desired dataset.
-#' 
-#' @usage num.items(x)
 #' 
 #' @exportMethod num.items
 setGeneric("num.items", function(x) standardGeneric("num.items"))
@@ -885,8 +786,6 @@ setGeneric("num.items", function(x) standardGeneric("num.items"))
 #' 
 #' @return \code{TRUE} if dataset has bootstrap samples.
 #' 
-#' @usage has.boots(x)
-#' 
 #' @seealso \code{\link{has.imp.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod has.boots
@@ -904,8 +803,6 @@ setGeneric("has.boots", function(x) standardGeneric("has.boots"))
 #' 
 #' @return \code{TRUE} if dataset has bootstrap samples from imputed data.
 #' 
-#' @usage has.imp.boots(x)
-#' 
 #' @seealso \code{\link{has.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod has.imp.boots
@@ -922,8 +819,6 @@ setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
 #' @param x a \code{\link{BNDataset}} object.
 #' 
 #' @return the list of bootstrap samples.
-#' 
-#' @usage boots(x)
 #' 
 #' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{imp.boots}}
 #' 
@@ -944,8 +839,6 @@ setGeneric("boots", function(x) standardGeneric("boots"))
 #' 
 #' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{boots}}
 #' 
-#' @usage imp.boots(x)
-#' 
 #' @exportMethod imp.boots
 setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))
 
@@ -960,8 +853,6 @@ setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))
 #' @param x a \code{\link{BNDataset}} object.
 #' 
 #' @return the number of bootstrap samples.
-#' 
-#' @usage num.boots(x)
 #' 
 #' @exportMethod num.boots
 setGeneric("num.boots", function(x) standardGeneric("num.boots"))
@@ -980,8 +871,6 @@ setGeneric("num.boots", function(x) standardGeneric("num.boots"))
 #' 
 #' @return the junction tree contained in the \code{\link{InferenceEngine}}.
 #' 
-#' @usage junction.tree(x)
-#' 
 #' @seealso \code{\link{build.junction.tree}}
 #' 
 #' @exportMethod junction.tree
@@ -998,8 +887,6 @@ setGeneric("junction.tree", function(x) standardGeneric("junction.tree"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' 
 #' @return the list of cliques of the junction tree contained in the \code{\link{InferenceEngine}}.
-#' 
-#' @usage jt.cliques(x)
 #' 
 #' @exportMethod jt.cliques
 setGeneric("jt.cliques", function(x) standardGeneric("jt.cliques"))
@@ -1021,8 +908,6 @@ setGeneric("jt.cliques", function(x) standardGeneric("jt.cliques"))
 #' 
 #' @return the list of joint probability tables compiled by the \code{\link{InferenceEngine}}.
 #' 
-#' @usage jpts(x)
-#' 
 #' @exportMethod jpts
 setGeneric("jpts", function(x) standardGeneric("jpts"))
 
@@ -1041,11 +926,10 @@ setGeneric("jpts", function(x) standardGeneric("jpts"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param updated.bn \code{TRUE} if the network to be returned is the updated one,
 #'        \code{FALSE} to obtain the original one.
+#' @param ... ignored.
 #' 
 #' @return the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #'         
-#' @usage bn(x, updated.bn = TRUE)
-#' 
 #' @exportMethod bn
 setGeneric("bn", function(x, ...) standardGeneric("bn"))
 
@@ -1067,8 +951,6 @@ setGeneric("bn", function(x, ...) standardGeneric("bn"))
 #' 
 #' @return the list of observations of the \code{\link{InferenceEngine}}.
 #' 
-#' @usage observations(x)
-#' 
 #' @exportMethod observations
 setGeneric("observations", function(x) standardGeneric("observations"))
 
@@ -1086,8 +968,6 @@ setGeneric("observations", function(x) standardGeneric("observations"))
 #' @param x an object.
 #' @param value the new name of the object.
 #' 
-#' @usage name(x) <- value
-#' 
 #' @exportMethod name<-
 setGeneric("name<-", function(x, value) standardGeneric("name<-"))
 
@@ -1102,8 +982,6 @@ setGeneric("name<-", function(x, value) standardGeneric("name<-"))
 #' 
 #' @param x an object.
 #' @param value the number of nodes in the object.
-#' 
-#' @usage num.nodes(x) <- value
 #' 
 #' @exportMethod num.nodes<-
 setGeneric("num.nodes<-", function(x, value) standardGeneric("num.nodes<-"))
@@ -1120,8 +998,6 @@ setGeneric("num.nodes<-", function(x, value) standardGeneric("num.nodes<-"))
 #' @param value vector containing the variable names of the object.
 #'        Overwrites \code{num.nodes} slot if non-matching.
 #' 
-#' @usage variables(x) <- value
-#' 
 #' @exportMethod variables<-
 setGeneric("variables<-", function(x, value) standardGeneric("variables<-"))
 
@@ -1135,8 +1011,6 @@ setGeneric("variables<-", function(x, value) standardGeneric("variables<-"))
 #' 
 #' @param x an object.
 #' @param value a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively).
-#' 
-#' @usage discreteness(x) <- value
 #' 
 #' @exportMethod discreteness<-
 setGeneric("discreteness<-", function(x, value) standardGeneric("discreteness<-"))
@@ -1152,8 +1026,6 @@ setGeneric("discreteness<-", function(x, value) standardGeneric("discreteness<-"
 #' 
 #' @param x an object.
 #' @param value vector contaning the size of each variable of the object.
-#' 
-#' @usage node.sizes(x) <- value
 #' 
 #' @exportMethod node.sizes<-
 setGeneric("node.sizes<-", function(x, value) standardGeneric("node.sizes<-"))
@@ -1172,8 +1044,6 @@ setGeneric("node.sizes<-", function(x, value) standardGeneric("node.sizes<-"))
 #' @param x an object.
 #' @param value list of the conditional probability tables of the object.
 #' 
-#' @usage cpts(x) <- value
-#' 
 #' @exportMethod cpts<-
 setGeneric("cpts<-", function(x, value) standardGeneric("cpts<-"))
 
@@ -1189,8 +1059,6 @@ setGeneric("cpts<-", function(x, value) standardGeneric("cpts<-"))
 #' @param value matrix containing the adjacency matrix of the directed acyclic graph representing
 #'        the structure of the object.
 #'         
-#' @usage dag(x) <- value
-#' 
 #' @exportMethod dag<-
 setGeneric("dag<-", function(x, value) standardGeneric("dag<-"))
 
@@ -1204,8 +1072,6 @@ setGeneric("dag<-", function(x, value) standardGeneric("dag<-"))
 #' 
 #' @param x an object.
 #' @param value matrix contaning the WPDAG of the object.
-#' 
-#' @usage wpdag(x) <- value
 #' 
 #' @exportMethod wpdag<-
 setGeneric("wpdag<-", function(x, value) standardGeneric("wpdag<-"))
@@ -1228,8 +1094,6 @@ setGeneric("wpdag<-", function(x, value) standardGeneric("wpdag<-"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value header filename.
 #' 
-#' @usage header.file(x) <- value
-#' 
 #' @seealso \code{\link{data.file<-}}
 #' 
 #' @exportMethod header.file<-
@@ -1249,8 +1113,6 @@ setGeneric("header.file<-", function(x, value) standardGeneric("header.file<-"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value data filename.
 #' 
-#' @usage data.file(x) <- value
-#' 
 #' @seealso \code{\link{header.file<-}}
 #' 
 #' @exportMethod data.file<-
@@ -1267,8 +1129,6 @@ setGeneric("data.file<-", function(x, value) standardGeneric("data.file<-"))
 #' @param x a \code{\link{BNDataset}} object.
 #' @param value number of variables of the dataset.
 #' 
-#' @usage num.variables(x) <- value
-#' 
 #' @exportMethod num.variables<-
 setGeneric("num.variables<-", function(x, value) standardGeneric("num.variables<-"))
 
@@ -1282,8 +1142,6 @@ setGeneric("num.variables<-", function(x, value) standardGeneric("num.variables<
 #' 
 #' @param x a \code{\link{BNDataset}} object.
 #' @param value number of items of the desired dataset.
-#' 
-#' @usage num.items(x) <- value
 #' 
 #' @exportMethod num.items<-
 setGeneric("num.items<-", function(x, value) standardGeneric("num.items<-"))
@@ -1299,8 +1157,6 @@ setGeneric("num.items<-", function(x, value) standardGeneric("num.items<-"))
 #' @param x a \code{\link{BNDataset}} object.
 #' @param value the list of bootstrap samples.
 #' 
-#' @usage boots(x) <- value
-#' 
 #' @exportMethod boots<-
 setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
 
@@ -1314,8 +1170,6 @@ setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
 #' 
 #' @param x a \code{\link{BNDataset}} object.
 #' @param value the list of bootstrap samples from imputed data.
-#' 
-#' @usage imp.boots(x) <- value
 #' 
 #' @exportMethod imp.boots<-
 setGeneric("imp.boots<-", function(x, value) standardGeneric("imp.boots<-"))
@@ -1331,8 +1185,6 @@ setGeneric("imp.boots<-", function(x, value) standardGeneric("imp.boots<-"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param value the junction tree to be inserted in the \code{\link{InferenceEngine}}.
 #' 
-#' @usage junction.tree(x) <- value
-#' 
 #' @exportMethod junction.tree<-
 setGeneric("junction.tree<-", function(x, value) standardGeneric("junction.tree<-"))
 
@@ -1347,8 +1199,6 @@ setGeneric("junction.tree<-", function(x, value) standardGeneric("junction.tree<
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param value the list of cliques of the junction tree contained in the \code{\link{InferenceEngine}}.
 #'
-#' @usage jt.cliques(x) <- value
-#'   
 #' @exportMethod jt.cliques<-
 setGeneric("jt.cliques<-", function(x, value) standardGeneric("jt.cliques<-"))
 
@@ -1366,8 +1216,6 @@ setGeneric("jt.cliques<-", function(x, value) standardGeneric("jt.cliques<-"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param value the list of joint probability tables compiled by the \code{\link{InferenceEngine}}.
 #' 
-#' @usage jpts(x) <- value
-#' 
 #' @exportMethod jpts<-
 setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))
 
@@ -1383,15 +1231,13 @@ setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))
 #' @rdname bn-set
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
-#' @param updated.bn \code{TRUE} if the network to be returned is the updated one,
-#'        \code{FALSE} to obtain the original one.
+#' @param updated.bn sss
+#' @param ... optional arguments to method.
 #' @param value the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #'         Updated network is the default choice.
 #'         
-#' @usage bn(x, updated.bn = TRUE) <- value
-#' 
 #' @exportMethod bn<-
-setGeneric("bn<-", function(x, ..., value) standardGeneric("bn<-"))
+setGeneric("bn<-", function(x, updated.bn, ..., value) standardGeneric("bn<-"))
 
 
 #' set the list of observations of an \code{\link{InferenceEngine}}.
@@ -1412,8 +1258,6 @@ setGeneric("bn<-", function(x, ..., value) standardGeneric("bn<-"))
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param value the list of observations of the \code{\link{InferenceEngine}}.
-#' 
-#' @usage observations(x) <- value
 #' 
 #' @seealso \code{\link{add.observations<-}}
 #' 
@@ -1440,8 +1284,6 @@ setGeneric("observations<-", function(x, value) standardGeneric("observations<-"
 #' 
 #' @seealso \code{\link{observations<-}}
 #' 
-#' @usage add.observations(x) <- value
-#' 
 #' @exportMethod add.observations<-
 setGeneric("add.observations<-", function(x, value) standardGeneric("add.observations<-"))
 
@@ -1464,11 +1306,6 @@ setGeneric("add.observations<-", function(x, value) standardGeneric("add.observa
 #' @param engine when \code{x} is an \code{\link{InferenceEngine}}, specify the inference engine to be shown.
 #'        Currently only \code{engine = 'jt'} is supported.
 #' @param ... potential other arguments.
-#' 
-#' @usage
-#' print(x) # BN
-#' print(x, show.raw.data = FALSE, show.imputed.data = FALSE) # BNDataset
-#' print(x, engine = 'jt') # InferenceEngine
 #' 
 #' @exportMethod print
 setGeneric("print", function(x, ...) standardGeneric("print"))

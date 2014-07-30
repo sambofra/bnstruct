@@ -1,6 +1,9 @@
 #' @name BN
 #' @rdname BN-class
 #' @aliases initialize,BN-method
+#' 
+#' 
+#' 
 setMethod("initialize",
           "BN",
           function(.Object, dataset = NULL,
@@ -68,12 +71,6 @@ setMethod("initialize",
 #' 
 #' @return BN object.
 #' 
-#' @usage
-#' BN()
-#' BN(dataset)
-#' BN(dataset, algo, alpha, ess, bootstrap, layering, max.fanin.layers,
-#'    max.fanin, cont.nodes, raw.data, ...)
-#'    
 #' @examples
 #' \dontrun{
 #' net.1 <- BN()
