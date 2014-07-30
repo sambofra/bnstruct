@@ -1,18 +1,52 @@
 #' Constructor method of \code{\link{InferenceEngine}} class.
 #'
 #' @name InferenceEngine
+#' @rdname InferenceEngine-class
+#' @aliases initialize,InferenceEngine-method
+#' 
+#' @param .Object an empty InferenceEngine object.
+#' 
+#' @return an InferenceEngine object.
 setMethod("initialize",
           c("InferenceEngine"),
           function(.Object, ...)  
           {
-            validObject(.Object)      
-            .Object
+            validObject(.Object)
+            return(.Object)
           })
 
-#' Wrapper for \code{\link{InferenceEngine}} object
+#' constructor for \code{\link{InferenceEngine}} object
 #' 
 #' @name InferenceEngine
-#' @export
+#' @rdname InferenceEngine-class
+#' @aliases InferenceEngine
+#' 
+#' @param bn a \code{\link{BN}} object.
+#' @param observations a list of observations composed by the two following vectors:
+#' \itemize{
+#' \item{\code{observed.vars}:}{vector of observed variables;}
+#' \item{\code{observed.vals}:}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
+#' }
+#' @param ... potential further arguments of methods.
+#' 
+#' @usage
+#' InferenceEngine()
+#' InferenceEngine(bn, observations, ...)
+#' 
+#' @return InferenceEngine object.
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' bn <- BN(dataset)
+#' eng <- InferenceEngine(bn)
+#' 
+#' obs <- list(c("A","G,"X),c(1,2,1))
+#' eng.2 <- InferenceEngine(bn, obs)
+#' }
+#' 
+#' @export 
 InferenceEngine <- function(bn = NULL, observations = NULL, ...)
 {
   object <- new("InferenceEngine", bn, observations, ...)
@@ -27,7 +61,7 @@ InferenceEngine <- function(bn = NULL, observations = NULL, ...)
   {
     object <- build.junction.tree(object, dag(bn))
   }
-  object
+  return(object)
 }
 
 # validator

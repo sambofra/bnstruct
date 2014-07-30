@@ -1,13 +1,7 @@
 ###############################################################################
+#
 # Generic Bayesian Network class
 #
-# name       : name of the network
-# num.nodes  : how many nodes it has
-# variable   : name of the variables associated to the nodes
-# node.sizes : number of values each variable can take
-# cpts       : list of Conditional Probability Tables
-# dag        : matrix representing the DAG of the network as adjacency matrix
-# wpdag      : weighted partially directed acyclic graph as adjacency matrix
 ###############################################################################
 
 #' BN class.
@@ -61,21 +55,9 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 
 
 ###############################################################################
+#
 # Dataset class
 #
-# name          : name of the dataset
-# file          : file from which che dataset is taken (if any)
-# variables     : variable (column) names
-# num.variables : number of variables contained (# columns)
-# num.items     : number of items contained (# rows)
-# has.rawdata   : TRUE if instance actually contains raw data
-# has.impdata   : TRUE if instance actually contains imputed data
-# raw.data      : dataset as matrix; no imputation has been performed, so
-#                 either the dataset has no missing data, or missing data
-#                 have not been imputed. Implies has.rawdata == TRUE
-# imputation    : TRUE if dataset requires imputation, FALSE otherwise
-# imputed data  : imputed dataset as matrix, if needed. Implies
-#                 has.impdata == TRUE
 ###############################################################################
 
 #' BNDataset class.
@@ -158,13 +140,9 @@ setClass("BNDataset",
 
 
 ###############################################################################
-# Junction Tree class
 #
-# junction.tree      : the junction tree as adjacency matrix of clique nodes
-# num.nodes          : number of nodes of the junction tree (# cliques)
-# bn                 : the network it refers to
-# cliques            : list of cliques, each as list of variables
-# triangulated.graph : the triangulated graph as adjacency matrix
+# InferenceEngine class
+#
 ###############################################################################
 
 #' InferenceEngine class.
@@ -176,11 +154,19 @@ setClass("BNDataset",
 #'   \item{\code{cliques}:}{list of cliques composing the nodes of the junction tree.}
 #'   \item{\code{triangulated.graph}:}{adjacency matrix of the original triangulated graph.}
 #'   \item{\code{jpts}:}{inferred joint probability tables.}
+#'   \item{\code{bn}:}{original Bayesian Network (as object of class \code{\link{BN}}) as provided by the user, or learnt from a dataset.
+#'          \code{NULL} if missing.}
+#'   \item{\code{updated.bn}:}{Bayesian Network  (as object of class \code{\link{BN}}) as modified by a belief propagation computation. In particular,
+#'          it will have different conditional probability tables with respect to its original version. \code{NULL} if missing.}
+#'   \item{\code{observed.vars}:}{list of observed variables, by name or number.}
+#'   \item{\code{observed.vals}:}{list of observed values for the corresponding variables in \code{observed.vars}.}
 #' }
 #' 
 #' 
 #' @name InferenceEngine-class
+#' @docType class
 #' @rdname InferenceEngine-class
+#' @aliases InferenceEngine,InferenceEngine-class
 #' 
 #' @exportClass InferenceEngine
 setClass("InferenceEngine",

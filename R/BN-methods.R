@@ -1,4 +1,6 @@
-#' Constructor method of \code{\link{BN}} class.
+#' @name BN
+#' @rdname BN-class
+#' @aliases initialize,BN-method
 setMethod("initialize",
           "BN",
           function(.Object, dataset = NULL,
@@ -6,30 +8,82 @@ setMethod("initialize",
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
           {
+            x <- .Object
+            
             if (!is.null(dataset))
             {
-              name(.Object)         <- name(dataset)
-              num.nodes(.Object)    <- num.variables(dataset)
-              variables(.Object)    <- variables(dataset)
-              node.sizes(.Object)   <- node.sizes(dataset)
-              discreteness(.Object) <- discreteness(dataset)
-              validObject(.Object)
+              name(x)         <- name(dataset)
+              num.nodes(x)    <- num.variables(dataset)
+              variables(x)    <- variables(dataset)
+              node.sizes(x)   <- node.sizes(dataset)
+              discreteness(x) <- discreteness(dataset)
+              validObject(x)
 
-              .Object <- learn.structure(.Object, dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
-                                         layering = layering, max.fanin.layers = max.fanin.layers,
-                                         max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
+              x <- learn.structure(x, dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                   layering = layering, max.fanin.layers = max.fanin.layers,
+                                   max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
               
-              validObject(.Object)
+              validObject(x)
 
-              .Object <- learn.params(.Object, dataset, ess = ess)
+              x <- learn.params(x, dataset, ess = ess)
             }
-            validObject(.Object)
-            return(.Object)
+            validObject(x)
+            return(x)
           })
 
-#' Wrapper for \code{\link{BN}} object
+
+#' constructor for a Bayesian Network.
+#' 
+#' Instantiate a \code{\link{BN}} object.
+#' 
+#' The constructor may be invoked without parameters -- in this case an empty network will be created, and its slots will be filled manually by the user.
+#' This is usually viable only if the user already has knowledge about the network structure.
+#' 
+#' Often, a better choice is to build a network starting from a dataset. Currently, two algorithms are supported for the structure learning step
+#' (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
+#' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
+#'  The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
+#' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
+#' to the method if \code{algo = 'sm'} is given as parameter to the method.
+#' 
+#' The parameter learning step is done using a Maximum-a-posteriori computation.
 #' 
 #' @name BN
+#' @rdname BN-class
+#' 
+#' @param dataset a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
+#'        are considered only if a starting dataset is provided.
+#' @param algo the algorithm used to learn the structure of the network, if needed. Currently, the supported options are
+#'        \code{'sm'}, Silander-Myllymaki, exact algorithm, and \code{'mmhc'}, Max-Min Hill-Climbing, heuristic (the default option).
+#' @param alpha the confidence threshold for the MMHC algorithm.
+#' @param ess Equivalent Sample Size value.
+#' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param cont.nodes use an empty vector.
+#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
+#'     (if available, otherwise the raw dataset will be used anyway).
+# ' @param ... potential further arguments of methods.
+#' 
+#' @return BN object.
+#' 
+#' @usage
+#' BN()
+#' BN(dataset)
+#' BN(dataset, algo, alpha, ess, bootstrap, layering, max.fanin.layers,
+#'    max.fanin, cont.nodes, raw.data, ...)
+#'    
+#' @examples
+#' \dontrun{
+#' net.1 <- BN()
+#' 
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' net.2 <- BN(dataset)
+#' }
+#' 
+#' 
 #' @export
 BN <- function(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
                layering = c(), max.fanin.layers = NULL,
@@ -227,8 +281,7 @@ setReplaceMethod("wpdag",
                  })
 
 
-#' @name layering
-#' @aliases layering
+#' @aliases layering,BN
 #' @rdname layering
 setMethod("layering",
           "BN",

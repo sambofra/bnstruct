@@ -1,16 +1,40 @@
-#' Constructor method of \code{\link{BNDataset}} class.
-#'
+#' initialize a \code{\link{BNDataset}} object.
+#' 
 #' @name BNDataset
+#' @rdname BNDataset-class
+#' @docType method
+#' @aliases initialize,BNDataset-method
+#' 
+#' @param .Object an empty BNDataset.
+#' 
+#' @return a BNDataset object.
 setMethod("initialize",
           "BNDataset", function(.Object, ...)  
           {
-            validObject(.Object)      
+            validObject(.Object)
             return(.Object)
           })
 
-#' Wrapper for \code{\link{BNDataset}} object
+#' constructor for \code{\link{BNDataset}} object
 #' 
 #' @name BNDataset
+#' @rdname BNDataset-class
+#' @aliases BNDataset
+#' 
+#' @param ... potential further arguments of methods.
+#' 
+#' @return BNDataset object.
+#' 
+#' @usage
+#' BNDataset()
+#' BNDataset(...)
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' }
+#' 
 #' @export 
 BNDataset <- function(...)
 {
@@ -40,7 +64,7 @@ BNDataset <- function(...)
       colnames(dataset@imputed.data) <- dataset@variables
 #   }
     
-return(dataset)
+    return(dataset)
 }
 
 # validator

@@ -1,3 +1,10 @@
+# generic initialization
+# ' @name initialize
+# ' @rdname initialize
+# ' 
+# ' @param ... ignored.
+#setGeneric("initialize", function(x, ...) standardGeneric("initialize"))
+
 ###############################################################################
 ###############################################################################
 
@@ -21,14 +28,17 @@
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
-#' @usage
-#' # first create a BN and learn its structure from a dataset
+#' @usage learn.params(bn, dataset, ess = 1)
+#' 
+#' @examples
+#' \dontrun{
+#' ## first create a BN and learn its structure from a dataset
 #' dataset <- BNDataset(name = "MyDataset")
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
 #' bn <- BN()
 #' bn <- learn.structure(bn, dataset)
-#' learn.params(bn, dataset, ess = 1)
-#' 
+#' bn <- learn.params(bn, dataset, ess=1)
+#' }
 #' 
 #' @exportMethod learn.params
 setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.params"))
@@ -63,17 +73,25 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
-#' @usage
+#' @usage learn.structure(bn, dataset, algo="mmhc", alpha=0.05, ess=1, bootstrap=FALSE,
+#'           layering=c(), max.fanin.layers=NULL,
+#'           max.fanin=num.variables(dataset), cont.nodes=c(), raw.data=FALSE, ...)
+#' 
+#' @examples
+#' \dontrun{
 #' dataset <- BNDataset(name = "MyDataset")
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
 #' bn <- BN()
-#' learn.structure(bn, dataset, alpha = 0.05, ess = 1, bootstrap = FALSE) # mmhc
+#' # use MMHC
+#' bn <- learn.structure(bn, dataset, alpha=0.05, ess=1, bootstrap=FALSE)
 #' 
+#' # now use Silander-Myllymaki
 #' layers <- layering(bn)
 #' mfl <- as.matrix(read.table(header=F,
-#' text='0  1  1  1  1 0  1  1  1  1 0  0  8  7  7 0  0  0 14  6 0  0  0  0 19'))
-#' learn.structure(bn, dataset, algo = 'sm', max.fanin = 3, cont.nodes = c(),
-#'                 layering = layers, max.fanin.layers = mfl, raw.data = FALSE)
+#' text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
+#' bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
+#'                       layering=layers, max.fanin.layers=mfl, raw.data=FALSE)
+#' }
 #' 
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.structure"))
@@ -87,18 +105,27 @@ setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.
 #' @rdname layering
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
+#' @param updated.bn \code{TRUE} if \code{x} is an InferenceEngine and the updated network is chosen (kept only for compatibility with other methods).
 #' @param ... potential further arguments for methods.
 #' 
 #' @usage
-#' dataset <- BNDataset(name = "MyDataset")
+#' layering(x) # x is a BN
+#' layering(x, ...)
+#' layering(x, updated.bn=TRUE, ...) # x is an InferenceEngine
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset(name="MyDataset")
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
 #' x <- BN(dataset)
 #' layering(x)
-#' eng <- InferenceEngine(x, updated.bn = TRUE)
-#' layering(x)
+#' eng <- InferenceEngine(x)
+#' layering(x, updated.bn=TRUE)
+#' }
 #' 
 #' @return a vector containing layers the nodes can be divided into.
 setGeneric("layering", function(x, ...) standardGeneric("layering"))
+
 
 #' compute the most probable values to be observed.
 #' 
@@ -114,12 +141,18 @@ setGeneric("layering", function(x, ...) standardGeneric("layering"))
 #' @return array containing, in each position, the most probable value for the corresponding variable.
 #' 
 #' @usage
-#' # x is a BN object
+#' get.most.probable.values(x)
+#' get.most.probable.values(x, ...)
+#' 
+#' @examples
+#' \dontrun{
+#' # try with a BN object x
 #' get.most.probable.values(x)
 #' 
-#' # x is a InferenceEngine object
-#' get.most.probable.values(x)
-#'
+#' # now build an InferenceEngine object
+#' eng <- InferenceEngine(x)
+#' get.most.probable.values(eng)
+#' }
 #'  
 #' @exportMethod get.most.probable.values
 setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
@@ -140,9 +173,13 @@ setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.mos
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' @param ... potential further arguments of methods.
 #' 
-#' @usage
-#' plot(x, use.node.names = TRUE, frac = 0.2, max.weight = 1,
-#'      node.col = c("cyan"), plot.wpdag = FALSE)
+#' @usage plot(x, use.node.names, frac, max.weight,node.col, plot.wpdag, ...)
+#' 
+#' @examples
+#' \dontrun{
+#' plot(x, use.node.names=TRUE, frac=0.2, max.weight=1,
+#'      node.col=c("cyan"), plot.wpdag=FALSE)
+#' }
 #' 
 #' @exportMethod plot
 setGeneric("plot", function(x, ...) standardGeneric("plot"))
@@ -159,8 +196,12 @@ setGeneric("plot", function(x, ...) standardGeneric("plot"))
 #' @param filename name (with path, if needed) of the file to be created
 #' 
 #' @usage
-#' # x is a BN object
-#' save.to.eps(x, filename = "out.eps")
+#' save.to.eps(x, filename)
+#' 
+#' @examples
+#' \dontrun{
+#' save.to.eps(x, "out.eps")
+#' }
 #' 
 #' @seealso \code{\link{plot}}
 #' 
@@ -185,12 +226,16 @@ setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage
+#' @usage has.data(x)
+#' 
+#' @examples
+#' \dontrun{
 #' x <- BNDataset()
 #' has.data(x) # FALSE
 #' 
 #' x <- read.dataset(x, "file.header", "file.data")
 #' has.data(x) # TRUE
+#' }
 #' 
 #' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
 #' 
@@ -206,12 +251,16 @@ setGeneric("has.data", function(x) standardGeneric("has.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage
+#' @usage has.raw.data(x)
+#' 
+#' @examples
+#' \dontrun{
 #' x <- BNDataset()
 #' has.raw.data(x) # FALSE
 #' 
 #' x <- read.dataset(x, "file.header", "file.data")
 #' has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
+#' }
 #' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
 #' 
@@ -227,7 +276,10 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @usage
+#' @usage has.imputed.data(x)
+#' 
+#' @examples
+#' \dontrun{
 #' x <- BNDataset()
 #' has.imputed.data(x) # FALSE
 #' 
@@ -236,6 +288,7 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' 
 #' x <- impute(x)
 #' has.imputed.data(x) # TRUE
+#' }
 #' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
 #' 
@@ -255,6 +308,16 @@ setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 #' @param x a \code{\link{BNDataset}}.
 #' 
 #' @usage get.data(x)
+#' 
+#' @examples
+#' \dontrun{
+#' x <- BNDataset()
+#' x <- read.dataset(x, "file.header", "file.data")
+#' get.data(x) # returns raw dataset, the only one present in dataset
+#' 
+#' x <- impute(x)
+#' get.data(x) # returns imputed dataset, since it is present now
+#' }
 #' 
 #' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
 #' 
@@ -277,6 +340,7 @@ setGeneric("get.data", function(x) standardGeneric("get.data"))
 #' @exportMethod get.raw.data
 setGeneric("get.raw.data", function(x) standardGeneric("get.raw.data"))
 
+
 #' get imputed data of a BNDataset.
 #' 
 #' Return imputed data contained in a \code{\link{BNDataset}} object, if any.
@@ -298,17 +362,18 @@ setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
 #' 
 #' Insert raw data in a \code{\link{BNDataset}} object.
 #' 
+#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}}.
+#' 
 #' @name raw.data<-
 #' @rdname raw.data-set
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' 
 #' @usage
 #' raw.data(x) <- value
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod raw.data<-
 setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
@@ -317,6 +382,8 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' add imputed data.
 #' 
 #' Insert imputed data in a \code{\link{BNDataset}} object.
+#' 
+#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}} with flag \code{imputation = TRUE}.
 #' 
 #' @name imputed.data<-
 #' @rdname imputed.data-set
@@ -327,7 +394,7 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' @usage
 #' imputed.data(x) <- value
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod imputed.data<-
 setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"))
@@ -358,6 +425,12 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' read.dataset(object, header = "file.header", dataset = "file.data",
 #'          imputation=FALSE, header.flag=FALSE, na.string.symbol='?', sep.symbol='',
 #'          k.impute = 10, bootstrap = FALSE, num.boots = 100, seed = 0, ...)
+#'          
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' }
 #' 
 #' @exportMethod read.dataset
 setGeneric("read.dataset", function(object, header, dataset, ...) standardGeneric("read.dataset"))
@@ -375,6 +448,13 @@ setGeneric("read.dataset", function(object, header, dataset, ...) standardGeneri
 #' @usage
 #' # object is a BNDataset object
 #' impute(object, k.impute = 10, ...)
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- impute(dataset)
+#' }
 #' 
 #' @exportMethod impute
 setGeneric("impute", function(object, ...) standardGeneric("impute"))
@@ -398,6 +478,13 @@ setGeneric("impute", function(object, ...) standardGeneric("impute"))
 #' @usage
 #' bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
 #'           k.impute = 10, na.string.symbol = '?', ...)
+#'           
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- bootstrap(dataset, num.boots = 1000)
+#' }
 #' 
 #' @exportMethod bootstrap
 setGeneric("bootstrap", function(object, ...) standardGeneric("bootstrap"))
@@ -416,8 +503,17 @@ setGeneric("bootstrap", function(object, ...) standardGeneric("bootstrap"))
 #' @param ... potential further arguments of methods (ignored).
 #' 
 #' @usage
-#' dataset <- bootstrap(dataset)
-#' get.boot(dataset, index = 1, imputed = TRUE, ...) # first sample
+#' get.boot(dataset, index = 1, imputed = TRUE, ...)
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- bootstrap(dataset, num.boots = 1000)
+#' 
+#' for (i in 1:num.boots(dataset))
+#'    print(get.boot(dataset, i))
+#' }
 #' 
 #' @seealso \code{\link{bootstrap}}
 #' 
@@ -447,6 +543,15 @@ setGeneric("get.boot", function(dataset, index, imputed, ...) standardGeneric("g
 #' @usage
 #' build.junction.tree(object, ...)
 #' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' net <- BN(dataset)
+#' eng <- InferenceEngine()
+#' eng <- build.junction.tree(eng)
+#' }
+#' 
 #' @exportMethod build.junction.tree
 setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.junction.tree"))
 
@@ -460,7 +565,7 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' @rdname belief.propagation
 #' 
 #' @param ie an \code{\link{InferenceEngine}} object.
-#' @param bn a \code{\link{BN}} object.
+#' @param net a \code{\link{BN}} object.
 #' @param observed.vars list of observed variables.
 #' @param observed.vals values taken by variables listed in \code{observed.vars}.
 #' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
@@ -469,8 +574,22 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' @return updated \code{\link{InferenceEngine}} object.
 #' 
 #' @usage
-#' ie <- InferenceEngine(bn)
 #' belief.propagation(ie)
+#' belief.propagation(ie, net=bn, return.potentials=TRUE)
+#' belief.propagation(ie, net=bn, observed.vars=c("A","G","X"), observed.vals=c(1,2,1))
+#' belief.propagation(ie, observed.vars=c("A", "G", "X"), observed.vals=c(1,2,1))
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' bn <- BN(dataset)
+#' ie <- InferenceEngine(bn)
+#' ie <- belief.propagation(ie)
+#' 
+#' observations(ie) <- list("observed.vars"=("A","G","X"), "observed.vals"=c(1,2,1))
+#' belief.propagation(ie)
+#' }
 #' 
 #' @exportMethod belief.propagation
 setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propagation"))
@@ -490,6 +609,19 @@ setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propa
 #' 
 #' @usage
 #' test.updated.bn(x)
+#' 
+#' @examples
+#' \dontrun{
+#' dataset <- BNDataset()
+#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' bn <- BN(dataset)
+#' ie <- InferenceEngine(bn)
+#' test.updated.bn(ie) # FALSE
+#' 
+#' observations(ie) <- list("observed.vars"=("A","G","X"), "observed.vals"=c(1,2,1))
+#' ie <- belief.propagation(ie)
+#' test.updated.bn(ie) # TRUE
+#' }
 #' 
 #' @export test.updated.bn
 setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))

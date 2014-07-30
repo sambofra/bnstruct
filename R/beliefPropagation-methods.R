@@ -4,6 +4,30 @@ setMethod("belief.propagation",
           c("InferenceEngine"),
           function(ie, net = NULL, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
             {
+              ###############################
+              # moved inside in order to eliminate a NOTE in R CMD check
+              proc.order <- function(node, from, adj)
+              {
+                # Recursive method to compute order of the message passing in the upward step.
+                #
+                # node : current node
+                # from : (local) root
+                # adj  : adjacency matrix
+                neighbours <- setdiff(which(adj[node,] > 0), from)
+                
+                if (length(neighbours) > 0)
+                {
+                  for (n in neighbours) {
+                    proc.order(n, node, adj)
+                    parents.list <<- c(parents.list, node)
+                  }
+                }
+                
+                process.order <<- c(process.order, node)
+              }
+              
+              ##############################
+              
               if (is.null(net))
               {
                 net <- bn(ie, updated.bn = FALSE)
@@ -363,25 +387,6 @@ setMethod("belief.propagation",
           })
 
 
-proc.order <- function(node, from, adj)
-{
-  # Recursive method to compute order of the message passing in the upward step.
-  #
-  # node : current node
-  # from : (local) root
-  # adj  : adjacency matrix
-  neighbours <- setdiff(which(adj[node,] > 0), from)
-  
-  if (length(neighbours) > 0)
-  {
-    for (n in neighbours) {
-      proc.order(n, node, adj)
-      parents.list <<- c(parents.list, node)
-    }
-  }
-  
-  process.order <<- c(process.order, node)
-}
 
 
 compute.message <- function(pot, dp, vfrom, vto, node.sizes)
