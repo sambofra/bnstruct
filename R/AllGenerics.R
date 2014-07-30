@@ -1231,7 +1231,7 @@ setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))
 #' @rdname bn-set
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
-#' @param updated.bn sss
+#' @param updated.bn \code{TRUE} if the network provided is the updated one (default), \code{FALSE} otherwise.
 #' @param ... optional arguments to method.
 #' @param value the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #'         Updated network is the default choice.
