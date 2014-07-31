@@ -1,8 +1,11 @@
 library("bnstruct")
 
-mydata <- BNDataset(name = "Asia")
-mydata <- read.dataset(mydata, "../bnstruct/extdata/asia_10000.header", "../bnstruct/extdata/asia_10000.data", imputation = FALSE, bootstrap=FALSE)
-mydata@name <- "Asia"
+# asia_10000 <- BNDataset(name = "Asia")
+# asia_10000 <- read.dataset(asia_10000, "../bnstruct/inst/extdata/asia_10000.header", "../bnstruct/inst/extdata/asia_10000.data", imputation = FALSE, bootstrap=FALSE)
+# save(asia_10000, file="data/asia_10000.rda")
+# break
+mydata <- asia()
+#mydata@name <- "Asia"
 print(mydata)
 
 net <- BN(mydata, algo = "mmhc")

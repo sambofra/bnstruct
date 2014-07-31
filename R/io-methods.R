@@ -6,12 +6,14 @@ setMethod("read.dataset",
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
                    bootstrap = FALSE, num.boots = 100, seed = 0, ...)
           {
+            header.file(object)  <- header
+            data.file(object)    <- dataset
+            
             ls                   <- readLines(header)
             variables(object)    <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
             lns                  <- c(unlist(strsplit(ls[2], split = " ")))
             node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
-            lds                  <- c(unlist(strsplit(ls[3], split = " ")))
-            discreteness(object) <- sapply(1:length(lds), FUN=function(x){ !is.na(match(lds[x],c('d',"D"))) })
+            discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
             
             a <- read.delim(dataset, na.strings = na.string.symbol,
                             header = header.flag, sep = sep.symbol) + 1
@@ -63,5 +65,52 @@ setMethod("read.dataset",
             }
             
             validObject(object)
-            object
+            return(object)
           })
+
+#' load \code{Asia} dataset.
+#' 
+#' Wrapper for a loader for the \code{Asia} dataset, with only raw data.
+#' 
+#' The dataset has 10000 items, no missing data, so no imputation needs to be performed. For informations on the network, see
+#' S. Lauritzen, D. Spiegelhalter. Local Computation with Probabilities on Graphical Structures and their Application to Expert Systems (with discussion). Journal of the Royal Statistical Society: Series B (Statistical Methodology), 50(2):157-224, 1988.
+#' 
+#' @name asia
+#' @rdname asia
+#' 
+#' @return a BNDataset containing the \code{Child} dataset.
+#' 
+#' @examples
+#' dataset <- asia()
+#' print(dataset)
+#' 
+#' @export
+asia <- function()
+{
+  data("asia_10000", envir=environment())
+  return(get("asia_10000", envir=environment()))
+}
+
+
+#' load \code{Child} dataset.
+#' 
+#' Wrapper for a loader for the \code{Child} raw dataset; also perform imputation.
+#' 
+#' The dataset has 5000 items, with random missing values (no latent variables). BNDataset object contains the raw dataset and imputed dataset, with \code{k=10}
+#' (see \code{\link{impute}} for related explanation). For informations on the network see
+#' D. J. Spiegelhalter, R. G. Coewll (1992). Learning in probabilistic expert systems. In Bayesian Statistics 4 (J. M. Bernardo, J. 0. Berger, A. P. Dawid and A. F. M. Smith, eds.) 447-466. Clarendon Press, Oxford. 
+#' 
+#' @name child
+#' @rdname child
+#' 
+#' @return a BNDataset containing the \code{Child} dataset.
+#' 
+#' @examples dataset <- child()
+#' print(dataset)
+#' 
+#' @export
+child <- function()
+{
+  data("child_NA_5000", envir=environment())
+  return(get("child_NA_5000", envir=environment()))
+}

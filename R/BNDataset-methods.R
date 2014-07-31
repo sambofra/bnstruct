@@ -21,6 +21,7 @@ setMethod("initialize",
 #' @rdname BNDataset-class
 #' @aliases BNDataset
 #' 
+#' @param name name of the dataset.
 #' @param ... potential further arguments of methods.
 #' 
 #' @return BNDataset object.
@@ -32,7 +33,7 @@ setMethod("initialize",
 #' }
 #' 
 #' @export 
-BNDataset <- function(...)
+BNDataset <- function(name = "", ...)
 {
   dataset <- new("BNDataset", ...)
   
@@ -59,6 +60,11 @@ BNDataset <- function(...)
     if(length(dataset@variables) > 0 && has.imputed.data(dataset))
       colnames(dataset@imputed.data) <- dataset@variables
 #   }
+
+#     args <- list(...)
+#     exist <- "name" %in% names(args)
+#     if (exist)
+    name(dataset) <- name
     
     return(dataset)
 }

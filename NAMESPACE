@@ -3,6 +3,8 @@
 export(BN)
 export(BNDataset)
 export(InferenceEngine)
+export(asia)
+export(child)
 export(test.updated.bn)
 exportClasses(BN)
 exportClasses(BNDataset)

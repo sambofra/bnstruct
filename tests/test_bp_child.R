@@ -1,8 +1,12 @@
 library("bnstruct")
 
-mydata <- BNDataset(name = "Child")
-mydata <- read.dataset(mydata, "../bnstruct/extdata/Child_data_na_5000.header", "../bnstruct/extdata/Child_data_na_5000.data", imputation = TRUE, bootstrap=FALSE)
-print(mydata)
+# child_NA_5000 <- BNDataset(name = "Child")
+# child_NA_5000 <- read.dataset(child_NA_5000, "../bnstruct/inst/extdata/Child_data_na_5000.header", "../bnstruct/inst/extdata/Child_data_na_5000.data", imputation = TRUE, bootstrap=FALSE)
+# save(child_NA_5000, file="data/child_NA_5000.rda")
+# break
+# print(mydata)
+
+mydata <- child()
 
 net <- BN()
 slot(net, "name") <- "Child"
