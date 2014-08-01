@@ -9,9 +9,9 @@
 learn.structure(bn, dataset, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  cont.nodes = c(), raw.data = FALSE)
+  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -19,6 +19,8 @@ learn.structure(bn, dataset, ...)
 \item{dataset}{a \code{\link{BNDataset}}.}
 
 \item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).}
+
+\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 
@@ -46,6 +48,8 @@ new \code{\link{BN}} object with DAG.
 Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
 Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
 and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
+Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
+the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
 }
 \details{
 The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.

@@ -3,7 +3,7 @@
 \name{asia_10000}
 \alias{asia_10000}
 \title{\code{Asia} dataset.}
-\format{a \code{\link{BNDataset}} with a raw data slow filled with 10000 items.}
+\format{a \code{\link{BNDataset}} with raw data slow filled.}
 \usage{
 asia_10000
 }
@@ -12,7 +12,7 @@ The \code{Asia} dataset contains 10000 complete (no missing data, no latent vari
 No imputation needs to be performed, so only raw data is present.
 }
 \details{
-The data the BNDataset object is built from is located in files \code{\emph{pkg_name}/extdata/asia_10000.header} and \code{\emph{pkg_name}/extdata/asia_10000.data}.
+The data the BNDataset object is built from is located in files \code{pkg_folder/extdata/asia_10000.header} and \code{pkg_folder/extdata/asia_10000.data}.
 }
 \references{
 S. Lauritzen, D. Spiegelhalter. Local Computation with Probabilities on Graphical Structures and their Application to Expert Systems

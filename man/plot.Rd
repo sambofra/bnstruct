@@ -6,8 +6,6 @@
 \alias{plot,BN-method}
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
-plot(x, ...)
-
 \S4method{plot}{BN}(x, use.node.names = TRUE, frac = 0.2,
   max.weight = max(dag(x)), node.col = rep("white", ncol(dag(x))),
   plot.wpdag = FALSE)

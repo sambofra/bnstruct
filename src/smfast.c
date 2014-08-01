@@ -146,7 +146,7 @@ SEXP fumt_mask( SEXP n_elements, SEXP pattern )
 	return(result);
 }
 
-SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss )
+SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss, SEXP func )
 {
 	unsigned int i,j,n_pa,pos;
 	
@@ -158,6 +158,7 @@ SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP i
 	unsigned int * ifm = INTEGER(imp_fam_mask);
 	unsigned int pow_nodes = ncols(imp_fam_mask);
 	double alpha = *(REAL(iss));
+  unsigned int scoring_func = *INTEGER(func);
 	unsigned int * pa = (unsigned int *) R_alloc( n_nodes, sizeof(unsigned int) );
 	
 	// allocate and initialize output
@@ -177,7 +178,8 @@ SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP i
 				// Rprintf("get bits\n");
 				n_pa = get_bits( j, pa, n_nodes );
 				// Rprintf("log lik, node %d, n parents %d\n",i,n_pa);
-				aflml[pos] = bdeu_score( d, n_nodes, n_ex, ns, i, pa, n_pa, alpha );
+				aflml[pos] = score_node_1(d, n_nodes, n_ex, ns, i, pa, n_pa, scoring_func, alpha);
+        // bdeu_score( d, n_nodes, n_ex, ns, i, pa, n_pa, alpha );
 				// Rprintf("end\n");
 			}
 		}

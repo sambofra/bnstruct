@@ -232,8 +232,11 @@ setReplaceMethod("observations",
                  "InferenceEngine",
                  function(x, value)
                  {
-                   slot(x, "observed.vars") <- c(unlist(value[[1]]))
-                   slot(x, "observed.vals") <- c(unlist(value[[2]]))
+                   ovrs <- c(unlist(value[[1]]))
+                   ovls <- c(unlist(value[[2]]))
+                   obs  <- unique.observations(ovrs, ovls)
+                   slot(x, "observed.vars") <- obs$observed.vars
+                   slot(x, "observed.vals") <- obs$observed.vals
                    validObject(x)
                    x
                  })
@@ -247,8 +250,11 @@ setReplaceMethod("add.observations",
                  "InferenceEngine",
                  function(x, value)
                  {
-                   slot(x, "observed.vars") <- c(slot(x, "observed.vars"), c(unlist(value[[1]])))
-                   slot(x, "observed.vals") <- c(slot(x, "observed.vals"), c(unlist(value[[2]])))
+                   ovrs <- c(slot(x, "observed.vars"), c(unlist(value[[1]])))
+                   ovls <- c(slot(x, "observed.vals"), c(unlist(value[[2]])))
+                   obs  <- unique.observations(ovrs, ovls)
+                   slot(x, "observed.vars") <- obs$observed.vars
+                   slot(x, "observed.vals") <- obs$observed.vals
                    validObject(x)
                    x
                  })
@@ -322,3 +328,14 @@ setMethod("print",
             }
             
           })
+
+# keep last (most recent) observation for each var
+unique.observations <- function(observed.vars, observed.vals)
+{
+  ovrs <- c(unlist(observed.vars))
+  ovls <- c(unlist(observed.vals))
+  dup  <- which(duplicated(rev(ovrs)) == TRUE)
+  ovrs <- rev(rev(ovrs)[-dup])
+  ovls <- rev(rev(ovls)[-dup])
+  return(list("observed.vars"=ovrs, "observed.vals"=ovls))
+}

@@ -8,7 +8,7 @@ mydata <- asia()
 #mydata@name <- "Asia"
 print(mydata)
 
-net <- BN(mydata, algo = "mmhc")
+net <- BN(mydata, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8
 # set.node.sizes(net) <- c(2,2,2,2,2,2,2,2)

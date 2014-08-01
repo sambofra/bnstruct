@@ -40,6 +40,8 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
 #' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
 #' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
+#' Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
+#' the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
 #' 
 #' The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
 #' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
@@ -51,6 +53,7 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' @param bn a \code{\link{BN}} object.
 #' @param dataset a \code{\link{BNDataset}}.
 #' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
@@ -151,6 +154,8 @@ setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.mos
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' @param ... potential further arguments of methods.
 #' 
+#' @importFrom graphics plot
+#' 
 #' @examples
 #' \dontrun{
 #' plot(x, use.node.names=TRUE, frac=0.2, max.weight=1,
@@ -158,7 +163,8 @@ setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.mos
 #' }
 #' 
 #' @exportMethod plot
-setGeneric("plot", function(x, ...) standardGeneric("plot"))
+if (!isGeneric("plot"))
+  setGeneric("plot", function(x, ...) standardGeneric("plot"))
 
 
 #' save a \code{\link{BN}} picture as \code{.eps} file.

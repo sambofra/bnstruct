@@ -10,8 +10,7 @@ Depends:
     Matrix,
     methods
 Suggests:
-    Rgraphviz,
-    iterators
+    Rgraphviz
 Author: Francesco Sambo
 Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
 Description: More about what it does (maybe more than one line)

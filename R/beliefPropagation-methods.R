@@ -39,6 +39,12 @@ setMethod("belief.propagation",
                 observed.vars <- obs$observed.vars
                 observed.vals <- obs$observed.vals
               }
+              else
+              {
+                obs <- unique.observations(observed.vars, observed.vals)
+                observed.vars <- obs$observed.vars
+                observed.vals <- obs$observed.vals
+              }
               
               num.nodes  <- num.nodes(net)
               num.cliqs  <- num.nodes(ie)

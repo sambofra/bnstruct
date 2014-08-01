@@ -7,7 +7,7 @@
 setMethod("initialize",
           "BN",
           function(.Object, dataset = NULL,
-                   algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
           {
@@ -22,7 +22,7 @@ setMethod("initialize",
               discreteness(x) <- discreteness(dataset)
               validObject(x)
 
-              x <- learn.structure(x, dataset, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
+              x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
                                    layering = layering, max.fanin.layers = max.fanin.layers,
                                    max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
               

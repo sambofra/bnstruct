@@ -28,6 +28,30 @@ SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP
   return score;
 }
 
+
+double score_node_1( int* data, int ncols_data, int nrows_data, int* node_sizes, unsigned int ni, int* pars, int length_pars, int func, double ess )
+{
+  double score;
+  
+  switch (func)
+  {
+    case 0 : score = bdeu_score( data, ncols_data, nrows_data, node_sizes,
+                                 ni, pars, length_pars, ess );
+             break;
+                
+    case 1 : score = log_likelihood( data, ncols_data, nrows_data, node_sizes,
+                                     ni, pars, length_pars, 0.5*log(nrows_data) );
+             break;
+    
+    case 2 : score = log_likelihood( data, ncols_data, nrows_data, node_sizes,
+                                     ni, pars, length_pars, 1.0 );
+             break;
+  }
+
+  return score;
+}
+
+
 SEXP is_acyclic( SEXP graph )
 {
   int n_nodes = nrows(graph);

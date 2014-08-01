@@ -9,13 +9,14 @@
 # }
 
 # Silander and Myllymaki complete search, BDeu score, high memory occupation.
-sm <- function(x, node.sizes, cont.nodes = NULL, max.fanin = NULL, 
+sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = NULL, 
 	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL ) 
 {
 	n.nodes <- ncol(x)
 	n.cases <- nrow(x)
 	
 	storage.mode(node.sizes) <- "integer" # just to be sure
+  storage.mode(scoring.func) <- "integer"
 	
 	# if no max.fanin is given, assume maximum possible
 	if( is.null(max.fanin) )
@@ -71,7 +72,7 @@ sm <- function(x, node.sizes, cont.nodes = NULL, max.fanin = NULL,
                      PACKAGE = "bnstruct") > 0) ] <- FALSE
   
   # aflml <- all.families.log.marginal.likelihood( data, node.sizes, ifm, ess )
-	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, ess, PACKAGE = "bnstruct" )
+	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, ess, scoring.func, PACKAGE = "bnstruct" )
 	
 	# bps <- find.best.parents( aflml )
 	bps <- .Call("fbp", aflml = aflml, PACKAGE = "bnstruct");

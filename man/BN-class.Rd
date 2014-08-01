@@ -8,9 +8,10 @@
 \title{BN class.}
 \usage{
 \S4method{initialize}{BN}(.Object, dataset = NULL, algo = "mmhc",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  cont.nodes = c(), raw.data = FALSE, ...)
+  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+  ...)
 
 BN(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1,
   bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,

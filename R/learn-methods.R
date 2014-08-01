@@ -57,7 +57,7 @@ setMethod("learn.params",
 #' @aliases learn.structure,BN,BNDataset
 setMethod("learn.structure",
           c("BN", "BNDataset"),
-          function(bn, dataset, algo = "mmhc", alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE)
           {
@@ -79,6 +79,18 @@ setMethod("learn.structure",
               else
                 data   <- get.data(dataset)
             }
+            
+
+            scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
+            if (is.na(scoring.func))
+            {
+              message("scoring function not recognized, using BDeu")
+              scoring.func <- 0
+            }
+            else {
+              scoring.func <- scoring.func - 1
+            }
+            
 
             if (algo == "sm")
             {
@@ -96,7 +108,7 @@ setMethod("learn.structure",
 #                 print(max.fanin)
 #                 print(layering)
 #                 print(max.fanin.layers)
-                dag(bn)  <- sm(data, node.sizes, cont.nodes, max.fanin, layering, max.fanin.layers)
+                dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers)
               }
               return(bn)
             }
@@ -104,7 +116,7 @@ setMethod("learn.structure",
             # if (algo == "mmhc") # default
             {
               cpc    <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
-              dag(bn) <- hc( data, node.sizes, cpc, cont.nodes )
+              dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               return(bn)
             }
           })
