@@ -72,8 +72,7 @@ setMethod("read.dataset",
 #' 
 #' Wrapper for a loader for the \code{Asia} dataset, with only raw data.
 #' 
-#' The dataset has 10000 items, no missing data, so no imputation needs to be performed. For informations on the network, see
-#' S. Lauritzen, D. Spiegelhalter. Local Computation with Probabilities on Graphical Structures and their Application to Expert Systems (with discussion). Journal of the Royal Statistical Society: Series B (Statistical Methodology), 50(2):157-224, 1988.
+#' The dataset has 10000 items, no missing data, so no imputation needs to be performed.
 #' 
 #' @name asia
 #' @rdname asia
@@ -83,6 +82,8 @@ setMethod("read.dataset",
 #' @examples
 #' dataset <- asia()
 #' print(dataset)
+#' 
+#' @seealso \code{\link{asia_10000}}
 #' 
 #' @export
 asia <- function()
@@ -97,8 +98,7 @@ asia <- function()
 #' Wrapper for a loader for the \code{Child} raw dataset; also perform imputation.
 #' 
 #' The dataset has 5000 items, with random missing values (no latent variables). BNDataset object contains the raw dataset and imputed dataset, with \code{k=10}
-#' (see \code{\link{impute}} for related explanation). For informations on the network see
-#' D. J. Spiegelhalter, R. G. Coewll (1992). Learning in probabilistic expert systems. In Bayesian Statistics 4 (J. M. Bernardo, J. 0. Berger, A. P. Dawid and A. F. M. Smith, eds.) 447-466. Clarendon Press, Oxford. 
+#' (see \code{\link{impute}} for related explanation).
 #' 
 #' @name child
 #' @rdname child
@@ -107,6 +107,8 @@ asia <- function()
 #' 
 #' @examples dataset <- child()
 #' print(dataset)
+#' 
+#' @seealso \code{\link{child_NA_5000}}
 #' 
 #' @export
 child <- function()
