@@ -30,7 +30,7 @@
 #' @docType data
 #' 
 #' @references
-#' D. J. Spiegelhalter, R. G. Coewll (1992). Learning in probabilistic expert systems. In Bayesian Statistics 4
+#' D. J. Spiegelhalter, R. G. Cowell (1992). Learning in probabilistic expert systems. In Bayesian Statistics 4
 #' (J. M. Bernardo, J. 0. Berger, A. P. Dawid and A. F. M. Smith, eds.) 447-466. Clarendon Press, Oxford. 
 #' 
 #' @format a \code{\link{BNDataset}} with a raw and imputed data slow filled with 5000 items.
