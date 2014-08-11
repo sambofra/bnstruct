@@ -11,7 +11,8 @@ learn.structure(bn, dataset, ...)
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE)
+  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+  num.boots = 100, imputation = TRUE, k.impute = 10)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}

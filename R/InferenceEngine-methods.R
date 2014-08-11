@@ -48,7 +48,7 @@ InferenceEngine <- function(bn = NULL, observations = NULL, ...)
   object <- new("InferenceEngine", bn, observations, ...)
   
   if (!is.null(bn))
-    bn(object, updated.bn = FALSE) <- bn
+    bn(object) <- bn
   
   if (!is.null(observations))
     observations(object) <- observations
@@ -110,25 +110,29 @@ setMethod("jpts", "InferenceEngine", function(x) slot(x, "jpts"))
 #' @aliases bn,InferenceEngine
 setMethod("bn",
            "InferenceEngine",
-           function(x, updated.bn = TRUE)
+           function(x)
            {
-             if (updated.bn && !is.null(slot(x, "updated.bn")))
-               return(slot(x, "updated.bn"))
-             
-             if (updated.bn && is.null(slot(x, "updated.bn")) && !is.null(slot(x, "bn")))
-             {
-               message("Updated network not yet computed, returning the original one.")
-               return(slot(x, "bn"))
-             }
-             
              if (is.null(slot(x, "bn")))
              {
                message("No network present.")
                return(NULL)
              }
-             
              return(slot(x, "bn"))
            })
+
+#' @rdname updated.bn-method
+#' @aliases updated.bn,InferenceEngine
+setMethod("updated.bn",
+          "InferenceEngine",
+          function(x)
+          {
+            if (is.null(slot(x, "updated.bn")))
+            {
+              message("No updated network present.")
+              return(NULL)
+            }
+            return(slot(x, "updated.bn"))
+          })
 
 
 #' @rdname observations
@@ -205,19 +209,23 @@ setReplaceMethod("jpts",
 #' @rdname bn-set
 setReplaceMethod("bn",
                  c("InferenceEngine"),
-                 function(x, updated.bn = TRUE, ..., value)
+                 function(x, value)
                  {
-                   if (class(value) != "BN")
-                   {
-                     message("Value argument is not a BN object.\nLeaving InferenceEngine untouched.")
-                     return(x)
-                   }
-                   
-                   if (updated.bn)
-                     slot(x, "updated.bn") <- value
-                   else
-                     slot(x, "bn") <- value
+                   slot(x, "bn") <- value
+                   validObject(x)
+                   x
+                 })
 
+
+#' @name updated.bn<-
+#' @aliases updated.bn<-,InferenceEngine-method
+#' @docType methods
+#' @rdname updated.bn-set
+setReplaceMethod("updated.bn",
+                 c("InferenceEngine"),
+                 function(x, value)
+                 {
+                   slot(x, "updated.bn") <- value
                    validObject(x)
                    x
                  })
@@ -274,20 +282,95 @@ setMethod("layering",
           "InferenceEngine",
           function(x, updated.bn = TRUE, ...)
           {
-            layers <- topological.sort(dag(bn(x, updated.bn)))
-            layers <- array(layers, dimnames = variables(bn(x, updated.bn)))
+            if (updated.bn)
+              layers <- topological.sort(dag(updated.bn(x)))
+            else
+              layers <- topological.sort(dag(bn(x)))
+            layers <- array(layers, dimnames = variables(bn(x)))
             layers
           })
 
 
-# TODO replace with method based on cliques, should be much faster
 #' @rdname get.most.probable.values
 #' @aliases get.most.probable.values,InferenceEngine
 setMethod("get.most.probable.values",
           "InferenceEngine",
           function(x, ...)
           {
-            get.most.probable.values(bn(x))
+#             if (is.null(jpts(x))) # don't know if this works...
+#               return(get.most.probable.values(bn(x)))
+            jpts      <- jpts(x)
+            num.nodes <- num.nodes(bn(x))
+            cliques   <- jt.cliques(x)
+            num.cliqs <- length(cliques)
+            variables <- variables(bn(x))
+            
+            mpv <- array(rep(0, num.nodes), dim=c(num.nodes), dimnames=list(variables))
+
+            dim.vars   <- lapply(1:num.cliqs,
+                                 function(index)
+                                   as.list(
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(jpts[[index]]))
+                                       )),
+                                       c(variables)
+                                     )
+                                   )
+            )
+            
+#             print(jpts)
+#             print(dim.vars)
+#             readLines(file("stdin"),1)
+            
+            for (i in 1:num.nodes)
+            {
+              target.clique <- which(sapply(1:num.cliqs,
+                                                function(index){
+                                                    is.element(
+                                                        i,
+                                                        c(unlist(dim.vars[[index]]))
+                                                    )
+                                                }
+                                            ) == TRUE)[1]
+#               print("-----------------------------")
+#               print(i)
+#               print(target.clique)
+#               print(c(unlist(dim.vars[[target.clique]])))
+              
+              pot  <- jpts[[target.clique]]
+              vars <- c(unlist(dim.vars[[target.clique]]))
+#               print(setdiff(vars,i))
+#               readLines(file("stdin"),1)
+              #print(pot)
+#print(jpts)
+              for (v in c(unlist(setdiff(vars,i))))
+              {
+#                 print("........")
+#                 print(pot)
+#                 print(vars)
+                out  <- marginalize(pot, vars, v)
+                pot  <- out$potential
+                vars <- out$vars
+                pot  <- pot / sum(pot)
+              }
+#              print(pot)
+#               print(pot)
+              wm <- which(!is.na(match(c(pot),max(pot))))
+              if (length(wm) == 1)
+              {
+                mpv[i] <- wm # pot[wm]
+              }
+              else
+              {
+                print("°°°")
+                print(wm)
+                print(pot)
+                mpv[i] <- sample(wm,1) #,replace=TRUE
+              }
+            }
+            
+            return(mpv)
           })
 
 
@@ -335,7 +418,10 @@ unique.observations <- function(observed.vars, observed.vals)
   ovrs <- c(unlist(observed.vars))
   ovls <- c(unlist(observed.vals))
   dup  <- which(duplicated(rev(ovrs)) == TRUE)
-  ovrs <- rev(rev(ovrs)[-dup])
-  ovls <- rev(rev(ovls)[-dup])
+  if (length(dup) > 0)
+  {
+    ovrs <- rev(rev(ovrs)[-dup])
+    ovls <- rev(rev(ovls)[-dup])
+  }
   return(list("observed.vars"=ovrs, "observed.vals"=ovls))
 }
