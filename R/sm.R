@@ -12,8 +12,8 @@
 sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = NULL, 
 	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL ) 
 {
-	n.nodes <- ncol(x)
 	n.cases <- nrow(x)
+	n.nodes <- ncol(x)
 	
 	storage.mode(node.sizes) <- "integer" # just to be sure
   storage.mode(scoring.func) <- "integer"

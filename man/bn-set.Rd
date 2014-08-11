@@ -3,25 +3,16 @@
 \name{bn<-}
 \alias{bn<-}
 \alias{bn<-,InferenceEngine-method}
-\title{set the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
+\title{set the original \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
-bn(x, updated.bn, ...) <- value
+bn(x) <- value
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
 
-\item{updated.bn}{\code{TRUE} if the network provided is the updated one (default), \code{FALSE} otherwise.}
-
-\item{...}{optional arguments to method.}
-
-\item{value}{the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
-        Updated network is the default choice.}
+\item{value}{the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 }
 \description{
-Add a network to an InferenceEngine. The boolean \code{updated.bn} parameter can be used to choose
-if to insert the updated network or the original one; default inserted network is the updated one.
-}
-\details{
-It is suggested to always use the \code{updated.bn} parameter.
+Add an original network to an InferenceEngine.
 }
 

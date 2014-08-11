@@ -139,6 +139,21 @@ setGeneric("layering", function(x, ...) standardGeneric("layering"))
 setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
 
 
+#' query BN given observations
+#' 
+#' @name query
+#' @rdname query
+#' 
+#' @param x a BN.
+#' @param observed.vars vector of observed variables.
+#' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
+#' 
+#' @return most probable values given observations
+#' 
+#' @exportMethod query
+setGeneric("query", function(x, ...) standardGeneric("query"))
+
+
 #' plot a \code{\link{BN}} as a picture.
 #' 
 #' Plot the network as a picture to default output.
@@ -555,8 +570,25 @@ setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propa
 #' test.updated.bn(ie) # TRUE
 #' }
 #' 
-#' @export test.updated.bn
+#' @exportMethod test.updated.bn
 setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
+
+
+#' expectation-maximization algorithm.
+#' 
+#' @name em
+#' @rdname em
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
+#' @param threshold threshold
+#' @param k.impute k.impute
+#' @param ... further potential arguments for method.
+#' 
+#' @return an \code{\link{InferenceEngine}} with updated parameters.
+#' 
+#' @exportMethod em
+setGeneric("em", function(x, dataset, ...) standardGeneric("em"))
 
 
 ###############################################################################
@@ -920,25 +952,32 @@ setGeneric("jpts", function(x) standardGeneric("jpts"))
 
 #' get the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #' 
-#' Return a network contained in an InferenceEngine. The boolean \code{updated.bn} parameter can be used to choose
-#' the updated network or the original one; default returned network is the updated one,
-#' when available.
-#' 
-#' It is suggested to always use the \code{updated.bn} parameter.
+#' Return a network contained in an InferenceEngine.
 #' 
 #' @name bn
 #' @rdname bn-method
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
-#' @param updated.bn \code{TRUE} if the network to be returned is the updated one,
-#'        \code{FALSE} to obtain the original one.
-#' @param ... ignored.
 #' 
 #' @return the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #'         
 #' @exportMethod bn
-setGeneric("bn", function(x, ...) standardGeneric("bn"))
+setGeneric("bn", function(x) standardGeneric("bn"))
 
+
+#' get the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#' 
+#' Return an updated network contained in an InferenceEngine.
+#' 
+#' @name updated.bn
+#' @rdname updated.bn-method
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#'         
+#' @exportMethod updated.bn
+setGeneric("updated.bn", function(x) standardGeneric("updated.bn"))
 
 #' get the list of observations of an \code{\link{InferenceEngine}}.
 #' 
@@ -1167,6 +1206,20 @@ setGeneric("num.items<-", function(x, value) standardGeneric("num.items<-"))
 setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
 
 
+#' set number of bootstrap samples of a \code{\link{BNDataset}}.
+#' 
+#' Set the length of the list of samples of a dataset computed using bootstrap.
+#' 
+#' @name num.boots<-
+#' @rdname num.boots-set
+#' 
+#' @param x a \code{\link{BNDataset}} object.
+#' @param value the number of bootstrap samples.
+#' 
+#' @exportMethod num.boots<-
+setGeneric("num.boots<-", function(x, value) standardGeneric("num.boots<-"))
+
+
 #' set list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.
 #' 
 #' Add to a dataset a list of samples from imputed data computed using bootstrap.
@@ -1226,24 +1279,33 @@ setGeneric("jt.cliques<-", function(x, value) standardGeneric("jt.cliques<-"))
 setGeneric("jpts<-", function(x, value) standardGeneric("jpts<-"))
 
 
-#' set the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#' set the original \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 #' 
-#' Add a network to an InferenceEngine. The boolean \code{updated.bn} parameter can be used to choose
-#' if to insert the updated network or the original one; default inserted network is the updated one.
-#' 
-#' It is suggested to always use the \code{updated.bn} parameter.
+#' Add an original network to an InferenceEngine.
 #' 
 #' @name bn<-
 #' @rdname bn-set
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
-#' @param updated.bn \code{TRUE} if the network provided is the updated one (default), \code{FALSE} otherwise.
-#' @param ... optional arguments to method.
 #' @param value the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
-#'         Updated network is the default choice.
 #'         
 #' @exportMethod bn<-
-setGeneric("bn<-", function(x, updated.bn, ..., value) standardGeneric("bn<-"))
+setGeneric("bn<-", function(x, value) standardGeneric("bn<-"))
+
+
+#' set the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#' 
+#' Add an updated network to an InferenceEngine.
+#' 
+#' @name updated.bn<-
+#' @rdname updated.bn-set
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
+#'         
+#' @exportMethod updated.bn<-
+setGeneric("updated.bn<-", function(x, value) standardGeneric("updated.bn<-"))
+
 
 
 #' set the list of observations of an \code{\link{InferenceEngine}}.

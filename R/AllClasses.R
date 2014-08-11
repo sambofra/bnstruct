@@ -145,6 +145,8 @@ setClass("BNDataset",
 #
 ###############################################################################
 
+setClassUnion("vectorOrNULL", members=c("vector", "NULL"))
+
 #' InferenceEngine class.
 #' 
 #' @section Slots:
@@ -178,8 +180,8 @@ setClass("InferenceEngine",
            jpts               = "list",
            bn                 = "BNOrNULL",
            updated.bn         = "BNOrNULL",
-           observed.vars      = "vector",
-           observed.vals      = "vector"
+           observed.vars      = "vectorOrNULL",
+           observed.vals      = "vectorOrNULL"
          ),
          prototype(
            junction.tree      = matrix(),
@@ -189,7 +191,7 @@ setClass("InferenceEngine",
            jpts               = list(NULL),
            bn                 = NULL,
            updated.bn         = NULL,
-           observed.vars      = vector(),
-           observed.vals      = vector()
+           observed.vars      = NULL,
+           observed.vals      = NULL
          )
         )

@@ -357,6 +357,20 @@ setReplaceMethod("boots",
                  })
 
 
+#' @name num.boots<-
+#' @aliases num.boots<-,BNDataset-method
+#' @docType methods
+#' @rdname num.boots-set
+setReplaceMethod("num.boots",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "num.boots") <- value
+                   validObject(x)
+                   return(x)
+                 })
+
+
 #' @name imp.boots<-
 #' @aliases imp.boots<-,BNDataset-method
 #' @docType methods
@@ -430,6 +444,7 @@ setMethod("print",
             str <- paste(str, "variables :")
             #print(paste(c(object@variables), sep=', '))
             str <- paste(str, paste(object@variables, sep=" ", collapse=', '))
+            str <- paste(str, ".\n", sep = '')
             
             if (has.data(object))
             {
@@ -454,7 +469,6 @@ setMethod("print",
               cat("Imputed data:\n")
               print(get.imputed.data(object))
             }
-            
           })
 
 #' @rdname impute

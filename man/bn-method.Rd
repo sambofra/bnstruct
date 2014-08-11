@@ -6,27 +6,17 @@
 \alias{bn,InferenceEngine-method}
 \title{get the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
-bn(x, ...)
+bn(x)
 
-\S4method{bn}{InferenceEngine}(x, updated.bn = TRUE)
+\S4method{bn}{InferenceEngine}(x)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
-
-\item{updated.bn}{\code{TRUE} if the network to be returned is the updated one,
-\code{FALSE} to obtain the original one.}
-
-\item{...}{ignored.}
 }
 \value{
 the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 }
 \description{
-Return a network contained in an InferenceEngine. The boolean \code{updated.bn} parameter can be used to choose
-the updated network or the original one; default returned network is the updated one,
-when available.
-}
-\details{
-It is suggested to always use the \code{updated.bn} parameter.
+Return a network contained in an InferenceEngine.
 }
 

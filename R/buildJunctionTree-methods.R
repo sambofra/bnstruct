@@ -6,7 +6,7 @@ setMethod("build.junction.tree",
             # Calculate junction tree of a given graph.
             # Input parameter is the adjacency matrix of a directed graph.
             
-            dgraph <- dag(bn(object, updated.bn = FALSE))
+            dgraph <- dag(bn(object))
             
             graph <- moralization(dgraph)    # adj. matrix
             graph <- directed.to.undirected.graph(graph)   # adj. matrix

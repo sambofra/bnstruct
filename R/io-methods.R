@@ -44,6 +44,10 @@ setMethod("read.dataset",
             set.seed(seed)
             if (bootstrap && num.boots >= 1)
             {
+              object@num.boots <- num.boots
+              object@has.boots <- TRUE
+              print(object@has.boots)
+              print(object@num.boots)
               boot.sample <- matrix(sample.int(num.items(object),
                                                size = num.boots * num.items(object),
                                                replace=TRUE),

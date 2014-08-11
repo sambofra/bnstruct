@@ -10,28 +10,50 @@ setMethod("learn.params",
             # so that the sum over the last dimension is always 1
 
             # just to play safe
-            data <- get.data(dataset)
-            
+            data <- as.matrix(get.data(dataset))
+
             storage.mode(data) <- "integer"
-            storage.mode(bn@dag) <- "integer"
-            storage.mode(bn@node.sizes) <- "integer"
             
             node.sizes <- node.sizes(bn)
             dag        <- dag(bn)
             n.nodes    <- num.nodes(bn)
             variables  <- variables(bn)
             
+#             storage.mode(dag) <- "integer"
+            storage.mode(node.sizes) <- "integer"
+
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)
             var.names <- c(unlist(variables))  # colnames(data)
+            print(var.names)
             d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
             # esimate a cpt for each family from data
             for ( i in 1:n.nodes )
             {
+              print(i)
               family <- c( which(dag[,i]!=0), i )
+              print(family)
+              print(data[,family])
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
-              cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
+              #print(c(counts))
+              print("counts")
+              print(class(counts))
+              print(counts)
+              #tmp <- array(c(counts + ess / prod(dim(counts))), dim=dim(counts))
+              print("tmp")
+              print(ess/prod(dim(counts)))
+              print(dim(counts))
+              cpts[[i]] <- counts.to.probs(  counts)# + ess / prod(dim(counts)))
+#               storage.mode(counts) <- "numeric"
+#               print(counts)
+#               print(prod(dim(counts)))
+#               print(c(unlist(counts)))
+#               print(c(counts) + ess / prod(dim(counts)))
+#               readLines(file("stdin"),1)
+              # cpts[[i]] <- counts.to.probs( array(c(counts + ess / prod(dim(counts))), dim(counts)) )
+              print("cpts")
+              print(cpts)
               dms <- NULL
               dns <- NULL
               for (j in 1:length(family))
@@ -49,7 +71,7 @@ setMethod("learn.params",
             #return( cpts )
             
             cpts(bn) <- cpts
-            bn
+            return(bn)
           }
 )
 
@@ -59,7 +81,8 @@ setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
-                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE)
+                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+                   num.boots = 100, imputation = TRUE, k.impute = 10, na.string.symbol='?', seed = 0)
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -67,10 +90,20 @@ setMethod("learn.structure",
             validObject(bn)
             
             node.sizes <- node.sizes(bn)
+            num.nodes  <- num.nodes(bn)
             
             if (bootstrap)
             {
-              # todo
+              if (!has.boots(dataset))
+              {
+                dataset <- bootstrap(dataset, num.boots = num.boots,
+                                     seed = seed, imputation = imputation,
+                                     k.impute = k.impute, na.string.symbol = na.string.symbol)
+              }
+              else
+              {
+                num.boots <- num.boots(dataset)
+              }
             }
             else
             {
@@ -79,7 +112,6 @@ setMethod("learn.structure",
               else
                 data   <- get.data(dataset)
             }
-            
 
             scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
             if (is.na(scoring.func))
@@ -96,44 +128,73 @@ setMethod("learn.structure",
             {
               if (bootstrap)
               {
-#                 res.sm.boot <- boot.bn(as.matrix(a), node.sizes, B, cont.nodes, 
-#                                        verbose=TRUE, k.impute=10, method = "sm",
-#                                        max.fanin = max.fanin, layering = layering,
-#                                        max.fanin.layers = max.fanin.layers )
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                for( i in seq_len(num.boots(dataset)) )
+                {
+                  data <- get.boot(dataset, i, imputed=!raw.data)
+                  
+                  dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering,
+                            max.fanin.layers, ess)
+                  
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                }
+                wpdag(bn) <- finalPDAG
               }
               else
               {                
-#                 print(node.sizes)
-#                 print(cont.nodes)
-#                 print(max.fanin)
-#                 print(layering)
-#                 print(max.fanin.layers)
-                dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers)
+                dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers, ess)
               }
               return(bn)
             }
             
             # if (algo == "mmhc") # default
             {
-              cpc    <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
-              dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
+              if (bootstrap)
+              {
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                for( i in seq_len(num.boots(dataset)) )
+                {
+                  data <- get.boot(dataset, i, imputed=!raw.data)
+                  
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
+                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
+                  
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                }
+                wpdag(bn) <- finalPDAG
+              }
+              else
+              {
+                cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
+                dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
+              }
               return(bn)
             }
           })
 
 counts.to.probs <- function( counts )
 {
+  print(class(counts))
+  print("counts.to.probs")
+  print(counts)
+  print(class(counts))
   d <- dim(counts)
+  print(d)
   if( length(d) == 1 )
     return( counts / sum(counts) )
   else
   {
     # last dimension on the columns, everything else on the rows
+    print("nor")
     tmp.d <- c( prod(d[1:(length(d)-1)]), d[length(d)] )
+    print("nor")
     dim(counts) <- tmp.d
+    print("nor")
     # normalization
     nor <- rowSums( counts )
+    print("nor")
     nor <- nor + (nor == 0) # for the next division
+    print("nor")
     counts <- counts / array(nor,tmp.d)
     dim(counts) <- d
     return( counts )

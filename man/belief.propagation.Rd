@@ -9,7 +9,7 @@
 belief.propagation(ie, ...)
 
 \S4method{belief.propagation}{InferenceEngine}(ie, net = NULL,
-  observed.vars = c(), observed.vals = c(), return.potentials = FALSE)
+  observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE)
 }
 \arguments{
 \item{ie}{an \code{\link{InferenceEngine}} object.}

@@ -67,4 +67,6 @@ inf.eng <- belief.propagation(inf.eng)
 print("-------------------------------------------------------------------------------------------")
 
 get.most.probable.values(net)
+get.most.probable.values(bn(inf.eng))
+get.most.probable.values(updated.bn(inf.eng))
 get.most.probable.values(inf.eng)

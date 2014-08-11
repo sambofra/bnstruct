@@ -1,12 +1,14 @@
 library("bnstruct")
 
-# child_NA_5000 <- BNDataset(name = "Child")
-# child_NA_5000 <- read.dataset(child_NA_5000, "../bnstruct/inst/extdata/Child_data_na_5000.header", "../bnstruct/inst/extdata/Child_data_na_5000.data", imputation = TRUE, bootstrap=FALSE)
+child_NA_5000 <- BNDataset(name = "Child")
+child_NA_5000 <- read.dataset(child_NA_5000, "../bnstruct/inst/extdata/Child_data_na_5000.header",
+                              "../bnstruct/inst/extdata/Child_data_na_5000.data",
+                              imputation = TRUE, bootstrap=TRUE, num.boots=3)
 # save(child_NA_5000, file="data/child_NA_5000.rda")
 # break
 # print(mydata)
 
-mydata <- child()
+mydata <- child_NA_5000 #child()
 
 net <- BN()
 slot(net, "name") <- "Child"
@@ -21,34 +23,47 @@ slot(net, "variables") <- mydata@variables
 #    0  0  8  7  7
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3)
-# print(net)
-net <- learn.structure(net, mydata, algo="sm", scoring.func = "BDeu",
-layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
-   0  1  1  1  1
-   0  1  1  1  1
-   0  0  8  7  7
-   0  0  0 14  6
-   0  0  0  0 19")), max.fanin=3)
-net <- learn.params(net, mydata)
+print(net)
+net <- learn.structure(net, mydata, algo="mmhc", bootstrap=TRUE)# "sm", scoring.func = "BDeu",
+# layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
+#    0  1  1  1  1
+#    0  1  1  1  1
+#    0  0  8  7  7
+#    0  0  0 14  6
+#    0  0  0  0 19")), max.fanin=3, bootstrap = TRUE)
+# net <- learn.params(net, mydata)
 # 
 print(net)
-lapply(net@cpts, sum)
+print(wpdag(net))
+# lapply(net@cpts, sum)
+# # readLines(file("stdin"),1)
+# 
+# print(net)
+
 # readLines(file("stdin"),1)
 
-print(net)
+# inf.eng <- InferenceEngine(net)
+# # inf.eng <- build.junction.tree(inf.eng, net@dag)
+# 
+# print(inf.eng)
+# # readLines(file("stdin"),1)
+# 
+# observations(inf.eng) <- list(c(3,5,9,19), rep(2,4))
+# inf.eng <- belief.propagation(inf.eng)
 
+# print("-------------------------------------------------------------------------------------------")
+# 
+# get.most.probable.values(net)
+# print("-------------------------------------------------------------------------------------------")
+# get.most.probable.values(bn(inf.eng))
+# print("-------------------------------------------------------------------------------------------")
+# get.most.probable.values(updated.bn(inf.eng))
+# print("-------------------------------------------------------------------------------------------")
+# get.most.probable.values(inf.eng)
+
+# em(inf.eng, child_NA_5000)
+
+# print(bn(inf.eng))
 # readLines(file("stdin"),1)
-
-inf.eng <- InferenceEngine(net)
-# inf.eng <- build.junction.tree(inf.eng, net@dag)
-
-print(inf.eng)
+# print(updated.bn(inf.eng))
 # readLines(file("stdin"),1)
-
-observations(inf.eng) <- list(c(3,5,9,19), rep(2,4))
-inf.eng <- belief.propagation(inf.eng)
-
-print("-------------------------------------------------------------------------------------------")
-
-get.most.probable.values(net)
-get.most.probable.values(inf.eng)

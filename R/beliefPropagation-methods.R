@@ -2,7 +2,7 @@
 #' @aliases belief.propagation,InferenceEngine
 setMethod("belief.propagation",
           c("InferenceEngine"),
-          function(ie, net = NULL, observed.vars = c(), observed.vals = c(), return.potentials = FALSE){
+          function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE){
             {
               ###############################
               # moved inside in order to eliminate a NOTE in R CMD check
@@ -30,10 +30,10 @@ setMethod("belief.propagation",
               
               if (is.null(net))
               {
-                net <- bn(ie, updated.bn = FALSE)
+                net <- bn(ie)
               }
               
-              if (length(observed.vars) == 0)
+              if (is.null(observed.vars))
               {
                 obs <- observations(ie)
                 observed.vars <- obs$observed.vars
@@ -320,18 +320,19 @@ setMethod("belief.propagation",
               
               for (node in 1:num.nodes)
               {
-                mpos <- match(node, observed.vars)
-                if (!is.na(mpos))
-                # works also when observed.vars == c()
-                # in that case, the `else` branch will be the chosen one for every variable
-                {
-                  ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
-                                         c(node.sizes[observed.vars[mpos]]))
-                  ncpts[[node]][observed.vals[mpos]] <- 1
-                  dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
-                  names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
-                }
-                else
+                # faster, but result does not change. While debugging, better keep this out...
+#                 mpos <- match(node, observed.vars)
+#                 if (!is.na(mpos))
+#                 # works also when observed.vars == c()
+#                 # in that case, the `else` branch will be the chosen one for every variable
+#                 {
+#                   ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
+#                                          c(node.sizes[observed.vars[mpos]]))
+#                   ncpts[[node]][observed.vals[mpos]] <- 1
+#                   dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
+#                   names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
+#                 }
+#                 else
                 {
                   target.clique <- which.min(lapply(1:num.cliqs,
                                                     function(x){
@@ -356,20 +357,27 @@ setMethod("belief.propagation",
                     pot <- out$potential
                     dms <- c(unlist(out$vars))
                   }
+                  pot <- pot / sum(pot)
                   
-                  if (length(vs) > 1)
+#                   cat(node, " ", dms,"\n")
+#                   print(pot)
+                  
+                  if (length(dms) > 1)
                   {
                     pot.bak <- pot
                     dms.bak <- dms
                     
                     out <- marginalize(pot, dms, node)
+                    pot <- out$potential
+                    pot <- pot / sum(pot)
                     out <- divide(pot.bak,
                                   dms.bak,
-                                  out$potential,
+                                  pot,
                                   out$vars,
                                   node.sizes)
                     
                     pot <- out$potential
+                    #pot <- pot / sum(pot)
                     dms <- c(unlist(out$vars))
                   }
                   
@@ -381,13 +389,16 @@ setMethod("belief.propagation",
                   dimnames(pot)        <- dmns
                   names(dimnames(pot)) <- as.list(variables[dms])
                   ncpts[[node]] <- pot
+#                   print(pot)
+#                   readLines(file("stdin"),1)
                 }
                 
               }
               
               cpts(nbn) <- ncpts
               
-              bn(ie, updated.bn = TRUE) <- nbn
+              updated.bn(ie) <- nbn
+              jpts(ie) <- potentials
               return(ie)
             }
           })

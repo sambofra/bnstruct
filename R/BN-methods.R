@@ -334,11 +334,20 @@ setMethod("get.most.probable.values",
                   out  <- marginalize(pot, vars, parent)
                   pot  <- out$potential
                   vars <- out$vars
+                  pot <- pot / sum(pot)
                 }
               }
               
-              wm        <- which.max(pot)
-              mpv[node] <- wm
+              # print(pot)
+              wm <- which(!is.na(match(c(pot),max(pot))))
+              if (length(wm) == 1)
+              {
+                mpv[node] <- wm # pot[wm]
+              }
+              else
+              {
+                mpv[node] <- sample(wm,1) #,replace=TRUE
+              }
               
               # propagate information from parent nodes to children
               children <- which(dag[node,] > 0)
@@ -346,8 +355,8 @@ setMethod("get.most.probable.values",
               {
                 for (child in children)
                 {
-                  out <- mult(pot, c(node),
-                              cpts[[child]], dim.vars[[child]],
+                  out <- mult(cpts[[child]], dim.vars[[child]],
+                              pot, c(node),
                               node.sizes)
                   cpts[[child]]     <- out$potential
                   dim.vars[[child]] <- out$vars
@@ -356,6 +365,23 @@ setMethod("get.most.probable.values",
             }
             return(mpv)
           })
+
+
+#' @rdname query
+#' @aliases query,BN
+setMethod("query",
+          "BN",
+          function(x, observed.vars, observed.vals)
+          {
+#             obs <- unique.observations(observed.vars, observed.vals)
+#             observed.vars <- obs$observed.vars
+#             observed.vals <- obs$observed.vals
+#             cpts <- cpts(x)
+#             cpts <- lapply(1:length(cpts), function(x) {
+#                               if (!match(x, observed.vars)){}
+#                             })
+          })
+
 
 # redefition of print() for BN objects
 #' @rdname print
@@ -464,23 +490,22 @@ setMethod("save.to.eps",
 
 dag.to.cpdag <- function(object, layering = NULL)
 {
-  return(abs(label.edges(dag(object), layering)))
+  return(abs(label.edges(object, layering)))
 }
 
 
-label.edges <- function(dag, layering = NULL)
+label.edges <- function(dgraph, layering = NULL)
 {
   # LABEL-EDGES produce a N*N matrix which values are
   # 	+1 if the edge is compelled or
   #	-1 if the edge is reversible.
-  
-  N<-nrow(dag)
-  o <- order.edges(dag)
+  N<-nrow(dgraph)
+  o <- order.edges(dgraph)
   order <- o$order
   xedge <- o$x
   yedge <- o$y
   
-  label <- 2*dag
+  label <- 2*dgraph
   NbEdges <- length(xedge)
   
   # edges between layers are compelled
@@ -489,7 +514,7 @@ label.edges <- function(dag, layering = NULL)
     layers = length(unique(layering))
     for( l in 1:(layers-1) )
       label[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ] <- 
-      dag[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ]
+      dgraph[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ]
   } 
   
   for( Edge in 1:NbEdges)
@@ -533,16 +558,16 @@ label.edges <- function(dag, layering = NULL)
   return(label)
 }
 
-order.edges <- function(dag)
+order.edges <- function(dgraph)
   # ORDER_EDGES produce a total (natural) ordering over the edges in a DAG.
 {
-  N <- nrow(dag)
+  N <- nrow(dgraph)
   order <- matrix(c(0),N,N)
   
-  node_order <- topological.sort(dag)
+  node_order <- topological.sort(dgraph)
   oo <- sort(node_order,index.return=TRUE)$ix
-  dag <- dag[oo,oo]
-  xy <- which(dag == 1, arr.ind = TRUE)
+  dgraph <- dgraph[oo,oo]
+  xy <- which(dgraph == 1, arr.ind = TRUE)
   nb.edges <- nrow(xy)
   
   if( nb.edges != 0)
@@ -555,13 +580,13 @@ order.edges <- function(dag)
   return(list(order=order,x=x,y=y))
 }
 
-topological.sort <- function(dag)
+topological.sort <- function(dgraph)
   # TOPOLOGICAL_SORT Return the nodes in topological order (parents before children).
 {
-  n <- nrow(dag)
+  n <- nrow(dgraph)
   
   # assign zero-indegree nodes to the top
-  fringe <- which( colSums(dag)==0 )
+  fringe <- which( colSums(dgraph)==0 )
   order <- rep(0,n)
   
   i <- 1
@@ -572,10 +597,10 @@ topological.sort <- function(dag)
     order[ind] <- i
     i <- i + 1 
     
-    for( j in which(dag[ind,] != 0) )
+    for( j in which(dgraph[ind,] != 0) )
     {
-      dag[ind,j] <- 0
-      if( sum(dag[,j]) == 0 )
+      dgraph[ind,j] <- 0
+      if( sum(dgraph[,j]) == 0 )
         fringe <- c(fringe,j)
     }
   }
