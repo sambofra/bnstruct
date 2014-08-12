@@ -1,0 +1,233 @@
+\documentclass{article}
+% \VignetteIndexEntry{R package for Bayesian Network Structure Learning}
+% \VignettePackage{bnstruct}
+% \VignetteKeywords{Documentation}
+\usepackage{url}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\texttt{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+
+\usepackage{Sweave}
+\begin{document}
+\input{bnstruct-concordance}
+
+\title{R package for Bayesian Network Structure Learning}
+\author{Francesco Sambo, Alberto Franzin}
+\maketitle
+
+
+\section{Introduction}
+Bayesian Networks are a powerful tool for probabilistic inference among a set
+of variables, modeled using a directed acyclic graph. However, one often does not
+have the network, but only a set of observations, and wants ro reconstruct the
+network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
+learning the structure and parameters of the network, also in presence of missing data,
+and a set of additional tools to use Bayesian Networks, such as methods to perform
+belief propagation.
+
+This document is intended to show some examples of how \Rpackage{bnstruct} can be used
+to learn and use Bayesian Networks. First we describe how to manage datasets,
+how to use them to discover a Bayesian Network, and finally how to perform some
+operations on a network.
+
+Complete reference for classes and methods can be found in the package documentation.
+
+\section{Installation}
+
+The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
+
+In order to install the package, it suffices to launch\\
+\verb!R CMD INSTALL path/to/bnstruct!\\
+from a terminal, or to use R command \verb!install_packages!. \Rpackage{bnstruct} requires R $\geq 2.10$,
+and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
+Package \Rpackage{Rgraphviz} is requested in order to plot graphs, but it is not mandatory.
+
+
+\section{Datasets}
+The class that \Rpackage{bnstruct} provides to manage datasets is the \Rclass{BNDataset} object.
+It contains all of the data and the informations related to it: raw and imputed data, raw and imputed
+bootstrap samples, and variable names and cardinality.
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+\end{Sinput}
+\end{Schunk}
+
+
+\subsection{Data format}
+\Rpackage{bnstruct} requires the data files to be in a format we describe in this section. 
+The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
+with the values for each variable separated by a space or a tab. Values for each variable have to be
+numbers, starting from \texttt{0}. Data files can have a first row containing the names of the corresponding variables.
+
+In addition to the data file, a header file containing additional informations can also be provided.
+An header file has to be composed by three rows:
+\begin{enumerate}
+\item list of names of the variables, in the same order of the data file;
+\item a list of integers representing the cardinality of the variables, in case of discrete variables,
+      or the number of levels each variable has to be quantized in, in case of continuous variables;
+\item a list that indicates, for each variable, if the variable is continuous (\texttt{c}) or discrete (\texttt{d}).
+\end{enumerate}
+
+We provide two sample datasets, one with complete data (the \texttt{Asia} network) and one with missing values
+(the \texttt{Child} network), in the \texttt{extdata} subfolder;
+the user can refer to them as an example.
+
+\subsection{Importing a dataset}
+The preferred way to create a \Rclass{BNDataset} object is by reading a dataset from a file.
+In order to accomplish this, we provide the \Rmethod{read.dataset} method.
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+> dataset <- read.dataset(dataset,
++                         header.file = "path/to/file.header",
++                         data.file   = "path/to/file.data")
+\end{Sinput}
+\end{Schunk}
+
+The sample datasets we provide come with two custom loaders:
+\begin{Schunk}
+\begin{Sinput}
+> asia.data  <- asia()
+> child.data <- child()
+\end{Sinput}
+\end{Schunk}
+
+\subsection{Imputation}
+A dataset may contain various kinds of missing data, namely unobserved variables,
+and unobserved values for otherwise observed variables. We currently deal only with this
+second kind of missing data. The process of guessing the missing values is called \emph{imputation}.
+
+We provide the \Rmethod{impute} to perform imputation.
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+> dataset <- read.dataset(dataset,
++                         header.file = "path/to/file.header",
++                         data.file   = "path/to/file.data")
+> dataset <- impute(dataset)
+\end{Sinput}
+\end{Schunk}
+
+Imputation can also be performed during the loading of a dataset, as shown in the following example.
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+> dataset <- read.dataset(dataset,
++                         header.file = "path/to/file.header",
++                         data.file   = "path/to/file.data",
++                         imputation  = TRUE)
+\end{Sinput}
+\end{Schunk}
+
+Note that, when imputed data is present, it has higher priority over raw data when using a dataset
+(see section \ref{sec:usingdata}).
+
+The sample dataset available using the \Rmethod{child()} method contains raw and imputed data.
+
+\subsection{Bootstrap}
+\Robject{BNDataset} objects have also room for bootstrap samples, both for raw and imputed data.
+We provide the \Rmethod{bootstrap} method for this.
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+> dataset <- read.dataset(dataset,
++                         header.file = "path/to/file.header",
++                         data.file   = "path/to/file.data")
+> dataset <- bootstrap(dataset, num.boots = 100)
+> dataset.with.imputed.samples <- bootstrap(dataset,
++                             num.boots = 100, imputation = TRUE)
+\end{Sinput}
+\end{Schunk}
+
+Again, the generation of bootstrap samples can be performed during the loading of a dataset.
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- BNDataset(name="Example")
+> dataset <- read.dataset(dataset,
++                         header.file = "path/to/file.header",
++                         data.file   = "path/to/file.data",
++                         bootstrap   = TRUE,
++                         num.boots   = 100,
++                         imputation  = TRUE)
+\end{Sinput}
+\end{Schunk}
+
+The sample datasets provided have no bootstrap samples in them.
+
+\subsection{Using data}
+\label{sec:usingdata}
+After a \Robject{BNDataset} has been created, it is ready to be used.
+The complete list of methods available for a \Robject{BNDataset} object is available
+oin the package documentation; we are not going to cover all of the methods in this brief series
+of examples, but we just show how to retrieve data.
+
+The main operation that can be done with a \Robject{BNDataset} is to get the data it contains.
+The main methods we provide are \Rmethod{get.raw.data}, \Rmethod{get.imputed.data} and \Rmethod{get.data}. \Rmethod{get.data} is just a proxy
+for one of the other two methods.
+As previously mentioned, imputed data (if present) has higher priority over raw data, since it is supposed to be more useful.
+Therefore, if imputed data is present, \Rmethod{get.data} will behave as \Rmethod{get.imputed.data}; otherwise,
+it will return the raw dataset just like \Rmethod{get.raw.data}.
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset.1 <- child()
+> # if we want raw data
+> get.raw.data(dataset.1)
+> # if we want imputed dataset, the following are equivalent
+> get.imputed.data(dataset.1)
+> get.data(dataset.1)
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset.2 <- asia()
+> # we only can get raw data, the following are equivalent
+> get.raw.data(dataset.2)
+> get.data(dataset.2)
+\end{Sinput}
+\end{Schunk}
+
+We can check if a dataset has imputed data or not with the \Rmethod{has.imputed.data} method.
+\begin{Schunk}
+\begin{Sinput}
+> dataset.1 <- child()
+> has.imputed.data(dataset.1) # TRUE
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset.2 <- asia()
+> has.imputed.data(dataset.2) # FALSE
+\end{Sinput}
+\end{Schunk}
+
+In order to retrieve bootstrap samples, one can use the \Rmethod{boots} and \Rmethod{imp.boots} methods for samples
+made of raw and imputed data. The presence of imputed samples can be tested using \Rmethod{has.imp.boots}.
+We also provide the \Rmethod{get.boot} method to directly access a single sample. Again, imputed samples have higher priority.
+\begin{Schunk}
+\begin{Sinput}
+> # get imputed samples
+> for (i in 1:num.boots(dataset))
++   print( get.boot(dataset, i) )
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> # get raw samples
+> for (i in 1:num.boots(dataset))
++   print( get.boot(dataset, i, imputed = FALSE) )
+\end{Sinput}
+\end{Schunk}
+
+\section{Bayesian Networks}
+
+\end{document}
