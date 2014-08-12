@@ -2,29 +2,35 @@
 \docType{methods}
 \name{em}
 \alias{em}
-\alias{em,InferenceEngine}
+\alias{em,InferenceEngine,BNDataset}
+\alias{em,InferenceEngine,BNDataset-method}
 \title{expectation-maximization algorithm.}
 \usage{
 em(x, dataset, ...)
 
 \S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001,
-  k.impute = 10)
+  k.impute = 10, ...)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
 
 \item{dataset}{observed dataset with missing values for the Bayesian Network of \code{x}.}
 
-\item{threshold}{threshold}
+\item{threshold}{threshold for convergence, used as stopping criterion.}
 
-\item{k.impute}{k.impute}
+\item{k.impute}{radius of imputation.}
 
 \item{...}{further potential arguments for method.}
 }
 \value{
-an \code{\link{InferenceEngine}} with updated parameters.
+an \code{\link{InferenceEngine}} with a new updated network.
 }
 \description{
-expectation-maximization algorithm.
+Learn parameters of a network using thr Expectation-Maximization algorithm.
+}
+\examples{
+\dontrun{
+em(x, dataset)
+}
 }
 

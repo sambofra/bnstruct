@@ -16,6 +16,8 @@ query(x, ...)
 \item{observed.vars}{vector of observed variables.}
 
 \item{observed.vals}{vector of observed values for corresponding variables in \code{observed.vars}.}
+
+\item{...}{potential further arguments for method.}
 }
 \value{
 most probable values given observations

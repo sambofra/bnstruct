@@ -25,35 +25,16 @@ setMethod("learn.params",
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)
             var.names <- c(unlist(variables))  # colnames(data)
-            print(var.names)
             d.names <- mapply(function(name,size)(1:size),var.names,node.sizes)
             # esimate a cpt for each family from data
             for ( i in 1:n.nodes )
             {
-              print(i)
               family <- c( which(dag[,i]!=0), i )
-              print(family)
-              print(data[,family])
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
-              #print(c(counts))
-              print("counts")
-              print(class(counts))
-              print(counts)
-              #tmp <- array(c(counts + ess / prod(dim(counts))), dim=dim(counts))
-              print("tmp")
-              print(ess/prod(dim(counts)))
-              print(dim(counts))
-              cpts[[i]] <- counts.to.probs(  counts)# + ess / prod(dim(counts)))
-#               storage.mode(counts) <- "numeric"
-#               print(counts)
-#               print(prod(dim(counts)))
-#               print(c(unlist(counts)))
-#               print(c(counts) + ess / prod(dim(counts)))
-#               readLines(file("stdin"),1)
-              # cpts[[i]] <- counts.to.probs( array(c(counts + ess / prod(dim(counts))), dim(counts)) )
-              print("cpts")
-              print(cpts)
+#               if (sum(counts) != 5000)
+#                 readLines(file("stdin"),1)
+              cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
               dms <- NULL
               dns <- NULL
               for (j in 1:length(family))
@@ -174,27 +155,17 @@ setMethod("learn.structure",
 
 counts.to.probs <- function( counts )
 {
-  print(class(counts))
-  print("counts.to.probs")
-  print(counts)
-  print(class(counts))
   d <- dim(counts)
-  print(d)
   if( length(d) == 1 )
     return( counts / sum(counts) )
   else
   {
     # last dimension on the columns, everything else on the rows
-    print("nor")
     tmp.d <- c( prod(d[1:(length(d)-1)]), d[length(d)] )
-    print("nor")
     dim(counts) <- tmp.d
-    print("nor")
     # normalization
     nor <- rowSums( counts )
-    print("nor")
     nor <- nor + (nor == 0) # for the next division
-    print("nor")
     counts <- counts / array(nor,tmp.d)
     dim(counts) <- d
     return( counts )

@@ -2,12 +2,12 @@
 #' @aliases read.dataset,BNDataset,character,character
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
-          function(object, header, dataset, imputation = FALSE, header.flag = FALSE,
+          function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
                    bootstrap = FALSE, num.boots = 100, seed = 0, ...)
           {
-            header.file(object)  <- header
-            data.file(object)    <- dataset
+            header.file(object)  <- header.file
+            data.file(object)    <- data.file
             
             ls                   <- readLines(header)
             variables(object)    <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))

@@ -319,10 +319,6 @@ setMethod("get.most.probable.values",
                                    )
             )
             
-#             print(jpts)
-#             print(dim.vars)
-#             readLines(file("stdin"),1)
-            
             for (i in 1:num.nodes)
             {
               target.clique <- which(sapply(1:num.cliqs,
@@ -333,29 +329,16 @@ setMethod("get.most.probable.values",
                                                     )
                                                 }
                                             ) == TRUE)[1]
-#               print("-----------------------------")
-#               print(i)
-#               print(target.clique)
-#               print(c(unlist(dim.vars[[target.clique]])))
-              
               pot  <- jpts[[target.clique]]
               vars <- c(unlist(dim.vars[[target.clique]]))
-#               print(setdiff(vars,i))
-#               readLines(file("stdin"),1)
-              #print(pot)
-#print(jpts)
+
               for (v in c(unlist(setdiff(vars,i))))
               {
-#                 print("........")
-#                 print(pot)
-#                 print(vars)
                 out  <- marginalize(pot, vars, v)
                 pot  <- out$potential
                 vars <- out$vars
                 pot  <- pot / sum(pot)
               }
-#              print(pot)
-#               print(pot)
               wm <- which(!is.na(match(c(pot),max(pot))))
               if (length(wm) == 1)
               {
@@ -363,9 +346,6 @@ setMethod("get.most.probable.values",
               }
               else
               {
-                print("°°°")
-                print(wm)
-                print(pot)
                 mpv[i] <- sample(wm,1) #,replace=TRUE
               }
             }

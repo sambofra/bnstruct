@@ -6,19 +6,19 @@
 \alias{read.dataset,BNDataset,character,character-method}
 \title{Read a dataset from file.}
 \usage{
-read.dataset(object, header, dataset, ...)
+read.dataset(object, header.file, data.file, ...)
 
-\S4method{read.dataset}{BNDataset,character,character}(object, header, dataset,
-  imputation = FALSE, header.flag = FALSE, na.string.symbol = "?",
-  sep.symbol = "", k.impute = 10, bootstrap = FALSE, num.boots = 100,
-  seed = 0, ...)
+\S4method{read.dataset}{BNDataset,character,character}(object, header.file,
+  data.file, imputation = FALSE, header.flag = FALSE,
+  na.string.symbol = "?", sep.symbol = "", k.impute = 10,
+  bootstrap = FALSE, num.boots = 100, seed = 0, ...)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
 
-\item{header}{the \code{header} file.}
+\item{header.file}{the \code{header} file.}
 
-\item{dataset}{the \code{data} file.}
+\item{data.file}{the \code{data} file.}
 
 \item{na.string.symbol}{character that denotes \code{NA} in the dataset.}
 

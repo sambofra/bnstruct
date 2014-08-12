@@ -13,8 +13,8 @@
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
   ...)
 
-BN(dataset = NULL, algo = "mmhc", alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
+BN(dataset = NULL, algo = "mmhc", scoring.func = 0, alpha = 0.05,
+  ess = 1, bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
   ...)
 }
@@ -24,6 +24,8 @@ are considered only if a starting dataset is provided.}
 
 \item{algo}{the algorithm used to learn the structure of the network, if needed. Currently, the supported options are
 \code{'sm'}, Silander-Myllymaki, exact algorithm, and \code{'mmhc'}, Max-Min Hill-Climbing, heuristic (the default option).}
+
+\item{scoring.func}{scoring function: ome among BDeu, AIC, and BIC.}
 
 \item{alpha}{the confidence threshold for the MMHC algorithm.}
 

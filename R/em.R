@@ -1,9 +1,8 @@
-#' @name em
 #' @rdname em
-#' @aliases em,InferenceEngine
+#' @aliases em,InferenceEngine,BNDataset
 setMethod("em",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, threshold = 0.001, k.impute = 10)
+          function(x, dataset, threshold = 0.001, k.impute = 10, ...)
           {
             # We assume:
             # 1) there is a BN with learnt or known parameters
@@ -29,6 +28,8 @@ setMethod("em",
             raw.data   <- get.raw.data(dataset)
             imputed.data <- get.imputed.data(dataset)
             orig.bn    <- bn(x)
+            bak.bn     <- orig.bn
+            bn         <- orig.bn
             eng        <- x
             num.items  <- num.items(dataset)
             num.nodes  <- num.nodes(orig.bn)
@@ -38,93 +39,122 @@ setMethod("em",
             cliques    <- jt.cliques(x)
             
             # ndataset <- dataset
-            bn       <- orig.bn
-            bak.bn   <- bn
-
-            observations(eng) <- list(NULL, NULL) # clean observations, if needed
-            eng <- belief.propagation(eng)
-
-            imp.data <- matrix(data=c(rep(0, prod(dim(raw.data)))), nrow=nrow(raw.data), ncol=ncol(raw.data))
-            for (row in 1:num.items)
+            difference <- threshold + 1
+            while(difference > threshold)
             {
-              y <- raw.data[row,]
-              print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-              print(row)
-              print(y)
-              #mpv <- as.vector(c(rep(0, num.nodes)))#, dim=c(num.nodes), dimnames=list(var.names))
-              mpv <- rep(0, num.nodes)
-              obsd.vars <- which(!is.na(y))
-              obsd.vals <- y[obsd.vars]
-              non.obsd.vars <- setdiff(1:num.nodes, obsd.vars)
-              print(obsd.vars)
-              print(non.obsd.vars)
-              j <- jpts(eng)
+              observations(eng) <- list(NULL, NULL) # clean observations, if needed
+              eng      <- belief.propagation(eng,bn)            
+              imp.data <- matrix(data=c(rep(0, prod(dim(raw.data)))),
+                                 nrow=nrow(raw.data),
+                                 ncol=ncol(raw.data))
               
-              for (i in non.obsd.vars)
+              for (row in 1:num.items)
               {
-                target.clique <- which.min(!is.na(sapply(cliques, function(cl) {match(i, c(unlist(cl)))})))
-                jpt <- j[[target.clique]]
-                d   <- c(match(names(dimnames(jpt)),var.names))
-                if (length(intersect(d, obsd.vars)) > 0)
+                y             <- raw.data[row,]
+                # mpv           <- rep(0, num.nodes)
+                obsd.vars     <- which(!is.na(y))
+                obsd.vals     <- y[obsd.vars]
+                non.obsd.vars <- setdiff(1:num.nodes, obsd.vars)
+                mpv           <- c(unlist(y))
+  
+                j                 <- jpts(eng)
+                to.evaluate       <- non.obsd.vars
+                overall.obsd.vars <- obsd.vars
+                overall.obsd.vals <- obsd.vals
+                
+                while(length(to.evaluate) > 0)
                 {
-                  print("intersect")
-                  print(intersect(d, obsd.vars))
-                  for (v in intersect(d, obsd.vars))
+                  to.evaluate.next <- c()
+                  for (i in to.evaluate)
                   {
-                    print(v)
-                    print(obsd.vals)
-                    print(jpt)
-                    dmnms <- dimnames(jpt)
-                    nms   <- names(dimnames(jpt))
-                    cpt <- rep(0, node.sizes[v])
-                    cpt[obsd.vals[which(obsd.vars == v)]] <- 1
-                    print(cpt)
-                    out <- mult(jpt, d, cpt, c(v), node.sizes)
-                    jpt <- out$potential
-                    d <- c(unlist(out$vars))
-                    jpt <- jpt / sum(jpt)
-                    dimnames(jpt) <- dmnms
-                    names(dimnames(jpt)) <- nms
-                    out <- marginalize(jpt, d, v)
-                    jpt <- out$potential
-                    d   <- c(unlist(out$vars))
+                    target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(unlist(cl)))})))
+                    
+                    tc <- 1
+                    while (tc  <= length(target.cliques))
+                    {
+                      target.clique  <- target.cliques[tc]
+                      jpt            <- j[[target.clique]]
+                      d              <- c(match(names(dimnames(jpt)),var.names))
+                      
+                      if (length(intersect(d, overall.obsd.vars)) == length(d)-1)
+                      {
+                        dd <- d
+                        for (v in intersect(d, overall.obsd.vars))
+                        {
+                          #dmnms <- dimnames(jpt)
+                          #nms   <- names(dimnames(jpt))
+                          cpt         <- rep(0, node.sizes[v])
+                          cpt[mpv[v]] <- 1
+                          out         <- mult(jpt, dd, cpt, c(v), node.sizes)
+                          jpt         <- out$potential
+                          dd          <- c(unlist(out$vars))
+                          jpt         <- jpt / sum(jpt)
+                          #dimnames(jpt) <- dmnms
+                          #names(dimnames(jpt)) <- nms
+                          out         <- marginalize(jpt, dd, v)
+                          jpt         <- out$potential
+                          dd          <- c(unlist(out$vars))
+                        }
+                        
+                        if (length(dd) == 1 && !is.element(NaN,jpt) && !is.element(NA,jpt))
+                        {
+                          tc <- length(target.cliques) + 100
+                          
+                          wm <- which(!is.na(match(c(jpt),max(jpt))))
+                          if (length(wm) == 1)
+                          {
+                            mpv[i] <- wm # jpt[wm]
+                          }
+                          else
+                          {
+                            mpv[i] <- sample(wm,1) #,replace=TRUE
+                          }
+                          overall.obsd.vars <- sort(c(overall.obsd.vars,i))
+                        }
+                        #  else
+                        #  {
+                        #  # print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                        #  }
+                      }
+                      #  else
+                      # {
+                      #   print("too many unobserved vars in current clique")
+                      # }
+                      tc <- tc + 1
+                    }
+  
+                    if(tc <= length(target.cliques)+2 || is.element(NaN,jpt) || is.element(NA, jpt))
+                    {
+                      to.evaluate.next <- c(to.evaluate.next, i)
+                    }
+                  }
+
+                  if (length(to.evaluate.next) < length(to.evaluate))
+                  {
+                    to.evaluate <- to.evaluate.next
+                  }
+                  else
+                  {
+                    # ok, for now skip, or will loop.
+                    # find out how to deal with this.
+                    to.evaluate <- c()
                   }
                 }
-                wm <- which(!is.na(match(c(jpt),max(jpt))))
-                if (length(wm) == 1)
-                {
-                  mpv[i] <- wm # jpt[wm]
-                }
-                else
-                {
-                  print("°°°")
-                  print(nms)
-                  print(j[[target.clique]])
-                  print(jpt)
-                  readLines(file("stdin"),1)
-                  mpv[i] <- sample(wm,1) #,replace=TRUE
-                }
+  
+                imp.data[row,] <- mpv
               }
               
-              for (i in 1:length(obsd.vars))
-                mpv[obsd.vars[i]] <- obsd.vals[i]
+              storage.mode(imp.data) <- "integer"
+              imputed.data(dataset)  <- imp.data
               
-              print(mpv)
-              print(imputed.data[row,])
-              #readLines(file("stdin"),1)
-              # imp.data[row,] <- mpv
-              for (k in 1:num.nodes)
-                imp.data[row,k] <- mpv[k]
+              bn <- learn.params(bn, dataset)
+
+              difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
+              print(difference)
+              # readLines(file("stdin"),1)
+              orig.bn <- bn
             }
             
-            # imp.data <- as.matrix(imp.data)
-            # colnames(imp.data) <- var.names
-#             print(imp.data)
-# print(dim(imp.data))
-            imputed.data(dataset) <- imp.data
-            # storage.mode(imp.data) <- "integer"
-# print(dim(get.imputed.data(dataset)))
-# print(dataset, show.imputed.data = TRUE)
-            bn <- learn.params(bn, dataset)
-            print(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn))))
+            updated.bn(x) <- bn
+            return(x)
           })

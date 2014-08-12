@@ -57,12 +57,17 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param num.boots number of bootstrap samples to generate, if needed.
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
 #' @param cont.nodes use an empty vector.
 #' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
 #'     (if available, otherwise the raw dataset will be used anyway).
+#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
+#' @param na.string.symbol symbol for \code{NA} values (missing data).
+#' @param k.impute radius for imputation.
+#' @param seed random seed.
 #' @param ... potential further arguments of methods.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
@@ -147,6 +152,7 @@ setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.mos
 #' @param x a BN.
 #' @param observed.vars vector of observed variables.
 #' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
+#' @param ... potential further arguments for method.
 #' 
 #' @return most probable values given observations
 #' 
@@ -384,8 +390,8 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @rdname read.dataset
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param header the \code{header} file.
-#' @param dataset the \code{data} file.
+#' @param header.file the \code{header} file.
+#' @param data.file the \code{data} file.
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
 #' @param header.flag \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
@@ -403,7 +409,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header, dataset, ...) standardGeneric("read.dataset"))
+setGeneric("read.dataset", function(object, header.file, data.file, ...) standardGeneric("read.dataset"))
 
 
 #' Impute a \code{\link{BNDataset}} raw data with missing values.
@@ -576,16 +582,23 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 
 #' expectation-maximization algorithm.
 #' 
+#' Learn parameters of a network using thr Expectation-Maximization algorithm.
+#' 
 #' @name em
 #' @rdname em
 #' 
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
-#' @param threshold threshold
-#' @param k.impute k.impute
+#' @param threshold threshold for convergence, used as stopping criterion.
+#' @param k.impute radius of imputation.
 #' @param ... further potential arguments for method.
 #' 
-#' @return an \code{\link{InferenceEngine}} with updated parameters.
+#' @return an \code{\link{InferenceEngine}} with a new updated network.
+#' 
+#' @examples
+#' \dontrun{
+#' em(x, dataset)
+#' }
 #' 
 #' @exportMethod em
 setGeneric("em", function(x, dataset, ...) standardGeneric("em"))

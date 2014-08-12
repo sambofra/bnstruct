@@ -12,7 +12,8 @@ learn.structure(bn, dataset, ...)
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, k.impute = 10)
+  num.boots = 100, imputation = TRUE, k.impute = 10,
+  na.string.symbol = "?", seed = 0)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -29,6 +30,8 @@ learn.structure(bn, dataset, ...)
 
 \item{bootstrap}{\code{TRUE} to use bootstrap samples.}
 
+\item{num.boots}{number of bootstrap samples to generate, if needed.}
+
 \item{layering}{vector containing the layers each node belongs to (only for \code{sm}).}
 
 \item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm}).}
@@ -39,6 +42,14 @@ learn.structure(bn, dataset, ...)
 
 \item{raw.data}{\code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
 (if available, otherwise the raw dataset will be used anyway).}
+
+\item{imputation}{\code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.}
+
+\item{na.string.symbol}{symbol for \code{NA} values (missing data).}
+
+\item{k.impute}{radius for imputation.}
+
+\item{seed}{random seed.}
 
 \item{...}{potential further arguments of methods.}
 }
