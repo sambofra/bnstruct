@@ -9,13 +9,13 @@ setMethod("read.dataset",
             header.file(object)  <- header.file
             data.file(object)    <- data.file
             
-            ls                   <- readLines(header)
+            ls                   <- readLines(header.file)
             variables(object)    <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
             lns                  <- c(unlist(strsplit(ls[2], split = " ")))
             node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
             discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
             
-            a <- read.delim(dataset, na.strings = na.string.symbol,
+            a <- read.delim(data.file, na.strings = na.string.symbol,
                             header = header.flag, sep = sep.symbol) + 1
             raw.data(object)      <- as.matrix(a)
             num.variables(object) <- ncol(object@raw.data)
