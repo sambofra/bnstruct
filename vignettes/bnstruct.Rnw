@@ -3,6 +3,8 @@
 % \VignettePackage{bnstruct}
 % \VignetteKeywords{Documentation}
 \usepackage{url}
+\usepackage[numbers]{natbib}\citeindextrue
+
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
 \newcommand{\Robject}[1]{{\texttt{#1}}}
 \newcommand{\Rpackage}[1]{{\texttt{#1}}}
@@ -64,6 +66,7 @@ bootstrap samples, and variable names and cardinality.
 
 <<bndataset.constructor>>=
 dataset <- BNDataset(name="Example")
+# creates an enpty BNDataset object
 @
 
 
@@ -71,15 +74,17 @@ dataset <- BNDataset(name="Example")
 \Rpackage{bnstruct} requires the data files to be in a format we describe in this section. 
 The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
 with the values for each variable separated by a space or a tab. Values for each variable have to be
-numbers, starting from \texttt{0}. Data files can have a first row containing the names of the corresponding variables.
+numbers, starting from \texttt{0} in case of discrete variables.
+Data files can have a first row containing the names of the corresponding variables.
 
 In addition to the data file, a header file containing additional informations can also be provided.
-An header file has to be composed by three rows:
+An header file has to be composed by three rows of tab-delimited values:
 \begin{enumerate}
 \item list of names of the variables, in the same order of the data file;
 \item a list of integers representing the cardinality of the variables, in case of discrete variables,
       or the number of levels each variable has to be quantized in, in case of continuous variables;
-\item a list that indicates, for each variable, if the variable is continuous (\texttt{c}) or discrete (\texttt{d}).
+\item a list that indicates, for each variable, if the variable is continuous (\texttt{c} or \texttt{C}), and thus has to be quantized before learning,
+ or discrete (\texttt{d} or \texttt{D}).
 \end{enumerate}
 
 We provide two sample datasets, one with complete data (the \texttt{Asia} network) and one with missing values
@@ -108,7 +113,7 @@ A dataset may contain various kinds of missing data, namely unobserved variables
 and unobserved values for otherwise observed variables. We currently deal only with this
 second kind of missing data. The process of guessing the missing values is called \emph{imputation}.
 
-We provide the \Rmethod{impute} to perform imputation.
+We provide the \Rmethod{impute} function to perform imputation.
 <<imputation1,eval=FALSE>>=
 dataset <- BNDataset(name="Example")
 dataset <- read.dataset(dataset,
@@ -117,22 +122,25 @@ dataset <- read.dataset(dataset,
 dataset <- impute(dataset)
 @
 
+Imputation is accomplished with the k-Nearest Neighbour algorithm. The number of neighbours to be used
+can be chosen specifying the \Rfunarg{k.impute} parameter.
 Imputation can also be performed during the loading of a dataset, as shown in the following example.
 <<imputation2,eval=FALSE>>=
 dataset <- BNDataset(name="Example")
 dataset <- read.dataset(dataset,
                         header.file = "path/to/file.header",
                         data.file   = "path/to/file.data",
-                        imputation  = TRUE)
+                        imputation  = TRUE,
+                        k.impute    = 10)
 @
 
 Note that, when imputed data is present, it has higher priority over raw data when using a dataset
 (see section \ref{sec:usingdata}).
 
-The sample dataset available using the \Rmethod{child()} method contains raw and imputed data.
+The sample dataset available using the \Rmethod{child()} method contains both raw and imputed data.
 
 \subsection{Bootstrap}
-\Robject{BNDataset} objects have also room for bootstrap samples, both for raw and imputed data.
+\Robject{BNDataset} objects have also room for bootstrap samples, i.e. random samples with replacement of the original data with the same number of observations, both for raw and imputed data.
 We provide the \Rmethod{bootstrap} method for this.
 <<bootstrap1,eval=FALSE>>=
 dataset <- BNDataset(name="Example")
@@ -144,7 +152,7 @@ dataset.with.imputed.samples <- bootstrap(dataset,
                             num.boots = 100, imputation = TRUE)
 @
 
-Again, the generation of bootstrap samples can be performed during the loading of a dataset.
+Again, the generation of bootstrap samples can be performed while loading a dataset.
 <<bootstrap2,eval=FALSE>>=
 dataset <- BNDataset(name="Example")
 dataset <- read.dataset(dataset,
@@ -182,7 +190,7 @@ get.data(dataset.1)
 
 <<getdata1.1,eval=FALSE>>=
 dataset.2 <- asia()
-# we only can get raw data, the following are equivalent
+# we can only get raw data, the following are equivalent
 get.raw.data(dataset.2)
 get.data(dataset.2)
 @
@@ -225,15 +233,17 @@ net <- BN(name = "Example")
 
 
 The method of choice to create a \Robject{BN} object is to create it from a \Robject{BNDataset}.
-The following code will create a \Robject{BN} object for the \texttt{Child} network.
+The following code will create an empty \Robject{BN} object for the \texttt{Child} network.
 <<bn2, eval=FALSE>>=
 dataset <- child() # or any other way to create a custom BNDataset
 net     <- BN(dataset)
 @
 
-Note that the above snippet already creates a full object, that is, a network with structure and parameters.
-To better highlight the various options and possible operations, we delve a little into the details
-of the main learning methods.
+% Note that the above snippet already creates a full object, that is, a network with structure and parameters.
+% To better highlight the various options and possible operations, we delve a little into the details
+% of the main learning methods.
+
+Now, starting from the empty network and the dataset, we can proceed with the tasks of structure and parameter learning.
 
 \subsection{Structure learning}
 When constructing a network starting from a dataset, the first operation we may want to perform is to learn
@@ -248,17 +258,17 @@ The \Rmethod{learn.structure} method returns a new \Robject{BN} object, with a n
 learning has been performed using bootstrap -- more on this later).
 
 We provide two algorithms in order to learn the structure of the network, that can be chosen with the \texttt{algo} parameter.
-The first is the Silander-Myllymaki (\texttt{sm})
-exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+The first is the Silander-Myllym\"aki (\texttt{sm})
+exact search-and-score algorithm (see \citet*{silander2012simple}), that performs a complete evaluation of the search space in order to discover
 the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
-with more than 20 or 30 nodes. Even for small networks, users are strongly encouraged to provide
+with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
 meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
 documentation in package manual for more details on the method parameters.
 
-The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\texttt{mmhc}), that performs a statistical
-sieving of the search space followed by a greedy evaluation. It is considerably faster, at the cost of a (likely)
+The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\texttt{mmhc}, see \citet*{tsamardinos2006max}), that performs a statistical
+sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method, at the cost of a (likely)
 lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
-of the search space may take a long time. Also for this algorithm there are parameters that may be needed to be tuned,
+of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
 mainly the confidence threshold of the statistical pruning.
 
 Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
@@ -273,26 +283,26 @@ net.1   <- learn.structure(net, dataset,
                            algo = "sm", scoring.func = "AIC")
 net.2   <- learn.structure(net, dataset,
                            algo = "mmhc", scoring.func = "BDeu")
-# net.2 == net
 @
 
-Since building a \Robject{BN} object from a \Robject{BNDataset} already performs a structure learning task,
-we can specify the parameters of the \Rmethod{learn.structure} method in the \Rmethod{BN} constructor.
-<<structurelearn3, eval=FALSE>>=
-dataset <- child() # or any other way to create a custom BNDataset
-net     <- BN(dataset, algo = "sm", scoring.func = "AIC")
-@
+% Since building a \Robject{BN} object from a \Robject{BNDataset} already performs a structure learning task,
+% we can specify the parameters of the \Rmethod{learn.structure} method in the \Rmethod{BN} constructor.
+% # <<structurelearn3, eval=FALSE>>=
+% # dataset <- child() # or any other way to create a custom BNDataset
+% # net     <- BN(dataset, algo = "sm", scoring.func = "AIC")
+% # @
 
 The \Rmethod{learn.structure} method by default computes the structure as a DAG. We can however use
 bootstrap samples to learn a weighted partially DAG, in order to get a weighted confidence on the presence or
-absence of an edge in the structure. This can be done by providing the constructor or the \Rmethod{learn.structure}
+absence of an edge in the structure (\citet*{friedman1999data}). This can be done by providing the constructor or the \Rmethod{learn.structure}
 method a \Robject{BNDataset} with bootstrap samples, and the additional parameter \Rfunarg{bootstrap = TRUE}.
 <<structurelearn4, eval=FALSE>>=
 dataset <- asia() # or any other way to create a custom BNDataset
-net.1   <- BN(dataset, algo = "mmhc",
+net     <- BN(dataset)
+net.1   <- learn.structure(net, dataset, algo = "mmhc",
               scoring.func = "AIC", bootstrap = TRUE)
 # or, for explicitely learning from raw data
-net.2   <- BN(dataset, algo = "mmhc",
+net.2   <- learn.structure(net, dataset, algo = "mmhc",
               scoring.func = "AIC", bootstrap = TRUE,
               imputation = FALSE)
 @
@@ -300,14 +310,15 @@ net.2   <- BN(dataset, algo = "mmhc",
 \subsection{Parameter learning}
 Parameter learning is the operation that learns the conditional probabilities entailed by a network,
 given the data and the structure of the network. \Rpackage{bnstruct} provides the \Rmethod{learn.params} method for this task,
-performing a Maximum-a-posteriori estimation of the parameters.
-Also, parameter learning is already performed by the constructor when fed with a \Robject{BNDataset}, and optional
-parameters for \Rmethod{learn.params} such as \Rfunarg{ess} can be passed also to the network constructor.
+performing a Maximum-A-Posteriori (MAP) estimate of the parameters.
+% Also, parameter learning is already performed by the constructor when fed with a \Robject{BNDataset}, and optional
+% parameters for \Rmethod{learn.params} such as \Rfunarg{ess} can be passed also to the network constructor.
 <<paramlearn, eval=FALSE>>=
 dataset <- asia() # or any other way to create a custom BNDataset
-net     <- BN(dataset, algo = "mmhc",
-              scoring.func = "AIC")
-# the previous operaton already does the following:
+net     <- BN(dataset)
+net     <- learn.structure(net, dataset, 
+                           algo = "mmhc",
+                           scoring.func = "AIC")
 net     <- learn.params(net, dataset)
 @
 
@@ -320,16 +331,17 @@ starting from the original network, the list of cliques of variables that form t
 and the list of joint probability tables for the cliques composing the junction tree.
 
 An \Robject{InferenceEngine} can be built from a network: in this case, the junction tree is immediately constructed.
-Alternatively, one can use the \Rmethod{build.junction.tree} method.
+%Alternatively, one can use the \Rmethod{build.junction.tree} method.
 <<infeng1, eval=FALSE>>=
 dataset <- asia() # or any other way to create a custom BNDataset
 net     <- BN(dataset)
 inf.eng <- InferenceEngine(net)
-# equivalent to
-inf.eng <- InferenceEnfine()
-bn(inf.eng) <- net
-build.junction.tree(inf.eng, dag(net))
 @
+% # equivalent to
+% inf.eng <- InferenceEnfine()
+% bn(inf.eng) <- net
+% build.junction.tree(inf.eng, dag(net))
+% @
 
 Belief propagation over the junction tree can be then performed using the \Rmethod{belief.propagation} method.
 <<belprop1, eval=FALSE>>=
@@ -341,12 +353,14 @@ inf.eng <- belief.propagation(inf.eng)
 
 Belief propagation can be fed with a list of observations. This can be done in two ways: as parameters in the method,
 or inserting them directly into the inference engine. Note that the two options are mutually exclusive, in the sense that
-the list of observations given as parameter replaces (in the current operation, not in the \Robject{InferenceEngine} object)
+the list of observations given as parameter replaces (in the whole \Robject{InferenceEngine} object returned)
 the observations contained in the engine. Furthermore, if a list of observations contains multiple observations
 of the same variable, only the last one is considered.
 <<belprop2, eval=FALSE>>=
 dataset <- asia() # or any other way to create a custom BNDataset
 net     <- BN(dataset)
+net     <- learn.structure(net, dataset)
+net     <- learn.params(net, dataset)
 inf.eng <- InferenceEngine(net)
 inf.eng <- belief.propagation(inf.eng,
                               observed.vars = c("Asia","X-ray"),
@@ -366,10 +380,14 @@ an updated network with the newly estimated conditional probability tables.
 <<em1,eval=FALSE>>=
 dataset <- child() # or any other way to create a custom BNDataset
 net     <- BN(dataset)
+net     <- learn.structure(net, dataset)
+net     <- learn.params(net, dataset)
 inf.eng <- InferenceEngine(net)
 inf.eng <- em(inf.eng, dataset)
 print(updated.bn(inf.eng))
 @
 
+\bibliographystyle{plainnat}
+\bibliography{bibtex}
 
 \end{document}

@@ -22,7 +22,7 @@ bootstrap(object, ...)
 
 \item{na.string.symbol}{character that denotes NA in the dataset (useful only if imputation == TRUE).}
 
-\item{k.impute}{radius for imputation (useful only if imputation == TRUE).}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).}
 
 \item{...}{potential further arguments of methods.}
 }

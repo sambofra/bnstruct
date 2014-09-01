@@ -8,7 +8,7 @@ mydata <- asia()
 #mydata@name <- "Asia"
 print(mydata)
 
-net <- BN(mydata, algo = "sm", scoring.func = "BIC")
+net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8
 # set.node.sizes(net) <- c(2,2,2,2,2,2,2,2)
@@ -46,8 +46,8 @@ net <- BN(mydata, algo = "sm", scoring.func = "BIC")
 # # 
 # slot(net, "cpts") <- cpts
 
-# net <- learn.structure(net, mydata, algo="mmhc")
-#net <- learn.params(net, mydata)
+net <- learn.structure(net, mydata, algo="mmhc")
+net <- learn.params(net, mydata)
  
 # print(net)
 # unlist(lapply(net@cpts, sum))
@@ -66,7 +66,5 @@ inf.eng <- belief.propagation(inf.eng)
 
 print("-------------------------------------------------------------------------------------------")
 
-get.most.probable.values(net)
-get.most.probable.values(bn(inf.eng))
-get.most.probable.values(updated.bn(inf.eng))
+marginals(inf.eng)
 get.most.probable.values(inf.eng)

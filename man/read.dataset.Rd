@@ -28,7 +28,7 @@ read.dataset(object, header.file, data.file, ...)
 
 \item{imputation}{\code{TRUE} if imputation has to be performed.}
 
-\item{k.impute}{radius for imputation (useful only if imputation == TRUE).}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).}
 
 \item{bootstrap}{\code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.}
 

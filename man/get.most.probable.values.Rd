@@ -23,7 +23,7 @@ get.most.probable.values(x, ...)
 array containing, in each position, the most probable value for the corresponding variable.
 }
 \description{
-Return an array containing thevalues that each variable of the network is morel ikely to take, according to the CPTS.
+Return an array containing the values that each variable of the network is more likely to take, according to the CPTS.
 In case of ties take the first value.
 }
 \examples{

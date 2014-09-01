@@ -13,7 +13,7 @@ impute(object, ...)
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
 
-\item{k.impute}{radius for imputation.}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
 \item{...}{potential further arguments of methods.}
 }

@@ -66,7 +66,7 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #'     (if available, otherwise the raw dataset will be used anyway).
 #' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
 #' @param na.string.symbol symbol for \code{NA} values (missing data).
-#' @param k.impute radius for imputation.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param seed random seed.
 #' @param ... potential further arguments of methods.
 #' 
@@ -119,7 +119,7 @@ setGeneric("layering", function(x, ...) standardGeneric("layering"))
 
 #' compute the most probable values to be observed.
 #' 
-#' Return an array containing thevalues that each variable of the network is morel ikely to take, according to the CPTS.
+#' Return an array containing the values that each variable of the network is more likely to take, according to the CPTS.
 #' In case of ties take the first value.
 #' 
 #' @name get.most.probable.values
@@ -142,6 +142,29 @@ setGeneric("layering", function(x, ...) standardGeneric("layering"))
 #'  
 #' @exportMethod get.most.probable.values
 setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
+
+
+#' compute the list of inferred marginals of a BN.
+#' 
+#' Given an \code{\link{InferenceEngine}}, it returns a list containing the marginals for the variables
+#' in the network, according to the propagated beliefs.
+#' 
+#' @name marginals
+#' @rdname marginals
+#' 
+#' @param x an \code{\link{InferenceEngine}}
+#' @param ... potential further arguments of methods.
+#' 
+#' @return a list containing the marginals of each variable, as probability tables.
+#' 
+#' @examples
+#' \dontrun{
+#' eng <- InferenceEngine(net)
+#' marginals(eng)
+#' }
+#' 
+#' @exportMethod marginals
+setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 
 
 #' query BN given observations
@@ -396,7 +419,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param sep.symbol separator among values in the dataset.
 #' @param header.flag \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
 #' @param imputation \code{TRUE} if imputation has to be performed.
-#' @param k.impute radius for imputation (useful only if imputation == TRUE).
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
 #' @param bootstrap \code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.
 #' @param num.boots number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).
 #' @param seed random seed (useful only if bootstrap == TRUE).
@@ -418,7 +441,7 @@ setGeneric("read.dataset", function(object, header.file, data.file, ...) standar
 #' @rdname impute
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param k.impute radius for imputation.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param ... potential further arguments of methods.
 #' 
 #' @examples
@@ -444,7 +467,7 @@ setGeneric("impute", function(object, ...) standardGeneric("impute"))
 #' @param seed random seed.
 #' @param imputation \code{TRUE} if imputation has to be performed.
 #' @param na.string.symbol character that denotes NA in the dataset (useful only if imputation == TRUE).
-#' @param k.impute radius for imputation (useful only if imputation == TRUE).
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
 #' @param ... potential further arguments of methods.
 #' 
 #' @examples
@@ -582,7 +605,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 
 #' expectation-maximization algorithm.
 #' 
-#' Learn parameters of a network using thr Expectation-Maximization algorithm.
+#' Learn parameters of a network using the Expectation-Maximization algorithm.
 #' 
 #' @name em
 #' @rdname em
@@ -590,10 +613,11 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param threshold threshold for convergence, used as stopping criterion.
-#' @param k.impute radius of imputation.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param ... further potential arguments for method.
 #' 
-#' @return an \code{\link{InferenceEngine}} with a new updated network.
+#' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
+#'         and the imputed dataset (\code{"BNDataset"}).
 #' 
 #' @examples
 #' \dontrun{

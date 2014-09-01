@@ -47,7 +47,7 @@ learn.structure(bn, dataset, ...)
 
 \item{na.string.symbol}{symbol for \code{NA} values (missing data).}
 
-\item{k.impute}{radius for imputation.}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
 \item{seed}{random seed.}
 

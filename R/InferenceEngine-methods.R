@@ -354,6 +354,63 @@ setMethod("get.most.probable.values",
           })
 
 
+#' @rdname marginals
+#' @aliases marginals,InferenceEngine
+setMethod("marginals",
+          "InferenceEngine",
+          function(x, ...)
+          {
+            #             if (is.null(jpts(x))) # don't know if this works...
+            #               return(get.most.probable.values(bn(x)))
+            jpts      <- jpts(x)
+            num.nodes <- num.nodes(bn(x))
+            cliques   <- jt.cliques(x)
+            num.cliqs <- length(cliques)
+            variables <- variables(bn(x))
+            
+            mpv <- NULL
+            
+            dim.vars   <- lapply(1:num.cliqs,
+                                 function(index)
+                                   as.list(
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(jpts[[index]]))
+                                       )),
+                                       c(variables)
+                                     )
+                                   )
+            )
+            
+            for (i in 1:num.nodes)
+            {
+              target.clique <- which(sapply(1:num.cliqs,
+                                            function(index){
+                                              is.element(
+                                                i,
+                                                c(unlist(dim.vars[[index]]))
+                                              )
+                                            }
+              ) == TRUE)[1]
+              pot  <- jpts[[target.clique]]
+              vars <- c(unlist(dim.vars[[target.clique]]))
+              
+              for (v in c(unlist(setdiff(vars,i))))
+              {
+                out  <- marginalize(pot, vars, v)
+                pot  <- out$potential
+                vars <- out$vars
+                pot  <- pot / sum(pot)
+              }
+              
+              mpv[[i]] <- pot
+            }
+            
+            names(mpv) <- as.list(variables)
+            return(mpv)
+          })
+
+
 # redefition of print() for InferenceEngine objects
 #' @rdname print
 #' @aliases print,InferenceEngine

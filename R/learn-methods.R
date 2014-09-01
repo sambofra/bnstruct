@@ -32,6 +32,7 @@ setMethod("learn.params",
               family <- c( which(dag[,i]!=0), i )
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
+#               print(sum(counts))
 #               if (sum(counts) != 5000)
 #                 readLines(file("stdin"),1)
               cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )

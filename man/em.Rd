@@ -18,15 +18,16 @@ em(x, dataset, ...)
 
 \item{threshold}{threshold for convergence, used as stopping criterion.}
 
-\item{k.impute}{radius of imputation.}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
 \item{...}{further potential arguments for method.}
 }
 \value{
-an \code{\link{InferenceEngine}} with a new updated network.
+a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
+        and the imputed dataset (\code{"BNDataset"}).
 }
 \description{
-Learn parameters of a network using thr Expectation-Maximization algorithm.
+Learn parameters of a network using the Expectation-Maximization algorithm.
 }
 \examples{
 \dontrun{

@@ -7,48 +7,19 @@
 \alias{initialize,BN-method}
 \title{BN class.}
 \usage{
-\S4method{initialize}{BN}(.Object, dataset = NULL, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  ...)
+\S4method{initialize}{BN}(.Object, dataset = NULL, ...)
 
-BN(dataset = NULL, algo = "mmhc", scoring.func = 0, alpha = 0.05,
-  ess = 1, bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  ...)
+BN(dataset = NULL, ...)
 }
 \arguments{
+\item{name}{name of the Bayesian Network.}
+
 \item{dataset}{a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
 are considered only if a starting dataset is provided.}
 
-\item{algo}{the algorithm used to learn the structure of the network, if needed. Currently, the supported options are
-\code{'sm'}, Silander-Myllymaki, exact algorithm, and \code{'mmhc'}, Max-Min Hill-Climbing, heuristic (the default option).}
-
-\item{scoring.func}{scoring function: ome among BDeu, AIC, and BIC.}
-
-\item{alpha}{the confidence threshold for the MMHC algorithm.}
-
-\item{ess}{Equivalent Sample Size value.}
-
-\item{bootstrap}{\code{TRUE} to use bootstrap samples.}
-
-\item{layering}{vector containing the layers each node belongs to (only for \code{sm}).}
-
-\item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm}).}
-
-\item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
-
-\item{cont.nodes}{use an empty vector.}
-
-\item{raw.data}{\code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-    (if available, otherwise the raw dataset will be used anyway).}
+\item{...}{potential further arguments of methods.}
 
 \item{.Object}{ An object:  see the Details section.}
-
-\item{...}{data to include in the new object.  Named arguments
-    correspond to slots in the class definition. Unnamed arguments must
-    be objects from classes that this class extends.}
 }
 \value{
 BN object.
@@ -61,15 +32,6 @@ Instantiate a \code{\link{BN}} object.
 \details{
 The constructor may be invoked without parameters -- in this case an empty network will be created, and its slots will be filled manually by the user.
 This is usually viable only if the user already has knowledge about the network structure.
-
-Often, a better choice is to build a network starting from a dataset. Currently, two algorithms are supported for the structure learning step
-(can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
-and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
- The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
-It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
-to the method if \code{algo = 'sm'} is given as parameter to the method.
-
-The parameter learning step is done using a Maximum-a-posteriori computation.
 }
 \section{Slots}{
 
