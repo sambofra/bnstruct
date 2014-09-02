@@ -1,3 +1,19 @@
+#' Perform imputation of a data frame using k-NN.
+#' 
+#' Perform imputation of missing data in a data frame using the k-Nearest Neighbour algorithm.
+#' For discrete variables we use the mode, for continuous variables the median value is instead taken.
+#' 
+#' @name knn.impute
+#' @rdname knn.impute
+#' 
+#' @param data a data frame
+#' @param k number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
+#' @param cat.var vector containing the cardinality of the variables, if discrete,
+#'        or the number of levels the variables are going to be quantized into, if continuous.
+#'        
+#' @return imputed data frame.
+#' 
+#' @export knn.impute
 knn.impute <- function( data, k, cat.var )
 {
   n.cases <- dim(data)[1]

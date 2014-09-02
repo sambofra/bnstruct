@@ -4,7 +4,7 @@ setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                   bootstrap = FALSE, num.boots = 100, seed = 0, ...)
+                   bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
@@ -16,7 +16,7 @@ setMethod("read.dataset",
             discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
             
             a <- read.delim(data.file, na.strings = na.string.symbol,
-                            header = header.flag, sep = sep.symbol) + 1
+                            header = header.flag, sep = sep.symbol) + (1 - starts.from)
             raw.data(object)      <- as.matrix(a)
             num.variables(object) <- ncol(object@raw.data)
             num.items(object)     <- nrow(object@raw.data)
@@ -26,12 +26,6 @@ setMethod("read.dataset",
               message(paste(c("Incoherent number of variables between files ",
                               header," and ",dataset,"\n"), sep=''))
               quit(status = 1)
-            }
-            
-            # quantize if needed
-            if (!is.na(match(FALSE,c(unlist(discreteness(object))))))
-            {
-              raw.data(object) <- quantize.matrix(get.raw.data(object), node.sizes(object))
             }
             
             if (imputation)

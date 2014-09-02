@@ -423,6 +423,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param bootstrap \code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.
 #' @param num.boots number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).
 #' @param seed random seed (useful only if bootstrap == TRUE).
+#' @param starts.from starting value for entries in the dataset (observed values, default is 0).
 #' @param ... potential further arguments of methods.
 #' 
 #' @examples

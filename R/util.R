@@ -76,6 +76,8 @@ quantize.matrix <- function(data, levels)
   
   quant <- matrix(0,nr,nc)
   
+  print(levels)
+  
   for( i in 1:nc )
   {
     if( levels[i] == 0 )  # already discrete
@@ -89,6 +91,7 @@ quantize.matrix <- function(data, levels)
   }
   
   storage.mode(quant) <- "integer"
+  print(sapply(1:nc,function(x)max(quant[,x])))
   colnames(quant) <- colnames(data)
   return(quant)
 }

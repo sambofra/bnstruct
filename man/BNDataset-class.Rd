@@ -59,7 +59,7 @@ Dataset should be provided in the following format... (describe)
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
+dataset <- BNDataset(name = "MyData")
 dataset <- read.dataset(dataset, "file.header", "file.data")
 }
 }

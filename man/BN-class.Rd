@@ -12,8 +12,6 @@
 BN(dataset = NULL, ...)
 }
 \arguments{
-\item{name}{name of the Bayesian Network.}
-
 \item{dataset}{a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
 are considered only if a starting dataset is provided.}
 

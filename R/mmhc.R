@@ -196,6 +196,8 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   
   # print(cpc.mat)
   
+  storage.mode(data) <- "integer"
+  
   # forward addition of nodes
   for( i in 1:n.nodes )
   {

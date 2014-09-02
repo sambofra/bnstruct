@@ -73,6 +73,9 @@ setMethod("learn.structure",
             
             node.sizes <- node.sizes(bn)
             num.nodes  <- num.nodes(bn)
+                        
+            if (length(cont.nodes) == 0)
+              cont.nodes <- setdiff(1:num.nodes,which(discreteness(dataset)))
             
             if (bootstrap)
             {

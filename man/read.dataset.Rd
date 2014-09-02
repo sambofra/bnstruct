@@ -11,7 +11,7 @@ read.dataset(object, header.file, data.file, ...)
 \S4method{read.dataset}{BNDataset,character,character}(object, header.file,
   data.file, imputation = FALSE, header.flag = FALSE,
   na.string.symbol = "?", sep.symbol = "", k.impute = 10,
-  bootstrap = FALSE, num.boots = 100, seed = 0, ...)
+  bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -35,6 +35,8 @@ read.dataset(object, header.file, data.file, ...)
 \item{num.boots}{number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).}
 
 \item{seed}{random seed (useful only if bootstrap == TRUE).}
+
+\item{starts.from}{starting value for entries in the dataset (observed values, default is 0).}
 
 \item{...}{potential further arguments of methods.}
 }

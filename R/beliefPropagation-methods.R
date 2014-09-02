@@ -44,6 +44,7 @@ setMethod("belief.propagation",
                 obs <- unique.observations(observed.vars, observed.vals)
                 observed.vars <- obs$observed.vars
                 observed.vals <- obs$observed.vals
+                observations(ie) <- list(observed.vars, observed.vals)
               }
               
               num.nodes  <- num.nodes(net)

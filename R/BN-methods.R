@@ -145,10 +145,7 @@ setMethod("discreteness",
           "BN",
           function(x)
           {
-            vs  <- slot(x, "discreteness")
-            nvs <- rep('c', length(vs))
-            nvs[which(vs == TRUE)] <- 'd'
-            return(nvs)
+            return(slot(x, "discreteness"))
           })
 
 #' @aliases node.sizes,BN
