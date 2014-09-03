@@ -15,6 +15,24 @@ setMethod("initialize",
             return(.Object)
           })
 
+# initialize a \code{\link{BNDataset}} object given a \code{data.frame}.
+# 
+# Build a BNDataset starting from a \code{data.frame} and description vectors for the variables.
+# 
+# @name BNDataset
+# @rdname BNDataset-class
+# @docType method
+# @aliases initialize,data.frame,character,numeric,character
+# 
+# @return a BNDataset object
+# setMethod("initialize",
+#           c("data.frame"),
+#           function(data, variables, node.sizes, discreteness)
+#           {
+#             object <- new("BNDataset", ...)
+#             return(object)
+#           })
+
 #' constructor for \code{\link{BNDataset}} object
 #' 
 #' @name BNDataset
@@ -28,7 +46,7 @@ setMethod("initialize",
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
+#' dataset <- BNDataset(name = "MyData")
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
 #' }
 #' 
@@ -37,37 +55,17 @@ BNDataset <- function(name = "", ...)
 {
   dataset <- new("BNDataset", ...)
   
-#  WARNING: HOW DO I MANAGE THIS?
-#   # just to be sure
-#   if ((length(dataset@raw.data) == 1) && (dataset@raw.data == matrix(c(0))))
-#     dataset@has.rawdata <- FALSE
-#   else
-#   {
-#     dataset@has.rawdata <- TRUE
     if(length(dataset@variables) > 0 && has.raw.data(dataset))
       colnames(dataset@raw.data) <- dataset@variables
-#   }
-#   
-#   if ((length(dataset@imputed.data) == 1) && (dataset@imputed.data == matrix(c(0))))
-#   {
-#     dataset@has.impdata <- FALSE
-#     dataset@imputation  <- FALSE
-#   }
-#   else
-#   {
-#     dataset@has.impdata <- TRUE
-#     dataset@imputation  <- TRUE
+
     if(length(dataset@variables) > 0 && has.imputed.data(dataset))
       colnames(dataset@imputed.data) <- dataset@variables
-#   }
 
-#     args <- list(...)
-#     exist <- "name" %in% names(args)
-#     if (exist)
     name(dataset) <- name
     
     return(dataset)
 }
+
 
 # validator
 setValidity("BNDataset",
@@ -115,10 +113,7 @@ setMethod("discreteness",
           "BNDataset",
           function(x)
           {
-            vs  <- slot(x, "discreteness")
-            nvs <- rep('c', length(vs))
-            nvs[which(vs == TRUE)] <- 'd'
-            return(nvs)
+            return(slot(x, "discreteness"))
           })
 
 #' @rdname node.sizes
