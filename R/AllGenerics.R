@@ -206,9 +206,9 @@ setGeneric("query", function(x, ...) standardGeneric("query"))
 #'      node.col=c("cyan"), plot.wpdag=FALSE)
 #' }
 #' 
-#' @exportMethod plot
-if (!isGeneric("plot"))
-  setGeneric("plot", function(x, ...) standardGeneric("plot"))
+#' @exportMethod plot.BN
+#if (!isGeneric("plot"))
+setGeneric("plot.BN", function(x, ...) standardGeneric("plot.BN"))
 
 
 #' save a \code{\link{BN}} picture as \code{.eps} file.

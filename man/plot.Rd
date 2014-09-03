@@ -3,10 +3,12 @@
 \name{plot}
 \alias{plot}
 \alias{plot,BN}
-\alias{plot,BN-method}
+\alias{plot.BN,BN-method}
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
-\S4method{plot}{BN}(x, use.node.names = TRUE, frac = 0.2,
+plot.BN(x, ...)
+
+\S4method{plot.BN}{BN}(x, use.node.names = TRUE, frac = 0.2,
   max.weight = max(dag(x)), node.col = rep("white", ncol(dag(x))),
   plot.wpdag = FALSE)
 }
@@ -27,6 +29,8 @@
 }
 \description{
 Plot the network as a picture to default output.
+
+plot adjacency matrix
 }
 \examples{
 \dontrun{

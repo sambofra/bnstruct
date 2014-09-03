@@ -411,13 +411,38 @@ setMethod("print",
             
           })
 
-# plot adjacency matrix
+# plot a \code{\link{BN}} as a picture.
+# 
+# Plot the network as a picture to default output.
+# 
+# @name plot
+# @rdname plot
+# 
+# @param x a \code{\link{BN}} object.
+# @param use.node.names \code{TRUE} if node names have to be printed. If \code{FALSE}, number are used instead.
+# @param frac fraction
+# @param max.weight max.weight
+# @param node.col list of (\code{R}) colors for the nodes.
+# @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
+# @param ... potential further arguments of methods.
+# 
+# @importFrom graphics plot
+# 
+# @examples
+# \dontrun{
+# plot(x, use.node.names=TRUE, frac=0.2, max.weight=1,
+#      node.col=c("cyan"), plot.wpdag=FALSE)
+# }
+# 
+# @export plot.BN
+#' plot adjacency matrix
 #' @rdname plot
 #' @aliases plot,BN
-setMethod("plot",
+setMethod("plot.BN",
           c("BN"),
           # Plot a weighted connectivity matrix using Rgraphviz
-          function( x, use.node.names = TRUE, frac = 0.2, 
+# plot.BN <- 
+  function( x, use.node.names = TRUE, frac = 0.2, 
                     max.weight = max(dag(x)), node.col = rep('white',ncol(dag(x))),
                     plot.wpdag = FALSE)
           {
