@@ -33,7 +33,7 @@ setMethod("belief.propagation",
                 net <- bn(ie)
               }
               
-              if (is.null(observed.vars))
+              if (missing(observed.vars))
               {
                 obs <- observations(ie)
                 observed.vars <- obs$observed.vars
