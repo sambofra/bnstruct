@@ -4,9 +4,6 @@
 \alias{asia_10000}
 \title{\code{Asia} dataset.}
 \format{a \code{\link{BNDataset}} with raw data slow filled.}
-\usage{
-asia_10000
-}
 \description{
 The \code{Asia} dataset contains 10000 complete (no missing data, no latent variables) randomly generated items of the \code{Asia} Bayesian Network.
 No imputation needs to be performed, so only raw data is present.
@@ -21,5 +18,4 @@ S. Lauritzen, D. Spiegelhalter. Local Computation with Probabilities on Graphica
 \seealso{
 \code{\link{asia}}
 }
-\keyword{datasets}
 

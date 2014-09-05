@@ -28,7 +28,7 @@ setMethod("belief.propagation",
               
               ##############################
               
-              if (is.null(net))
+              if (missing(net))
               {
                 net <- bn(ie)
               }

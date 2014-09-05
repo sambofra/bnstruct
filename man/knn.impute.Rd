@@ -3,15 +3,24 @@
 \alias{knn.impute}
 \title{Perform imputation of a data frame using k-NN.}
 \usage{
-knn.impute(data, k, cat.var)
+knn.impute(data, k = 10, cat.var = 1:ncol(data), to.impute = 1:nrow(data),
+  using = 1:nrow(data))
 }
 \arguments{
 \item{data}{a data frame}
 
-\item{k}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
+\item{k}{number of neighbours to be used; for categorical variables
+the mode of the neighbours is used, for continuous variables
+the median value is used instead. Default: 10.}
 
-\item{cat.var}{vector containing the cardinality of the variables, if discrete,
-       or the number of levels the variables are going to be quantized into, if continuous.}
+\item{cat.var}{vector containing the indices of the variables to be
+considered as categorical. Default: all variables.}
+
+\item{to.impute}{vector indicating which rows of the dataset are to be imputed.
+Default: impute all rows.}
+
+\item{using}{vector indicating which rows of the dataset are to be used to search for neighbours.
+       Automatically set to include also the rows to be imputed. Default: use all rows.}
 }
 \value{
 imputed data frame.

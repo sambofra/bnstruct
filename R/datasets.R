@@ -16,7 +16,8 @@
 #' @format a \code{\link{BNDataset}} with raw data slow filled.
 #' 
 #' @seealso \code{\link{asia}}
-"asia_10000"
+NULL
+# "asia_10000"
 
 #' \code{Child} dataset.
 #' 
@@ -36,4 +37,5 @@
 #' @format a \code{\link{BNDataset}} with a raw and imputed data slow filled with 5000 items.
 #' 
 #' @seealso \code{\link{child}}
-"child_NA_5000"
+NULL
+# "child_NA_5000"
