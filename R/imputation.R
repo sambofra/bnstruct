@@ -7,46 +7,54 @@
 #' @rdname knn.impute
 #' 
 #' @param data a data frame
-#' @param k number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param cat.var vector containing the cardinality of the variables, if discrete,
-#'        or the number of levels the variables are going to be quantized into, if continuous.
-#'        
+#' @param k number of neighbours to be used; for categorical variables 
+#'        the mode of the neighbours is used, for continuous variables 
+#'        the median value is used instead. Default: 10.
+#' @param cat.var vector containing the indices of the variables to be 
+#'        considered as categorical. Default: all variables.
+#' @param to.impute vector indicating which rows of the dataset are to be imputed. 
+#'        Default: impute all rows.
+#' @param using vector indicating which rows of the dataset are to be used to search for neighbours.
+#'        Automatically set to include also the rows to be imputed. Default: use all rows.
+#'      
 #' @return imputed data frame.
 #' 
 #' @export knn.impute
-knn.impute <- function( data, k, cat.var )
+knn.impute <- function( data, k = 10, cat.var = 1:ncol(data), 
+	to.impute = 1:nrow(data), using = 1:nrow(data) )
 {
-  n.cases <- dim(data)[1]
   n.var <- dim(data)[2]
   num.var <- setdiff(1:n.var,cat.var)
-  t.data <- t(data)
+  using <- union(using, to.impute) # forced to include the rows to be imputed 
   
-  num.var.max <- apply(data[,num.var],2,max,na.rm=TRUE)
-  num.var.min <- apply(data[,num.var],2,min,na.rm=TRUE)
-  # num.var.range <- matrix(rep(num.var.max-num.var.min,n.cases),dim(data),byrow=TRUE)
-  num.var.range <- num.var.max-num.var.min
+  imp.data <- data[to.impute,,drop=FALSE]  # retain dimensions even for one row
+  use.data <- data[using,]
+  storage.mode(imp.data) <- "double"
+  storage.mode(use.data) <- "double"
   
-  imp.data <- data
+  num.var.max <- apply(use.data[,num.var],2,max,na.rm=TRUE)
+  num.var.min <- apply(use.data[,num.var],2,min,na.rm=TRUE)
+  num.var.range <- num.var.max - num.var.min
   
-  na.cases <- which(rowSums(is.na(data)) > 0)
+  na.cases <- which(rowSums(is.na(imp.data)) > 0)
+   
   neigh <- rep(0,k)
   storage.mode(num.var) <- "integer"
   
   for( i in na.cases )
   {
-    # d <- heom.dist( data[i,], data, num.var, num.var.range )
-    d <- .Call( "heom_dist", data[i,], data, num.var, num.var.range, PACKAGE = "bnstruct" )
+    d <- .Call( "heom_dist", imp.data[i,], use.data, num.var, num.var.range, PACKAGE = "bnstruct" )
     s <- sort(d, index.return=TRUE)$ix
-    for( j in which(is.na(data[i,])) )
+    for( j in which(is.na(imp.data[i,])) )
     {
       # find the k closest neighbours with nonmissing value for j
       ind.neigh <- 1
       ind.s <- 2 # the first element is the case itself
       while( ind.neigh < k + 1)
       {
-        if( !is.na(data[s[ind.s],j]) )
+        if( !is.na(use.data[s[ind.s],j]) )
         {
-          neigh[ind.neigh] <- data[s[ind.s],j]
+          neigh[ind.neigh] <- use.data[s[ind.s],j]
           ind.neigh <- ind.neigh + 1
         }
         ind.s <- ind.s + 1
