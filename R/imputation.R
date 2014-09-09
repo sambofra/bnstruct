@@ -14,8 +14,8 @@
 #'        considered as categorical. Default: all variables.
 #' @param to.impute vector indicating which rows of the dataset are to be imputed. 
 #'        Default: impute all rows.
-#' @param using vector indicating which rows of the dataset are to be used to search for neighbours.
-#'        Automatically set to include also the rows to be imputed. Default: use all rows.
+#' @param using vector indicating which rows of the dataset are to be used 
+#'        to search for neighbours. Default: use all rows.
 #'      
 #' @return imputed data frame.
 #' 
@@ -25,46 +25,58 @@ knn.impute <- function( data, k = 10, cat.var = 1:ncol(data),
 {
   n.var <- dim(data)[2]
   num.var <- setdiff(1:n.var,cat.var)
-  using <- union(using, to.impute) # forced to include the rows to be imputed 
   
-  imp.data <- data[to.impute,,drop=FALSE]  # retain dimensions even for one row
-  use.data <- data[using,]
-  storage.mode(imp.data) <- "double"
+  use.data <- data[using,,drop=FALSE] # retain dimensions even for one row
+  imp.data <- data[to.impute,,drop=FALSE] 
+  
   storage.mode(use.data) <- "double"
+  storage.mode(imp.data) <- "double"
   
-  num.var.max <- apply(use.data[,num.var],2,max,na.rm=TRUE)
-  num.var.min <- apply(use.data[,num.var],2,min,na.rm=TRUE)
-  num.var.range <- num.var.max - num.var.min
+  use.num.var.max <- apply(use.data[,num.var],2,max,na.rm=TRUE)
+  use.num.var.min <- apply(use.data[,num.var],2,min,na.rm=TRUE)
   
-  na.cases <- which(rowSums(is.na(imp.data)) > 0)
+  na.cases <- (rowSums(is.na(imp.data)) > 0)
    
   neigh <- rep(0,k)
   storage.mode(num.var) <- "integer"
   
-  for( i in na.cases )
+  for( i in 1:nrow(imp.data) )
   {
-    d <- .Call( "heom_dist", imp.data[i,], use.data, num.var, num.var.range, PACKAGE = "bnstruct" )
-    s <- sort(d, index.return=TRUE)$ix
-    for( j in which(is.na(imp.data[i,])) )
+    if( na.cases[i] )
     {
-      # find the k closest neighbours with nonmissing value for j
-      ind.neigh <- 1
-      ind.s <- 2 # the first element is the case itself
-      while( ind.neigh < k + 1)
-      {
-        if( !is.na(use.data[s[ind.s],j]) )
-        {
-          neigh[ind.neigh] <- use.data[s[ind.s],j]
-          ind.neigh <- ind.neigh + 1
-        }
-        ind.s <- ind.s + 1
-      }
+      num.var.max <- pmax(use.num.var.max, imp.data[i,num.var], na.rm=TRUE)
+      num.var.min <- pmin(use.num.var.min, imp.data[i,num.var], na.rm=TRUE)
+      num.var.range <- num.var.max - num.var.min
       
-      # impute from the neighbours
-      if( j %in% cat.var )
-        imp.data[i,j] <- stat.mode.ord(neigh)
-      else
-        imp.data[i,j] <- median(neigh)      
+      d <- .Call( "heom_dist", imp.data[i,], use.data, 
+                  num.var, num.var.range, PACKAGE = "bnstruct" )
+      s <- sort(d, index.return=TRUE)$ix
+      
+      for( j in which(is.na(imp.data[i,])) )
+      {
+        # find the k closest neighbours with nonmissing value for j
+        ind.neigh <- 1
+        # if to.impute[i] is in _using_, it is the first of the list
+        if (to.impute[i] %in% using)
+          ind.s <- 2
+        else
+          ind.s <- 1
+        while( ind.neigh < k + 1)
+        {
+          if( !is.na(use.data[s[ind.s],j]) )
+          {
+            neigh[ind.neigh] <- use.data[s[ind.s],j]
+            ind.neigh <- ind.neigh + 1
+          }
+          ind.s <- ind.s + 1
+        }
+        
+        # impute from the neighbours
+        if( j %in% cat.var )
+          imp.data[i,j] <- stat.mode.ord(neigh)
+        else
+          imp.data[i,j] <- median(neigh)      
+      }
     }
   }
   
