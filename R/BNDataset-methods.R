@@ -40,30 +40,60 @@ setMethod("initialize",
 #' @aliases BNDataset
 #' 
 #' @param name name of the dataset.
+#' @param data raw data.frame.
+#' @param variables vector of variable names.
+#' @param node.sizes vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).
+#' @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)
 #' @param ... potential further arguments of methods.
 #' 
 #' @return BNDataset object.
 #' 
 #' @examples
 #' \dontrun{
+#' # create from files
 #' dataset <- BNDataset(name = "MyData")
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' 
+#' # other way: create from raw dataset and metadata
+#' data <- matrix(c(1:16), nrow = 4, ncol = 4)
+#' dataset <- BNDataset(name = "MyData", data = data,
+#'                      variables = c("a", "b", "c", "d"),
+#'                      node.sizes = c(4,8,12,16),
+#'                      discreteness = rep('d',4))
 #' }
 #' 
 #' @export 
-BNDataset <- function(name = "", ...)
+BNDataset <- function(name = "", data = NULL, variables = c(), node.sizes = c(), discreteness = c(), ...)
 {
   dataset <- new("BNDataset", ...)
   
-    if(length(dataset@variables) > 0 && has.raw.data(dataset))
-      colnames(dataset@raw.data) <- dataset@variables
-
-    if(length(dataset@variables) > 0 && has.imputed.data(dataset))
-      colnames(dataset@imputed.data) <- dataset@variables
-
-    name(dataset) <- name
-    
-    return(dataset)
+  name(dataset) <- name
+  
+  if(length(variables) > 0)
+  {
+    variables(dataset) <- variables
+    num.variables(dataset) <- length(variables)
+  }
+  
+  if (length(node.sizes) > 0)
+    node.sizes(dataset) <- node.sizes
+  
+  if (length(discreteness) > 0)
+    discreteness(dataset) <- discreteness
+  
+  if (!is.null(data))
+  {
+    raw.data(dataset) <- as.matrix(data)
+  }
+  
+  num.items(dataset) <- nrow(dataset@raw.data)
+  
+  validObject(dataset)
+  
+  if(length(dataset@variables) > 0 && has.raw.data(dataset))
+    colnames(dataset@raw.data) <- dataset@variables
+  
+  return(dataset)
 }
 
 

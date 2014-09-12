@@ -8,6 +8,9 @@ mydata <- asia()
 #mydata@name <- "Asia"
 print(mydata)
 
+other <- BNDataset(data = mydata@raw.data, variables = variables(mydata), node.sizes = mydata@node.sizes, discreteness = rep('d',8))
+print(other)
+
 net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8

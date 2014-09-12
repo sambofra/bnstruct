@@ -1,3 +1,9 @@
+setClassUnion("missingOrNumeric", c("missing","numeric"))
+setClassUnion("missingOrLogical", c("missing","logical"))
+setClassUnion("missingOrInteger", c("missing","integer"))
+setClassUnion("missingOrCharacter", c("missing","character"))
+setClassUnion("missingOrNULL", c("missing", "NULL"))
+
 ###############################################################################
 #
 # Generic Bayesian Network class

@@ -23,8 +23,7 @@ setMethod("read.dataset",
             
             if (num.variables(object) != length(variables(object)))
             {
-              message(paste(c("Incoherent number of variables between files ",
-                              header," and ",dataset,"\n"), sep=''))
+              message(paste(c("Incoherent number of variables in dataset\n"), sep=''))
               quit(status = 1)
             }
             

@@ -1,9 +1,9 @@
 library("bnstruct")
 
-child_NA_5000 <- BNDataset(name = "Child")
-child_NA_5000 <- read.dataset(child_NA_5000, header.file="../bnstruct/extdata/Child_data_na_5000.header",
-                              data.file="../bnstruct/extdata/Child_data_na_5000.data",
-                              imputation = TRUE, bootstrap=FALSE, num.boots=3)
+# child_NA_5000 <- BNDataset(name = "Child")
+# child_NA_5000 <- read.dataset(child_NA_5000, header.file="../bnstruct/inst/extdata/Child_data_na_5000.header",
+#                               data.file="../bnstruct/inst/extdata/Child_data_na_5000.data",
+#                               imputation = TRUE, bootstrap=FALSE, num.boots=3)
 # save(child_NA_5000, file="data/child_NA_5000.rda")
 # break
 # print(mydata)
@@ -52,6 +52,10 @@ observations(inf.eng) <- list(c(3,5,9,19), rep(2,4))
 inf.eng <- belief.propagation(inf.eng)
 
 marginals(inf.eng)
+
+plot(net)
+readLines(file("stdin"),1)
+plot(updated.bn(inf.eng))
 
 # em(inf.eng, child_NA_5000)
 

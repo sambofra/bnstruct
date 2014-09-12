@@ -6,7 +6,7 @@
 \alias{query,BN-method}
 \title{query BN given observations}
 \usage{
-query(x, ...)
+query(x, observed.vars = c(), observed.vals = c(), ...)
 
 \S4method{query}{BN}(x, observed.vars, observed.vals)
 }

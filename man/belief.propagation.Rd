@@ -6,10 +6,12 @@
 \alias{belief.propagation,InferenceEngine-method}
 \title{perform belief propagation.}
 \usage{
-belief.propagation(ie, ...)
+belief.propagation(ie, net = NULL, observed.vars = NULL,
+  observed.vals = NULL, return.potentials = FALSE, ...)
 
 \S4method{belief.propagation}{InferenceEngine}(ie, net = NULL,
-  observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE)
+  observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE,
+  ...)
 }
 \arguments{
 \item{ie}{an \code{\link{InferenceEngine}} object.}

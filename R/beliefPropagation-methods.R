@@ -2,7 +2,7 @@
 #' @aliases belief.propagation,InferenceEngine
 setMethod("belief.propagation",
           c("InferenceEngine"),
-          function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE){
+          function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE, ...){
             {
               ###############################
               # moved inside in order to eliminate a NOTE in R CMD check
@@ -196,8 +196,8 @@ setMethod("belief.propagation",
               
               
               # compute processing order from leaves to root
-              process.order <<- c()
-              parents.list  <<- c()
+              process.order <- c()
+              parents.list  <- c()
               proc.order(root, c(), ctree)              
               
               # MESSAGE PASSING FROM LEAVES TO ROOT

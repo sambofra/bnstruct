@@ -32,7 +32,7 @@
 #' }
 #' 
 #' @exportMethod learn.params
-setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.params"))
+setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("learn.params"))
 
 
 #' learn the structure of a network.
@@ -61,14 +61,14 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param cont.nodes use an empty vector.
+#' @param cont.nodes vector containing the index of continuous variables.
 #' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
 #'     (if available, otherwise the raw dataset will be used anyway).
 #' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
 #' @param na.string.symbol symbol for \code{NA} values (missing data).
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param seed random seed.
-#' @param ... potential further arguments of methods.
+#' @param ... potential further arguments for method.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
@@ -89,7 +89,10 @@ setGeneric("learn.params", function(bn, dataset, ...) standardGeneric("learn.par
 #' }
 #' 
 #' @exportMethod learn.structure
-setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.structure"))
+setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+                                       layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
+                                       cont.nodes=c(), raw.data=FALSE, num.boots=100, imputation = TRUE, k.impute = 10,
+                                       na.string.symbol='?', seed = 0, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -114,7 +117,7 @@ setGeneric("learn.structure", function(bn, dataset, ...) standardGeneric("learn.
 #' }
 #' 
 #' @return a vector containing layers the nodes can be divided into.
-setGeneric("layering", function(x, ...) standardGeneric("layering"))
+setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layering"))
 
 
 #' compute the most probable values to be observed.
@@ -180,35 +183,7 @@ setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 #' @return most probable values given observations
 #' 
 #' @exportMethod query
-setGeneric("query", function(x, ...) standardGeneric("query"))
-
-
-#' plot a \code{\link{BN}} as a picture.
-#' 
-#' Plot the network as a picture to default output.
-#' 
-#' @name plot
-#' @rdname plot
-#' 
-#' @param x a \code{\link{BN}} object.
-#' @param use.node.names \code{TRUE} if node names have to be printed. If \code{FALSE}, number are used instead.
-#' @param frac fraction
-#' @param max.weight max.weight
-#' @param node.col list of (\code{R}) colors for the nodes.
-#' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
-#' @param ... potential further arguments of methods.
-#' 
-#' @importFrom graphics plot
-#' 
-#' @examples
-#' \dontrun{
-#' plot(x, use.node.names=TRUE, frac=0.2, max.weight=1,
-#'      node.col=c("cyan"), plot.wpdag=FALSE)
-#' }
-#' 
-#' @exportMethod plot.BN
-#if (!isGeneric("plot"))
-setGeneric("plot.BN", function(x, ...) standardGeneric("plot.BN"))
+setGeneric("query", function(x, observed.vars=c(), observed.vals=c(), ...) standardGeneric("query"))
 
 
 #' save a \code{\link{BN}} picture as \code{.eps} file.
@@ -433,7 +408,10 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header.file, data.file, ...) standardGeneric("read.dataset"))
+setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
+                                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
+                                    bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+                            standardGeneric("read.dataset"))
 
 
 #' Impute a \code{\link{BNDataset}} raw data with missing values.
@@ -453,7 +431,7 @@ setGeneric("read.dataset", function(object, header.file, data.file, ...) standar
 #' }
 #' 
 #' @exportMethod impute
-setGeneric("impute", function(object, ...) standardGeneric("impute"))
+setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
 
 
 #' Perform bootstrap.
@@ -479,7 +457,8 @@ setGeneric("impute", function(object, ...) standardGeneric("impute"))
 #' }
 #' 
 #' @exportMethod bootstrap
-setGeneric("bootstrap", function(object, ...) standardGeneric("bootstrap"))
+setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10,
+                                 na.string.symbol = '?', ...) standardGeneric("bootstrap"))
 
 
 #' get selected element of bootstrap list.
@@ -507,7 +486,7 @@ setGeneric("bootstrap", function(object, ...) standardGeneric("bootstrap"))
 #' @seealso \code{\link{bootstrap}}
 #' 
 #' @exportMethod get.boot
-setGeneric("get.boot", function(dataset, index, imputed, ...) standardGeneric("get.boot"))
+setGeneric("get.boot", function(dataset, index, imputed = TRUE, ...) standardGeneric("get.boot"))
 
 
 ###############################################################################
@@ -572,7 +551,8 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' }
 #' 
 #' @exportMethod belief.propagation
-setGeneric("belief.propagation", function(ie, ...) standardGeneric("belief.propagation"))
+setGeneric("belief.propagation", function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL,
+                                          return.potentials = FALSE, ...) standardGeneric("belief.propagation"))
 
 
 #' check if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.
@@ -626,7 +606,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' }
 #' 
 #' @exportMethod em
-setGeneric("em", function(x, dataset, ...) standardGeneric("em"))
+setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) standardGeneric("em"))
 
 
 ###############################################################################

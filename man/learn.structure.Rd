@@ -6,7 +6,12 @@
 \alias{learn.structure,BN,BNDataset-method}
 \title{learn the structure of a network.}
 \usage{
-learn.structure(bn, dataset, ...)
+learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
+  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+  cont.nodes = c(), raw.data = FALSE, num.boots = 100,
+  imputation = TRUE, k.impute = 10, na.string.symbol = "?", seed = 0,
+  ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
@@ -38,7 +43,7 @@ learn.structure(bn, dataset, ...)
 
 \item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
 
-\item{cont.nodes}{use an empty vector.}
+\item{cont.nodes}{vector containing the index of continuous variables.}
 
 \item{raw.data}{\code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
 (if available, otherwise the raw dataset will be used anyway).}
@@ -51,7 +56,7 @@ learn.structure(bn, dataset, ...)
 
 \item{seed}{random seed.}
 
-\item{...}{potential further arguments of methods.}
+\item{...}{potential further arguments for method.}
 }
 \value{
 new \code{\link{BN}} object with DAG.

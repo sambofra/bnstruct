@@ -6,7 +6,7 @@
 \alias{learn.params,BN,BNDataset-method}
 \title{learn the parameters of a \link{BN}.}
 \usage{
-learn.params(bn, dataset, ...)
+learn.params(bn, dataset, ess = 1, ...)
 
 \S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = 1)
 }

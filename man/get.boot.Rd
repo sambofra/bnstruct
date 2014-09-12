@@ -6,7 +6,7 @@
 \alias{get.boot,BNDataset,numeric-method}
 \title{get selected element of bootstrap list.}
 \usage{
-get.boot(dataset, index, imputed, ...)
+get.boot(dataset, index, imputed = TRUE, ...)
 
 \S4method{get.boot}{BNDataset,numeric}(dataset, index, imputed = TRUE, ...)
 }

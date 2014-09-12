@@ -6,7 +6,7 @@
 \alias{em,InferenceEngine,BNDataset-method}
 \title{expectation-maximization algorithm.}
 \usage{
-em(x, dataset, ...)
+em(x, dataset, threshold = 0.001, k.impute = 10, ...)
 
 \S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001,
   k.impute = 10, ...)

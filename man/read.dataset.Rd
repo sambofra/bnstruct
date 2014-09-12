@@ -6,7 +6,10 @@
 \alias{read.dataset,BNDataset,character,character-method}
 \title{Read a dataset from file.}
 \usage{
-read.dataset(object, header.file, data.file, ...)
+read.dataset(object, header.file, data.file, imputation = FALSE,
+  header.flag = FALSE, na.string.symbol = "?", sep.symbol = "",
+  k.impute = 10, bootstrap = FALSE, num.boots = 100, seed = 0,
+  starts.from = 0, ...)
 
 \S4method{read.dataset}{BNDataset,character,character}(object, header.file,
   data.file, imputation = FALSE, header.flag = FALSE,

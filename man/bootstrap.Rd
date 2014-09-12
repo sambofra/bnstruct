@@ -6,7 +6,8 @@
 \alias{bootstrap,BNDataset-method}
 \title{Perform bootstrap.}
 \usage{
-bootstrap(object, ...)
+bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
+  k.impute = 10, na.string.symbol = "?", ...)
 
 \S4method{bootstrap}{BNDataset}(object, num.boots = 100, seed = 0,
   imputation = FALSE, k.impute = 10, na.string.symbol = "?", ...)

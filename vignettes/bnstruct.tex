@@ -114,6 +114,28 @@ The sample datasets we provide come with two custom loaders:
 \end{Sinput}
 \end{Schunk}
 
+\subsection{Creating a \Robject{BNDataset} from data}
+Another possible way for creating a \Robject{BNDataset} is to create it from a \Rclass{data.frame} or a \Rclass{matrix}
+and some metadata. This is useful, for example, for instantiating a dataset after the data has already been 
+processed in some way.
+
+In particular, it is requested to provide the data, in \Rclass{data.frame} or \Rclass{matrix} form, and three additional
+vectors of informations on the domain: one containing the names of the variables, another one containing values indicating
+the cardinality (for discrete variables) or the quantization domain (for continuous variables) of the variables,
+and the last one containing the status of the variables (\texttt{c} for continuous, \texttt{d} for discrete). Please note that
+all of the metadata are required, and it is also suggested that the slot names are specified when passing data and metadata
+as parameters to the constructor; when no dataset name is provided, the slot names are mandatory.
+
+\begin{Schunk}
+\begin{Sinput}
+> data <- matrix(c(1:16), nrow = 4, ncol = 4)
+> dataset <- BNDataset(name = "MyData", data = data,
++                      variables = c("a", "b", "c", "d"),
++                      node.sizes = c(4,8,12,16),
++                      discreteness = rep('d',4))
+\end{Sinput}
+\end{Schunk}
+
 \subsection{Imputation}
 A dataset may contain various kinds of missing data, namely unobserved variables,
 and unobserved values for otherwise observed variables. We currently deal only with this

@@ -6,7 +6,7 @@
 \alias{impute,BNDataset-method}
 \title{Impute a \code{\link{BNDataset}} raw data with missing values.}
 \usage{
-impute(object, ...)
+impute(object, k.impute = 10)
 
 \S4method{impute}{BNDataset}(object, k.impute = 10)
 }

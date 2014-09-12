@@ -8,9 +8,9 @@
 \alias{layering,InferenceEngine-method}
 \title{return the layering of the nodes.}
 \usage{
-layering(x, ...)
+layering(x, updated.bn = TRUE, ...)
 
-\S4method{layering}{BN}(x, ...)
+\S4method{layering}{BN}(x, updated.bn = TRUE, ...)
 
 \S4method{layering}{InferenceEngine}(x, updated.bn = TRUE, ...)
 }

@@ -9,12 +9,21 @@
 \usage{
 \S4method{initialize}{BNDataset}(.Object, ...)
 
-BNDataset(name = "", ...)
+BNDataset(name = "", data = NULL, variables = c(), node.sizes = c(),
+  discreteness = c(), ...)
 }
 \arguments{
 \item{.Object}{an empty BNDataset.}
 
 \item{name}{name of the dataset.}
+
+\item{data}{raw data.frame.}
+
+\item{variables}{vector of variable names.}
+
+\item{node.sizes}{vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).}
+
+\item{discreteness}{a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)}
 
 \item{...}{potential further arguments of methods.}
 }
@@ -59,8 +68,16 @@ Dataset should be provided in the following format... (describe)
 }
 \examples{
 \dontrun{
+# create from files
 dataset <- BNDataset(name = "MyData")
 dataset <- read.dataset(dataset, "file.header", "file.data")
+
+# other way: create from raw dataset and metadata
+data <- matrix(c(1:16), nrow = 4, ncol = 4)
+dataset <- BNDataset(name = "MyData", data = data,
+                     variables = c("a", "b", "c", "d"),
+                     node.sizes = c(4,8,12,16),
+                     discreteness = rep('d',4))
 }
 }
 
