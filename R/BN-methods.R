@@ -20,6 +20,8 @@ setMethod("initialize",
               variables(x)    <- variables(dataset)
               node.sizes(x)   <- node.sizes(dataset)
               discreteness(x) <- discreteness(dataset)
+              dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
 #               validObject(x)
 # 
 #               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
@@ -214,7 +216,10 @@ setReplaceMethod("discreteness",
                  "BN",
                  function(x, value)
                  {
-                   slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                   if (class(value) == "character")
+                    slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                   else # is logical
+                     slot(x, "discreteness") <- value
                    validObject(x)
                    return(x)
                  })
@@ -438,12 +443,12 @@ plot.BN <-
               stop("this function requires the Rgraphviz package.")
             
             # adjacency matrix
-            if (plot.wpdag || (nrow(dag(x)) == 1 && num.nodes(x) > 1))
+            if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
               mat <- wpdag(x)
             else
               mat <- dag(x)
             
-            if (plot.wpdag || (nrow(dag(x)) == 1 && num.nodes(x) > 1))
+            if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
             {
               if (missing(max.weight))
                 max.weight <- max(mat)
@@ -455,8 +460,12 @@ plot.BN <-
             variables <- variables(x)
             
             mat.th <- mat
-            mat.th[mat <  frac*max.weight] <- 0
-            mat.th[mat >= frac*max.weight] <- 1
+            if (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0)
+            {
+              mat.th[mat <  frac*max.weight] <- 0
+              mat.th[mat >= frac*max.weight] <- 1
+            }
+            
             # node names
             if (use.node.names && length(variables) > 0)
               node.names <- variables
