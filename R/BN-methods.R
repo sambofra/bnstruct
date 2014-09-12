@@ -438,10 +438,18 @@ plot.BN <-
               stop("this function requires the Rgraphviz package.")
             
             # adjacency matrix
-            if (plot.wpdag)
+            if (plot.wpdag || (nrow(dag(x)) == 1 && num.nodes(x) > 1))
               mat <- wpdag(x)
             else
               mat <- dag(x)
+            
+            if (plot.wpdag || (nrow(dag(x)) == 1 && num.nodes(x) > 1))
+            {
+              if (missing(max.weight))
+                max.weight <- max(mat)
+              if (missing(node.col))
+                node.col <- rep('white',ncol(mat))
+            }
             
             num.nodes <- num.nodes(x)
             variables <- variables(x)
