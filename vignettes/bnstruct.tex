@@ -119,12 +119,13 @@ Another possible way for creating a \Robject{BNDataset} is to create it from a \
 and some metadata. This is useful, for example, for instantiating a dataset after the data has already been 
 processed in some way.
 
-In particular, it is requested to provide the data, in \Rclass{data.frame} or \Rclass{matrix} form, and three additional
+In particular, it is requested to provide the data, in \texttt{data.frame} or \texttt{matrix} form, and three additional
 vectors of informations on the domain: one containing the names of the variables, another one containing values indicating
 the cardinality (for discrete variables) or the quantization domain (for continuous variables) of the variables,
 and the last one containing the status of the variables (\texttt{c} for continuous, \texttt{d} for discrete). Please note that
-all of the metadata are required, and it is also suggested that the slot names are specified when passing data and metadata
-as parameters to the constructor; when no dataset name is provided, the slot names are mandatory.
+all of the metadata are required when choosing this option, and it is also suggested that the slot names
+are specified when passing data and metadata as parameters to the constructor;
+when no dataset name is provided, the slot names are mandatory.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -379,6 +380,42 @@ performing a Maximum-A-Posteriori (MAP) estimate of the parameters.
 +                            algo = "mmhc",
 +                            scoring.func = "AIC")
 > net     <- learn.params(net, dataset)
+\end{Sinput}
+\end{Schunk}
+
+\section{Using a network}
+Once a network is created, it can be used. Here we briefly mention some of the basic methods provided in order to
+manipulate a network and access its components.
+
+First of all, it is surely of interest to obtain the structure of a network. The \Rpackage{bnstruct} package
+provides the \Rmethod{dag()} and \Rmethod{wpdag()} methods in order to access the structure of a network learnt without and
+with bootstrap (respectively).
+\begin{Schunk}
+\begin{Sinput}
+> dag(net)
+> wpdag(net.boot)
+\end{Sinput}
+\end{Schunk}
+
+Then we may want to retrieve the parameters, using the \Rmethod{cpts()} method.
+\begin{Schunk}
+\begin{Sinput}
+> cpts(net)
+\end{Sinput}
+\end{Schunk}
+
+Another common operation that we may want to perform is displaying the network, or printing its main informations, using the
+\Rmethod{plot()} and \Rmethod{print()} methods. Note that the \Rmethod{plot()} method is flexible enough to allow 
+some custom settings such as the choice of the colors of the nodes, and, more importantly, some threshold settings 
+for the networks learnt with bootstrap. As default, the DAG of a network is selected for plotting, if available,
+otherwise the WPDAG is used. In case of presence of both the DAG and the WPDAG, in order to specify the latter as
+structure to be plotted, the \Rfunarg{plot.wpdag} logical parameter is provided.
+\begin{Schunk}
+\begin{Sinput}
+> print(net)
+> plot(net) # regular DAG
+> plot(net, plot.wpdag=T) # wpdag
+> plot(net.boot)
 \end{Sinput}
 \end{Schunk}
 

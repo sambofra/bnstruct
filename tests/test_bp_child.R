@@ -51,13 +51,13 @@ print(inf.eng)
 observations(inf.eng) <- list(c(3,5,9,19), rep(2,4))
 inf.eng <- belief.propagation(inf.eng)
 
-marginals(inf.eng)
+# marginals(inf.eng)
 
-plot(net)
-readLines(file("stdin"),1)
-plot(updated.bn(inf.eng))
+# plot(net)
+# readLines(file("stdin"),1)
+# plot(updated.bn(inf.eng))
 
-# em(inf.eng, child_NA_5000)
+em(inf.eng, mydata)
 
 # print(bn(inf.eng))
 # readLines(file("stdin"),1)

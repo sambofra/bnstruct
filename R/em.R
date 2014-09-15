@@ -157,40 +157,22 @@ setMethod("em",
                   imp.data[row,] <- mpv
                 }
                 
-                # fill in holes left by rows with too many NAs for being all identified
-                # treat variables independently; maybe it is better to use the network, but
-                # it is also much more cumbersome
+                # Fill in holes left by rows with too many NAs for being all identified.
+                # Use the network
                 if (length(still.has.NAs) > 0)
                 {
-#                   # copy dataset
-#                   # remove rows with NAs
-#                   bis.data <- imp.data[-still.has.NAs,]
-#                   # discover marginals for the variables by counting occurrences in dataset
-#                   bis.marg <- NULL
-#                   for (bis.var in 1:num.nodes)
-#                   {
-#                     bis.marg[[bis.var]] <- rep(0, node.sizes[bis.var])
-#                     bis.marg[[bis.var]] <- sapply(1:node.sizes[bis.var],
-#                                                   function(x) {
-#                                                     length(which(bis.data[,bis.var] == x))
-#                                                   })
-#                     bis.marg[[bis.var]] <- bis.marg[[bis.var]] / sum(bis.marg[[bis.var]])
-#                   }
-#                   
-#                   # guess missing values using the marginals
-#                   for (bis.row in still.has.NAs)
-#                   {
-#                     for (bis.var in which(is.na(imp.data[bis.row,])))
-#                     {
-#                       imp.data[bis.row,bis.var] <- sample(x = c(1:node.sizes[bis.var]),
-#                                                           size = 1,
-#                                                           replace = TRUE,
-#                                                           prob = bis.marg[[bis.var]])
-#                     }
-#                   }
+                  bis.data <- imp.data[-still.has.NAs,]
+                  bis.dataset <- dataset
+                  imputed.data(bis.dataset) <- bis.data
+                  num.items(bis.dataset) <- nrow(bis.data)
+                  bis.net <- learn.params(bn, bis.dataset)
+
                   for (bis.row in still.has.NAs)
                   {
-                    
+                    bis.ie <- InferenceEngine(bis.net)
+                    ov     <- which(!is.na(imp.data[bis.row]))
+                    bis.ie.1 <- belief.propagation(bis.ie, observed.vars = ov, observed.vals = (imp.data[bis.row])[ov])
+                    imp.data[bis.row,] <- get.most.probable.values(bis.ie.1)
                   }
                 }
                 # uuugly, fix this

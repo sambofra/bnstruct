@@ -344,7 +344,34 @@ net     <- learn.params(net, dataset)
 @
 
 \section{Using a network}
+Once a network is created, it can be used. Here we briefly mention some of the basic methods provided in order to
+manipulate a network and access its components.
 
+First of all, it is surely of interest to obtain the structure of a network. The \Rpackage{bnstruct} package
+provides the \Rmethod{dag()} and \Rmethod{wpdag()} methods in order to access the structure of a network learnt without and
+with bootstrap (respectively).
+<<dag1,eval=FALSE>>=
+dag(net)
+wpdag(net.boot)
+@
+
+Then we may want to retrieve the parameters, using the \Rmethod{cpts()} method.
+<<cpts2,eval=FALSE>>=
+cpts(net)
+@
+
+Another common operation that we may want to perform is displaying the network, or printing its main informations, using the
+\Rmethod{plot()} and \Rmethod{print()} methods. Note that the \Rmethod{plot()} method is flexible enough to allow 
+some custom settings such as the choice of the colors of the nodes, and, more importantly, some threshold settings 
+for the networks learnt with bootstrap. As default, the DAG of a network is selected for plotting, if available,
+otherwise the WPDAG is used. In case of presence of both the DAG and the WPDAG, in order to specify the latter as
+structure to be plotted, the \Rfunarg{plot.wpdag} logical parameter is provided.
+<<plotprint,eval=FALSE>>=
+print(net)
+plot(net) # regular DAG
+plot(net, plot.wpdag=T) # wpdag
+plot(net.boot)
+@
 
 \section{Inference in networks}
 \subsection{Belief Propagation}
