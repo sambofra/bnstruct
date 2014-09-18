@@ -2,7 +2,7 @@
 #' @rdname BN-class
 #' @aliases initialize,BN-method
 #' 
-#' 
+#' @param .Object a BN
 #' 
 setMethod("initialize",
           "BN",
@@ -633,3 +633,19 @@ topological.sort <- function(dgraph)
   
   return(order)
 }
+
+
+#' Show method for objects.
+#'
+#' The \code{show} method allows to provide a custom aspect for the output that is generated
+#' when the name of an instance is gives as command in an R session.
+#'
+#' @name show
+#' @rdname show
+#' @aliases show show,AllTheClasses-method show,BN-method show,BNDataset-method show,InferenceEngine-method
+#' @docType methods
+#' 
+#' @param object an object.
+#' 
+#' @export
+setMethod("show", "AllTheClasses", function(object) print(object))

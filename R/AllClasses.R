@@ -3,6 +3,7 @@ setClassUnion("missingOrLogical", c("missing","logical"))
 setClassUnion("missingOrInteger", c("missing","integer"))
 setClassUnion("missingOrCharacter", c("missing","character"))
 setClassUnion("missingOrNULL", c("missing", "NULL"))
+setClassUnion("vectorOrNULL", c("vector", "NULL"))
 
 ###############################################################################
 #
@@ -151,7 +152,6 @@ setClass("BNDataset",
 #
 ###############################################################################
 
-setClassUnion("vectorOrNULL", members=c("vector", "NULL"))
 
 #' InferenceEngine class.
 #' 
@@ -201,3 +201,7 @@ setClass("InferenceEngine",
            observed.vals      = NULL
          )
         )
+
+
+####
+setClassUnion("AllTheClasses", c("BN", "BNDataset", "InferenceEngine"))

@@ -462,3 +462,19 @@ unique.observations <- function(observed.vars, observed.vals)
   }
   return(list("observed.vars"=ovrs, "observed.vals"=ovls))
 }
+
+
+# #' Show method for \code{\link{InferenceEngine}} objects.
+# #'
+# #' The \code{show} method allows to provide a custom aspect for the output that is generated
+# #' when the name of an instance is gives as command in an R session.
+# #'
+# #' @name show
+# #' @rdname show
+# #' @aliases show show,InferenceEngine-method
+# #' @docType methods
+# #' 
+# #param object an InferenceEngine.
+# #' 
+# #' @export
+# setMethod("show", "InferenceEngine", function(object) print(object))

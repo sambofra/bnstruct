@@ -405,7 +405,7 @@ Then we may want to retrieve the parameters, using the \Rmethod{cpts()} method.
 \end{Schunk}
 
 Another common operation that we may want to perform is displaying the network, or printing its main informations, using the
-\Rmethod{plot()} and \Rmethod{print()} methods. Note that the \Rmethod{plot()} method is flexible enough to allow 
+\Rmethod{plot()}, \Rmethod{print()} and \Rmethod{show()} methods. Note that the \Rmethod{plot()} method is flexible enough to allow 
 some custom settings such as the choice of the colors of the nodes, and, more importantly, some threshold settings 
 for the networks learnt with bootstrap. As default, the DAG of a network is selected for plotting, if available,
 otherwise the WPDAG is used. In case of presence of both the DAG and the WPDAG, in order to specify the latter as
@@ -418,6 +418,18 @@ structure to be plotted, the \Rfunarg{plot.wpdag} logical parameter is provided.
 > plot(net.boot)
 \end{Sinput}
 \end{Schunk}
+
+The \Rmethod{show()} method is an alias for the \Rmethod{print()} method, but allows to print the state of an instance of an object
+just by typing its name in an \texttt{R} session.
+\begin{Schunk}
+\begin{Sinput}
+> # TFAE
+> print(net)
+> show(net)
+> net
+\end{Sinput}
+\end{Schunk}
+
 
 \section{Inference in networks}
 \subsection{Belief Propagation}
@@ -471,7 +483,7 @@ of the same variable, only the last one is considered.
 > # is equivalent to
 > observations(inf.eng) <- list(c("Asia","X-ray"), c(1,1))
 > inf.eng <- belief.propagation(inf.eng)
-> print(updated.bn(inf.eng))
+> plot(updated.bn(inf.eng))
 \end{Sinput}
 \end{Schunk}
 
@@ -488,7 +500,7 @@ an updated network with the newly estimated conditional probability tables.
 > net     <- learn.params(net, dataset)
 > inf.eng <- InferenceEngine(net)
 > inf.eng <- em(inf.eng, dataset)
-> print(updated.bn(inf.eng))
+> plot(updated.bn(inf.eng))
 \end{Sinput}
 \end{Schunk}
 

@@ -572,3 +572,18 @@ setMethod("get.boot",
             # if !has.boots && !imputed && has.imp.boots - though I don't know if this will ever happen
             return(NULL)
           })
+
+# #' Show method for \code{\link{BNDataset}} objects.
+# #'
+# #' The \code{show} method allows to provide a custom aspect for the output that is generated
+# #' when the name of an instance is gives as command in an R session.
+# #'
+# #' @name show
+# #' @rdname show
+# #' @aliases show show,BNDataset-method
+# #' @docType methods
+# #' 
+# #param object a BNDataset.
+# #' 
+# #' @export
+# setMethod("show", "BNDataset", function(object) print(object))
