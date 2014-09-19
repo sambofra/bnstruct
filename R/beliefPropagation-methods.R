@@ -64,7 +64,7 @@ setMethod("belief.propagation",
                                      as.list(
                                        match(
                                          c(unlist(
-                                          names(dimnames(cpts[[x]]))
+                                          names(dimnames(cpts[[x]])), F, F
                                          )),
                                          variables
                                        )
@@ -74,8 +74,8 @@ setMethod("belief.propagation",
               
               node.sizes <- node.sizes(net)
               
-              observed.vars <- c(unlist(observed.vars))
-              observed.vals <- c(unlist(observed.vals))
+              observed.vars <- c(unlist(observed.vars, F, F))
+              observed.vals <- c(unlist(observed.vals, F, F))
               
               # potentials is a list containing the probability tables of each clique
               potentials <- as.list(rep(as.list(c(1)), num.cliqs))
@@ -116,7 +116,7 @@ setMethod("belief.propagation",
                                                       which(unlist(
                                                         is.element(
                                                           c(unlist(dim.vars[[cpt]])),
-                                                          c(unlist(cliques[[x]]))
+                                                          c(cliques[[x]])
                                                         )
                                                       ) == FALSE) == 0)
                                                   }
@@ -158,7 +158,7 @@ setMethod("belief.propagation",
               
               if (length(observed.vars) > 0)
               {
-                observed.vars <- c(unlist(observed.vars))
+                # observed.vars <- c(unlist(observed.vars, F, F))
                 
                 if (class(observed.vars) == "character") # hope that the user gives coherent input...
                   observed.vars <- sapply(observed.vars, function(x) which(x == variables))
@@ -176,7 +176,7 @@ setMethod("belief.propagation",
                                                       function(x) {
                                                         which(is.element(
                                                           unlist(dimensions.contained[[x]]),
-                                                          unlist(observed.vars)[var]
+                                                          observed.vars[var]
                                                         ) == TRUE)
                                                       }
                     ))
@@ -338,7 +338,7 @@ setMethod("belief.propagation",
                   target.clique <- which.min(lapply(1:num.cliqs,
                                                     function(x){
                                                       length(
-                                                        which(unlist(
+                                                        which(c(
                                                           is.element(
                                                             c(unlist(dim.vars[[node]])),
                                                             c(unlist(dimensions.contained[[x]]))
@@ -356,7 +356,7 @@ setMethod("belief.propagation",
                   {
                     out <- marginalize(pot, dms, var)
                     pot <- out$potential
-                    dms <- c(unlist(out$vars))
+                    dms <- c(unlist(out$vars, F, F))
                   }
                   pot <- pot / sum(pot)
                   
@@ -379,7 +379,7 @@ setMethod("belief.propagation",
                     
                     pot <- out$potential
                     #pot <- pot / sum(pot)
-                    dms <- c(unlist(out$vars))
+                    dms <- c(unlist(out$vars, F, F))
                   }
                   
                   dmns <- list(NULL)
@@ -421,9 +421,9 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
   # node.sizes : node sizes
   
   # separator is made of the shared variables between the two cliques
-  vars.msg <- c(unlist(vfrom))
+  vars.msg <- c(unlist(vfrom, F, F))
   sep      <- intersect(vars.msg, c(unlist(vto)))
-  dp       <- c(unlist(dp))
+  dp       <- c(unlist(dp, F, F))
   
   # for all of the variables not in the separator, repeat marginalization
   # shrinking the prob.table
@@ -449,7 +449,7 @@ marginalize <- function(pot, vars, marg.var)
   # vars     : variables associated to pot
   # marg.var : variable to be marginalizes
   
-  marg.dim <- which(c(unlist(vars)) == marg.var)
+  marg.dim <- which(c(unlist(vars, F, F)) == marg.var)
   
   # get dimensions, compute dimensions for the soon-to-be-created prob. table
   # and number of the values that it will contain
@@ -468,7 +468,7 @@ marginalize <- function(pot, vars, marg.var)
   
   # switch dimensions, make prob.table  a linear array,
   cpt  <- aperm(pot, new.order)
-  marg <- c(unlist(cpt))
+  marg <- c(cpt)
   
   # the marginalization is now done by summing consecutive values
   marg <- tapply(marg, rep(1:new.num.vals, each=length.of.run), sum)
@@ -495,8 +495,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # node.sizes : sizes of the nodes
   
   # clean format
-  vars1 <- c(unlist(vars1))
-  vars2 <- c(unlist(vars2))
+  vars1 <- c(unlist(vars1, F, F))
+  vars2 <- c(unlist(vars2, F, F))
   
   # If the variables associated to cpt1 are all contained in the list of variables for cpt2, but
   # no variables of cpt2 is contained also in cpt1, swap the two cpts.
@@ -519,11 +519,11 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # Check this requirement, and take action if it is not met.
   out   <- sort.dimensions(cpt1, vars1)
   cpt1  <- out$potential
-  vars1 <- c(unlist(out$vars))
+  vars1 <- c(unlist(out$vars, F, F))
   
   out   <- sort.dimensions(cpt2, vars2)
   cpt2  <- out$potential
-  vars2 <- c(unlist(out$vars))
+  vars2 <- c(unlist(out$vars, F, F))
   
   # Proper multiplication starts here.
   # It works like this:
@@ -594,15 +594,17 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     }
     
     # [a b c] ==> [a b c a b c]
-    cpt2  <- c(rep(c(unlist(cpt2)),
+    cpt2  <- c(rep(c(cpt2),
                    prod(node.sizes[vars1[-common1]])
     ))
     
     # - point-wise product
-    cpt1 <- c(unlist(cpt1)) * c(unlist(cpt2))
+    cpt1 <- c(cpt1) * c(cpt2)
     
   }
   
+  vars1 <- unlist(vars1, F, F)
+  vars2 <- unlist(vars2, F, F)
   
   # - compute variables for the resulting cpt; if there were no shared variables, then
   #   it suffices to concatenate 
@@ -610,15 +612,15 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   {
     # new.where <- which(vars2 == common.vars)
     new.where <- which(is.na(match(vars2, common.vars)) == FALSE) # ugly, but should be more robust
-    vars1     <- as.list(c(c(unlist(vars2)[-new.where]),
-                           c(unlist(vars1))))
+    vars1     <- c(c(vars2[-new.where]),
+                           c(vars1))
   }
   else
   {
-    vars1 <- as.list(c(c(vars1), c(vars2)))
+    vars1 <- c(vars1, vars2)
   }
   
-  cpt1 <- array(c(cpt1), c(node.sizes[unlist(vars1)]))
+  cpt1 <- array(c(cpt1), c(node.sizes[vars1]))
 
   out  <- sort.dimensions(cpt1, vars1)
   
@@ -637,8 +639,8 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # node.sizes : sizes of the nodes
   
   # clean format
-  vars1 <- c(unlist(vars1))
-  vars2 <- c(unlist(vars2))
+  vars1 <- c(unlist(vars1, F, F))
+  vars2 <- c(unlist(vars2, F, F))
   
   # If the variables associated to cpt1 are all contained in the list of variables for cpt2, but
   # no variables of cpt2 is contained also in cpt1, swap the two cpts.
@@ -660,11 +662,11 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # Check this requirement, and take action if it is not met.
   out   <- sort.dimensions(cpt1, vars1)
   cpt1  <- out$potential
-  vars1 <- c(unlist(out$vars))
+  vars1 <- c(unlist(out$vars, F, F))
   
   out   <- sort.dimensions(cpt2, vars2)
   cpt2  <- out$potential
-  vars2 <- c(unlist(out$vars))
+  vars2 <- c(unlist(out$vars, F, F))
   
   
   # The proper division starts here.
@@ -689,7 +691,7 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   
   # - unlist cpt2 and repeat it as many times as needed (product of cardinality
   #   of non-common variables of cpt1);
-  cpt2      <- c(rep(c(unlist(cpt2)),
+  cpt2      <- c(rep(c(cpt2),
                      prod(
                        node.sizes[vars1[-common1]]
                      )
@@ -698,17 +700,17 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - now, every cell of cpt1 is paired with a cell of cpt2 whose variables
   #   have the same setting of it;
   # - perform element-wise division, handling the 0/0 case (conventionally set to 0 too);
-  cpt1 <- sapply(1:length(unlist(cpt2)),
+  cpt1 <- sapply(1:length(cpt2),
                  function(x) {
                    if(cpt2[x] == 0) {
                      return(0)
                    } else {
-                     return(unlist(cpt1)[x] / unlist(cpt2)[x])
+                     return(cpt1[x] / cpt2[x])
                    }
                  })
   
   # - rebuild array with corresponding dimensions, and permute dimensions to reconstruct order
-  cpt1 <- array(c(cpt1), c(node.sizes[unlist(vars1)]))
+  cpt1 <- array(c(cpt1), c(node.sizes[vars1]))
   out  <- sort.dimensions(cpt1, vars1)
   
   return(list("potential"=out$potential, "vars"=as.list(out$vars)))
@@ -721,7 +723,7 @@ sort.dimensions <- function(cpt, vars)
   # cpt  : conditional probability table
   # vars : dimension names
   
-  new.ordering <- c(unlist(vars))
+  new.ordering <- c(unlist(vars, F, F))
   if (length(new.ordering) > 1)
   {
     # look if there is some variable out of order (preceding a variable with a lower number)

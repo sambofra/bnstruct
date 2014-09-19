@@ -393,21 +393,42 @@ setMethod("print",
           "BN",
           function(x, ...)
           {
-            str <- "\nBayesian Network "
+            str <- "\nBayesian Network: "
             str <- paste(str, name(x), sep = '')
-            str <- paste(str, " with ", sep = '')
-            str <- paste(str, num.nodes(x), sep = '')
-            str <- paste(str, " nodes\n", sep = '')
-            str <- paste(str, paste(variables(x), sep=" ", collapse=', '))
+            str <- paste(str, "\n", sep = '')
             cat(str)
+            str <- "\nnum.nodes "
+            str <- paste(str, num.nodes(x), sep = '')
+            str <- paste(str, "\n", sep = '')
+            cat(str)
+            str <- "\nvariables\n"
+            cat(str)
+            print(variables(x))
+            str <- "\ndiscreteness\n"
+            cat(str)
+            print(discreteness(x))
+            str <- "\nnode.sizes\n"
+            cat(str)
+            print(node.sizes(x))
             
-            if (num.nodes(x) > 0 && length(dag(x)) > 1)
+            if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
             {
-              colnames(dag(x)) <- variables(x)
-              rownames(dag(x)) <- variables(x)
               
-              cat('\nAdjacency matrix:')
-              print(dag(x))
+              if (is.element(1,dag(x)))
+              {
+                colnames(dag(x)) <- variables(x)
+                rownames(dag(x)) <- variables(x)
+                cat('\nAdjacency matrix:\n')
+                print(dag(x))
+              }
+                
+              if (length(which(wpdag(x) != 0)) > 0)
+              {
+                colnames(wpdag(x)) <- variables(x)
+                rownames(wpdag(x)) <- variables(x)
+                cat('\nWPDAG:\n')
+                print(wpdag(x))
+              }  
               
               cat("\nConditional probability tables:")
               print(cpts(x))
@@ -634,18 +655,3 @@ topological.sort <- function(dgraph)
   return(order)
 }
 
-
-#' Show method for objects.
-#'
-#' The \code{show} method allows to provide a custom aspect for the output that is generated
-#' when the name of an instance is gives as command in an R session.
-#'
-#' @name show
-#' @rdname show
-#' @aliases show show,AllTheClasses-method show,BN-method show,BNDataset-method show,InferenceEngine-method
-#' @docType methods
-#' 
-#' @param object an object.
-#' 
-#' @export
-setMethod("show", "AllTheClasses", function(object) print(object))

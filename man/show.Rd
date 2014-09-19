@@ -8,7 +8,7 @@
 \alias{show,InferenceEngine-method}
 \title{Show method for objects.}
 \usage{
-\S4method{show}{AllTheClasses}(object)
+show(object)
 }
 \arguments{
 \item{object}{an object.}

@@ -450,49 +450,50 @@ setMethod("print",
           "BNDataset",
           function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
           {
-            object <- x
-            str <- "\nDataset"
             
-            if (object@name != "")
-              str <- paste(str, object@name)
-            
-            if (object@data.file != "")
-            {
-              str <- paste(str, "from file")
-              str <- paste(str, object@data.file)
-            }
-            
-            str <- paste(str, '\n')
-            
-            str <- paste(str, "with ", sep = '')
-            str <- paste(str, object@num.variables, sep = '')
-            str <- paste(str, "variables :")
-            #print(paste(c(object@variables), sep=', '))
-            str <- paste(str, paste(object@variables, sep=" ", collapse=', '))
-            str <- paste(str, ".\n", sep = '')
-            
-            if (has.data(object))
-            {
-              str <- paste(str, "\nand ", sep='')
-              str <- paste(str, object@num.items, sep='')
-              str <- paste(str, " items", sep='')
-            }
-            else
-            {
-              str <- paste(str, "currently empty", sep='')
-            }
-            str <- paste(str, ".\n", sep = '')
+            str <- "\nDataset: "
+            str <- paste(str, name(x), sep = '')
+            str <- paste(str, "\n", sep = '')
             cat(str)
+            str <- "\nnum.variables "
+            str <- paste(str, num.variables(x), sep = '')
+            str <- paste(str, "\n", sep = '')
+            cat(str)
+            str <- "\nvariables\n"
+            cat(str)
+            print(variables(x))
+            str <- "\ndiscreteness\n"
+            cat(str)
+            print(discreteness(x))
+            str <- "\nnode.sizes\n"
+            cat(str)
+            print(node.sizes(x))
+            str <- "\nnum.items\n"
+            cat(str)
+            print(num.items(x))
+            str <- "\nimputation\n"
+            cat(str)
+            print(x@imputation)
+            str <- "\nhas.boots\n"
+            cat(str)
+            print(has.boots(x))
+            str <- "\nhas.imp.boots\n"
+            cat(str)
+            print(has.imp.boots(x))
+            str <- "\nnum.boots\n"
+            cat(str)
+            print(num.boots(x))
             
-            if (show.raw.data == TRUE && has.raw.data(object))
+            
+            if (show.raw.data == TRUE && has.raw.data(x))
             {
-              cat("Raw data:\n")
-              print(get.raw.data(object))
+              cat("\nRaw data:\n")
+              print(get.raw.data(x))
             }
-            if (show.imputed.data == TRUE && has.imputed.data(object))
+            if (show.imputed.data == TRUE && has.imputed.data(x))
             {
-              cat("Imputed data:\n")
-              print(get.imputed.data(object))
+              cat("\nImputed data:\n")
+              print(get.imputed.data(x))
             }
           })
 
@@ -573,17 +574,3 @@ setMethod("get.boot",
             return(NULL)
           })
 
-# #' Show method for \code{\link{BNDataset}} objects.
-# #'
-# #' The \code{show} method allows to provide a custom aspect for the output that is generated
-# #' when the name of an instance is gives as command in an R session.
-# #'
-# #' @name show
-# #' @rdname show
-# #' @aliases show show,BNDataset-method
-# #' @docType methods
-# #' 
-# #param object a BNDataset.
-# #' 
-# #' @export
-# setMethod("show", "BNDataset", function(object) print(object))

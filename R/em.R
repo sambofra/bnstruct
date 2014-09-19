@@ -56,7 +56,7 @@ setMethod("em",
                 obsd.vars     <- which(!is.na(y))
                 obsd.vals     <- y[obsd.vars]
                 non.obsd.vars <- setdiff(1:num.nodes, obsd.vars)
-                mpv           <- c(unlist(y))
+                mpv           <- c(y)
                 
                 if (length(non.obsd.vars) == 0)
                 {
@@ -75,7 +75,7 @@ setMethod("em",
                   to.evaluate.next <- c()
                   for (i in to.evaluate)
                   {
-                    target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(unlist(cl)))})))
+                    target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(cl))})))
                     
                     tc <- 1
                     while (tc  <= length(target.cliques))
@@ -95,13 +95,13 @@ setMethod("em",
                           cpt[mpv[v]] <- 1
                           out         <- mult(jpt, dd, cpt, c(v), node.sizes)
                           jpt         <- out$potential
-                          dd          <- c(unlist(out$vars))
+                          dd          <- c(unlist(out$vars, F, F))
                           jpt         <- jpt / sum(jpt)
                           #dimnames(jpt) <- dmnms
                           #names(dimnames(jpt)) <- nms
                           out         <- marginalize(jpt, dd, v)
                           jpt         <- out$potential
-                          dd          <- c(unlist(out$vars))
+                          dd          <- c(unlist(out$vars, F, F))
                         }
                         
                         if (length(dd) == 1 && !is.element(NaN,jpt) && !is.element(NA,jpt))

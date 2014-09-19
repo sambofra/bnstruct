@@ -57,7 +57,7 @@ inf.eng <- belief.propagation(inf.eng)
 # readLines(file("stdin"),1)
 # plot(updated.bn(inf.eng))
 
-em(inf.eng, mydata)
+print(em(inf.eng, mydata))
 
 # print(bn(inf.eng))
 # readLines(file("stdin"),1)
