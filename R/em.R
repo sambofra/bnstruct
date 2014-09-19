@@ -44,7 +44,7 @@ setMethod("em",
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
               eng      <- belief.propagation(eng,bn)            
-              imp.data <- matrix(data=c(rep(0, prod(dim(raw.data)))),
+              imp.data <- matrix(data=rep(0, prod(dim(raw.data))),
                                  nrow=nrow(raw.data),
                                  ncol=ncol(raw.data))
               
@@ -95,13 +95,13 @@ setMethod("em",
                           cpt[mpv[v]] <- 1
                           out         <- mult(jpt, dd, cpt, c(v), node.sizes)
                           jpt         <- out$potential
-                          dd          <- c(unlist(out$vars, F, F))
+                          dd          <- out$vars
                           jpt         <- jpt / sum(jpt)
                           #dimnames(jpt) <- dmnms
                           #names(dimnames(jpt)) <- nms
                           out         <- marginalize(jpt, dd, v)
                           jpt         <- out$potential
-                          dd          <- c(unlist(out$vars, F, F))
+                          dd          <- out$vars
                         }
                         
                         if (length(dd) == 1 && !is.element(NaN,jpt) && !is.element(NA,jpt))
@@ -160,7 +160,7 @@ setMethod("em",
                 bis.data <- imp.data[-still.has.NAs,]
                 bis.dataset <- dataset
                 imputed.data(bis.dataset) <- bis.data
-                num.items(bis.dataset) <- nrow(bis.data)
+                num.items(bis.dataset) <- num.items - length(still.has.NAs)
                 bis.net <- learn.params(bn, bis.dataset)
 
                 for (bis.row in still.has.NAs)

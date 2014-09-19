@@ -123,7 +123,7 @@ setMethod("belief.propagation",
                 ))
                 
                 # get the variables currently contained in the selected clique
-                ds <- c(unlist(dimensions.contained[[target.clique]]))
+                ds <- unlist(dimensions.contained[[target.clique]], F, F)
                 
                 if (length(ds) == 0)
                 {
@@ -356,7 +356,7 @@ setMethod("belief.propagation",
                   {
                     out <- marginalize(pot, dms, var)
                     pot <- out$potential
-                    dms <- c(unlist(out$vars, F, F))
+                    dms <- out$vars
                   }
                   pot <- pot / sum(pot)
                   
@@ -379,7 +379,7 @@ setMethod("belief.propagation",
                     
                     pot <- out$potential
                     #pot <- pot / sum(pot)
-                    dms <- c(unlist(out$vars, F, F))
+                    dms <- out$vars
                   }
                   
                   dmns <- list(NULL)
@@ -421,9 +421,9 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
   # node.sizes : node sizes
   
   # separator is made of the shared variables between the two cliques
-  vars.msg <- c(unlist(vfrom, F, F))
-  sep      <- intersect(vars.msg, c(unlist(vto)))
-  dp       <- c(unlist(dp, F, F))
+  vars.msg <- unlist(vfrom, F, F)
+  sep      <- intersect(vars.msg, unlist(vto, F, F))
+  dp       <- unlist(dp, F, F)
   
   # for all of the variables not in the separator, repeat marginalization
   # shrinking the prob.table
@@ -437,7 +437,7 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
     }
   }
   
-  return(list("potential"=pot, "vars"=as.list(dp)))
+  return(list("potential"=pot, "vars"=dp))
 }
 
 
@@ -449,14 +449,14 @@ marginalize <- function(pot, vars, marg.var)
   # vars     : variables associated to pot
   # marg.var : variable to be marginalizes
   
-  marg.dim <- which(c(unlist(vars, F, F)) == marg.var)
+  marg.dim <- which(unlist(vars, F, F) == marg.var)
   
   # get dimensions, compute dimensions for the soon-to-be-created prob. table
   # and number of the values that it will contain
   dims          <- dim(pot)
-  new.dims      <- c(dims[-marg.dim])
+  new.dims      <- dims[-marg.dim]
   new.num.vals  <- prod(new.dims)
-  length.of.run <- c(dims[marg.dim])
+  length.of.run <- dims[marg.dim]
   num.runs      <- new.num.vals
   
   # switch dimensions in the array:
@@ -464,7 +464,7 @@ marginalize <- function(pot, vars, marg.var)
   new.order <- c(marg.dim, (1:length(dims))[-marg.dim])
   
   # remove marginalized dimension name
-  new.order.names <- c(vars[-marg.dim])
+  new.order.names <- vars[-marg.dim]
   
   # switch dimensions, make prob.table  a linear array,
   cpt  <- aperm(pot, new.order)
@@ -479,7 +479,7 @@ marginalize <- function(pot, vars, marg.var)
     marg <- array(marg, new.dims)
   }
   
-  return(list("potential"=marg, "vars"=as.list(new.order.names)))
+  return(list("potential"=marg, "vars"=new.order.names))
 }
 
 
@@ -495,8 +495,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # node.sizes : sizes of the nodes
   
   # clean format
-  vars1 <- c(unlist(vars1, F, F))
-  vars2 <- c(unlist(vars2, F, F))
+  vars1 <- unlist(vars1, F, F)
+  vars2 <- unlist(vars2, F, F)
   
   # If the variables associated to cpt1 are all contained in the list of variables for cpt2, but
   # no variables of cpt2 is contained also in cpt1, swap the two cpts.
@@ -519,16 +519,16 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # Check this requirement, and take action if it is not met.
   out   <- sort.dimensions(cpt1, vars1)
   cpt1  <- out$potential
-  vars1 <- c(unlist(out$vars, F, F))
+  vars1 <- out$vars
   
   out   <- sort.dimensions(cpt2, vars2)
   cpt2  <- out$potential
-  vars2 <- c(unlist(out$vars, F, F))
+  vars2 <- out$vars
   
   # Proper multiplication starts here.
   # It works like this:
   # - look for the common variables in vars1 and vars2;
-  common.vars <- c(intersect(vars1, vars2))
+  common.vars <- intersect(vars1, vars2)
   common1 <- match  (vars1, common.vars)
   common1 <- which(!is.na(common1), TRUE)
   common2 <- match  (vars2, common.vars)
@@ -563,8 +563,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   {
     if (length(vars1) > 1)
     {
-      new.order <- c(c(c(1:length(vars1))[common1]),
-                     c(c(1:length(vars1))[-common1]))
+      new.order <- c((1:length(vars1))[common1],
+                     (1:length(vars1))[-common1])
       cpt1      <- aperm(cpt1, new.order)
       vars1     <- vars1[new.order]
       common1 <- match  (vars1, common.vars)
@@ -585,8 +585,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     
     if(length(vars2) > 1)
     {
-      new.order <- c(c(c(1:length(vars2))[-common2]),
-                     c(c(1:length(vars2))[common2]))
+      new.order <- c((1:length(vars2))[-common2],
+                     (1:length(vars2))[common2])
       cpt2      <- aperm(cpt2, new.order)
       vars2     <- vars2[new.order]
       common2 <- match  (vars2, common.vars)
@@ -594,9 +594,9 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     }
     
     # [a b c] ==> [a b c a b c]
-    cpt2  <- c(rep(c(cpt2),
+    cpt2  <- rep(c(cpt2),
                    prod(node.sizes[vars1[-common1]])
-    ))
+    )
     
     # - point-wise product
     cpt1 <- c(cpt1) * c(cpt2)
@@ -612,8 +612,7 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   {
     # new.where <- which(vars2 == common.vars)
     new.where <- which(is.na(match(vars2, common.vars)) == FALSE) # ugly, but should be more robust
-    vars1     <- c(c(vars2[-new.where]),
-                           c(vars1))
+    vars1     <- c(vars2[-new.where], vars1)
   }
   else
   {
@@ -639,8 +638,8 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # node.sizes : sizes of the nodes
   
   # clean format
-  vars1 <- c(unlist(vars1, F, F))
-  vars2 <- c(unlist(vars2, F, F))
+  vars1 <- unlist(vars1, F, F)
+  vars2 <- unlist(vars2, F, F)
   
   # If the variables associated to cpt1 are all contained in the list of variables for cpt2, but
   # no variables of cpt2 is contained also in cpt1, swap the two cpts.
@@ -662,40 +661,40 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # Check this requirement, and take action if it is not met.
   out   <- sort.dimensions(cpt1, vars1)
   cpt1  <- out$potential
-  vars1 <- c(unlist(out$vars, F, F))
+  vars1 <- out$vars
   
   out   <- sort.dimensions(cpt2, vars2)
   cpt2  <- out$potential
-  vars2 <- c(unlist(out$vars, F, F))
+  vars2 <- out$vars
   
   
   # The proper division starts here.
   # It works like this:
   # - domain of the divisor is entirely contained into the one of the dividend;
   # - look for the common variables (all of the variables in vars2, some of them in vars1);
-  common.vars <- c(intersect(vars1, vars2))
+  common.vars <- intersect(vars1, vars2)
   common1 <- match(vars1, common.vars)
   common1 <- which(!is.na(common1), TRUE)# common1[!is.na(common1)]
   
   # - permute array dimensions for cpt1 putting the common variables in the first dimensions;
   if (length(vars1) > 1)
   {
-    cpt1 <- aperm(cpt1, c(c(c(1:length(vars1))[common1]),
-                          c(c(1:length(vars1))[-common1])
+    cpt1 <- aperm(cpt1, c((1:length(vars1))[common1],
+                          (1:length(vars1))[-common1]
     ))
-    vars1 <- c(vars1[c(c(1:length(vars1))[common1])],
-               vars1[c(c(1:length(vars1))[-common1])])
+    vars1 <- c(vars1[(1:length(vars1))[common1]],
+               vars1[(1:length(vars1))[-common1]])
     common1 <- match  (vars1, common.vars)
     common1 <- which(!is.na(common1), TRUE) # common1[!is.na(common1)]
   }
   
   # - unlist cpt2 and repeat it as many times as needed (product of cardinality
   #   of non-common variables of cpt1);
-  cpt2      <- c(rep(c(cpt2),
+  cpt2      <- rep(c(cpt2),
                      prod(
                        node.sizes[vars1[-common1]]
                      )
-  ))
+  )
   
   # - now, every cell of cpt1 is paired with a cell of cpt2 whose variables
   #   have the same setting of it;
@@ -710,10 +709,10 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
                  })
   
   # - rebuild array with corresponding dimensions, and permute dimensions to reconstruct order
-  cpt1 <- array(c(cpt1), c(node.sizes[vars1]))
+  cpt1 <- array(c(cpt1), node.sizes[vars1])
   out  <- sort.dimensions(cpt1, vars1)
   
-  return(list("potential"=out$potential, "vars"=as.list(out$vars)))
+  return(list("potential"=out$potential, "vars"=out$vars))
 }
 
 sort.dimensions <- function(cpt, vars)
@@ -723,7 +722,7 @@ sort.dimensions <- function(cpt, vars)
   # cpt  : conditional probability table
   # vars : dimension names
   
-  new.ordering <- c(unlist(vars, F, F))
+  new.ordering <- unlist(vars, F, F)
   if (length(new.ordering) > 1)
   {
     # look if there is some variable out of order (preceding a variable with a lower number)
@@ -739,13 +738,12 @@ sort.dimensions <- function(cpt, vars)
     
     if (!is.ordered) # permute
     {
-      dd           <- data.frame(c1 = c(new.ordering),
+      dd           <- data.frame(c1 = new.ordering,
                                  c2 = c(1:length(new.ordering)))
       dd           <- dd[with(dd,order(c1)),]
       new.ordering <- new.ordering[c(dd[,"c2"])]
       cpt          <- aperm(cpt, c(dd[,"c2"]))
-      vars         <- as.list(new.ordering)
     }
   }
-  return(list("potential"=cpt, "vars"=vars))
+  return(list("potential"=cpt, "vars"=new.ordering))
 }

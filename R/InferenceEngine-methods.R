@@ -319,13 +319,14 @@ setMethod("get.most.probable.values",
                                    )
             )
             
+
             for (i in 1:num.nodes)
             {
               target.clique <- which(sapply(1:num.cliqs,
                                                 function(index){
                                                     is.element(
                                                         i,
-                                                        c(unlist(dim.vars[[index]]))
+                                                        unlist(dim.vars[[index]])
                                                     )
                                                 }
                                             ) == TRUE)[1]
@@ -374,9 +375,9 @@ setMethod("marginals",
                                  function(index)
                                    as.list(
                                      match(
-                                       c(unlist(
-                                         names(dimnames(jpts[[index]]))
-                                       )),
+                                       unlist(
+                                         names(dimnames(jpts[[index]])),F, F
+                                       ),
                                        c(variables)
                                      )
                                    )
@@ -388,12 +389,12 @@ setMethod("marginals",
                                             function(index){
                                               is.element(
                                                 i,
-                                                c(unlist(dim.vars[[index]]))
+                                                unlist(dim.vars[[index]], F, F)
                                               )
                                             }
               ) == TRUE)[1]
               pot  <- jpts[[target.clique]]
-              vars <- c(unlist(dim.vars[[target.clique]]))
+              vars <- unlist(dim.vars[[target.clique]])
               
               for (v in c(unlist(setdiff(vars,i))))
               {
@@ -442,7 +443,7 @@ setMethod("print",
                 colnames(x@junction.tree) <- clnames
                 rownames(x@junction.tree) <- clnames
                 
-                cat(str, '\n\nAdjacency matrix:')
+                cat(str, '\n\nAdjacency matrix:\n')
                 print(junction.tree(x))
               }
             }
@@ -452,8 +453,8 @@ setMethod("print",
 # keep last (most recent) observation for each var
 unique.observations <- function(observed.vars, observed.vals)
 {
-  ovrs <- c(unlist(observed.vars))
-  ovls <- c(unlist(observed.vals))
+  ovrs <- unlist(observed.vars)
+  ovls <- unlist(observed.vals)
   dup  <- which(duplicated(rev(ovrs)) == TRUE)
   if (length(dup) > 0)
   {
@@ -463,18 +464,3 @@ unique.observations <- function(observed.vars, observed.vals)
   return(list("observed.vars"=ovrs, "observed.vals"=ovls))
 }
 
-
-# #' Show method for \code{\link{InferenceEngine}} objects.
-# #'
-# #' The \code{show} method allows to provide a custom aspect for the output that is generated
-# #' when the name of an instance is gives as command in an R session.
-# #'
-# #' @name show
-# #' @rdname show
-# #' @aliases show show,InferenceEngine-method
-# #' @docType methods
-# #' 
-# #param object an InferenceEngine.
-# #' 
-# #' @export
-# setMethod("show", "InferenceEngine", function(object) print(object))
