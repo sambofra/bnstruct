@@ -147,6 +147,33 @@ setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layeri
 setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
 
 
+#' sample a row vector of values for a network.
+#' 
+#' @name sample.row
+#' @rdname sample.row
+#' 
+#' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
+#' 
+#' @return a vector of values.
+#' 
+#' @exportMethod sample.row
+setGeneric("sample.row", function(x) standardGeneric("sample.row"))
+
+
+#' sample a \code{\link{BNDataset}} from a network of an inference engine.
+#' 
+#' @name sample.dataset
+#' @rdname sample.dataset
+#' 
+#' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
+#' @param n number of items to sample.
+#' 
+#' @return a \code{\link{BNDataset}}
+#' 
+#' @exportMethod sample.dataset
+setGeneric("sample.dataset", function(x, n=100) standardGeneric("sample.dataset"))
+
+
 #' compute the list of inferred marginals of a BN.
 #' 
 #' Given an \code{\link{InferenceEngine}}, it returns a list containing the marginals for the variables

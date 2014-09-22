@@ -460,6 +460,25 @@ inf.eng <- em(inf.eng, dataset)
 plot(updated.bn(inf.eng))
 @
 
+\section{Other utilities}
+\subsection{Sample data}
+We provide also methods for generating a sample of data, or a complete dataset.
+
+The two methods for this purpose are the \Rmethod{sample.row} and \Rmethod{sample.dataset}, that generate, respectively,
+a vector of values and a \Robject{BNDataset} object. Both the methods accept as first argument a \Robject{BN} or an
+\Robject{InferenceEngine} object. To generate a \Robject{BNDataset} with \Rmethod{sample.dataset} one should also provide the
+number of observations to sample, via the \Rfunarg{n} parameter.
+
+<<sample,eval=FALSE>>=
+net <- BN(...)
+eng <- InferenceEngine(net)
+sample.row(net)
+sample.row(eng)
+sample.dataset(net,1000)
+sample.dataset(eng,10000)
+@
+
+
 \bibliographystyle{plainnat}
 \bibliography{bibtex}
 

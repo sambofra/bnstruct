@@ -349,7 +349,7 @@ setMethod("get.most.probable.values",
               }
               else
               {
-                mpv[node] <- sample(wm,1) #,replace=TRUE
+                mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
               }
               
               # propagate information from parent nodes to children
@@ -532,6 +532,99 @@ setMethod("save.to.eps",
             postscript(filename)
             plot(x)
             dev.off()
+          })
+
+
+#' @rdname sample.row
+#' @aliases sample.row,BN
+setMethod("sample.row", "BN",
+          function(x){
+            bn   <- x
+            dag  <- dag(bn)
+            cpts <- cpts(bn)
+            num.nodes <- num.nodes(bn)
+            variables <- variables(bn)
+            node.sizes <- node.sizes(bn)
+            
+            mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
+            
+            sorted.nodes <- topological.sort(dag)
+            
+            dim.vars   <- lapply(1:num.nodes,
+                                 function(x)
+                                   as.list(
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(cpts[[x]]))
+                                       )),
+                                       c(variables)
+                                     )
+                                   )
+            )
+            
+            
+            for (node in sorted.nodes)
+            {
+              pot  <- cpts[[node]]
+              vars <- c(unlist(dim.vars[[node]]))
+              
+              # sum out parent variables
+              if (length(dim.vars[[node]]) > 1)
+              {
+                # find the dimensions corresponding to the current variable
+                for (parent in setdiff(vars, node))
+                {
+                  out  <- marginalize(pot, vars, parent)
+                  pot  <- out$potential
+                  vars <- out$vars
+                  pot <- pot / sum(pot)
+                }
+              }
+              
+              mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
+              
+              # propagate information from parent nodes to children
+              children <- which(dag[node,] > 0)
+              if (length(children) > 0)
+              {
+                for (child in children)
+                {
+                  out <- mult(cpts[[child]], dim.vars[[child]],
+                              pot, c(node),
+                              node.sizes)
+                  cpts[[child]]     <- out$potential
+                  dim.vars[[child]] <- out$vars
+                }
+              }
+            }
+            return(mpv)
+          })
+
+
+#' @rdname sample.dataset
+#' @aliases sample.dataset,BN
+setMethod("sample.dataset",c("BN"),
+          function(x, n = 100)
+          {
+            bnd <- BNDataset("")
+            name(bnd)          <- name(x)
+            variables(bnd)     <- variables(x)
+            num.variables(bnd) <- num.nodes(x)
+            discreteness(bnd)  <- discreteness(x)
+            node.sizes(bnd)    <- node.sizes(x)
+            num.items(bnd)     <- n
+            
+            obs <- matrix(rep(0, num.variables(bnd) * n), nrow = n, ncol = num.variables(bnd))
+            
+            for (i in 1:n)
+            {
+              obs[i,] <- sample.row(x)
+            }
+            
+            storage.mode(obs) <- "integer"
+            raw.data(bnd)     <- obs
+            
+            return(bnd)
           })
 
 

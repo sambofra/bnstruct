@@ -347,11 +347,98 @@ setMethod("get.most.probable.values",
               }
               else
               {
-                mpv[i] <- sample(wm,1) #,replace=TRUE
+                mpv[i] <- sample(1:node.sizes[node], 1, replace=T, prob=pot) #,replace=TRUE
               }
             }
             
             return(mpv)
+          })
+
+#' @rdname sample.row
+#' @aliases sample.row,InferenceEngine
+setMethod("sample.row",
+          "InferenceEngine",
+          function(x)
+          {
+            jpts      <- jpts(x)
+            num.nodes <- num.nodes(bn(x))
+            cliques   <- jt.cliques(x)
+            num.cliqs <- length(cliques)
+            variables <- variables(bn(x))
+            
+            mpv <- array(rep(0, num.nodes), dim=c(num.nodes), dimnames=list(variables))
+            
+            dim.vars   <- lapply(1:num.cliqs,
+                                 function(index)
+                                   as.list(
+                                     match(
+                                       c(unlist(
+                                         names(dimnames(jpts[[index]]))
+                                       )),
+                                       c(variables)
+                                     )
+                                   )
+            )
+            
+            
+            for (i in 1:num.nodes)
+            {
+              target.clique <- which(sapply(1:num.cliqs,
+                                            function(index){
+                                              is.element(
+                                                i,
+                                                unlist(dim.vars[[index]])
+                                              )
+                                            }
+              ) == TRUE)[1]
+              pot  <- jpts[[target.clique]]
+              vars <- c(unlist(dim.vars[[target.clique]]))
+              
+              for (v in c(unlist(setdiff(vars,i))))
+              {
+                out  <- marginalize(pot, vars, v)
+                pot  <- out$potential
+                vars <- out$vars
+                pot  <- pot / sum(pot)
+              }
+              
+              mpv[i] <- sample(1:node.sizes[node], 1, replace=T, prob=pot) #,replace=TRUE
+            }
+            
+            return(mpv)
+          })
+
+
+#' @rdname sample.dataset
+#' @aliases sample.dataset,InferenceEngine
+setMethod("sample.dataset",c("InferenceEngine"),
+          function(x, n = 100)
+          {
+            bnd <- BNDataset("")
+            
+            if(test.updated.bn(x))
+              net <- updated.bn(x)
+            else
+              net <- bn(x)
+            
+            name(bnd)          <- name(net)
+            variables(bnd)     <- variables(net)
+            num.variables(bnd) <- num.nodes(net)
+            discreteness(bnd)  <- discreteness(net)
+            node.sizes(bnd)    <- node.sizes(net)
+            num.items(bnd)     <- n
+            
+            obs <- matrix(rep(0, num.variables(bnd) * n), nrow = n, ncol = num.variables(bnd))
+            
+            for (i in 1:n)
+            {
+              obs[i,] <- sample.row(net)
+            }
+            
+            storage.mode(obs) <- "integer"
+            raw.data(bnd)     <- obs
+            
+            return(bnd)
           })
 
 
