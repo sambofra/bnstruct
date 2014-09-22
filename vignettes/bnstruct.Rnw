@@ -343,6 +343,18 @@ net     <- learn.structure(net, dataset,
 net     <- learn.params(net, dataset)
 @
 
+\subsection{Reading a network from a file}
+Other than starting from a dataset, it is also possible to read a network from a file, formatted in a specific way
+in order to describe the structure and the parameters of the network. Several of such formats exist; we provide methods
+for two of the most widely adopted ones, the \texttt{dsc} and the \texttt{bif} format. The method names are, respectively,
+\Rmethod{read.dsc} and \Rmethod{read.bif}. These methods return a full \Robject{BN} object.
+
+<<readfromfile,eval=FALSE>>=
+net <- read.dsc("path/to/network.dsc")
+plot(net)
+@
+
+
 \section{Using a network}
 Once a network is created, it can be used. Here we briefly mention some of the basic methods provided in order to
 manipulate a network and access its components.

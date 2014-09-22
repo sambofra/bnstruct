@@ -130,3 +130,221 @@ child <- function()
 #' 
 #' @export
 setMethod("show", "AllTheClasses", function(object) print(object))
+
+
+#' @rdname read.dsc
+#' @aliases read.dsc,character
+setMethod("read.dsc", c("character"),
+          function(x)
+          {
+            file.name <- x
+            all.file  <- readChar(file.name, file.info(file.name)$size)
+            all.file  <- gsub('\n', ' ', all.file)
+            all.file  <- gsub('"', '', all.file)
+            
+            lines        <- unlist(strsplit(all.file, "node|probability"))
+            num.nodes    <- (length(lines) - 1) / 2
+            network.name <- lines[1]
+            network.name <- gsub(" ", "", unlist(strsplit(network.name, "belief network"), F, F)[2])
+            lines        <- lines[-1]
+            
+            variables    <- rep("", num.nodes)
+            discreteness <- rep(TRUE, num.nodes)
+            node.sizes   <- rep(0, num.nodes)
+            
+            net <- BN()
+            name(net)      <- network.name
+            num.nodes(net) <- num.nodes
+            
+            nodes <- sapply(1:num.nodes, function(x) gsub(" ", "", lines[x]))
+            probs <- sapply((num.nodes+1):(2*num.nodes), function(x) gsub(" ", "", lines[x]))
+            
+            for (i in 1:num.nodes)
+            {
+              tmp <- unlist(strsplit(nodes[i], "\\{|\\}"))
+              variables[i] <- tmp[1]
+              tmp2 <- unlist(strsplit(tmp[2], "\\:|\\[|\\]"))
+              if (tolower(tmp2[2]) == "continuous") discreteness[i] <- FALSE
+              node.sizes[i] <- as.numeric(tmp2[3])
+            }
+            
+            variables(net)    <- variables
+            discreteness(net) <- discreteness
+            node.sizes(net)   <- node.sizes
+
+            dag <- ""
+            prob.list <- rep("", num.nodes)
+            
+            for (i in 1:num.nodes)
+            {
+              tmp    <- unlist(strsplit(probs[i], "\\{|\\}"))
+              to.num <- unlist(strsplit(tmp[1], "\\(|\\||\\)|\\,"))[-1]
+              to.num <- sapply(to.num, function(x) which(variables==x))
+              
+              local.node <- "("
+              local.node <- paste(local.node, to.num[1], sep="")
+              if (length(to.num) > 1)
+              {
+                local.node <- paste(local.node, "|", sep="")
+                for(j in 2:length(to.num))
+                {
+                  local.node <- paste(local.node, to.num[j], sep="")
+                  if (j < length(to.num))
+                    local.node <- paste(local.node, ",", sep="")
+                }
+              }
+              local.node <- paste(local.node, ")", sep="")
+              
+              dag <- paste(dag, local.node, sep="")
+              prob.list[i] <- tmp[2]
+            }
+            
+            dag(net) <- factors.to.graph(dag)
+            
+            cpts <- NULL
+            
+            for (i in 1:num.nodes)
+            {
+              family <- c(which(dag(net)[,i]!=0), i)
+              if (length(family) > 1)
+              {
+                ps <- unlist(strsplit(prob.list[i], "\\(\\*\\)\\:|\\,|\\;|\\:"))
+              }
+              else
+              {
+                ps <- unlist(strsplit(prob.list[i], "\\,|\\;"))
+              }
+              ps <- ps[which(ps != "")]
+              suppressWarnings(ps <- ps[which(!is.na(as.numeric(ps)))])
+              ps <- array(as.numeric(ps), dim=node.sizes[family])
+              cpts[[i]] <- ps
+              
+              dms <- NULL
+              dns <- NULL
+              for (j in 1:length(family))
+              {
+                dms[[j]] <- as.list(c(1:node.sizes[family[j]]))
+                dns[[j]] <- c(variables[family[j]])
+              }
+              
+              dimnames(cpts[[i]])          <- dms
+              names( dimnames(cpts[[i]]) ) <- dns
+            }
+            names(cpts) <- variables
+            
+            cpts(net) <- cpts
+            
+            return(net)  
+          })
+
+
+#' @rdname read.bif
+#' @aliases read.bif,character
+setMethod("read.bif", c("character"),
+          function(x)
+          {
+            file.name <- x
+            all.file  <- readChar(file.name, file.info(file.name)$size)
+            all.file  <- gsub('\n', ' ', all.file)
+            all.file  <- gsub('"', '', all.file)
+            
+            lines        <- unlist(strsplit(all.file, "variable|probability"))
+
+            num.nodes    <- (length(lines) - 1) / 2
+            network.name <- lines[1]
+            network.name <- gsub(" ", "", unlist(strsplit(network.name, "network"), F, F)[2])
+            network.name <- gsub("\\{", "", network.name)
+            network.name <- gsub("\\}", "", network.name)
+            lines        <- lines[-1]
+            
+            variables    <- rep("", num.nodes)
+            discreteness <- rep(TRUE, num.nodes)
+            node.sizes   <- rep(0, num.nodes)
+            
+            net <- BN()
+            name(net)      <- network.name
+            num.nodes(net) <- num.nodes
+            
+            nodes <- lines[1:num.nodes]
+            probs <- lines[(num.nodes+1):(2*num.nodes)]
+            
+            for (i in 1:num.nodes)
+            {
+              tmp <- unlist(strsplit(nodes[i], "\\{|\\}|type|\\[|\\]|\\;"))
+              tmp <- gsub(" ", "", tmp)
+              tmp <- tmp[-which(tmp == "")]
+              
+              variables[i] <- tmp[1]
+              if (tolower(tmp[2]) == "continuous") discreteness[i] <- FALSE
+              node.sizes[i] <- as.numeric(tmp[3])
+            }
+            
+            variables(net)    <- variables
+            discreteness(net) <- discreteness
+            node.sizes(net)   <- node.sizes
+            
+            dag <- ""
+            prob.list <- rep("", num.nodes)
+            
+            for (i in 1:num.nodes)
+            {
+              tmp    <- gsub(" ", "", unlist(strsplit(probs[i], "\\{|\\}")))
+              to.num <- unlist(strsplit(tmp[1], "\\(|\\||\\)|\\,"))[-1]
+              to.num <- sapply(to.num, function(x) which(variables==x))
+              
+              local.node <- "("
+              local.node <- paste(local.node, to.num[1], sep="")
+              if (length(to.num) > 1)
+              {
+                local.node <- paste(local.node, "|", sep="")
+                for(j in 2:length(to.num))
+                {
+                  local.node <- paste(local.node, to.num[j], sep="")
+                  if (j < length(to.num))
+                    local.node <- paste(local.node, ",", sep="")
+                }
+              }
+              local.node <- paste(local.node, ")", sep="")
+              
+              dag <- paste(dag, local.node, sep="")
+              prob.list[i] <- tmp[2]
+            }
+            
+            dag(net) <- factors.to.graph(dag)
+            
+            cpts <- NULL
+            
+            for (i in 1:num.nodes)
+            {
+              family <- c(rev(which(dag(net)[,i]!=0)), i)
+              if (length(family) > 1)
+              {
+                ps <- unlist(strsplit(prob.list[i], "\\(|\\)|\\,|\\;|\\:"))
+              }
+              else
+              {
+                ps <- gsub("table","", prob.list[i])
+                ps <- unlist(strsplit(ps, "\\,|\\;"))
+              }
+              ps <- ps[which(ps != "")]
+              suppressWarnings(ps <- ps[which(!is.na(as.numeric(ps)))])
+              ps <- array(as.numeric(ps), dim=c(node.sizes[family]))
+              cpts[[i]] <- ps
+              
+              dms <- NULL
+              dns <- NULL
+              for (j in 1:length(family))
+              {
+                dms[[j]] <- as.list(c(1:node.sizes[family[j]]))
+                dns[[j]] <- c(variables[family[j]])
+              }
+              
+              dimnames(cpts[[i]])          <- dms
+              names( dimnames(cpts[[i]]) ) <- dns
+            }
+            names(cpts) <- variables
+            
+            cpts(net) <- cpts
+            
+            return(net)  
+          })

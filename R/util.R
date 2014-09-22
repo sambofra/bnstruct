@@ -294,3 +294,86 @@ ind2subv <- function(siz,index)
 # 	
 # 	return(order)
 # }
+
+
+factors.to.graph <- function(factors, sep = '(')
+{
+  # compute adjacency matrix from factor chain
+  # eg: (1)(2)(3|1,2)
+  # accepts '(' or '[' as separator character
+  # nodes are numbers from 1 to N
+  # DOES NOT CHECK FOR CORRECTNESS OF INPUT
+  l <- list()
+  if (sep == '(') {
+    sep1 = '('
+    sep2 = ')'
+  } else if (sep == '[') {
+    sep1 = '['
+    sep2 = ']'    
+  } else {
+    # error
+  }
+  
+  for (i in unlist(strsplit(factors, sep1, TRUE)))
+    for (j in unlist(strsplit(i, sep2, TRUE)))
+      l[[length(l)+1]] <- list(j)
+  
+  num_nodes = length(l)
+  am = matrix(rep(0, num_nodes*num_nodes), c(num_nodes,num_nodes))
+  for (i in l)
+  {
+    item <- unlist(strsplit(unlist(i), "|",TRUE))
+    if (length(item) > 1)
+    {
+      to <- as.integer(item[1])
+      for (j in unlist(strsplit(unlist(item[2]), ",", TRUE)))
+      {
+        from <- as.integer(j)
+        am[from,to] <- 1
+      }    
+    }
+  }
+  return(am)
+}
+
+graph.to.factors <- function(am, sep = '(')
+{
+  # compute factor chain from adjacency matrix
+  # accepts '(' or '[' as separator character
+  # nodes are numbers from 1 to N
+  # DOES NOT CHECK FOR CORRECTNESS OF INPUT
+  l <- list()
+  if (sep == '(') {
+    sep1 = '('
+    sep2 = ')'
+  } else if (sep == '[') {
+    sep1 = '['
+    sep2 = ']'    
+  } else {
+    # error
+  }
+  
+  factors <- c()
+  
+  # build up string node after node
+  for (i in 1:nrow(am))
+  {
+    factor = c(sep1,i)
+    parents <- which(am[,i] > 0)
+    if (length(parents) > 0)
+    {
+      factor <- c(factor,'|')
+      # build up parents
+      while(length(parents) > 1)
+      {
+        factor <- c(factor, parents[1],',')
+        parents <- parents[-1]
+      }
+      factor <- c(factor, parents[1])
+    }
+    factor <- c(factor,sep2)
+    factors <- c(factors, factor)
+  }
+  factors <- paste(unlist(factors), collapse='')
+  return(factors)
+}

@@ -207,6 +207,42 @@ setGeneric("query", function(x, observed.vars=c(), observed.vals=c(), ...) stand
 setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
 
 
+#' Read a network from a \code{.dsc} file.
+#' 
+#' Read a network described in a \code{.dsc}-formatted file, and
+#' build a \code{\link{BN}} object.
+#' 
+#' The method relies on a coherent ordering of variable values and parameters.
+#' 
+#' @name read.dsc
+#' @rdname read.dsc
+#' 
+#' @param x the \code{.dsc} file, with absolute/relative position.
+#' 
+#' @return a \code{\link{BN}} object.
+#' 
+#' @exportMethod read.dsc
+setGeneric("read.dsc", function(x) standardGeneric("read.dsc"))
+
+
+#' Read a network from a \code{.bif} file.
+#' 
+#' Read a network described in a \code{.bif}-formatted file, and
+#' build a \code{\link{BN}} object.
+#' 
+#' The method relies on a coherent ordering of variable values and parameters.
+#' 
+#' @name read.bif
+#' @rdname read.bif
+#' 
+#' @param x the \code{.bif} file, with absolute/relative position.
+#' 
+#' @return a \code{\link{BN}} object.
+#' 
+#' @exportMethod read.bif
+setGeneric("read.bif", function(x) standardGeneric("read.bif"))
+
+
 ###############################################################################
 ###############################################################################
 
