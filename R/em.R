@@ -99,9 +99,12 @@ setMethod("em",
                           jpt         <- jpt / sum(jpt)
                           #dimnames(jpt) <- dmnms
                           #names(dimnames(jpt)) <- nms
-                          out         <- marginalize(jpt, dd, v)
-                          jpt         <- out$potential
-                          dd          <- out$vars
+                          # out         <- marginalize(jpt, dd, v)
+                          # jpt         <- out$potential
+                          # dd          <- out$vars
+                          remaining <- (1:length(dd))[-which(dd == v)]
+                          dd <- dd[remaining]
+                          jpt <- apply(jpt, remaining, sum)
                         }
                         
                         if (length(dd) == 1 && !is.element(NaN,jpt) && !is.element(NA,jpt))

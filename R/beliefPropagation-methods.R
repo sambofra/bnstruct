@@ -351,13 +351,16 @@ setMethod("belief.propagation",
                   dms <- c(unlist(dimensions.contained[[target.clique]]))
                   vs  <- c(unlist(dim.vars[[node]]))
                   
-                  others <- setdiff(dms,vs)
-                  for (var in others)
-                  {
-                    out <- marginalize(pot, dms, var)
-                    pot <- out$potential
-                    dms <- out$vars
-                  }
+#                   others <- setdiff(dms,vs)
+#                   for (var in others)
+#                   {
+#                     out <- marginalize(pot, dms, var)
+#                     pot <- out$potential
+#                     dms <- out$vars
+#                   }
+                  remaining <- match(vs, dms)
+                  dms <- dms[remaining]
+                  pot <- apply(pot, remaining, sum)
                   pot <- pot / sum(pot)
                   
 #                   cat(node, " ", dms,"\n")
@@ -367,21 +370,25 @@ setMethod("belief.propagation",
                   {
                     pot.bak <- pot
                     dms.bak <- dms
-                    
-                    out <- marginalize(pot, dms, node)
-                    pot <- out$potential
+                    # readLines(file("stdin"),1)
+#                     out <- marginalize(pot, dms, node)
+#                     pot <- out$potential
+#                     dms <- out$vars
+                    remaining <- (1:length(dms))[-which(dms == node)]
+                    dms <- dms[remaining]
+                    pot <- apply(pot, remaining, sum)
                     pot <- pot / sum(pot)
                     out <- divide(pot.bak,
                                   dms.bak,
-                                  pot,
-                                  out$vars,
+                                  as.array(pot),
+                                  dms, # out$vars,
                                   node.sizes)
                     
                     pot <- out$potential
                     #pot <- pot / sum(pot)
                     dms <- out$vars
                   }
-                  
+                  pot <- as.array(pot)
                   dmns <- list(NULL)
                   for (i in length(dms))
                   {
@@ -427,15 +434,27 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
   
   # for all of the variables not in the separator, repeat marginalization
   # shrinking the prob.table
-  for (var in setdiff(vars.msg, sep))
-  {
-    if (length(intersect(var, dp)))
-    {
-      msg  <- marginalize(pot, dp, var)
-      pot  <- msg$potential
-      dp   <- msg$vars
-    }
-  }
+#   for (var in setdiff(vars.msg, sep))
+#   {
+#     if (length(intersect(var, dp)))
+#     {
+#       msg  <- marginalize(pot, dp, var)
+#       pot  <- msg$potential
+#       dp   <- msg$vars
+#     }
+#   }
+  
+  # othervars <- setdiff(dp, sep)
+  remaining <- match(sep, dp)
+  dp        <- dp[remaining] # rem.vars <- ...
+  pot <- apply(pot, remaining, sum)
+  
+#   if (sum(out) != sum(pot))
+#   {
+#     print(sum(out))
+#     print(sum(pot))
+#     readLines(file("stdin"),1)
+#   }
   
   return(list("potential"=pot, "vars"=dp))
 }
@@ -450,6 +469,8 @@ marginalize <- function(pot, vars, marg.var)
   # marg.var : variable to be marginalizes
   
   marg.dim <- which(unlist(vars, F, F) == marg.var)
+#   print("marg.dim")
+#   print(marg.dim)
   
   # get dimensions, compute dimensions for the soon-to-be-created prob. table
   # and number of the values that it will contain
@@ -468,10 +489,13 @@ marginalize <- function(pot, vars, marg.var)
   
   # switch dimensions, make prob.table  a linear array,
   cpt  <- aperm(pot, new.order)
-  marg <- c(cpt)
+  # marg <- c(cpt)
   
   # the marginalization is now done by summing consecutive values
-  marg <- tapply(marg, rep(1:new.num.vals, each=length.of.run), sum)
+  marg <- tapply(c(cpt), rep(1:new.num.vals, each=length.of.run), sum)
+  # marg <- rowSums(matrix(cpt, new.num.vals, length.of.run))
+  # marg <- aggregate(as.data.frame(marg), list(rep(1:new.num.vals, each=length.of.run)), sum)[,2]
+  # tapply is much faster than the conversion into a data.frame
   
   # apply new dimensions to resulting list (if needed)
   if (length(new.order.names) > 0)
@@ -735,6 +759,8 @@ sort.dimensions <- function(cpt, vars)
         break
       }
     }
+    
+    # is.ordered <- is.na(match(FALSE,sapply(1:(length(new.ordering)-1), function(x) new.ordering[x] >= new.ordering[x+1])))
     
     if (!is.ordered) # permute
     {

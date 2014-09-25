@@ -414,31 +414,12 @@ setMethod("sample.row",
 setMethod("sample.dataset",c("InferenceEngine"),
           function(x, n = 100)
           {
-            bnd <- BNDataset("")
-            
             if(test.updated.bn(x))
               net <- updated.bn(x)
             else
               net <- bn(x)
             
-            name(bnd)          <- name(net)
-            variables(bnd)     <- variables(net)
-            num.variables(bnd) <- num.nodes(net)
-            discreteness(bnd)  <- discreteness(net)
-            node.sizes(bnd)    <- node.sizes(net)
-            num.items(bnd)     <- n
-            
-            obs <- matrix(rep(0, num.variables(bnd) * n), nrow = n, ncol = num.variables(bnd))
-            
-            for (i in 1:n)
-            {
-              obs[i,] <- sample.row(net)
-            }
-            
-            storage.mode(obs) <- "integer"
-            raw.data(bnd)     <- obs
-            
-            return(bnd)
+            return(sample.dataset(net, n))
           })
 
 

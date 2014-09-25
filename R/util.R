@@ -336,11 +336,12 @@ factors.to.graph <- function(factors, sep = '(')
   return(am)
 }
 
-graph.to.factors <- function(am, sep = '(')
+graph.to.factors <- function(am, sep = '(', names = NULL)
 {
   # compute factor chain from adjacency matrix
   # accepts '(' or '[' as separator character
   # nodes are numbers from 1 to N
+  # names should be a vector containing the variable names
   # DOES NOT CHECK FOR CORRECTNESS OF INPUT
   l <- list()
   if (sep == '(') {
@@ -353,12 +354,28 @@ graph.to.factors <- function(am, sep = '(')
     # error
   }
   
+  if (missing(names) || is.null(names))
+  {
+    use.names <- FALSE
+  }
+  else
+  {
+    use.names <- TRUE
+  }
+  
   factors <- c()
   
   # build up string node after node
   for (i in 1:nrow(am))
   {
-    factor = c(sep1,i)
+    if (use.names)
+    {
+      factor <- c(sep1, names[i])
+    }
+    else
+    {
+      factor = c(sep1,i)
+    }
     parents <- which(am[,i] > 0)
     if (length(parents) > 0)
     {
@@ -366,10 +383,24 @@ graph.to.factors <- function(am, sep = '(')
       # build up parents
       while(length(parents) > 1)
       {
-        factor <- c(factor, parents[1],',')
+        if (use.names)
+        {
+          factor <- c(factor, names[parents[1]], ',')
+        }
+        else
+        {
+          factor <- c(factor, parents[1],',')
+        }
         parents <- parents[-1]
       }
-      factor <- c(factor, parents[1])
+      if (use.names)
+      {
+        factor <- c(factor, names[parents[1]])
+      }
+      else
+      {
+        factor <- c(factor, parents[1])
+      }
     }
     factor <- c(factor,sep2)
     factors <- c(factors, factor)
@@ -377,3 +408,27 @@ graph.to.factors <- function(am, sep = '(')
   factors <- paste(unlist(factors), collapse='')
   return(factors)
 }
+
+# concatenate strings: paste an arbitrary number of strings with default sep=''
+# input strings are not checked, be careful
+strcat <- function(..., sep = '')
+{
+  s <- ""
+  args <- list(...)
+  for (i in args)
+  {
+    s <- paste(s, as.character(i), sep=sep)
+  }
+  return(s)
+}
+
+fast.bincombinations <- function(p)
+{
+  # computes all the combinations of p elements
+  # many many thanks to
+  # http://stackoverflow.com/questions/13891604
+  return(vapply(X = seq_len(p),
+         FUN = function(i)rep(rep(0L:1L, each = 2^(p-i)), times = 2^(i-1)),
+         FUN.VALUE = integer(2^(p))))
+}
+
