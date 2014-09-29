@@ -110,17 +110,25 @@ setMethod("belief.propagation",
               for (cpt in 1:num.nodes)
               {
                 # find a suitable clique for the CPT of node `cpt` (a clique that contains node `cpt` and all of its parents)
+#                 target.clique <- which.min(lapply(1:num.cliqs,
+#                                                   function(x){
+#                                                     length(
+#                                                       which(unlist(
+#                                                         is.element(
+#                                                           c(unlist(dim.vars[[cpt]])),
+#                                                           c(cliques[[x]])
+#                                                         )
+#                                                       ) == FALSE) == 0)
+#                                                   }
+#                 ))
+                
                 target.clique <- which.min(lapply(1:num.cliqs,
                                                   function(x){
-                                                    length(
-                                                      which(unlist(
-                                                        is.element(
-                                                          c(unlist(dim.vars[[cpt]])),
-                                                          c(cliques[[x]])
-                                                        )
-                                                      ) == FALSE) == 0)
-                                                  }
-                ))
+                                                    length(which(!is.na(match(
+                                                      c(unlist(dim.vars[[cpt]])),
+                                                      c(cliques[[x]])
+                                                    )) == FALSE))
+                                                  }))
                 
                 # get the variables currently contained in the selected clique
                 ds <- unlist(dimensions.contained[[target.clique]], F, F)
@@ -335,17 +343,26 @@ setMethod("belief.propagation",
 #                 }
 #                 else
                 {
+                  dnode <- unlist(dim.vars[[node]], F, F)
+#                   target.clique <- which.min(lapply(1:num.cliqs,
+#                                                     function(x){
+#                                                       length(
+#                                                         which(c(
+#                                                           is.element(
+#                                                             dnode,
+#                                                             unlist(dimensions.contained[[x]])
+#                                                           )
+#                                                         ) == FALSE) == 0)
+#                                                     }
+#                   ))
+                  
                   target.clique <- which.min(lapply(1:num.cliqs,
-                                                    function(x){
-                                                      length(
-                                                        which(c(
-                                                          is.element(
-                                                            c(unlist(dim.vars[[node]])),
-                                                            c(unlist(dimensions.contained[[x]]))
-                                                          )
-                                                        ) == FALSE) == 0)
-                                                    }
-                  ))
+                                            function(x){
+                                              length(which(!is.na(match(
+                                                dnode,
+                                                unlist(dimensions.contained[[x]])
+                                              )) == FALSE))
+                                            }))
                   
                   pot <- potentials[[target.clique]]
                   dms <- c(unlist(dimensions.contained[[target.clique]]))
@@ -553,10 +570,12 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # It works like this:
   # - look for the common variables in vars1 and vars2;
   common.vars <- intersect(vars1, vars2)
-  common1 <- match  (vars1, common.vars)
-  common1 <- which(!is.na(common1), TRUE)
-  common2 <- match  (vars2, common.vars)
-  common2 <- which(!is.na(common2), TRUE)
+  #common1 <- match  (vars1, common.vars)
+  #common1 <- which(!is.na(common1), TRUE)
+  common1 <- match(common.vars, vars1)
+  #common2 <- match  (vars2, common.vars)
+  #common2 <- which(!is.na(common2), TRUE)
+  common2 <- match(common.vars, vars2)
 
   
   # - if the cpts share no common variables, we can multiply them with an outer product;
@@ -591,8 +610,9 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
                      (1:length(vars1))[-common1])
       cpt1      <- aperm(cpt1, new.order)
       vars1     <- vars1[new.order]
-      common1 <- match  (vars1, common.vars)
-      common1 <- which(!is.na(common1), TRUE)
+      # common1 <- match  (vars1, common.vars)
+      # common1 <- which(!is.na(common1), TRUE)
+      common1 <- match(common.vars, vars1)
     }
     
     # [a b c] ==> [a a b b c c]
@@ -613,8 +633,9 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
                      (1:length(vars2))[common2])
       cpt2      <- aperm(cpt2, new.order)
       vars2     <- vars2[new.order]
-      common2 <- match  (vars2, common.vars)
-      common2 <- which(!is.na(common2), TRUE)
+      # common2 <- match  (vars2, common.vars)
+      # common2 <- which(!is.na(common2), TRUE)
+      common2 <- match(common.vars, vars2)
     }
     
     # [a b c] ==> [a b c a b c]
@@ -697,8 +718,9 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - domain of the divisor is entirely contained into the one of the dividend;
   # - look for the common variables (all of the variables in vars2, some of them in vars1);
   common.vars <- intersect(vars1, vars2)
-  common1 <- match(vars1, common.vars)
-  common1 <- which(!is.na(common1), TRUE)# common1[!is.na(common1)]
+  # common1 <- match(vars1, common.vars)
+  # common1 <- which(!is.na(common1), TRUE)# common1[!is.na(common1)]
+  common1 <- match(common.vars, vars1)
   
   # - permute array dimensions for cpt1 putting the common variables in the first dimensions;
   if (length(vars1) > 1)
@@ -708,8 +730,9 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     ))
     vars1 <- c(vars1[(1:length(vars1))[common1]],
                vars1[(1:length(vars1))[-common1]])
-    common1 <- match  (vars1, common.vars)
-    common1 <- which(!is.na(common1), TRUE) # common1[!is.na(common1)]
+    # common1 <- match  (vars1, common.vars)
+    # common1 <- which(!is.na(common1), TRUE) # common1[!is.na(common1)]
+    common1 <- match(common.vars, vars1)
   }
   
   # - unlist cpt2 and repeat it as many times as needed (product of cardinality
