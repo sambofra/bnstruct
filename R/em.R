@@ -27,7 +27,10 @@ setMethod("em",
             # raw.data   <- get.imputed.data(dataset)
             raw.data   <- get.raw.data(dataset)
             imputed.data <- get.imputed.data(dataset)
-            orig.bn    <- bn(x)
+            if (test.updated.bn(x))
+              orig.bn <- updated.bn(x)
+            else
+              orig.bn    <- bn(x)
             bak.bn     <- orig.bn
             bn         <- orig.bn
             eng        <- x
@@ -39,8 +42,9 @@ setMethod("em",
             cliques    <- jt.cliques(x)
             
             # ndataset <- dataset
-            difference <- threshold + 1
-            while(difference > threshold)
+            first.iteration <- TRUE
+            difference      <- threshold + 1
+            while(difference > threshold || first.iteration)
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
               eng      <- belief.propagation(eng,bn)            
@@ -180,8 +184,11 @@ setMethod("em",
               
               bn <- learn.params(bn, dataset)
 
-              difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
-              # print(difference)
+              if (first.iteration)
+                first.iteration <- FALSE
+              else
+                difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
+              print(difference)
               # readLines(file("stdin"),1)
               orig.bn <- bn
             }

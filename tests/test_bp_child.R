@@ -24,13 +24,14 @@ slot(net, "variables") <- mydata@variables
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3)
 print(net)
-net <- learn.structure(net, mydata, "sm", scoring.func = "BDeu",
-layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
-   0  1  1  1  1
-   0  1  1  1  1
-   0  0  8  7  7
-   0  0  0 14  6
-   0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
+net <- learn.structure(net, mydata, algo="mmhc", scoring.func = "BIC")
+# net <- learn.structure(net, mydata, algo="sm", scoring.func = "BIC",
+# layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
+#    0  1  1  1  1
+#    0  1  1  1  1
+#    0  0  8  7  7
+#    0  0  0 14  6
+#    0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
 net <- learn.params(net, mydata)
 # 
 print(net)
@@ -57,7 +58,9 @@ inf.eng <- belief.propagation(inf.eng)
 # readLines(file("stdin"),1)
 # plot(updated.bn(inf.eng))
 
-print(em(inf.eng, mydata))
+# em(inf.eng, mydata)
+out <- sem(inf.eng, mydata, struct.threshold = 0)
+print(out)
 
 # print(bn(inf.eng))
 # readLines(file("stdin"),1)

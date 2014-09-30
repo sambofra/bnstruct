@@ -109,8 +109,9 @@ setMethod("learn.structure",
             else {
               scoring.func <- scoring.func - 1
             }
-            
+            scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
 
+            
             if (algo == "sm")
             {
               if (bootstrap)
@@ -128,13 +129,12 @@ setMethod("learn.structure",
                 wpdag(bn) <- finalPDAG
               }
               else
-              {                
+              {     
                 dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers, ess)
               }
-              return(bn)
             }
             
-            # if (algo == "mmhc") # default
+            if (algo == "mmhc") # default
             {
               if (bootstrap)
               {
@@ -155,8 +155,10 @@ setMethod("learn.structure",
                 cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
-              return(bn)
             }
+            struct.algo(bn) <- algo
+            
+            return(bn)
           })
 
 counts.to.probs <- function( counts )

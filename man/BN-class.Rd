@@ -5,7 +5,7 @@
 \alias{BN,BN-class}
 \alias{BN-class}
 \alias{initialize,BN-method}
-\title{BN class.}
+\title{BN class definition.}
 \usage{
 \S4method{initialize}{BN}(.Object, dataset = NULL, ...)
 
@@ -23,7 +23,7 @@ are considered only if a starting dataset is provided.}
 BN object.
 }
 \description{
-BN class.
+BN class definition.
 
 Instantiate a \code{\link{BN}} object.
 }
@@ -43,6 +43,8 @@ This is usually viable only if the user already has knowledge about the network 
   \item{\code{cpts}:}{list of conditional probability tables of the network}
   \item{\code{dag}:}{adjacency matrix of the network}
   \item{\code{wpdag}:}{weighted partially dag}
+  \item{\code{scoring.func}:}{scoring function used in structure learning (when performed)}
+  \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
 }
 }
 \examples{

@@ -166,6 +166,14 @@ setMethod("dag", "BN", function(x) { return(slot(x, "dag")) } )
 #' @rdname wpdag
 setMethod("wpdag", "BN", function(x) { return(slot(x, "wpdag")) } )
 
+#' @aliases scoring.func,BN
+#' @rdname scoring.func
+setMethod("scoring.func", "BN", function(x) { return(slot(x, "scoring.func")) } )
+
+#' @aliases struct.algo,BN
+#' @rdname struct.algo
+setMethod("struct.algo", "BN", function(x) { return(slot(x, "struct.algo") ) } )
+
 #' @name name<-
 #' @aliases name<-,BN-method
 #' @docType methods
@@ -277,6 +285,32 @@ setReplaceMethod("wpdag",
                  {
                    slot(x, "wpdag") <- value
                    validObject(x)
+                   return(x)
+                 })
+
+
+#' @name scoring.func<-
+#' @aliases scoring.func<-,BN-method
+#' @docType methods
+#' @rdname scoring.func-set
+setReplaceMethod("scoring.func",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "scoring.func") <- value
+                   return(x)
+                 })
+
+
+#' @name struct.algo<-
+#' @aliases struct.algo<-,BN-method
+#' @docType methods
+#' @rdname struct.algo-set
+setReplaceMethod("struct.algo",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "struct.algo") <- value
                    return(x)
                  })
 

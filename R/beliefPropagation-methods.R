@@ -325,6 +325,9 @@ setMethod("belief.propagation",
               discreteness(nbn) <- discreteness(net)
               dag(nbn)          <- dag(net)
               wpdag(nbn)        <- wpdag(net)
+              scoring.func(nbn) <- scoring.func(net)
+              struct.algo(nbn)  <- struct.algo(net)
+
               ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
               
               for (node in 1:num.nodes)
@@ -462,7 +465,7 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
 #   }
   
   # othervars <- setdiff(dp, sep)
-  remaining <- match(sep, dp)
+  remaining <- match(intersect(dp,sep), dp)
   dp        <- dp[remaining] # rem.vars <- ...
   pot <- apply(pot, remaining, sum)
   

@@ -239,7 +239,7 @@ setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
 #' Read a network described in a \code{.dsc}-formatted file, and
 #' build a \code{\link{BN}} object.
 #' 
-#' The method relies on a coherent ordering of variable values and parameters.
+#' The method relies on a coherent ordering of variable values and parameters in the file.
 #' 
 #' @name read.dsc
 #' @rdname read.dsc
@@ -257,7 +257,7 @@ setGeneric("read.dsc", function(x) standardGeneric("read.dsc"))
 #' Read a network described in a \code{.bif}-formatted file, and
 #' build a \code{\link{BN}} object.
 #' 
-#' The method relies on a coherent ordering of variable values and parameters.
+#' The method relies on a coherent ordering of variable values and parameters in the file.
 #' 
 #' @name read.bif
 #' @rdname read.bif
@@ -268,6 +268,102 @@ setGeneric("read.dsc", function(x) standardGeneric("read.dsc"))
 #' 
 #' @exportMethod read.bif
 setGeneric("read.bif", function(x) standardGeneric("read.bif"))
+
+
+#' Read a network from a \code{.net} file.
+#' 
+#' Read a network described in a \code{.net}-formatted file, and
+#' build a \code{\link{BN}} object.
+#' 
+#' The method relies on a coherent ordering of variable values and parameters in the file.
+#' 
+#' @name read.net
+#' @rdname read.net
+#' 
+#' @param x the \code{.net} file, with absolute/relative position.
+#' 
+#' @return a \code{\link{BN}} object.
+#' 
+#' @exportMethod read.net
+setGeneric("read.net", function(x) standardGeneric("read.net"))
+
+
+#' Write a network saving it in a \code{.dsc} file.
+#' 
+#' Write a network on disk, saving it in a \code{.dsc}-formatted file.
+#' 
+#' @name write.dsc
+#' @rdname write.dsc
+#' 
+#' @param x the \code{\link{BN}} object.
+#' @param path the relative or absolute path of the directory of the created file.
+#' 
+#' @exportMethod write.dsc
+setGeneric("write.dsc", function(x, path="./") standardGeneric("write.dsc"))
+
+
+#' Read the scoring function used to learn the structure of a network.
+#' 
+#' Read the scoring function used in the \code{\link{learn.structure}} method.
+#' Outcome is meaningful only if the structure of a network has been learnt.
+#' 
+#' @name scoring.func
+#' @rdname scoring.func
+#' 
+#' @param x the \code{\link{BN}} object.
+#' 
+#' @return the scoring function used.
+#' 
+#' @exportMethod scoring.func
+setGeneric("scoring.func", function(x) standardGeneric("scoring.func"))
+
+
+#' Set the scoring function used to learn the structure of a network.
+#' 
+#' Set the scoring function used in the \code{\link{learn.structure}} method.
+#' 
+#' @name scoring.func<-
+#' @rdname scoring.func-set
+#' 
+#' @param x the \code{\link{BN}} object.
+#' @param value the scoring function used.
+#' 
+#' @return updated BN.
+#' 
+#' @exportMethod scoring.func<-
+setGeneric("scoring.func<-", function(x, value) standardGeneric("scoring.func<-"))
+
+
+#' Read the algorithm used to learn the structure of a network.
+#' 
+#' Read the algorithm used in the \code{\link{learn.structure}} method.
+#' Outcome is meaningful only if the structure of a network has been learnt.
+#' 
+#' @name struct.algo
+#' @rdname struct.algo
+#' 
+#' @param x the \code{\link{BN}} object.
+#' 
+#' @return the structure learning algorithm used.
+#' 
+#' @exportMethod struct.algo
+setGeneric("struct.algo", function(x) standardGeneric("struct.algo"))
+
+
+#' Set the algorithm used to learn the structure of a network.
+#' 
+#' Set the algorithm used in the \code{\link{learn.structure}} method.
+#' 
+#' @name struct.algo<-
+#' @rdname struct.algo-set
+#' 
+#' @param x the \code{\link{BN}} object.
+#' @param value the scoring function used.
+#' 
+#' @return updated BN.
+#' 
+#' @exportMethod struct.algo<-
+setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 
 
 ###############################################################################
@@ -670,6 +766,53 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' 
 #' @exportMethod em
 setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) standardGeneric("em"))
+
+
+#' Structural Expectation-Maximization algorithm.
+#' 
+#' Learn struvture and parameters of a network with the Structural EM algorithm.
+#' 
+#' @name sem
+#' @rdname sem
+#' 
+#' @param x an \code{\link{InferenceEngine}}
+#' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
+#' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
+#' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
+#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
+#' @param alpha confidence threshold (only for \code{mmhc}).
+#' @param ess Equivalent Sample Size value.
+#' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param num.boots number of bootstrap samples to generate, if needed.
+#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param cont.nodes vector containing the index of continuous variables.
+#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
+#'     (if available, otherwise the raw dataset will be used anyway).
+#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
+#' @param na.string.symbol symbol for \code{NA} values (missing data).
+#' @param seed random seed.
+#' @param ... further potential arguments for method.
+#' 
+#' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
+#'         and the imputed dataset (\code{"BNDataset"}).
+#'
+#' @examples
+#' \dontrun{
+#' sem(x, dataset)
+#' }
+#' 
+#' @exportMethod sem
+setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10, 
+                           algo = "mmhc", scoring.func = "BDeu",
+                           alpha = 0.05, ess = 1, bootstrap = FALSE,
+                           layering = c(), max.fanin.layers = NULL,
+                           max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+                           num.boots = 100, imputation = TRUE, na.string.symbol='?',
+                           seed = 0, ...) standardGeneric("sem"))
 
 
 ###############################################################################

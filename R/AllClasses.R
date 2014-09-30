@@ -11,7 +11,7 @@ setClassUnion("vectorOrNULL", c("vector", "NULL"))
 #
 ###############################################################################
 
-#' BN class.
+#' BN class definition.
 #' 
 #' @section Slots:
 #' \describe{
@@ -24,6 +24,8 @@ setClassUnion("vectorOrNULL", c("vector", "NULL"))
 #'   \item{\code{cpts}:}{list of conditional probability tables of the network}
 #'   \item{\code{dag}:}{adjacency matrix of the network}
 #'   \item{\code{wpdag}:}{weighted partially dag}
+#'   \item{\code{scoring.func}:}{scoring function used in structure learning (when performed)}
+#'   \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
 #' }
 #' 
 #' @name BN-class
@@ -41,7 +43,9 @@ setClass("BN",
            node.sizes   = "numeric",
            cpts         = "list",
            dag          = "matrix",
-           wpdag        = "matrix"
+           wpdag        = "matrix",
+           scoring.func = "character",
+           struct.algo  = "character"
          ),
          prototype(
            name         = "",
@@ -51,7 +55,9 @@ setClass("BN",
            node.sizes   = c(0),
            cpts         = list(NULL),
            dag          = matrix(),
-           wpdag        = matrix()
+           wpdag        = matrix(),
+           scoring.func = "",
+           struct.algo  = ""
          )
         )
 
