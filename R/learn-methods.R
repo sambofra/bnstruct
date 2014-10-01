@@ -110,7 +110,6 @@ setMethod("learn.structure",
               scoring.func <- scoring.func - 1
             }
             scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
-
             
             if (algo == "sm")
             {

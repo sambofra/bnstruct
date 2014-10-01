@@ -466,8 +466,11 @@ compute.message <- function(pot, dp, vfrom, vto, node.sizes)
   
   # othervars <- setdiff(dp, sep)
   remaining <- match(intersect(dp,sep), dp)
-  dp        <- dp[remaining] # rem.vars <- ...
-  pot <- apply(pot, remaining, sum)
+  if (length(remaining) > 0)
+  {
+    dp        <- dp[remaining] # rem.vars <- ...
+    pot <- apply(pot, remaining, sum)
+  }
   
 #   if (sum(out) != sum(pot))
 #   {
@@ -704,6 +707,9 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     cpt1 <- cpt2
     cpt2 <- tmp
   }
+#   print("--")
+#   print(vars1)
+#   print(vars2)
   
   # For (my) simplicity, cpts are managed with the variables (and therefore dimensions) in ascending order.
   # Check this requirement, and take action if it is not met.
@@ -721,6 +727,8 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - domain of the divisor is entirely contained into the one of the dividend;
   # - look for the common variables (all of the variables in vars2, some of them in vars1);
   common.vars <- intersect(vars1, vars2)
+  if (length(common.vars) == 0)
+    return(list("potential"=cpt1, "vars"=vars1))
   # common1 <- match(vars1, common.vars)
   # common1 <- which(!is.na(common1), TRUE)# common1[!is.na(common1)]
   common1 <- match(common.vars, vars1)
@@ -759,6 +767,7 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
                  })
   
   # - rebuild array with corresponding dimensions, and permute dimensions to reconstruct order
+  #print(cpt1)
   cpt1 <- array(c(cpt1), node.sizes[vars1])
   out  <- sort.dimensions(cpt1, vars1)
   

@@ -17,9 +17,13 @@ setMethod("sem",
             
             if (missing(algo))
               struct.algo  <- struct.algo(net)
+            else
+              struct.algo  <- algo
             
             if (missing(scoring.func))
               scoring.func <- scoring.func(net)
+            else
+              scoring.func <- scoring.func
 
             w.net     <- net
             w.dataset <- dataset

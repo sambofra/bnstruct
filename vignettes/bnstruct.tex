@@ -298,7 +298,7 @@ The following code will create an empty \Robject{BN} object for the \texttt{Chil
 
 Now, starting from the empty network and the dataset, we can proceed with the tasks of structure and parameter learning.
 
-\subsection{Structure learning}
+\subsection{Structure learning}\label{sec:structurelearning}
 When constructing a network starting from a dataset, the first operation we may want to perform is to learn
 the structure of the network. \Rpackage{bnstruct} provides the \Rmethod{learn.structure} method for this task.
 \begin{Schunk}
@@ -502,10 +502,13 @@ of the same variable, only the last one is considered.
 \end{Schunk}
 
 \subsection{The Expectation-Maximization algorithm}
-\Rpackage{bnstruct} can also use an \Robject{InferenceEngine} and a \Robject{BNDataset} to perform
+Package \Rpackage{bnstruct} can also use an \Robject{InferenceEngine} and a \Robject{BNDataset} to perform
 the Expectation-Maximization algorithm to estimate the parameters of the network.
 It suffices to use the \Rmethod{em} method, that returns an \Robject{InferenceEngine} containing
 an updated network with the newly estimated conditional probability tables.
+
+It is possible to control the algorithm by specifying the \Rfunarg{threshold} parameter, that specifies a threshold
+for the convergence of the algorithm.
 \begin{Schunk}
 \begin{Sinput}
 > dataset <- child() # or any other way to create a custom BNDataset
@@ -514,9 +517,36 @@ an updated network with the newly estimated conditional probability tables.
 > net     <- learn.params(net, dataset)
 > inf.eng <- InferenceEngine(net)
 > inf.eng <- em(inf.eng, dataset)
+> print(updated.bn(inf.eng))
+\end{Sinput}
+\end{Schunk}
+
+\subsection{The Structural EM algorithm}
+We provide an implementation of the Structural Expectation-Maximization algorithm
+(\citet{friedman1997learning,friedman1998bayesian}),
+in order to learn both the structure and the parameters of a network in case of a dataset containing missing values.
+The method provided is \Rmethod{sem}. It accepts as parameters an \Robject{InferenceEngine} and a \Robject{BNDataset}.
+Also this method can be controlled with thresholds for the structure learning and the parameter learning steps, namely
+\Rfunarg{struct.threshold} and \Rfunarg{param.threshold}.
+
+The method accepts also all of the parameters available for the structure learning method (see section \ref{sec:structurelearning}).
+However, the method is designed in order to follow as much as possible the settings of the original learning, whenever possible.
+For example, it is strongly recommended to adopt the same scoring function used in the learning of the network structure.
+If the network has been first learnt using \Rpackage{bnstruct}, the method will take care of that;
+in case of network read from a file, this is left to the user.
+
+\begin{Schunk}
+\begin{Sinput}
+> dataset <- child() # or any other way to create a custom BNDataset
+> net     <- BN(dataset)
+> net     <- learn.structure(net, dataset)
+> net     <- learn.params(net, dataset)
+> inf.eng <- InferenceEngine(net)
+> inf.eng <- sem(inf.eng, dataset)
 > plot(updated.bn(inf.eng))
 \end{Sinput}
 \end{Schunk}
+
 
 \section{Other utilities}
 \subsection{Sample data}

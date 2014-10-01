@@ -24,7 +24,7 @@ slot(net, "variables") <- mydata@variables
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3)
 print(net)
-net <- learn.structure(net, mydata, algo="mmhc", scoring.func = "BIC")
+net <- learn.structure(net, mydata, algo="mmhc", scoring.func = "AIC")
 # net <- learn.structure(net, mydata, algo="sm", scoring.func = "BIC",
 # layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
 #    0  1  1  1  1
@@ -33,36 +33,22 @@ net <- learn.structure(net, mydata, algo="mmhc", scoring.func = "BIC")
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
 net <- learn.params(net, mydata)
-# 
-print(net)
-#print(wpdag(net))
-# lapply(net@cpts, sum)
-# # readLines(file("stdin"),1)
-# 
-# print(net)
 
-# readLines(file("stdin"),1)
+print(net)
 
 inf.eng <- InferenceEngine(net)
-# inf.eng <- build.junction.tree(inf.eng, net@dag)
 
 print(inf.eng)
-# readLines(file("stdin"),1)
 
 observations(inf.eng) <- list(c(3,5,9,19), rep(2,4))
 inf.eng <- belief.propagation(inf.eng)
 
-# marginals(inf.eng)
-
-# plot(net)
-# readLines(file("stdin"),1)
-# plot(updated.bn(inf.eng))
-
 # em(inf.eng, mydata)
-out <- sem(inf.eng, mydata, struct.threshold = 0)
+out <- sem(inf.eng, mydata, struct.threshold = 0)#, algo="sm", scoring.func = "AIC",
+#            layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
+#    0  1  1  1  1
+#    0  1  1  1  1
+#    0  0  8  7  7
+#    0  0  0 14  6
+#    0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
 print(out)
-
-# print(bn(inf.eng))
-# readLines(file("stdin"),1)
-# print(updated.bn(inf.eng))
-# readLines(file("stdin"),1)
