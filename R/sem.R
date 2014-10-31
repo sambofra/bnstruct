@@ -29,8 +29,15 @@ setMethod("sem",
             w.dataset <- dataset
             w.eng     <- InferenceEngine(net) #x
             
-            if (scoring.func == "BDeu")
-              next
+#             if (scoring.func == "BDeu")
+#             {
+#               repeat
+#               {
+#                 difference <- shd(dag(w.net), dag(new.net))
+#                 print(difference)
+#                 if (difference <= struct.threshold) break
+#               }
+#             }
             
             if (scoring.func == "AIC" || scoring.func == "BIC")
             {
