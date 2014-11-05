@@ -6,10 +6,12 @@
 \alias{em,InferenceEngine,BNDataset-method}
 \title{expectation-maximization algorithm.}
 \usage{
-em(x, dataset, threshold = 0.001, k.impute = 10, ...)
+em(x, dataset, threshold = params@em_convergence,
+  k.impute = params@k.impute, ..., params)
 
-\S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001,
-  k.impute = 10, ...)
+\S4method{em}{InferenceEngine,BNDataset}(x, dataset,
+  threshold = params@em_convergence, k.impute = params@k.impute, ...,
+  params)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
@@ -21,6 +23,8 @@ em(x, dataset, threshold = 0.001, k.impute = 10, ...)
 \item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
 \item{...}{further potential arguments for method.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \value{
 a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
@@ -31,7 +35,7 @@ Learn parameters of a network using the Expectation-Maximization algorithm.
 }
 \examples{
 \dontrun{
-em(x, dataset)
+em(x, dataset, params = params)
 }
 }
 

@@ -6,9 +6,9 @@
 \alias{impute,BNDataset-method}
 \title{Impute a \code{\link{BNDataset}} raw data with missing values.}
 \usage{
-impute(object, k.impute = 10)
+impute(object, k.impute = params@k.impute, ..., params)
 
-\S4method{impute}{BNDataset}(object, k.impute = 10)
+\S4method{impute}{BNDataset}(object, k.impute = params@k.impute, params)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -16,6 +16,8 @@ impute(object, k.impute = 10)
 \item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
 \item{...}{potential further arguments of methods.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \description{
 Impute a \code{\link{BNDataset}} raw data with missing values.
@@ -24,7 +26,7 @@ Impute a \code{\link{BNDataset}} raw data with missing values.
 \dontrun{
 dataset <- BNDataset()
 dataset <- read.dataset(dataset, "file.header", "file.data")
-dataset <- impute(dataset)
+dataset <- impute(dataset, params = myparams)
 }
 }
 

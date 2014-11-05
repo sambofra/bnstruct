@@ -1,0 +1,3 @@
+PKG_CFLAGS=-m64 -fPIC
+PKG_CPPFLAGS=-I/opt/ibm/ILOG/CPLEX_Studio125/cplex/include -DIL_STD
+PKG_LIBS=-L/opt/ibm/ILOG/CPLEX_Studio125/cplex/lib/x86-64_sles10_4.1/static_pic -L. -lcplex -m64 -lm -pthread

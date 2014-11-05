@@ -6,9 +6,9 @@
 \alias{learn.params,BN,BNDataset-method}
 \title{learn the parameters of a \link{BN}.}
 \usage{
-learn.params(bn, dataset, ess = 1, ...)
+learn.params(bn, dataset, ess = params@ess, ..., params)
 
-\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = 1)
+\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = params@ess, params)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -18,6 +18,8 @@ learn.params(bn, dataset, ess = 1, ...)
 \item{ess}{Equivalent Sample Size value.}
 
 \item{...}{potential further arguments of methods.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \value{
 new \code{\link{BN}} object with conditional probabilities.
@@ -33,7 +35,7 @@ dataset <- BNDataset(name = "MyDataset")
 dataset <- read.dataset(dataset, "file.header", "file.data")
 bn <- BN()
 bn <- learn.structure(bn, dataset)
-bn <- learn.params(bn, dataset, ess=1)
+bn <- learn.params(bn, dataset, ess=1, params)
 }
 }
 

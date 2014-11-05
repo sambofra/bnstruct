@@ -7,17 +7,17 @@
 \alias{initialize,BN-method}
 \title{BN class definition.}
 \usage{
-\S4method{initialize}{BN}(.Object, dataset = NULL, ...)
+\S4method{initialize}{BN}(.Object, ...)
 
 BN(dataset = NULL, ...)
 }
 \arguments{
 \item{.Object}{a BN}
 
+\item{...}{potential further arguments of methods.}
+
 \item{dataset}{a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
 are considered only if a starting dataset is provided.}
-
-\item{...}{potential further arguments of methods.}
 }
 \value{
 BN object.

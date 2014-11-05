@@ -2,13 +2,14 @@
 #' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10,
-                   algo = "mmhc", scoring.func = "BDeu",
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(x, dataset, struct.threshold = params@sem_convergence,
+                   param.threshold = params@em_convergence, k.impute = params@k.impute,
+                   algo = params@learning.algo, scoring.func = params@scoring.func,
+                   alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                   num.boots = 100, imputation = TRUE, na.string.symbol='?',
-                   seed = 0,...)
+                   num.boots = params@num.boots, imputation = TRUE, na.string.symbol='?',
+                   seed = params@seed, ..., params)
           {
             if(test.updated.bn(x))
               net <- updated.bn(x)
@@ -38,7 +39,7 @@ setMethod("sem",
               {
                 #w.eng     <- InferenceEngine(w.net)
                 
-                out <- em(w.eng, dataset, param.threshold, k.impute, ...)
+                out <- em(w.eng, dataset, param.threshold, k.impute, ...,  params)
                 
                 new.eng     <- out$InferenceEngine
                 new.dataset <- out$BNDataset
@@ -48,7 +49,7 @@ setMethod("sem",
                                            layering = layering, max.fanin.layers = max.fanin.layers,
                                            max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data,
                                            num.boots = num.boots, imputation = imputation, na.string.symbol=na.string.symbol,
-                                           seed = seed, ...)
+                                           seed = seed, ..., params)
                 
                 difference <- shd(dag(w.net), dag(new.net))
                 print(difference)

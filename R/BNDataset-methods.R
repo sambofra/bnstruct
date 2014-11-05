@@ -501,7 +501,7 @@ setMethod("print",
 #' @aliases impute,BNDataset
 setMethod("impute",
           "BNDataset",
-          function(object, k.impute = 10)
+          function(object, k.impute = params@k.impute, params)
           {
             # assumes raw data is ok
             object@imputed.data <- knn.impute(object@raw.data, k.impute,
@@ -514,7 +514,8 @@ setMethod("impute",
 #' @aliases bootstrap,BNDataset
 setMethod("bootstrap",
           "BNDataset",
-          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10, na.string.symbol = '?', ...)
+          function(object, num.boots = params@num.boots, seed = params@seed,
+                   imputation = FALSE, k.impute = params@k.impute, na.string.symbol = '?', ..., params)
           {
             # assumes raw data is ok
             object@has.boots <- TRUE

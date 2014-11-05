@@ -6,20 +6,24 @@
 \alias{sem,InferenceEngine,BNDataset-method}
 \title{Structural Expectation-Maximization algorithm.}
 \usage{
-sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
-  k.impute = 10, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05,
-  ess = 1, bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, na.string.symbol = "?", seed = 0,
-  ...)
-
-\S4method{sem}{InferenceEngine,BNDataset}(x, dataset, struct.threshold = 10,
-  param.threshold = 0.001, k.impute = 10, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+sem(x, dataset, struct.threshold = params@sem_convergence,
+  param.threshold = params@em_convergence, k.impute = params@k.impute,
+  algo = params@learning.algo, scoring.func = params@scoring.func,
+  alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, na.string.symbol = "?", seed = 0,
-  ...)
+  num.boots = params@num.boots, imputation = TRUE, na.string.symbol = "?",
+  seed = params@seed, ..., params)
+
+\S4method{sem}{InferenceEngine,BNDataset}(x, dataset,
+  struct.threshold = params@sem_convergence,
+  param.threshold = params@em_convergence, k.impute = params@k.impute,
+  algo = params@learning.algo, scoring.func = params@scoring.func,
+  alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+  num.boots = params@num.boots, imputation = TRUE, na.string.symbol = "?",
+  seed = params@seed, ..., params)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}}
@@ -62,6 +66,8 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 \item{seed}{random seed.}
 
 \item{...}{further potential arguments for method.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \value{
 a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),

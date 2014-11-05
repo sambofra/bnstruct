@@ -1,3 +1,6 @@
+#' @include aaConstants.R
+NULL
+
 setClassUnion("missingOrNumeric", c("missing","numeric"))
 setClassUnion("missingOrLogical", c("missing","logical"))
 setClassUnion("missingOrInteger", c("missing","integer"))
@@ -211,3 +214,66 @@ setClass("InferenceEngine",
 
 ####
 setClassUnion("AllTheClasses", c("BN", "BNDataset", "InferenceEngine"))
+
+
+###############################################################################
+#
+# BNParams class
+#
+###############################################################################
+
+#' BNParams class
+#' 
+#' Contains all of the parameters available for the algorithms contained in the package.
+#' 
+#' @slot CPX_PARAM_SCRIND = "numeric",
+#' @slot CPX_PARAM_PRELINEAR = "numeric",
+#' @slot CPX_PARAM_PREIND = "numeric",
+#' @slot CPX_PARAM_MIPCBREDLP = "numeric",
+#' @slot CPX_PARAM_MIPSEARCH = "numeric",
+#' @slot cplex_presolve_algo = "numeric"
+#'
+#' 
+#' @name BNParams-class
+#' @docType class
+#' @rdname BNParams-class
+#' @aliases BNParams,BNParams-class
+#' 
+#' @exportClass BNParams
+setClass("BNParams",
+         representation(
+           ess                  = "numeric",
+           alpha                = "numeric",
+           learning.algo        = "character",
+           scoring.func         = "character",
+           num.boots            = "numeric",
+           k.impute             = "numeric",
+           seed                 = "integer",
+           em_convergence       = "numeric",
+           sem_convergence      = "numeric",
+           CPX_PARAM_PRELINEAR  = "integer",
+           CPX_PARAM_SCRIND     = "integer",
+           CPX_PARAM_PREIND     = "integer",
+           CPX_PARAM_MIPCBREDLP = "integer",
+           CPX_PARAM_MIPSEARCH  = "integer",
+           cplex_presolve_algo  = "integer"
+         ),
+         prototype(
+           ess                  = 1,
+           alpha                = 0.05,
+           learning.algo        = "mmhc",
+           scoring.func         = "BDeu",
+           num.boots            = 100,
+           k.impute             = 10,
+           seed                 = 0L,
+           em_convergence       = 0.001,
+           sem_convergence      = 0,
+           CPX_PARAM_PRELINEAR  = 0L,
+           CPX_PARAM_SCRIND     = CPX_ON,
+           CPX_PARAM_PREIND     = CPX_OFF,
+           CPX_PARAM_MIPCBREDLP = CPX_OFF,
+           CPX_PARAM_MIPSEARCH  = CPX_MIPSEARCH_TRADITIONAL,
+           cplex_presolve_algo  = CPX_ALG_NONE
+         )
+        )
+

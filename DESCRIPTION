@@ -10,9 +10,34 @@ Depends:
     Matrix,
     methods
 Suggests:
-    Rgraphviz
+    Rgraphviz,
+    cplexAPI
 Author: Francesco Sambo
 Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
 Description: More about what it does (maybe more than one line)
 License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
+Collate:
+    'aaConstants.R'
+    'AllClasses.R'
+    'AllGenerics.R'
+    'BN-methods.R'
+    'BNDataset-methods.R'
+    'BNParams-methods.R'
+    'InferenceEngine-methods.R'
+    'JunctionTree-methods.R'
+    'beliefPropagation-methods.R'
+    'buildJunctionTree-methods.R'
+    'cpdag.R'
+    'datasets.R'
+    'edge.orientation.R'
+    'em.R'
+    'imputation.R'
+    'init.R'
+    'io-methods.R'
+    'io.R'
+    'learn-methods.R'
+    'mmhc.R'
+    'sem.R'
+    'sm.R'
+    'util.R'

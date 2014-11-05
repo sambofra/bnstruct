@@ -8,13 +8,15 @@
 \usage{
 read.dataset(object, header.file, data.file, imputation = FALSE,
   header.flag = FALSE, na.string.symbol = "?", sep.symbol = "",
-  k.impute = 10, bootstrap = FALSE, num.boots = 100, seed = 0,
-  starts.from = 0, ...)
+  k.impute = params@k.impute, bootstrap = FALSE,
+  num.boots = params@num.boots, seed = params@seed, starts.from = 0, ...,
+  params)
 
 \S4method{read.dataset}{BNDataset,character,character}(object, header.file,
   data.file, imputation = FALSE, header.flag = FALSE,
-  na.string.symbol = "?", sep.symbol = "", k.impute = 10,
-  bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+  na.string.symbol = "?", sep.symbol = "", k.impute = params@k.impute,
+  bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
+  starts.from = 0, ..., params)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -42,6 +44,8 @@ read.dataset(object, header.file, data.file, imputation = FALSE,
 \item{starts.from}{starting value for entries in the dataset (observed values, default is 0).}
 
 \item{...}{potential further arguments of methods.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \description{
 File has to be in format (describe...)
@@ -49,7 +53,7 @@ File has to be in format (describe...)
 \examples{
 \dontrun{
 dataset <- BNDataset()
-dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
+dataset <- read.dataset(dataset, header="file.header", dataset="file.data", params = myparams)
 }
 }
 

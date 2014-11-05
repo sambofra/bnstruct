@@ -6,19 +6,22 @@
 \alias{learn.structure,BN,BNDataset-method}
 \title{learn the structure of a network.}
 \usage{
-learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+learn.structure(bn, dataset, algo = params@learning.algo,
+  scoring.func = params@scoring.func, alpha = params@alpha,
+  ess = params@ess, bootstrap = FALSE, layering = c(),
   max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  cont.nodes = c(), raw.data = FALSE, num.boots = 100,
-  imputation = TRUE, k.impute = 10, na.string.symbol = "?", seed = 0,
-  ...)
+  cont.nodes = c(), raw.data = FALSE, num.boots = params@num.boots,
+  imputation = TRUE, k.impute = params@k.impute, na.string.symbol = "?",
+  seed = params@seed, ..., params)
 
-\S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+\S4method{learn.structure}{BN,BNDataset}(bn, dataset,
+  algo = params@learning.algo, scoring.func = params@scoring.func,
+  alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, k.impute = 10,
-  na.string.symbol = "?", seed = 0)
+  num.boots = params@num.boots, imputation = TRUE,
+  k.impute = params@k.impute, na.string.symbol = "?", seed = params@seed,
+  params)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -57,6 +60,8 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
 \item{seed}{random seed.}
 
 \item{...}{potential further arguments for method.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \value{
 new \code{\link{BN}} object with DAG.
@@ -86,7 +91,7 @@ layers <- layering(bn)
 mfl <- as.matrix(read.table(header=F,
 text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-                      layering=layers, max.fanin.layers=mfl, raw.data=FALSE)
+                      layering=layers, max.fanin.layers=mfl, raw.data=FALSE, params)
 }
 }
 

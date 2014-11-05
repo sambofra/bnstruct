@@ -6,10 +6,7 @@
 #' 
 setMethod("initialize",
           "BN",
-          function(.Object, dataset = NULL, ...)#,
-#                    algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-#                    layering = c(), max.fanin.layers = NULL,
-#                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+          function(.Object, dataset = NULL, ...)
           {
             x <- .Object
             
@@ -22,15 +19,6 @@ setMethod("initialize",
               discreteness(x) <- discreteness(dataset)
               dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
               wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
-#               validObject(x)
-# 
-#               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
-#                                    layering = layering, max.fanin.layers = max.fanin.layers,
-#                                    max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
-#               
-#               validObject(x)
-# 
-#               x <- learn.params(x, dataset, ess = ess)
             }
             validObject(x)
             return(x)
@@ -58,18 +46,6 @@ setMethod("initialize",
 #'
 #' @param dataset a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
 #'        are considered only if a starting dataset is provided.
-# @param algo the algorithm used to learn the structure of the network, if needed. Currently, the supported options are
-#        \code{'sm'}, Silander-Myllymaki, exact algorithm, and \code{'mmhc'}, Max-Min Hill-Climbing, heuristic (the default option).
-# @param scoring.func scoring function: ome among BDeu, AIC, and BIC.
-# @param alpha the confidence threshold for the MMHC algorithm.
-# @param ess Equivalent Sample Size value.
-# @param bootstrap \code{TRUE} to use bootstrap samples. 
-# @param layering vector containing the layers each node belongs to (only for \code{sm}).
-# @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-# @param max.fanin maximum number of parents for each node (only for \code{sm}).
-# @param cont.nodes use an empty vector.
-# @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-#     (if available, otherwise the raw dataset will be used anyway).
 #' @param ... potential further arguments of methods.
 #' 
 #' @return BN object.
@@ -85,13 +61,9 @@ setMethod("initialize",
 #' 
 #' 
 #' @export
-BN <- function(dataset = NULL, ...)#, algo = "mmhc", scoring.func = 0, alpha = 0.05, ess = 1, bootstrap = FALSE,
-#                layering = c(), max.fanin.layers = NULL,
-#                max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+BN <- function(dataset = NULL, ...)
 {
-  object <- new("BN", dataset = dataset, ...)#, scoring.func = scoring.func, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
-#                 layering = layering, max.fanin.layers = max.fanin.layers,
-#                 max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
+  object <- new("BN", dataset = dataset, ...)
   return(object)
 }
 

@@ -3,8 +3,9 @@
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
-                   na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                   bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+                   na.string.symbol = '?', sep.symbol = '', k.impute = params@k.impute,
+                   bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
+                   starts.from = 0, ..., params)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file

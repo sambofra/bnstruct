@@ -6,11 +6,13 @@
 \alias{bootstrap,BNDataset-method}
 \title{Perform bootstrap.}
 \usage{
-bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
-  k.impute = 10, na.string.symbol = "?", ...)
+bootstrap(object, num.boots = params@num.boots, seed = params@seed,
+  imputation = FALSE, k.impute = params@k.impute, na.string.symbol = "?",
+  ..., params)
 
-\S4method{bootstrap}{BNDataset}(object, num.boots = 100, seed = 0,
-  imputation = FALSE, k.impute = 10, na.string.symbol = "?", ...)
+\S4method{bootstrap}{BNDataset}(object, num.boots = params@num.boots,
+  seed = params@seed, imputation = FALSE, k.impute = params@k.impute,
+  na.string.symbol = "?", ..., params)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -26,6 +28,8 @@ bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
 \item{na.string.symbol}{character that denotes NA in the dataset (useful only if imputation == TRUE).}
 
 \item{...}{potential further arguments of methods.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \description{
 Create a list of \code{num.boots} samples of the original dataset.
@@ -33,8 +37,8 @@ Create a list of \code{num.boots} samples of the original dataset.
 \examples{
 \dontrun{
 dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
-dataset <- bootstrap(dataset, num.boots = 1000)
+dataset <- read.dataset(dataset, "file.header", "file.data", params = myparams)
+dataset <- bootstrap(dataset, num.boots = 1000, params = myparams)
 }
 }
 

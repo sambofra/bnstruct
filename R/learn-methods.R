@@ -2,8 +2,7 @@
 #' @aliases learn.params,BN,BNDataset
 setMethod("learn.params",
           c("BN", "BNDataset"),
-          function(bn, dataset, ess = 1)
-          #learn.params <- function(data, dag, node.sizes, ess = 1)
+          function(bn, dataset, ess = params@ess, params)
           {
             # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
             # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
@@ -61,10 +60,12 @@ setMethod("learn.params",
 #' @aliases learn.structure,BN,BNDataset
 setMethod("learn.structure",
           c("BN", "BNDataset"),
-          function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(bn, dataset, algo = params@learning.algo, scoring.func = params@scoring.func,
+                   alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                   num.boots = 100, imputation = TRUE, k.impute = 10, na.string.symbol='?', seed = 0)
+                   num.boots = params@num.boots, imputation = TRUE, k.impute = params@k.impute,
+                   na.string.symbol='?', seed = params@seed, params)
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -130,6 +131,32 @@ setMethod("learn.structure",
               else
               {     
                 dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers, ess)
+              }
+            }
+            
+            if (algo == "eocp")
+            {
+              if (!require(cplexAPI))
+              {
+                stop ("This function requires the cplexAPI package")
+              }
+              
+              if (bootstrap)
+              {
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                for( i in seq_len(num.boots(dataset)) )
+                {
+                  data <- get.boot(dataset, i, imputed=!raw.data)
+                  
+                  dag <- eocp(data, node.sizes, scoring.func, cont.nodes, alpha, layering, params)
+                  
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                }
+                wpdag(bn) <- finalPDAG
+              }
+              else
+              {
+                dag(bn) <- eocp(data, node.sizes, scoring.func, cont.nodes, alpha, layering, params)
               }
             }
             

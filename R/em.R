@@ -2,7 +2,7 @@
 #' @aliases em,InferenceEngine,BNDataset
 setMethod("em",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, threshold = 0.001, k.impute = 10, ...)
+          function(x, dataset, threshold = params@em_convergence, k.impute = params@k.impute, ..., params)
           {
             # We assume:
             # 1) there is a BN with learnt or known parameters

@@ -18,6 +18,7 @@
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param ess Equivalent Sample Size value.
 #' @param ... potential further arguments of methods.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
@@ -28,11 +29,11 @@
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
 #' bn <- BN()
 #' bn <- learn.structure(bn, dataset)
-#' bn <- learn.params(bn, dataset, ess=1)
+#' bn <- learn.params(bn, dataset, ess=1, params)
 #' }
 #' 
 #' @exportMethod learn.params
-setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("learn.params"))
+setGeneric("learn.params", function(bn, dataset, ess=params@ess, ..., params) standardGeneric("learn.params"))
 
 
 #' learn the structure of a network.
@@ -69,6 +70,7 @@ setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("le
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param seed random seed.
 #' @param ... potential further arguments for method.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
@@ -85,14 +87,17 @@ setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("le
 #' mfl <- as.matrix(read.table(header=F,
 #' text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 #' bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-#'                       layering=layers, max.fanin.layers=mfl, raw.data=FALSE)
+#'                       layering=layers, max.fanin.layers=mfl, raw.data=FALSE, params)
 #' }
 #' 
 #' @exportMethod learn.structure
-setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo,
+                                       scoring.func=params@scoring.func, alpha=params@alpha,
+                                       ess=params@ess, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
-                                       cont.nodes=c(), raw.data=FALSE, num.boots=100, imputation = TRUE, k.impute = 10,
-                                       na.string.symbol='?', seed = 0, ...) standardGeneric("learn.structure"))
+                                       cont.nodes=c(), raw.data=FALSE, num.boots=params@num.boots,
+                                       imputation = TRUE, k.impute = params@k.impute,
+                                       na.string.symbol='?', seed = params@seed, ..., params) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -559,17 +564,19 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param seed random seed (useful only if bootstrap == TRUE).
 #' @param starts.from starting value for entries in the dataset (observed values, default is 0).
 #' @param ... potential further arguments of methods.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
+#' dataset <- read.dataset(dataset, header="file.header", dataset="file.data", params = myparams)
 #' }
 #' 
 #' @exportMethod read.dataset
 setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
-                                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                                    bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+                                    na.string.symbol = '?', sep.symbol = '', k.impute = params@k.impute,
+                                    bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
+                                    starts.from = 0, ..., params)
                             standardGeneric("read.dataset"))
 
 
@@ -581,16 +588,17 @@ setGeneric("read.dataset", function(object, header.file, data.file, imputation =
 #' @param object the \code{\link{BNDataset}} object.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param ... potential further arguments of methods.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
 #' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' dataset <- impute(dataset)
+#' dataset <- impute(dataset, params = myparams)
 #' }
 #' 
 #' @exportMethod impute
-setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
+setGeneric("impute", function(object, k.impute=params@k.impute, ..., params) standardGeneric("impute"))
 
 
 #' Perform bootstrap.
@@ -607,17 +615,19 @@ setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
 #' @param na.string.symbol character that denotes NA in the dataset (useful only if imputation == TRUE).
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
 #' @param ... potential further arguments of methods.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' dataset <- bootstrap(dataset, num.boots = 1000)
+#' dataset <- read.dataset(dataset, "file.header", "file.data", params = myparams)
+#' dataset <- bootstrap(dataset, num.boots = 1000, params = myparams)
 #' }
 #' 
 #' @exportMethod bootstrap
-setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10,
-                                 na.string.symbol = '?', ...) standardGeneric("bootstrap"))
+setGeneric("bootstrap", function(object, num.boots = params@num.boots, seed = params@seed,
+                                 imputation = FALSE, k.impute = params@k.impute,
+                                 na.string.symbol = '?', ..., params) standardGeneric("bootstrap"))
 
 
 #' get selected element of bootstrap list.
@@ -755,17 +765,19 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param threshold threshold for convergence, used as stopping criterion.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
 #' @param ... further potential arguments for method.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
 #'         and the imputed dataset (\code{"BNDataset"}).
 #' 
 #' @examples
 #' \dontrun{
-#' em(x, dataset)
+#' em(x, dataset, params = params)
 #' }
 #' 
 #' @exportMethod em
-setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) standardGeneric("em"))
+setGeneric("em", function(x, dataset, threshold = params@em_convergence,
+                          k.impute = params@k.impute, ..., params) standardGeneric("em"))
 
 
 #' Structural Expectation-Maximization algorithm.
@@ -796,6 +808,7 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' @param na.string.symbol symbol for \code{NA} values (missing data).
 #' @param seed random seed.
 #' @param ... further potential arguments for method.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
 #'         and the imputed dataset (\code{"BNDataset"}).
@@ -806,13 +819,14 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' }
 #' 
 #' @exportMethod sem
-setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10, 
-                           algo = "mmhc", scoring.func = "BDeu",
-                           alpha = 0.05, ess = 1, bootstrap = FALSE,
+setGeneric("sem", function(x, dataset, struct.threshold = params@sem_convergence,
+                           param.threshold = params@em_convergence, k.impute = params@k.impute, 
+                           algo = params@learning.algo, scoring.func = params@scoring.func,
+                           alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                           num.boots = 100, imputation = TRUE, na.string.symbol='?',
-                           seed = 0, ...) standardGeneric("sem"))
+                           num.boots = params@num.boots, imputation = TRUE, na.string.symbol='?',
+                           seed = params@seed, ..., params) standardGeneric("sem"))
 
 
 ###############################################################################
