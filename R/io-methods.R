@@ -27,6 +27,12 @@ setMethod("read.dataset",
               quit(status = 1)
             }
             
+            # Check range of variables
+            for (var in 1:num.variables)
+            {
+              
+            }
+            
             if (imputation)
             {
               # perform imputation
