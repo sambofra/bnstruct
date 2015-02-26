@@ -9,7 +9,7 @@
 #' 
 #' @return a BNDataset object.
 setMethod("initialize",
-          "BNDataset", function(.Object, ...)  
+          "BNDataset", function(.Object)  
           {
             validObject(.Object)
             return(.Object)
@@ -74,13 +74,13 @@ setMethod("initialize",
 BNDataset <- function(name = "", data = NULL, variables = c(), node.sizes = c(), discreteness = c(),
                       header.file = NULL, data.file = NULL, ...)
 {
-  dataset <- new("BNDataset", ...)
+  dataset <- new("BNDataset")
   
   name(dataset) <- name
   
   # The presence of BOTH data file and header file enable the call to read.dataset
   if (!is.null(header.file) && !is.null(data.file)) {
-    dataset <- read.dataset(dataset, header.file, data.file)
+    dataset <- read.dataset(dataset, header.file, data.file, ...)
     return(dataset)
   }
   

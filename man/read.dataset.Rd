@@ -6,15 +6,12 @@
 \alias{read.dataset,BNDataset,character,character-method}
 \title{Read a dataset from file.}
 \usage{
-read.dataset(object, header.file, data.file, imputation = FALSE,
-  header.flag = FALSE, na.string.symbol = "?", sep.symbol = "",
-  k.impute = 10, bootstrap = FALSE, num.boots = 100, seed = 0,
-  starts.from = 0, ...)
+read.dataset(object, header.file, data.file, data.with.header = FALSE,
+  na.string.symbol = "?", sep.symbol = "", starts.from = 1)
 
 \S4method{read.dataset}{BNDataset,character,character}(object, header.file,
-  data.file, imputation = FALSE, header.flag = FALSE,
-  na.string.symbol = "?", sep.symbol = "", k.impute = 10,
-  bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 1, ...)
+  data.file, data.with.header = FALSE, na.string.symbol = "?",
+  sep.symbol = "", starts.from = 1)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -23,25 +20,13 @@ read.dataset(object, header.file, data.file, imputation = FALSE,
 
 \item{data.file}{the \code{data} file.}
 
-\item{imputation}{\code{TRUE} if imputation has to be performed.}
-
-\item{header.flag}{\code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).}
+\item{data.with.header}{\code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).}
 
 \item{na.string.symbol}{character that denotes \code{NA} in the dataset.}
 
 \item{sep.symbol}{separator among values in the dataset.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).}
-
-\item{bootstrap}{\code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.}
-
-\item{num.boots}{number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).}
-
-\item{seed}{random seed (useful only if bootstrap == TRUE).}
-
-\item{starts.from}{starting value for entries in the dataset (observed values, default is 0).}
-
-\item{...}{potential further arguments of methods.}
+\item{starts.from}{starting value for entries in the dataset (observed values, default is 1).}
 }
 \description{
 File has to be in format (describe...)

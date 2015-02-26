@@ -8,18 +8,16 @@
 \title{BNDataset class.}
 \usage{
 dataset <- BNDataset(header.file = "path/header",
-                     data.file   = "path/data")
+                     data.file   = "path/data", ...)
 dataset <- BNDataset(name = "MyData", data = data,
                      variables = c("a", "b", "c", "d"),
                      node.sizes = c(4,8,12,16),
                      discreteness = rep('d',4))
 
-\S4method{initialize}{BNDataset}(.Object, ...)
+\S4method{initialize}{BNDataset}(.Object)
 }
 \arguments{
 \item{.Object}{an empty BNDataset.}
-
-\item{...}{potential further arguments of methods.}
 
 \item{name}{name of the dataset.}
 
@@ -34,6 +32,8 @@ dataset <- BNDataset(name = "MyData", data = data,
 \item{header.file}{the \code{header} file.}
 
 \item{data.file}{the \code{data} file.}
+
+\item{...}{further arguments for reading a dataset from files (see documentation for \code{read.dataset}).}
 }
 \value{
 BNDataset object.
@@ -69,6 +69,10 @@ An header file has to be composed by three rows of tab-delimited values:
 3. a list that indicates, for each variable, if the variable is continuous
   (\code{c} or \code{C}), and thus has to be quantized before learning,
   or discrete (\code{d} or \code{D}).
+
+In case of need of more advanced options when reading a dataset from files, please refer to the
+documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
+as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).
 
 Dataset name is useful for the user, but not mandatory.
 }
@@ -107,5 +111,8 @@ dataset <- BNDataset(name = "MyData", data = data,
                      node.sizes = c(4,8,12,16),
                      discreteness = rep('d',4))
 }
+}
+\seealso{
+read.dataset impute bootstrap
 }
 

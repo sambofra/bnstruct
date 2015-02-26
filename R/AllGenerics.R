@@ -555,14 +555,8 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param data.file the \code{data} file.
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
-#' @param header.flag \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
-#' @param imputation \code{TRUE} if imputation has to be performed.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
-#' @param bootstrap \code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.
-#' @param num.boots number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).
-#' @param seed random seed (useful only if bootstrap == TRUE).
-#' @param starts.from starting value for entries in the dataset (observed values, default is 0).
-#' @param ... potential further arguments of methods.
+#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
+#' @param starts.from starting value for entries in the dataset (observed values, default is 1).
 #' 
 #' @examples
 #' \dontrun{
@@ -571,9 +565,8 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
-                                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                                    bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+setGeneric("read.dataset", function(object, header.file, data.file, data.with.header = FALSE,
+                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1)
                             standardGeneric("read.dataset"))
 
 

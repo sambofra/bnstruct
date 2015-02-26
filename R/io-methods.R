@@ -2,9 +2,8 @@
 #' @aliases read.dataset,BNDataset,character,character
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
-          function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
-                   na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                   bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 1, ...)
+          function(object, header.file, data.file, data.with.header = FALSE,
+                   na.string.symbol = '?', sep.symbol = '', starts.from = 1)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
@@ -16,7 +15,7 @@ setMethod("read.dataset",
             discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
             
             a <- read.delim(data.file, na.strings = na.string.symbol,
-                            header = header.flag, sep = sep.symbol) + (1 - starts.from)
+                            header = data.with.header, sep = sep.symbol) + (1 - starts.from)
             raw.data(object)      <- as.matrix(a)
             num.variables(object) <- ncol(object@raw.data)
             num.items(object)     <- nrow(object@raw.data)

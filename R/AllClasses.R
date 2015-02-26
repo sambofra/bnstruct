@@ -101,6 +101,10 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   (\code{c} or \code{C}), and thus has to be quantized before learning,
 #'   or discrete (\code{d} or \code{D}).
 #'   
+#' In case of need of more advanced options when reading a dataset from files, please refer to the
+#' documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
+#' as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).
+#'   
 #' Dataset name is useful for the user, but not mandatory.
 #' 
 #' @param name name of the dataset.
@@ -110,13 +114,15 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)
 #' @param header.file the \code{header} file.
 #' @param data.file the \code{data} file.
-#' @param ... potential further arguments of methods.
+#' @param ... further arguments for reading a dataset from files (see documentation for \code{read.dataset}).
 #' 
 #' @return BNDataset object.
 #' 
+#' @seealso read.dataset impute bootstrap
+#' 
 #' @usage
 #' dataset <- BNDataset(header.file = "path/header",
-#'                      data.file   = "path/data")
+#'                      data.file   = "path/data", ...)
 #' dataset <- BNDataset(name = "MyData", data = data,
 #'                      variables = c("a", "b", "c", "d"),
 #'                      node.sizes = c(4,8,12,16),
