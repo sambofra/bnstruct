@@ -9,25 +9,28 @@
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
   max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  cont.nodes = c(), raw.data = FALSE, num.boots = 100,
-  imputation = TRUE, k.impute = 10, na.string.symbol = "?", seed = 0,
-  ...)
+  layer.struct = NULL, cont.nodes = c(), raw.data = FALSE,
+  num.boots = 100, imputation = TRUE, k.impute = 10,
+  na.string.symbol = "?", seed = 0, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, k.impute = 10,
-  na.string.symbol = "?", seed = 0)
+  max.fanin = num.variables(dataset), layer.struct = NULL,
+  cont.nodes = c(), raw.data = FALSE, num.boots = 100,
+  imputation = TRUE, k.impute = 10, na.string.symbol = "?", seed = 0,
+  ...)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
 
 \item{dataset}{a \code{\link{BNDataset}}.}
 
-\item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).}
+\item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
+(Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).}
 
-\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
+\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}
+(only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 
@@ -40,6 +43,8 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
 \item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm}).}
 
 \item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
+
+\item{layer.struct}{prior knowledge for layering structure (only for \code{mmhc}).}
 
 \item{cont.nodes}{vector containing the index of continuous variables.}
 

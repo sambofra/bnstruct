@@ -15,7 +15,7 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 
 \S4method{sem}{InferenceEngine,BNDataset}(x, dataset, struct.threshold = 10,
   param.threshold = 0.001, k.impute = 10, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+  scoring.func = "BIC", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
   num.boots = 100, imputation = TRUE, na.string.symbol = "?", seed = 0,

@@ -14,7 +14,7 @@ read.dataset(object, header.file, data.file, imputation = FALSE,
 \S4method{read.dataset}{BNDataset,character,character}(object, header.file,
   data.file, imputation = FALSE, header.flag = FALSE,
   na.string.symbol = "?", sep.symbol = "", k.impute = 10,
-  bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+  bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 1, ...)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}

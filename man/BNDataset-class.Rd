@@ -41,7 +41,30 @@ initialize a \code{\link{BNDataset}} object.
 constructor for \code{\link{BNDataset}} object
 }
 \details{
-Dataset should be provided in the following format... (describe)
+There are two ways to build a BNDataset: using two files containing respectively header informations
+and data, and manually providing the data table and the related header informations
+(variable names, cardinality and discreteness).
+The two ways cannot be mixed up. If the method of choice is the file-based one, both the files
+must be provided. Conversely, all of the \code{data}, \code{variables}, \code{node.sizes}
+and \code{discreteness} parameters has to be given, and the files parameters must be ignored.
+In any case, the names of the parameters used must be provided to the constructor.
+
+bnstruct requires the data files to be in a format subsequently described.
+The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
+with the values for each variable separated by a space or a tab. Values for each variable have to be
+numbers, starting from \code{1} in case of discrete variables.
+Data files can have a first row containing the names of the corresponding variables.
+
+In addition to the data file, a header file containing additional informations can also be provided.
+An header file has to be composed by three rows of tab-delimited values:
+1. list of names of the variables, in the same order of the data file;
+2. a list of integers representing the cardinality of the variables, in case of discrete variables,
+  or the number of levels each variable has to be quantized in, in case of continuous variables;
+3. a list that indicates, for each variable, if the variable is continuous
+  (\code{c} or \code{C}), and thus has to be quantized before learning,
+  or discrete (\code{d} or \code{D}).
+
+Dataset name is useful for the user, but not mandatory.
 }
 \section{Slots}{
 
