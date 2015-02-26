@@ -9,17 +9,13 @@
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
   max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  layer.struct = NULL, cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, k.impute = 10,
-  na.string.symbol = "?", seed = 0, ...)
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), raw.data = FALSE, num.boots = 100,
-  imputation = TRUE, k.impute = 10, na.string.symbol = "?", seed = 0,
-  ...)
+  cont.nodes = c(), use.imputed.data = FALSE, ...)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -48,20 +44,20 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
 
 \item{cont.nodes}{vector containing the index of continuous variables.}
 
-\item{raw.data}{\code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-(if available, otherwise the raw dataset will be used anyway).}
+\item{use.imputed.data}{\code{TRUE} to learn the structure from the imputed dataset
+(if available, a check is performed). Default is to use raw dataset}
+
+\item{...}{potential further arguments for method.}
 
 \item{num.boots}{number of bootstrap samples to generate, if needed.}
 
 \item{imputation}{\code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
 \item{na.string.symbol}{symbol for \code{NA} values (missing data).}
 
-\item{seed}{random seed.}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
 
-\item{...}{potential further arguments for method.}
+\item{seed}{random seed.}
 }
 \value{
 new \code{\link{BN}} object with DAG.

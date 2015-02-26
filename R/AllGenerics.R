@@ -17,7 +17,7 @@
 #' @param bn a \code{\link{BN}} object.
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param ess Equivalent Sample Size value.
-#' @param ... potential further arguments of methods.
+#' @param use.imputed.data use imputed data.
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
@@ -32,7 +32,7 @@
 #' }
 #' 
 #' @exportMethod learn.params
-setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("learn.params"))
+setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) standardGeneric("learn.params"))
 
 
 #' learn the structure of a network.
@@ -65,8 +65,8 @@ setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("le
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
 #' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
-#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-#'     (if available, otherwise the raw dataset will be used anyway).
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
 #' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
 #' @param na.string.symbol symbol for \code{NA} values (missing data).
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
@@ -95,8 +95,7 @@ setGeneric("learn.params", function(bn, dataset, ess=1, ...) standardGeneric("le
 setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
-                                       cont.nodes=c(), raw.data=FALSE, num.boots=100, imputation = TRUE, k.impute = 10,
-                                       na.string.symbol='?', seed = 0, ...) standardGeneric("learn.structure"))
+                                       cont.nodes=c(), use.imputed.data=FALSE, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -396,7 +395,7 @@ setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 #' has.data(x) # TRUE
 #' }
 #' 
-#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.data
 setGeneric("has.data", function(x) standardGeneric("has.data"))
@@ -419,7 +418,7 @@ setGeneric("has.data", function(x) standardGeneric("has.data"))
 #' has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.raw.data
 setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
@@ -445,73 +444,45 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' has.imputed.data(x) # TRUE
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.imputed.data
 setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 
-#' get data of a BNDataset.
-#' 
-#' Return data contained in a \code{\link{BNDataset}} object, if any.
-#' Preference is given to imputed data, if available, because the imputed dataset
-#' is (supposed to be), in general, more useful. To obtain specifically raw or imputed data,
-#' one must revert to \code{\link{get.raw.data}()} and \code{\link{get.imputed.data}()}, respectively.
-#' 
-#' @name get.data
-#' @rdname get.data
-#' 
-#' @param x a \code{\link{BNDataset}}.
-#' 
-#' @examples
-#' \dontrun{
-#' x <- BNDataset()
-#' x <- read.dataset(x, "file.header", "file.data")
-#' get.data(x) # returns raw dataset, the only one present in dataset
-#' 
-#' x <- impute(x)
-#' get.data(x) # returns imputed dataset, since it is present now
-#' }
-#' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
-#' 
-#' @exportMethod get.data
-setGeneric("get.data", function(x) standardGeneric("get.data"))
 
 #' get raw data of a BNDataset.
 #' 
 #' Return raw data contained in a \code{\link{BNDataset}} object, if any.
 #' 
-#' @name get.raw.data
-#' @rdname get.raw.data
+#' @name raw.data
+#' @rdname raw.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.imputed.data}}
 #' 
-#' @exportMethod get.raw.data
-setGeneric("get.raw.data", function(x) standardGeneric("get.raw.data"))
+#' @exportMethod raw.data
+setGeneric("raw.data", function(x) standardGeneric("raw.data"))
 
 
 #' get imputed data of a BNDataset.
 #' 
 #' Return imputed data contained in a \code{\link{BNDataset}} object, if any.
 #' 
-#' @name get.imputed.data
-#' @rdname get.imputed.data
+#' @name imputed.data
+#' @rdname imputed.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}
 #' 
-#' @exportMethod get.imputed.data
-setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
+#' @exportMethod imputed.data
+setGeneric("imputed.data", function(x) standardGeneric("imputed.data"))
 
 
 #' add raw data.
 #' 
 #' Insert raw data in a \code{\link{BNDataset}} object.
-#' 
-#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}}.
 #' 
 #' @name raw.data<-
 #' @rdname raw.data-set
@@ -519,7 +490,7 @@ setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod raw.data<-
 setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
@@ -529,15 +500,13 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' 
 #' Insert imputed data in a \code{\link{BNDataset}} object.
 #' 
-#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}} with flag \code{imputation = TRUE}.
-#' 
 #' @name imputed.data<-
 #' @rdname imputed.data-set
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod imputed.data<-
 setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"))
@@ -621,13 +590,15 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' 
 #' Given a \code{\link{BNDataset}}, return the sample corresponding to given index.
 #' 
-#' @name get.boot
-#' @rdname get.boot
+#' @name boot
+#' @rdname boot
 #' 
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param index the index of the requested sample.
 #' @param imputed \code{TRUE} if samples from imputed dataset are to be used.
 #' @param ... potential further arguments of methods (ignored).
+#' 
+#' @seealso bootstrap
 #' 
 #' @examples
 #' \dontrun{
@@ -636,13 +607,13 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' dataset <- bootstrap(dataset, num.boots = 1000)
 #' 
 #' for (i in 1:num.boots(dataset))
-#'    print(get.boot(dataset, i))
+#'    print(boot(dataset, i))
 #' }
 #' 
 #' @seealso \code{\link{bootstrap}}
 #' 
-#' @exportMethod get.boot
-setGeneric("get.boot", function(dataset, index, imputed = TRUE, ...) standardGeneric("get.boot"))
+#' @exportMethod boot
+setGeneric("boot", function(dataset, index, imputed = TRUE, ...) standardGeneric("boot"))
 
 
 ###############################################################################
@@ -777,7 +748,6 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
 #' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
 #' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
@@ -787,8 +757,8 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
 #' @param cont.nodes vector containing the index of continuous variables.
-#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-#'     (if available, otherwise the raw dataset will be used anyway).
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
 #' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
 #' @param na.string.symbol symbol for \code{NA} values (missing data).
 #' @param seed random seed.
@@ -804,10 +774,10 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' 
 #' @exportMethod sem
 setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10, 
-                           algo = "mmhc", scoring.func = "BDeu",
+                           scoring.func = "BDeu",
                            alpha = 0.05, ess = 1, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
-                           max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
+                           max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
                            num.boots = 100, imputation = TRUE, na.string.symbol='?',
                            seed = 0, ...) standardGeneric("sem"))
 

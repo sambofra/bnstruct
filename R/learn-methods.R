@@ -2,7 +2,7 @@
 #' @aliases learn.params,BN,BNDataset
 setMethod("learn.params",
           c("BN", "BNDataset"),
-          function(bn, dataset, ess = 1)
+          function(bn, dataset, ess = 1, use.imputed.data = FALSE)
           #learn.params <- function(data, dag, node.sizes, ess = 1)
           {
             # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
@@ -10,7 +10,10 @@ setMethod("learn.params",
             # so that the sum over the last dimension is always 1
 
             # just to play safe
-            data <- as.matrix(get.data(dataset))
+            if (use.imputed.data)
+              data <- as.matrix(imputed.data(dataset))
+            else
+              data <- as.matrix(raw.data(dataset))
 
             storage.mode(data) <- "integer"
             
@@ -32,9 +35,6 @@ setMethod("learn.params",
               family <- c( which(dag[,i]!=0), i )
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
-#               print(sum(counts))
-#               if (sum(counts) != 5000)
-#                 readLines(file("stdin"),1)
               cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
               dms <- NULL
               dns <- NULL
@@ -63,8 +63,7 @@ setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), raw.data = FALSE,
-                   num.boots = 100, imputation = TRUE, k.impute = 10, na.string.symbol='?', seed = 0, ...)
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, ...)
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -81,9 +80,7 @@ setMethod("learn.structure",
             {
               if (!has.boots(dataset))
               {
-                dataset <- bootstrap(dataset, num.boots = num.boots,
-                                     seed = seed, imputation = imputation,
-                                     k.impute = k.impute, na.string.symbol = na.string.symbol)
+                stop("Bootstrap samples not available. Please generate samples before learning with bootstrap.\nSee > ?bootstrap for help.")
               }
               else
               {
@@ -92,12 +89,14 @@ setMethod("learn.structure",
             }
             else
             {
-              if (raw.data)
-                data   <- get.raw.data(dataset)
+              if (use.imputed.data && has.imputed.data(dataset))
+                data   <- imputed.data(dataset)
+              else if (use.imputed.data && !has.imputed.data(dataset))
+                stop("Imputed data not available. Please impute data before learning.\nSee < ?impute for help.")
               else
-                data   <- get.data(dataset)
+                data   <- raw.data(dataset)
             }
-
+            
             scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
             if (is.na(scoring.func))
             {
@@ -127,9 +126,10 @@ setMethod("learn.structure",
               }
               else
               {     
-                dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering, max.fanin.layers, ess)
+                dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes,
+                               max.fanin, layering, max.fanin.layers, ess)
               }
-            }
+            } # end if algo == sm
             
             if (algo == "sem")
             {
@@ -181,7 +181,8 @@ setMethod("learn.structure",
                 cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
-            }
+            } # end if algo == mmhc
+            
             struct.algo(bn) <- algo
             
             return(bn)

@@ -6,9 +6,10 @@
 \alias{learn.params,BN,BNDataset-method}
 \title{learn the parameters of a \link{BN}.}
 \usage{
-learn.params(bn, dataset, ess = 1, ...)
+learn.params(bn, dataset, ess = 1, use.imputed.data = F)
 
-\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = 1)
+\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = 1,
+  use.imputed.data = FALSE)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -17,7 +18,7 @@ learn.params(bn, dataset, ess = 1, ...)
 
 \item{ess}{Equivalent Sample Size value.}
 
-\item{...}{potential further arguments of methods.}
+\item{use.imputed.data}{use imputed data.}
 }
 \value{
 new \code{\link{BN}} object with conditional probabilities.

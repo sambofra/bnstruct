@@ -17,10 +17,7 @@ imputed.data(x) <- value
 \description{
 Insert imputed data in a \code{\link{BNDataset}} object.
 }
-\details{
-Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}} with flag \code{imputation = TRUE}.
-}
 \seealso{
-\code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+\code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 }
 

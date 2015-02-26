@@ -17,10 +17,7 @@ raw.data(x) <- value
 \description{
 Insert raw data in a \code{\link{BNDataset}} object.
 }
-\details{
-Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}}.
-}
 \seealso{
-\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 }
 

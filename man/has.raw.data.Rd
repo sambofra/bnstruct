@@ -26,6 +26,6 @@ has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 }
 }
 \seealso{
-\code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+\code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
 

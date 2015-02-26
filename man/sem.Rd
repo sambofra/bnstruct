@@ -7,19 +7,18 @@
 \title{Structural Expectation-Maximization algorithm.}
 \usage{
 sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
-  k.impute = 10, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05,
-  ess = 1, bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, na.string.symbol = "?", seed = 0,
-  ...)
+  k.impute = 10, scoring.func = "BDeu", alpha = 0.05, ess = 1,
+  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), cont.nodes = c(),
+  use.imputed.data = FALSE, num.boots = 100, imputation = TRUE,
+  na.string.symbol = "?", seed = 0, ...)
 
 \S4method{sem}{InferenceEngine,BNDataset}(x, dataset, struct.threshold = 10,
-  param.threshold = 0.001, k.impute = 10, algo = "mmhc",
-  scoring.func = "BIC", alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-  num.boots = 100, imputation = TRUE, na.string.symbol = "?", seed = 0,
-  ...)
+  param.threshold = 0.001, k.impute = 10, scoring.func = "BIC",
+  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+  cont.nodes = c(), use.imputed.data = FALSE, num.boots = 100,
+  imputation = TRUE, na.string.symbol = "?", seed = 0, ...)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}}
@@ -31,8 +30,6 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 \item{param.threshold}{threshold for convergence of the parameter learning step, used as stopping criterion.}
 
 \item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
-\item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).}
 
 \item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
 
@@ -50,8 +47,8 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 
 \item{cont.nodes}{vector containing the index of continuous variables.}
 
-\item{raw.data}{\code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-(if available, otherwise the raw dataset will be used anyway).}
+\item{use.imputed.data}{\code{TRUE} to learn the structure from the imputed dataset
+(if available, a check is performed). Default is to use raw dataset}
 
 \item{num.boots}{number of bootstrap samples to generate, if needed.}
 

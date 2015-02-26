@@ -24,13 +24,12 @@ setMethod("em",
             #     - in case of parents with missing values: take variables in topological order
             #   - compute values according to distribution
 
-            # raw.data   <- get.imputed.data(dataset)
-            raw.data   <- get.raw.data(dataset)
-            imputed.data <- get.imputed.data(dataset)
+            rawdata  <- raw.data(dataset)
             if (test.updated.bn(x))
               orig.bn <- updated.bn(x)
             else
-              orig.bn    <- bn(x)
+              orig.bn <- bn(x)
+            
             bak.bn     <- orig.bn
             bn         <- orig.bn
             eng        <- x
@@ -48,14 +47,14 @@ setMethod("em",
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
               eng      <- belief.propagation(eng,bn)            
-              imp.data <- matrix(data=rep(0, prod(dim(raw.data))),
-                                 nrow=nrow(raw.data),
-                                 ncol=ncol(raw.data))
+              imp.data <- matrix(data=rep(0, prod(dim(rawdata))),
+                                 nrow=nrow(rawdata),
+                                 ncol=ncol(rawdata))
               
               still.has.NAs <- c()
               for (row in 1:num.items)
               {
-                y             <- raw.data[row,]
+                y             <- rawdata[row,]
                 # mpv           <- rep(0, num.nodes)
                 obsd.vars     <- which(!is.na(y))
                 obsd.vals     <- y[obsd.vars]
@@ -126,15 +125,7 @@ setMethod("em",
                           }
                           overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                         }
-                        #  else
-                        #  {
-                        #  # print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-                        #  }
                       }
-                      #  else
-                      # {
-                      #   print("too many unobserved vars in current clique")
-                      # }
                       tc <- tc + 1
                     }
   

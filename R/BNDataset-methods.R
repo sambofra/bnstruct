@@ -298,21 +298,9 @@ setMethod("has.imputed.data",
           })
 
 
-#' @rdname get.data
-#' @aliases get.data,BNDataset
-setMethod("get.data",
-          "BNDataset",
-          function(x)
-          {
-            if (has.imputed.data(x) == FALSE)
-              return (get.raw.data(x))
-            return (get.imputed.data(x))
-          })
-
-
-#' @rdname get.raw.data
-#' @aliases get.raw.data,BNDataset
-setMethod("get.raw.data",
+#' @rdname raw.data
+#' @aliases raw.data,BNDataset
+setMethod("raw.data",
           "BNDataset",
           function(x)
           {
@@ -322,9 +310,9 @@ setMethod("get.raw.data",
           })
 
 
-#' @rdname get.imputed.data
-#' @aliases get.imputed.data,BNDataset
-setMethod("get.imputed.data",
+#' @rdname imputed.data
+#' @aliases imputed.data,BNDataset
+setMethod("imputed.data",
           "BNDataset",
           function(x)
           {
@@ -444,6 +432,7 @@ setReplaceMethod("raw.data",
                  {
                    slot(x, "raw.data")    <- value
                    slot(x, "has.rawdata") <- TRUE
+                   num.items(x) <- nrow(value)
                    validObject(x)
                    return(x)
                  })
@@ -460,6 +449,7 @@ setReplaceMethod("imputed.data",
                    slot(x, "imputed.data") <- value
                    slot(x, "has.impdata")  <- TRUE
                    slot(x, "imputation")   <- TRUE
+                   num.items(x) <- nrow(value)
                    validObject(x)
                    return(x)
                  })
@@ -510,12 +500,12 @@ setMethod("print",
             if (show.raw.data == TRUE && has.raw.data(x))
             {
               cat("\nRaw data:\n")
-              print(get.raw.data(x))
+              print(raw.data(x))
             }
             if (show.imputed.data == TRUE && has.imputed.data(x))
             {
               cat("\nImputed data:\n")
-              print(get.imputed.data(x))
+              print(imputed.data(x))
             }
           })
 
@@ -568,9 +558,9 @@ setMethod("bootstrap",
           })
 
 
-#' @rdname get.boot
-#' @aliases get.boot,BNDataset
-setMethod("get.boot",
+#' @rdname boot
+#' @aliases boot,BNDataset
+setMethod("boot",
           c("BNDataset", "numeric"),
           function(dataset, index, imputed = TRUE, ...)
           {
