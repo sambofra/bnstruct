@@ -4,7 +4,7 @@ setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
                    na.string.symbol = '?', sep.symbol = '', k.impute = 10,
-                   bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 0, ...)
+                   bootstrap = FALSE, num.boots = 100, seed = 0, starts.from = 1, ...)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
