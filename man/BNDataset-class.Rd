@@ -7,10 +7,14 @@
 \alias{initialize,BNDataset-method}
 \title{BNDataset class.}
 \usage{
-\S4method{initialize}{BNDataset}(.Object, ...)
+dataset <- BNDataset(header.file = "path/header",
+                     data.file   = "path/data")
+dataset <- BNDataset(name = "MyData", data = data,
+                     variables = c("a", "b", "c", "d"),
+                     node.sizes = c(4,8,12,16),
+                     discreteness = rep('d',4))
 
-BNDataset(name = "", data = NULL, variables = c(), node.sizes = c(),
-  discreteness = c(), ...)
+\S4method{initialize}{BNDataset}(.Object, ...)
 }
 \arguments{
 \item{.Object}{an empty BNDataset.}
@@ -26,19 +30,21 @@ BNDataset(name = "", data = NULL, variables = c(), node.sizes = c(),
 \item{node.sizes}{vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).}
 
 \item{discreteness}{a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)}
+
+\item{header.file}{the \code{header} file.}
+
+\item{data.file}{the \code{data} file.}
 }
 \value{
-a BNDataset object.
-
 BNDataset object.
+
+a BNDataset object.
 }
 \description{
 Contains the all of the data that can be extracted from a given dataset:
 raw data, imputed data, raw and imputed data with bootstrap.
 
 initialize a \code{\link{BNDataset}} object.
-
-constructor for \code{\link{BNDataset}} object
 }
 \details{
 There are two ways to build a BNDataset: using two files containing respectively header informations
@@ -92,8 +98,7 @@ Dataset name is useful for the user, but not mandatory.
 \examples{
 \dontrun{
 # create from files
-dataset <- BNDataset(name = "MyData")
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- read.dataset("file.header", "file.data")
 
 # other way: create from raw dataset and metadata
 data <- matrix(c(1:16), nrow = 4, ncol = 4)

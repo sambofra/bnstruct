@@ -103,6 +103,25 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   
 #' Dataset name is useful for the user, but not mandatory.
 #' 
+#' @param name name of the dataset.
+#' @param data raw data.frame.
+#' @param variables vector of variable names.
+#' @param node.sizes vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).
+#' @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)
+#' @param header.file the \code{header} file.
+#' @param data.file the \code{data} file.
+#' @param ... potential further arguments of methods.
+#' 
+#' @return BNDataset object.
+#' 
+#' @usage
+#' dataset <- BNDataset(header.file = "path/header",
+#'                      data.file   = "path/data")
+#' dataset <- BNDataset(name = "MyData", data = data,
+#'                      variables = c("a", "b", "c", "d"),
+#'                      node.sizes = c(4,8,12,16),
+#'                      discreteness = rep('d',4))
+#' 
 #' @section Slots:
 #' \describe{
 #'   \item{\code{name}:}{name of the dataset}
@@ -129,6 +148,19 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' @rdname BNDataset-class
 #' @docType class
 #' @aliases BNDataset,BNDataset-class
+#' 
+#' @examples
+#' \dontrun{
+#' # create from files
+#' dataset <- read.dataset("file.header", "file.data")
+#' 
+#' # other way: create from raw dataset and metadata
+#' data <- matrix(c(1:16), nrow = 4, ncol = 4)
+#' dataset <- BNDataset(name = "MyData", data = data,
+#'                      variables = c("a", "b", "c", "d"),
+#'                      node.sizes = c(4,8,12,16),
+#'                      discreteness = rep('d',4))
+#' }
 #'
 #' @exportClass BNDataset
 setClass("BNDataset",
