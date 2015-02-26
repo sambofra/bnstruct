@@ -3,12 +3,12 @@
 setMethod("sem",
           c("InferenceEngine","BNDataset"),
           function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10,
-                   algo = "mmhc", scoring.func = "BDeu",
+                   algo = "mmhc", scoring.func = "BIC",
                    alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
                    num.boots = 100, imputation = TRUE, na.string.symbol='?',
-                   seed = 0,...)
+                   seed = 0, ...)
           {
             if(test.updated.bn(x))
               net <- updated.bn(x)
@@ -30,7 +30,9 @@ setMethod("sem",
             w.eng     <- InferenceEngine(net) #x
             
             if (scoring.func == "BDeu")
-              next
+            {
+              stop("BDeu scoring function currently not supported for SEM algorithm.")
+            }
             
             if (scoring.func == "AIC" || scoring.func == "BIC")
             {

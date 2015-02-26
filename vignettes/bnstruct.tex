@@ -26,16 +26,65 @@ Bayesian Networks are a powerful tool for probabilistic inference among a set
 of variables, modeled using a directed acyclic graph. However, one often does not
 have the network, but only a set of observations, and wants to reconstruct the
 network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
-learning the structure and parameters of the network, also in presence of missing data,
-and a set of additional tools to use Bayesian Networks, such as methods to perform
+learning the structure and parameters of the network in various situations, such as
+in presence of missing data, for which it is possible to perform \textit{imputation}
+(guessing the missing values, by looking at the data). The package also contains methods
+for learning using the Bootstrap technique.
+Finally, \Rpackage{bnstruct}, has a set of additional tools to use Bayesian Networks, such as methods to perform
 belief propagation.
 
 This document is intended to show some examples of how \Rpackage{bnstruct} can be used
 to learn and use Bayesian Networks. First we describe how to manage data sets,
 how to use them to discover a Bayesian Network, and finally how to perform some
-operations on a network.
+operations on a network. Complete reference for classes and methods can be found in the package documentation.
 
-Complete reference for classes and methods can be found in the package documentation.
+\subsection{Overview}
+We provide here some general informations about the context for understanding
+and using properly this document.
+
+\subsubsection{The data}
+A \emph{dataset} is a collection of rows, each of which is composed by the same number
+of values. Each value corresponds to an observation of a \emph{variable}, which is a feature,
+an event or an entity considered significant and therefore measured. In a Bayesian Network,
+each variable is associated to a node. The number of variables is the \emph{size} of the
+network. Each variable has a certain range of values it can take. If the variable can take
+any possible value in its range, it is called a \emph{continuous} variable; otherwise,
+if a variable can only take some values in its range, it is a \emph{discrete} variable.
+The number of values a variable can take is called its \emph{cardinality}.
+A continuous variable has infinite cardinality; however, in order to deal with it,
+we have to restrict its domain to a smaller set of values, in order to be able to
+treat it as a discrete variable; this process is called \emph{quantization}, the
+number of values it can take is called the number of \emph{levels} of the quantization step,
+and we will therefore call the cardinality of a continuous variable the number of its
+quantization levels, with a little abuse of terminology.
+
+In many real-life applications and contexts, it often happens that some observations in
+the dataset we are studying are absent, for many reasons. In this case, one may want to
+``guess'' a reasonable (according to the other observations) value that would have been
+present in the dataset, if the observations was successful. This inference task is
+called \emph{imputation}. In this case, the dataset with the ``holes filled''
+is called the \emph{imputed dataset}, while the original dataset with missing values is
+referred to as the \emph{raw dataset}.
+In section \ref{sec:imputation} we show how to perform imputation in \Rpackage{bnstruct}.
+
+Another common operation on data is the employment of resampling techniques in order
+to estimate properties of a distribution from an approximate one. This usually allows
+to have more confidence in the results. We implement the \emph{bootstrap} technique,
+and provide it to generate samples of a dataset, with the chance of using it on both raw and imputed data.
+
+\subsubsection{Bayesian Networks}
+After introducing the data, we are now ready to talk about \emph{Bayesian Networks}. A Bayesian Network
+(hereafter sometimes simply \emph{network}, \emph{net} or \emph{BN} for brevity) is a probabilistic graphical model that encodes
+the conditional dependency relationships of a set of variables using a Directed Acyclic Graph (DAG).
+Each node of the graph represents one variable of the dataset; we will therefore interchange
+the terms \emph{node} and \emph{variable} when no confusion arises. The set of directed edges
+connecting the nodes forms the \emph{structure} of the network, while the set of conditional
+probabilities associated with each variable forms the set of \emph{parameters} of the net.
+
+The problems of learning the structure and the parameters of a network from data define the
+\emph{structure learning} and \emph{parameter learning} tasks, respectively. 
+
+
 
 \section{Installation}
 
@@ -43,7 +92,7 @@ The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com
 
 In order to install the package, it suffices to launch\\
 \verb!R CMD INSTALL path/to/bnstruct!\\
-from a terminal, or to use R command \verb!install_packages!.
+from a terminal, or to use R command \verb!install.packages!.
 
 Being hosted on GitHub, it is also possible to use Hadley Wickham's \texttt{install\_github} tool from
 an R session:
@@ -53,6 +102,8 @@ an R session:
 > install_github("sambofra/bnstruct")
 \end{Sinput}
 \end{Schunk}
+
+For Windows platforms, a binary executable will be provided.
 
 \Rpackage{bnstruct} requires R $\geq 2.10$,
 and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
@@ -67,7 +118,7 @@ bootstrap samples, and variable names and cardinality.
 \begin{Schunk}
 \begin{Sinput}
 > dataset <- BNDataset(name="Example")
-> # creates an enpty BNDataset object
+> # creates an empty BNDataset object
 \end{Sinput}
 \end{Schunk}
 
@@ -129,15 +180,15 @@ when no dataset name is provided, the slot names are mandatory.
 
 \begin{Schunk}
 \begin{Sinput}
-> data <- matrix(c(1:16), nrow = 4, ncol = 4)
-> dataset <- BNDataset(name = "MyData", data = data,
-+                      variables = c("a", "b", "c", "d"),
-+                      node.sizes = c(4,8,12,16),
-+                      discreteness = rep('d',4))
+> my.data <- matrix(c(1:16), nrow = 4, ncol = 4)
+> my.dataset <- BNDataset(name = "MyData", data = my.data,
++                         variables = c("a", "b", "c", "d"),
++                         node.sizes = c(4,8,12,16),
++                         discreteness = rep('d',4))
 \end{Sinput}
 \end{Schunk}
 
-\subsection{Imputation}
+\subsection{Imputation}\label{sec:imputation}
 A dataset may contain various kinds of missing data, namely unobserved variables,
 and unobserved values for otherwise observed variables. We currently deal only with this
 second kind of missing data. The process of guessing the missing values is called \emph{imputation}.

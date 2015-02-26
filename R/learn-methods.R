@@ -62,9 +62,9 @@ setMethod("learn.params",
 setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL,
-                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                   num.boots = 100, imputation = TRUE, k.impute = 10, na.string.symbol='?', seed = 0)
+                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+                   layer.struct = NULL, cont.nodes = c(), raw.data = FALSE,
+                   num.boots = 100, imputation = TRUE, k.impute = 10, na.string.symbol='?', seed = 0, ...)
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -73,8 +73,6 @@ setMethod("learn.structure",
             
             node.sizes <- node.sizes(bn)
             num.nodes  <- num.nodes(bn)
-            
-            print(cont.nodes)
             
             if (length(cont.nodes) == 0)
               cont.nodes <- setdiff(1:num.nodes,which(discreteness(dataset)))
@@ -133,6 +131,35 @@ setMethod("learn.structure",
               }
             }
             
+            if (algo == "sem")
+            {
+              other.args <- list(...)
+
+              if ("mmpc" %in% names(other.args))
+              {
+                mmpc <- as.logical(other.args$mmpc)
+                print(mmpc)
+              }
+              else
+              {
+                mmpc <- TRUE
+              }
+              
+              if ("tabu.tenure" %in% names(other.args))
+              {
+                tabu.tenure <- as.numeric(other.args$tabu.tenure)
+                print(tabu.tenure)
+              }
+              else
+              {
+                tabu.tenure <- TRUE
+              }
+
+              sem.output <- sem()
+              
+              readLines(file("stdin"),1)
+            } # end if (algo == sem)
+            
             if (algo == "mmhc") # default
             {
               if (bootstrap)
@@ -142,7 +169,7 @@ setMethod("learn.structure",
                 {
                   data <- get.boot(dataset, i, imputed=!raw.data)
                   
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
                   
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
@@ -151,7 +178,7 @@ setMethod("learn.structure",
               }
               else
               {
-                cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
+                cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
             }
