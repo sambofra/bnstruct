@@ -2,26 +2,24 @@
 \docType{methods}
 \name{sem}
 \alias{sem}
+\alias{sem,BN,BNDataset-method}
 \alias{sem,InferenceEngine,BNDataset}
-\alias{sem,InferenceEngine,BNDataset-method}
 \title{Structural Expectation-Maximization algorithm.}
 \usage{
 sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
-  k.impute = 10, scoring.func = "BDeu", alpha = 0.05, ess = 1,
+  scoring.func = "BIC", alpha = 0.05, ess = 1, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), cont.nodes = c(),
+  use.imputed.data = FALSE, use.cpc = T, ...)
+
+\S4method{sem}{BN,BNDataset}(x, dataset, struct.threshold = 10,
+  param.threshold = 0.001, scoring.func = "BIC", alpha = 0.05, ess = 1,
   bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), cont.nodes = c(),
-  use.imputed.data = FALSE, num.boots = 100, imputation = TRUE,
-  na.string.symbol = "?", seed = 0, ...)
-
-\S4method{sem}{InferenceEngine,BNDataset}(x, dataset, struct.threshold = 10,
-  param.threshold = 0.001, k.impute = 10, scoring.func = "BIC",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  cont.nodes = c(), use.imputed.data = FALSE, num.boots = 100,
-  imputation = TRUE, na.string.symbol = "?", seed = 0, ...)
+  use.imputed.data = FALSE, use.cpc = TRUE, ...)
 }
 \arguments{
-\item{x}{an \code{\link{InferenceEngine}}}
+\item{x}{a \code{\link{BN}} object.}
 
 \item{dataset}{observed dataset with missing values for the Bayesian Network of \code{x}.}
 
@@ -29,9 +27,8 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 
 \item{param.threshold}{threshold for convergence of the parameter learning step, used as stopping criterion.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
-\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
+\item{scoring.func}{the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
+(default - \code{BDeu} currently not supported for \code{sem}).}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 
@@ -50,13 +47,8 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 \item{use.imputed.data}{\code{TRUE} to learn the structure from the imputed dataset
 (if available, a check is performed). Default is to use raw dataset}
 
-\item{num.boots}{number of bootstrap samples to generate, if needed.}
-
-\item{imputation}{\code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.}
-
-\item{na.string.symbol}{symbol for \code{NA} values (missing data).}
-
-\item{seed}{random seed.}
+\item{use.cpc}{(when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of
+starting the Hill Climbing from an empty graph.}
 
 \item{...}{further potential arguments for method.}
 }
@@ -65,7 +57,7 @@ a list containing: an \code{\link{InferenceEngine}} with a new updated network (
         and the imputed dataset (\code{"BNDataset"}).
 }
 \description{
-Learn struvture and parameters of a network with the Structural EM algorithm.
+Learn structure and parameters of a network with the Structural EM algorithm.
 }
 \examples{
 \dontrun{

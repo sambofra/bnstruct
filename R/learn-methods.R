@@ -63,7 +63,7 @@ setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, ...)
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -115,7 +115,7 @@ setMethod("learn.structure",
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
                 for( i in seq_len(num.boots(dataset)) )
                 {
-                  data <- get.boot(dataset, i, imputed=!raw.data)
+                  data <- boot(dataset, i, imputed = use.imputed.data)
                   
                   dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering,
                             max.fanin.layers, ess)
@@ -154,10 +154,26 @@ setMethod("learn.structure",
               {
                 tabu.tenure <- TRUE
               }
-
-              sem.output <- sem()
               
-              readLines(file("stdin"),1)
+              if ("struct.threshold" %in% names(other.args))
+              {
+                #struct.threshold <- as.numeric(other.args$struct.threshold)
+              }
+              else
+              {
+                #struct.threshold <- 10
+              }
+
+              sem.output <- sem(bn, dataset, param.threshold = 0.001,
+                                scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
+                                alpha = 0.05, ess = 1, bootstrap = FALSE,
+                                layering = c(), max.fanin.layers = NULL,
+                                max.fanin = num.variables(dataset), cont.nodes = c(),
+                                use.imputed.data = use.imputed.data,
+                                use.cpc = use.cpc, ...)
+              
+              # readLines(file("stdin"),1)
+              bn <- updated.bn(sem.output$InferenceEngine)
             } # end if (algo == sem)
             
             if (algo == "mmhc") # default
@@ -167,9 +183,13 @@ setMethod("learn.structure",
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
                 for( i in seq_len(num.boots(dataset)) )
                 {
-                  data <- get.boot(dataset, i, imputed=!raw.data)
+                  data <- boot(dataset, i, imputed=use.imputed.data)
                   
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  if (use.cpc)
+                    cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  else
+                    cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                  
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
                   
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
@@ -178,7 +198,10 @@ setMethod("learn.structure",
               }
               else
               {
-                cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                if (use.cpc)
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                else
+                  cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
             } # end if algo == mmhc

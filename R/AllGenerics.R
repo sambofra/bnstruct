@@ -59,7 +59,6 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param num.boots number of bootstrap samples to generate, if needed.
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
@@ -67,10 +66,8 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
-#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
-#' @param na.string.symbol symbol for \code{NA} values (missing data).
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param seed random seed.
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
 #' @param ... potential further arguments for method.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
@@ -88,14 +85,14 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' mfl <- as.matrix(read.table(header=F,
 #' text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 #' bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-#'                       layering=layers, max.fanin.layers=mfl, raw.data=FALSE)
+#'                       layering=layers, max.fanin.layers=mfl, use.imputed.data=FALSE)
 #' }
 #' 
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
-                                       cont.nodes=c(), use.imputed.data=FALSE, ...) standardGeneric("learn.structure"))
+                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -459,7 +456,7 @@ setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
 #' 
 #' @exportMethod raw.data
 setGeneric("raw.data", function(x) standardGeneric("raw.data"))
@@ -520,12 +517,14 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @rdname read.dataset
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param header.file the \code{header} file.
 #' @param data.file the \code{data} file.
+#' @param header.file the \code{header} file.
+#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
-#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
 #' @param starts.from starting value for entries in the dataset (observed values, default is 1).
+#' 
+#' @seealso BNDataset
 #' 
 #' @examples
 #' \dontrun{
@@ -534,7 +533,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header.file, data.file, data.with.header = FALSE,
+setGeneric("read.dataset", function(object, data.file, header.file, data.with.header = FALSE,
                                     na.string.symbol = '?', sep.symbol = '', starts.from = 1)
                             standardGeneric("read.dataset"))
 
@@ -738,30 +737,28 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 
 #' Structural Expectation-Maximization algorithm.
 #' 
-#' Learn struvture and parameters of a network with the Structural EM algorithm.
+#' Learn structure and parameters of a network with the Structural EM algorithm.
 #' 
 #' @name sem
 #' @rdname sem
 #' 
-#' @param x an \code{\link{InferenceEngine}}
+#' @param x a \code{\link{BN}} object.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
 #' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
+#' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
+#' (default - \code{BDeu} currently not supported for \code{sem}).
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param num.boots number of bootstrap samples to generate, if needed.
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
-#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
-#' @param na.string.symbol symbol for \code{NA} values (missing data).
-#' @param seed random seed.
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
 #' @param ... further potential arguments for method.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
@@ -773,13 +770,11 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' }
 #' 
 #' @exportMethod sem
-setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, k.impute = 10, 
-                           scoring.func = "BDeu",
+setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
                            alpha = 0.05, ess = 1, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
-                           num.boots = 100, imputation = TRUE, na.string.symbol='?',
-                           seed = 0, ...) standardGeneric("sem"))
+                           use.cpc = T, ...) standardGeneric("sem"))
 
 
 ###############################################################################

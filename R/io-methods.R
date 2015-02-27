@@ -2,7 +2,7 @@
 #' @aliases read.dataset,BNDataset,character,character
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
-          function(object, header.file, data.file, data.with.header = FALSE,
+          function(object, data.file, header.file, data.with.header = FALSE,
                    na.string.symbol = '?', sep.symbol = '', starts.from = 1)
           {
             header.file(object)  <- header.file
@@ -25,12 +25,6 @@ setMethod("read.dataset",
               message(paste(c("Incoherent number of variables in dataset\n"), sep=''))
               quit(status = 1)
             }
-            
-#             # Check range of variables
-#             for (var in 1:num.variables)
-#             {
-#               
-#             }
             
             validObject(object)
             return(object)

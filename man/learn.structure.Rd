@@ -9,13 +9,14 @@
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
   max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, ...)
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), use.imputed.data = FALSE, ...)
+  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -47,17 +48,10 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
 \item{use.imputed.data}{\code{TRUE} to learn the structure from the imputed dataset
 (if available, a check is performed). Default is to use raw dataset}
 
+\item{use.cpc}{(when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of
+starting the Hill Climbing from an empty graph.}
+
 \item{...}{potential further arguments for method.}
-
-\item{num.boots}{number of bootstrap samples to generate, if needed.}
-
-\item{imputation}{\code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.}
-
-\item{na.string.symbol}{symbol for \code{NA} values (missing data).}
-
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
-\item{seed}{random seed.}
 }
 \value{
 new \code{\link{BN}} object with DAG.
@@ -87,7 +81,7 @@ layers <- layering(bn)
 mfl <- as.matrix(read.table(header=F,
 text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-                      layering=layers, max.fanin.layers=mfl, raw.data=FALSE)
+                      layering=layers, max.fanin.layers=mfl, use.imputed.data=FALSE)
 }
 }
 

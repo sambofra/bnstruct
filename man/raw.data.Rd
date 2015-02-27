@@ -17,6 +17,6 @@ raw.data(x)
 Return raw data contained in a \code{\link{BNDataset}} object, if any.
 }
 \seealso{
-\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.imputed.data}}
+\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
 }
 

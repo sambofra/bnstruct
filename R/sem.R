@@ -1,32 +1,20 @@
 #' @rdname sem
 #' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
-          c("InferenceEngine","BNDataset"),
-          function(x, dataset, struct.threshold = 5, param.threshold = 0.001, k.impute = 10, scoring.func = "BIC",
+          c("BN","BNDataset"),
+          function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
                    alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
-                   num.boots = 100, imputation = TRUE, na.string.symbol='?',
-                   seed = 0, ...)
+                   use.cpc = TRUE, ...)
           {
-            if(test.updated.bn(x))
-              net <- updated.bn(x)
-            else
-              net <- bn(x)
+            net <- x
             
-            # if (missing(algo))
-            #   struct.algo  <- struct.algo(net)
-            # else
-            #   struct.algo  <- algo
-            
-            # if (missing(scoring.func))
-            #   scoring.func <- scoring.func(net)
-            # else
-            #   scoring.func <- scoring.func
+            num.nodes <- num.nodes(net)
 
             if (sum(dag(net)) == 0)
             {
-              # mmhc
+              # starting from an empty network: learn a starting point using MMHC
               scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
               if (is.na(scoring.func))
               {
@@ -38,39 +26,43 @@ setMethod("sem",
               }
               # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
               w.net <- net
-              cpc     <- mmpc( raw.data(dataset), node.sizes(w.net), cont.nodes, alpha, layering, layer.struct=c() )
+              if (use.cpc)
+                cpc <- mmpc( raw.data(dataset), node.sizes(w.net), cont.nodes, alpha, layering, layer.struct=c() )
+              else
+                cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
               dag(w.net) <- hc( raw.data(dataset), node.sizes(w.net), scoring.func, cpc, cont.nodes )
+              
+              w.net <- learn.params(w.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
             }
             else
+            {
+              # start from an already learnt network
               w.net     <- net
-            
-            print(w.net)
-            print(dag(w.net))
-            readLines(file("stdin"),1)
+            }
             
             w.dataset <- dataset
-            w.eng     <- InferenceEngine(w.net) #x
+            w.eng     <- InferenceEngine(w.net)
             
             if (scoring.func == "BDeu")
             {
               stop("BDeu scoring function currently not supported for SEM algorithm.")
             }
             
-            if (scoring.func == 2 || scoring.func == 3)
+            if (scoring.func == 1 || scoring.func == 2) # AIC or BIC
             {
               repeat
               {
                 #w.eng     <- InferenceEngine(w.net)
-                out <- em(w.eng, dataset, param.threshold, k.impute, ...)
+                out <- em(w.eng, dataset, param.threshold)
                 
                 new.eng     <- out$InferenceEngine
                 new.dataset <- out$BNDataset
                 
-                new.net <- learn.structure(updated.bn(new.eng), new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func],
+                new.net <- learn.structure(updated.bn(new.eng), new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
                                            alpha = alpha, ess = ess, bootstrap = bootstrap,
                                            layering = layering, max.fanin.layers = max.fanin.layers,
                                            max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                           use.imputed.data = use.imputed.data, ...)
+                                           use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
                 
                 difference <- shd(dag(w.net), dag(new.net))
                 print(difference)

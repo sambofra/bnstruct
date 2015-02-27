@@ -347,7 +347,7 @@ setMethod("get.most.probable.values",
               }
               else
               {
-                mpv[i] <- sample(1:node.sizes[node], 1, replace=T, prob=pot) #,replace=TRUE
+                mpv[i] <- sample(1:node.sizes[i], 1, replace=T, prob=pot) #,replace=TRUE
               }
             }
             
@@ -402,7 +402,7 @@ setMethod("sample.row",
                 pot  <- pot / sum(pot)
               }
               
-              mpv[i] <- sample(1:node.sizes[node], 1, replace=T, prob=pot) #,replace=TRUE
+              mpv[i] <- sample(1:node.sizes[i], 1, replace=T, prob=pot) #,replace=TRUE
             }
             
             return(mpv)

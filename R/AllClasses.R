@@ -78,6 +78,22 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' Contains the all of the data that can be extracted from a given dataset:
 #' raw data, imputed data, raw and imputed data with bootstrap.
 #' 
+#' There are two ways to build a dataset, directly providing all of the informations, and using two files.
+#' The key informations needed are:
+#' 1. the data;
+#' 2. the state of variables (discrete or continuous);
+#' 3. the names of the variables;
+#' 4. the cardinalities of the variables (if discrete), or the number of levels they have to be quantized into
+#' (if continuous). 
+#' Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
+#' _all_ of the informations, in order to avoid problems later on during the execution.
+#' Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
+#' to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
+#' 
+#' It is possible to use two files, instead of providing manually all of the info. 
+#' 
+#' 
+#' 
 #' There are two ways to build a BNDataset: using two files containing respectively header informations
 #' and data, and manually providing the data table and the related header informations
 #' (variable names, cardinality and discreteness).
@@ -104,29 +120,20 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' In case of need of more advanced options when reading a dataset from files, please refer to the
 #' documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
 #' as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).
-#'   
-#' Dataset name is useful for the user, but not mandatory.
-#' 
-#' @param name name of the dataset.
-#' @param data raw data.frame.
+#'
+#'  
+#' @param data raw data.frame or path/name of the file containing the raw dataset (see 'Details').
+#' @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively),
+#'   or path/name of the file containing header information for the dataset (discreteness, variable names, cardinality - see 'Details').
 #' @param variables vector of variable names.
 #' @param node.sizes vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).
-#' @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)
 #' @param header.file the \code{header} file.
 #' @param data.file the \code{data} file.
 #' @param ... further arguments for reading a dataset from files (see documentation for \code{read.dataset}).
 #' 
 #' @return BNDataset object.
 #' 
-#' @seealso read.dataset impute bootstrap
-#' 
-#' @usage
-#' dataset <- BNDataset(header.file = "path/header",
-#'                      data.file   = "path/data", ...)
-#' dataset <- BNDataset(name = "MyData", data = data,
-#'                      variables = c("a", "b", "c", "d"),
-#'                      node.sizes = c(4,8,12,16),
-#'                      discreteness = rep('d',4))
+#' @seealso read.dataset, impute, bootstrap
 #' 
 #' @section Slots:
 #' \describe{

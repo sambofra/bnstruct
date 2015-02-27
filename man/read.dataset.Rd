@@ -6,19 +6,19 @@
 \alias{read.dataset,BNDataset,character,character-method}
 \title{Read a dataset from file.}
 \usage{
-read.dataset(object, header.file, data.file, data.with.header = FALSE,
+read.dataset(object, data.file, header.file, data.with.header = FALSE,
   na.string.symbol = "?", sep.symbol = "", starts.from = 1)
 
-\S4method{read.dataset}{BNDataset,character,character}(object, header.file,
-  data.file, data.with.header = FALSE, na.string.symbol = "?",
+\S4method{read.dataset}{BNDataset,character,character}(object, data.file,
+  header.file, data.with.header = FALSE, na.string.symbol = "?",
   sep.symbol = "", starts.from = 1)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
 
-\item{header.file}{the \code{header} file.}
-
 \item{data.file}{the \code{data} file.}
+
+\item{header.file}{the \code{header} file.}
 
 \item{data.with.header}{\code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).}
 
@@ -36,5 +36,8 @@ File has to be in format (describe...)
 dataset <- BNDataset()
 dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
 }
+}
+\seealso{
+BNDataset
 }
 

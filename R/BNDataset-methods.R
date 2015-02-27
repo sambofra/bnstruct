@@ -15,96 +15,57 @@ setMethod("initialize",
             return(.Object)
           })
 
-# constructor for \code{\link{BNDataset}} object.
-# 
-# There are two ways to build a BNDataset: using two files containing respectively header informations
-# and data, and manually providing the data table and the related header informations
-# (variable names, cardinality and discreteness).
-# The two ways cannot be mixed up. If the method of choice is the file-based one, both the files
-# must be provided. Conversely, all of the \code{data}, \code{variables}, \code{node.sizes}
-# and \code{discreteness} parameters has to be given, and the files parameters must be ignored.
-# In any case, the names of the parameters used must be provided to the constructor.
-# 
-# bnstruct requires the data files to be in a format subsequently described.
-# The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
-# with the values for each variable separated by a space or a tab. Values for each variable have to be
-# numbers, starting from \code{1} in case of discrete variables.
-# Data files can have a first row containing the names of the corresponding variables.
-# 
-# In addition to the data file, a header file containing additional informations can also be provided.
-# An header file has to be composed by three rows of tab-delimited values:
-# 1. list of names of the variables, in the same order of the data file;
-# 2. a list of integers representing the cardinality of the variables, in case of discrete variables,
-#   or the number of levels each variable has to be quantized in, in case of continuous variables;
-# 3. a list that indicates, for each variable, if the variable is continuous
-#   (\code{c} or \code{C}), and thus has to be quantized before learning,
-#   or discrete (\code{d} or \code{D}).
-#   
-# Dataset name is useful for the user, but not mandatory.
-# 
-# @name BNDataset
-# @rdname BNDataset-class
-# @aliases BNDataset
-# 
-# @param name name of the dataset.
-# @param data raw data.frame.
-# @param variables vector of variable names.
-# @param node.sizes vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).
-# @param discreteness a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively)
-# @param header.file the \code{header} file.
-# @param data.file the \code{data} file.
-# @param ... potential further arguments of methods.
-# 
-# @return BNDataset object.
-# 
-# @examples
-# \dontrun{
-# # create from files
-# dataset <- read.dataset("file.header", "file.data")
-# 
-# # other way: create from raw dataset and metadata
-# data <- matrix(c(1:16), nrow = 4, ncol = 4)
-# dataset <- BNDataset(name = "MyData", data = data,
-#                      variables = c("a", "b", "c", "d"),
-#                      node.sizes = c(4,8,12,16),
-#                      discreteness = rep('d',4))
-# }
 
 #' @export
-BNDataset <- function(name = "", data = NULL, variables = c(), node.sizes = c(), discreteness = c(),
-                      header.file = NULL, data.file = NULL, ...)
+BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, ...)
 {
   dataset <- new("BNDataset")
   
-  name(dataset) <- name
+  # this is here for 2 purposes:
+  # 1. spare changes all over the package in order to remove name field
+  # 2. keep a suggestion on how to get variable name
+  name(dataset) <- deparse(substitute(dataset))
   
-  # The presence of BOTH data file and header file enable the call to read.dataset
-  if (!is.null(header.file) && !is.null(data.file)) {
-    dataset <- read.dataset(dataset, header.file, data.file, ...)
+  # The presence of ONLY data and discreteness, and them being 2 strings, mean that two files are passed:
+  # - data file (data)
+  # - header file (discreteness)
+  if ( is.null(variables)        &&  is.null(node.sizes)        &&
+      !is.null(data)             && !is.null(discreteness)      &&
+       length(discreteness) == 1 &&  is.character(discreteness) &&
+       length(data) == 1         &&  is.character(data)           ) {
+    
+    dataset <- read.dataset(dataset, data, discreteness, ...)
+    validObject(dataset)
     return(dataset)
   }
   
-  # if only one between header.file and data.file is provided, the program stops
-  if (!is.null(header.file) || !is.null(data.file))
-  {
-    stop("Please provide BOTH the header and the data files.\nConversely, use only data matrix and related variables (> ?read.dataset for details).")
-  }
-  
-  if(length(variables) > 0)
+  if(length(variables) > 1)
   {
     variables(dataset) <- variables
     num.variables(dataset) <- length(variables)
   }
   
-  if (length(node.sizes) > 0)
+  if (length(node.sizes) > 1)
     node.sizes(dataset) <- node.sizes
   
-  if (length(discreteness) > 0)
+  if (length(discreteness) > 1)
     discreteness(dataset) <- discreteness
   
   if (!is.null(data))
   {
     raw.data(dataset) <- as.matrix(data)
+    if (is.null(variables)) {
+      variables(dataset) <- rownames(data)
+      warning("Variable names guessed from data. Please check for consistency with your actual data.")
+    }
+    if (is.null(node.sizes)) {
+      node.sizes <- rep(0, length(variables))
+      for (v in 1:length(variables))
+      {
+        node.sizes[v] <- max(data[,v][which(!is.na(data[,v]))]) - min(data[,v][which(!is.na(data[,v]))]) + 1
+      }
+      warning("Variable cardinalities guessed from data. Please check for consistency with your actual data. Otherwise, execution may terminate with errors later.")
+    }
   }
   
   num.items(dataset) <- nrow(dataset@raw.data)
@@ -248,7 +209,16 @@ setReplaceMethod("discreteness",
                  "BNDataset",
                  function(x, value)
                  {
-                   slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
+                   if (is.logical(value))
+                     slot(x, "discreteness") <- value
+                   if (is.integer(value) || is.numeric(value))
+                   {
+                     d <- rep(F, num.variables(x))
+                     d[value] <- T
+                     slot(x, "discreteness") <- value
+                   }
+                   if (is.character(value))
+                     slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
                    validObject(x)
                    return(x)
                  })
@@ -463,9 +433,9 @@ setMethod("print",
           function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
           {
             
-            str <- "\nDataset: "
-            str <- paste(str, name(x), sep = '')
-            str <- paste(str, "\n", sep = '')
+            str <- "\nDataset: \n"
+            #str <- paste(str, name(x), sep = '')
+            #str <- paste(str, "\n", sep = '')
             cat(str)
             str <- "\nnum.variables "
             str <- paste(str, num.variables(x), sep = '')
