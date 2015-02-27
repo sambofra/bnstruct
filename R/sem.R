@@ -15,7 +15,7 @@ setMethod("sem",
             # starting from an empty network: learn a starting point using MMHC
             if (is.character(scoring.func))
               scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
-            print(scoring.func)
+
             if (is.na(scoring.func))
             {
               message("scoring function not recognized, using BIC")
@@ -45,7 +45,7 @@ setMethod("sem",
             
             w.dataset <- dataset
             w.eng     <- InferenceEngine(w.net)
-            print(scoring.func)
+
             if (scoring.func == 0)
             {
               warning("BDeu scoring function currently not supported for SEM algorithm. BIC score will be used.")
