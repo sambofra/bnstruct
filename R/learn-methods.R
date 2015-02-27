@@ -172,7 +172,6 @@ setMethod("learn.structure",
                                 use.imputed.data = use.imputed.data,
                                 use.cpc = use.cpc, ...)
               
-              # readLines(file("stdin"),1)
               bn <- updated.bn(sem.output$InferenceEngine)
             } # end if (algo == sem)
             
