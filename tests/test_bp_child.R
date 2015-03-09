@@ -35,8 +35,8 @@ print(net)
 #net <- learn.params(net, mydata)
 
 # em(inf.eng, mydata)
-net <- learn.structure(net, mydata, algo="mmhc", scoring.func="BIC")
-net <- learn.params(net, mydata)
+#net <- learn.structure(net, mydata, algo="mmhc", scoring.func="BIC")
+#net <- learn.params(net, mydata)
 print(dag(net))
 out <- learn.structure(net, mydata, algo = "sem", scoring.func = "BDeu", struct.threshold = 0)
 # out <- sem(net, mydata, struct.threshold = 0, algo="mmhc", scoring.func = "BIC")#,
