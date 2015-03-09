@@ -34,10 +34,11 @@ print(net)
 #    0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
 #net <- learn.params(net, mydata)
 
-print(net)
-
 # em(inf.eng, mydata)
-out <- learn.structure(net, mydata, algo = "sem", scoring.func = "BIC", struct.threshold = 0)
+net <- learn.structure(net, mydata, algo="mmhc", scoring.func="BIC")
+net <- learn.params(net, mydata)
+print(dag(net))
+out <- learn.structure(net, mydata, algo = "sem", scoring.func = "BDeu", struct.threshold = 0)
 # out <- sem(net, mydata, struct.threshold = 0, algo="mmhc", scoring.func = "BIC")#,
 #            layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
 #    0  1  1  1  1
@@ -45,5 +46,5 @@ out <- learn.structure(net, mydata, algo = "sem", scoring.func = "BIC", struct.t
 #    0  0  8  7  7
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3, bootstrap = FALSE)
-print(out)
+# print(out)
 # save.to.eps(updated.bn(out$InferenceEngine), filename = "bic.ps")

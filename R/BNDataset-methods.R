@@ -103,6 +103,64 @@ setValidity("BNDataset",
                 retval <- c(retval, "incoherent number of variable statuses")
               }
               
+              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.rawdata)
+              {
+                warn <- c()
+                halt <- c()
+                for (var in 1:object@num.variables)
+                {
+                  if (min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > 1 ||
+                      max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < object@node.sizes[var])
+                  {
+                    warn <- c(warn, var)
+                  }
+                  if (min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < 1 ||
+                      max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > object@node.sizes[var])
+                  {
+                    halt <- c(halt, var)
+                  }
+                }
+                if (length(halt) > 0)
+                {
+                  wrongs <- paste(c("Dataset contains out of bounds vales for variables ", halt), sep=" ")
+                  retval <- c(retval, wrongs)
+                }
+                if (length(warn) > 0)
+                {
+                  wrongs <- paste(c("Not all of the possible values have been observed for variables ", warn), sep = " ")
+                  warning(wrongs)
+                }
+              }
+              
+              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.impdata)
+              {
+                warn <- c()
+                halt <- c()
+                for (var in 1:object@num.variables)
+                {
+                  if (min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > 1 ||
+                        min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < object@node.sizes[var])
+                  {
+                    warn <- c(warn, var)
+                  }
+                  if (min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < 1 ||
+                        min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > object@node.sizes[var])
+                  {
+                    halt <- c(halt, var)
+                  }
+                }
+                if (length(halt) > 0)
+                {
+                  wrongs <- paste(c("Dataset contains out of bounds vales for variables ", halt))
+                  retval <- c(retval, wrongs)
+                }
+                if (length(warn) > 0)
+                {
+                  wrongs <- paste(c("Not all of the possible values have been observed for variables ", warn))
+                  warning(wrongs)
+                }
+              }
+              
               if (is.null(retval)) return (TRUE)
               return(retval)
             }

@@ -202,7 +202,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   for( i in 1:n.nodes )
   {
     cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
-    cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
+    # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     allowed[,i] <- allowed[,i] & t(cpc.mat[i,])
   }
   
@@ -212,7 +212,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   for( i in 1:n.nodes )
   {
     cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th )
-    cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
+    # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     cpc.mat[,i] <- cpc.mat[,i] & t(cpc.mat[i,])
   }
   

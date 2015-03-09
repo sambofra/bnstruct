@@ -48,39 +48,37 @@ setMethod("sem",
 
             if (scoring.func == 0)
             {
-              warning("BDeu scoring function currently not supported for SEM algorithm. BIC score will be used.")
-              scoring.func <- 2
+              warning("Using the linear approximation of BDeu scoring function in SEM.")
             }
             
-            if (scoring.func == 1 || scoring.func == 2) # AIC or BIC
+            #if (scoring.func == 1 || scoring.func == 2) # AIC or BIC
+            #{
+            repeat
             {
-              repeat
-              {
-                #w.eng     <- InferenceEngine(w.net)
-                out <- em(w.eng, dataset, param.threshold)
-                
-                new.eng     <- out$InferenceEngine
-                new.dataset <- out$BNDataset
-                
-                new.net <- learn.structure(BN(new.dataset), new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
-                                           alpha = alpha, ess = ess, bootstrap = bootstrap,
-                                           layering = layering, max.fanin.layers = max.fanin.layers,
-                                           max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                           use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
-                new.net <- learn.params(new.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
-                
-                difference <- shd(dag(w.net), dag(new.net))
-                
-                w.net     <- new.net
-                w.dataset <- new.dataset
-                w.eng     <- InferenceEngine(w.net)
-                # w.eng     <- belief.propagation(w.eng)
-                print(difference)
-                if (difference <= struct.threshold) break
-              }
+              out <- em(w.eng, dataset, param.threshold)
               
-              updated.bn(w.eng) <- new.net
+              new.eng     <- out$InferenceEngine
+              new.dataset <- out$BNDataset
+              
+              new.net <- learn.structure(BN(new.dataset), new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+                                         alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                         layering = layering, max.fanin.layers = max.fanin.layers,
+                                         max.fanin = max.fanin, cont.nodes = cont.nodes,
+                                         use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
+              new.net <- learn.params(new.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
+              
+              difference <- shd(dag(w.net), dag(new.net))
+              
+              w.net     <- new.net
+              w.dataset <- new.dataset
+              w.eng     <- InferenceEngine(w.net)
+              # w.eng     <- belief.propagation(w.eng)
+              cat("SHD between networks is ", difference, "\n")
+              if (difference <= struct.threshold) break
             }
+            
+            updated.bn(w.eng) <- new.net
+            #}
             
             return(list("InferenceEngine" = w.eng, "BNDataset" = w.dataset))
           })
