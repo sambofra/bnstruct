@@ -78,7 +78,10 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' Contains the all of the data that can be extracted from a given dataset:
 #' raw data, imputed data, raw and imputed data with bootstrap.
 #' 
-#' There are two ways to build a dataset, directly providing all of the informations, and using two files.
+#' There are two ways to build a BNDataset: using two files containing respectively header informations
+#' and data, and manually providing the data table and the related header informations
+#' (variable names, cardinality and discreteness).
+#' 
 #' The key informations needed are:
 #' 1. the data;
 #' 2. the state of variables (discrete or continuous);
@@ -90,17 +93,17 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
 #' to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
 #' 
-#' It is possible to use two files, instead of providing manually all of the info. 
+#' The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
+#' The default range of values for a discrete variable \code{X} is \code{[1,|X|]}, with \code{|X|} being
+#' the cardinality of \code{X}. The same applies for the levels of quantization for continuous variables.
+#' If the value ranges for the data are different from the expected ones, it is possible to specify a different
+#' starting value (for the whole dataset) with the \code{starts.from} parameter. E.g. by \code{starts.from=0}
+#' we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
+#' Please keep in mind that the internal representation of bnstruct starts from 1,
+#' and the original starting values are then lost.
 #' 
-#' 
-#' 
-#' There are two ways to build a BNDataset: using two files containing respectively header informations
-#' and data, and manually providing the data table and the related header informations
-#' (variable names, cardinality and discreteness).
-#' The two ways cannot be mixed up. If the method of choice is the file-based one, both the files
-#' must be provided. Conversely, all of the \code{data}, \code{variables}, \code{node.sizes}
-#' and \code{discreteness} parameters has to be given, and the files parameters must be ignored.
-#' In any case, the names of the parameters used must be provided to the constructor.
+#' It is possible to use two files, one for the data and one for the metadata,
+#' instead of providing manually all of the info. 
 #' 
 #' bnstruct requires the data files to be in a format subsequently described.
 #' The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
@@ -145,13 +148,13 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   \item{\code{num.variables}:}{number of variables (columns) in the dataset}
 #'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
 #'   \item{\code{num.items}:}{number of observations (rows) in the dataset}
-#'   \item{\code{has.rawdata}:}{TRUE if the dataset contains data read from a file}
+#'   \item{\code{has.raw.data}:}{TRUE if the dataset contains data read from a file}
 #'   \item{\code{has.imputed.data}:}{TRUE if the dataset contains imputed data (computed from raw data)}
 #'   \item{\code{raw.data}:}{matrix containing raw data}
 #'   \item{\code{imputed.data}:}{matrix containing imputed data}
 #'   \item{\code{has.boots}:}{dataset has bootstrap samples}
 #'   \item{\code{boots}:}{list of bootstrap samples}
-#'   \item{\code{has.imp.boots}:}{dataset has imputed bootstrap samples}
+#'   \item{\code{has.imputed.boots}:}{dataset has imputed bootstrap samples}
 #'   \item{\code{imp.boots}:}{list of imputed bootstrap samples}
 #'   \item{\code{num.boots}:}{number of bootstrap samples}
 #' }
@@ -177,42 +180,42 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' @exportClass BNDataset
 setClass("BNDataset",
          representation(
-           name             = "character",
-           header.file      = "character",
-           data.file        = "character",
-           variables        = "character",
-           node.sizes       = "numeric",
-           num.variables    = "numeric",
-           discreteness     = "logical",
-           num.items        = "numeric",
-           has.rawdata      = "logical",
-           has.imputed.data = "logical",
-           raw.data         = "matrix",
-           imputed.data     = "matrix",
-           has.boots        = "logical",
-           boots            = "list",
-           has.imp.boots    = "logical",
-           imp.boots        = "list",
-           num.boots        = "numeric"
+           name              = "character",
+           header.file       = "character",
+           data.file         = "character",
+           variables         = "character",
+           node.sizes        = "numeric",
+           num.variables     = "numeric",
+           discreteness      = "logical",
+           num.items         = "numeric",
+           has.raw.data      = "logical",
+           has.imputed.data  = "logical",
+           raw.data          = "matrix",
+           imputed.data      = "matrix",
+           has.boots         = "logical",
+           boots             = "list",
+           has.imputed.boots = "logical",
+           imp.boots         = "list",
+           num.boots         = "numeric"
          ),
          prototype(
-           name             = "",
-           header.file      = "",
-           data.file        = "",
-           variables        = c(""),
-           node.sizes       = c(0),
-           num.variables    = 0,
-           discreteness     = c(TRUE),
-           num.items        = 0,
-           has.rawdata      = FALSE,
-           has.imputed.data = FALSE,
-           raw.data         = matrix(c(0)),
-           imputed.data     = matrix(c(0)),
-           has.boots        = FALSE,
-           boots            = list(NULL),
-           has.imp.boots    = FALSE,
-           imp.boots        = list(NULL),
-           num.boots        = 0
+           name              = "",
+           header.file       = "",
+           data.file         = "",
+           variables         = c(""),
+           node.sizes        = c(0),
+           num.variables     = 0,
+           discreteness      = c(TRUE),
+           num.items         = 0,
+           has.raw.data      = FALSE,
+           has.imputed.data  = FALSE,
+           raw.data          = matrix(c(0)),
+           imputed.data      = matrix(c(0)),
+           has.boots         = FALSE,
+           boots             = list(NULL),
+           has.imputed.boots = FALSE,
+           imp.boots         = list(NULL),
+           num.boots         = 0
          )
         )
 

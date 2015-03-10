@@ -21,6 +21,6 @@ has.boots(x)
 Return \code{TRUE} if the given dataset contains samples for bootstrap, \code{FALSE} otherwise.
 }
 \seealso{
-\code{\link{has.imp.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
+\code{\link{has.imputed.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 }
 

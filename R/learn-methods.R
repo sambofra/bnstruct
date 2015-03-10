@@ -121,11 +121,17 @@ setMethod("learn.structure",
               }
               else
               {
+                if (use.imputed.data && has.imputed.data(dataset))
+                  data   <- imputed.data(dataset)
+                else if (use.imputed.data && !has.imputed.data(dataset))
+                  stop("Imputed data not available. Please impute data before learning.\nSee < ?impute for help.")
+                else
+                  data   <- raw.data(dataset)
                 num.boots <- num.boots(dataset)
               }
             }
             else
-            {
+            { # not bootstrap (default)
               if (use.imputed.data && has.imputed.data(dataset))
                 data   <- imputed.data(dataset)
               else if (use.imputed.data && !has.imputed.data(dataset))

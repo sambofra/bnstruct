@@ -1025,7 +1025,7 @@ setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 #' @exportMethod num.items
 setGeneric("num.items", function(x) standardGeneric("num.items"))
 
-# has.rawdata
+# has.raw.data
 # has.imputed.data
 # raw.data
 # imputed.data
@@ -1042,7 +1042,7 @@ setGeneric("num.items", function(x) standardGeneric("num.items"))
 #' 
 #' @return \code{TRUE} if dataset has bootstrap samples.
 #' 
-#' @seealso \code{\link{has.imp.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
+#' @seealso \code{\link{has.imputed.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod has.boots
 setGeneric("has.boots", function(x) standardGeneric("has.boots"))
@@ -1052,8 +1052,8 @@ setGeneric("has.boots", function(x) standardGeneric("has.boots"))
 #' 
 #' Return \code{TRUE} if the given dataset contains samples for bootstrap from inputed dataset, \code{FALSE} otherwise.
 #' 
-#' @name has.imp.boots
-#' @name has.imp.boots
+#' @name has.imputed.boots
+#' @name has.imputed.boots
 #'
 #' @param x a \code{\link{BNDataset}} object.
 #' 
@@ -1061,8 +1061,8 @@ setGeneric("has.boots", function(x) standardGeneric("has.boots"))
 #' 
 #' @seealso \code{\link{has.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
-#' @exportMethod has.imp.boots
-setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
+#' @exportMethod has.imputed.boots
+setGeneric("has.imputed.boots", function(x) standardGeneric("has.imputed.boots"))
 
 
 #' get list of bootstrap samples of a \code{\link{BNDataset}}.
@@ -1076,7 +1076,7 @@ setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
 #' 
 #' @return the list of bootstrap samples.
 #' 
-#' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{imp.boots}}
+#' @seealso \code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod boots
 setGeneric("boots", function(x) standardGeneric("boots"))
@@ -1093,7 +1093,7 @@ setGeneric("boots", function(x) standardGeneric("boots"))
 #' 
 #' @return the list of bootstrap samples from imputed data.
 #' 
-#' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{boots}}
+#' @seealso \code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{boots}}
 #' 
 #' @exportMethod imp.boots
 setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))

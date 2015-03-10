@@ -21,6 +21,6 @@ the list of bootstrap samples.
 Return the list of samples computed from raw data of a dataset.
 }
 \seealso{
-\code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{imp.boots}}
+\code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{imp.boots}}
 }
 

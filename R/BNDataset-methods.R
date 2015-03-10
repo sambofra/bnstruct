@@ -89,7 +89,7 @@ setValidity("BNDataset",
               {
                 retval <- c(retval, "incoherent number of variable names")
               }
-              if (object@has.rawdata && ncol(object@raw.data) != object@num.variables)
+              if (object@has.raw.data && ncol(object@raw.data) != object@num.variables)
               {
                 retval <- c(retval, "incoherent number of variables in raw dataset")
               }
@@ -103,7 +103,7 @@ setValidity("BNDataset",
                 retval <- c(retval, "incoherent number of variable statuses")
               }
               
-              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.rawdata)
+              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.raw.data)
               {
                 warn <- c()
                 halt <- c()
@@ -213,9 +213,9 @@ setMethod("num.items", "BNDataset", function(x) return(slot(x, "num.items")))
 #' @aliases has.boots,BNDataset
 setMethod("has.boots", "BNDataset", function(x) return(slot(x, "has.boots")))
 
-#' @rdname has.imp.boots
-#' @aliases has.imp.boots,BNDataset
-setMethod("has.imp.boots", "BNDataset", function(x) return(slot(x, "has.imp.boots")))
+#' @rdname has.imputed.boots
+#' @aliases has.imputed.boots,BNDataset
+setMethod("has.imputed.boots", "BNDataset", function(x) return(slot(x, "has.imputed.boots")))
 
 #' @rdname boots
 #' @aliases boots,BNDataset
@@ -302,7 +302,7 @@ setMethod("has.raw.data",
           "BNDataset",
           function(x)
           {
-            return(x@has.rawdata)
+            return(x@has.raw.data)
           })
 
 
@@ -434,7 +434,7 @@ setReplaceMethod("imp.boots",
                  {
                    slot(x, "imp.boots")     <- value
                    slot(x, "num.boots")     <- length(value)
-                   slot(x, "has.imp.boots") <- TRUE
+                   slot(x, "has.imputed.boots") <- TRUE
                    validObject(x)
                    return(x)
                  })
@@ -449,7 +449,7 @@ setReplaceMethod("raw.data",
                  function(x, value)
                  {
                    slot(x, "raw.data")    <- value
-                   slot(x, "has.rawdata") <- TRUE
+                   slot(x, "has.raw.data") <- TRUE
                    num.items(x) <- nrow(value)
                    validObject(x)
                    return(x)
@@ -506,9 +506,9 @@ setMethod("print",
             str <- "\nhas.boots\n"
             cat(str)
             print(has.boots(x))
-            str <- "\nhas.imp.boots\n"
+            str <- "\nhas.imputed.boots\n"
             cat(str)
-            print(has.imp.boots(x))
+            print(has.imputed.boots(x))
             str <- "\nnum.boots\n"
             cat(str)
             print(num.boots(x))
@@ -558,7 +558,7 @@ setMethod("bootstrap",
                                     object@num.items, num.boots)
               
               if (imputation)
-                object@has.imp.boots <- TRUE
+                object@has.imputed.boots <- TRUE
               
               for (i in 1:num.boots)
               {
@@ -581,7 +581,7 @@ setMethod("boot",
           c("BNDataset", "numeric"),
           function(dataset, index, imputed = TRUE, ...)
           {
-            if (!(dataset@has.boots || dataset@has.imp.boots))
+            if (!(dataset@has.boots || dataset@has.imputed.boots))
             {
               message('WARNING: No bootstrap samples available for dataset.\n')
               return(NULL)
@@ -593,13 +593,13 @@ setMethod("boot",
               return(NULL)
             }
             
-            if (imputed && dataset@has.imp.boots)
+            if (imputed && dataset@has.imputed.boots)
               return(dataset@imp.boots[[index]])
             
             if (dataset@has.boots)
               return(dataset@boots[[index]])
             
-            # if !has.boots && !imputed && has.imp.boots - though I don't know if this will ever happen
+            # if !has.boots && !imputed && has.imputed.boots - though I don't know if this will ever happen
             return(NULL)
           })
 
