@@ -6,7 +6,9 @@
 ###############################################################################
 
 
-#' learn a network (structure and parameters) of a \link{BN}.
+#' learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.
+#' 
+#' Learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset} (see the \code{Details} section).
 #' 
 #' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
 #' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
@@ -23,8 +25,9 @@
 #' @name learn.network
 #' @rdname learn.network
 #' 
-#' @param bn a \code{\link{BN}} object.
-#' @param dataset a \code{\link{BNDataset}} object.
+#' @param x can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
+#' then also the \code{dataset} parameter must be given.
+#' @param y a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.
 #' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
 #'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
 #' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
@@ -45,11 +48,24 @@
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 #' as learnt from the given dataset.
 #' 
+#' @examples
+#' \dontrun{
+#' mydataset <- BNDataset("data.file", header.file")
+#' 
+#' # starting from a BN
+#' net <- BN(mydataset)
+#' net <- learn.network(net, mydataset)
+#' 
+#' # start directly from the dataset
+#' net <- learn.network(mydataset)
+#' }
+#' 
 #' @exportMethod learn.network
-setGeneric("learn.network", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
-                                     layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
-                                     layer.struct = NULL,
-                                     cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.network"))
+setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+                                     #layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
+                                     #layer.struct = NULL,
+                                     #cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...)
+  standardGeneric("learn.network"))
 
 
 #' learn the parameters of a \link{BN}.

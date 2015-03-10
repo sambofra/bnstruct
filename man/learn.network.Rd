@@ -11,7 +11,7 @@
 \usage{
 learn.network(x, ...)
 
-\S4method{learn.network}{BN}(x, dataset = NULL, algo = "mmhc",
+\S4method{learn.network}{BN}(x, y = NULL, algo = "mmhc",
   scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
@@ -24,7 +24,10 @@ learn.network(x, ...)
   use.cpc = TRUE, ...)
 }
 \arguments{
-\item{x,}{dataset a \code{\link{BN}} object.}
+\item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
+then also the \code{dataset} parameter must be given.}
+
+\item{y}{a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.}
 
 \item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
 (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).}
@@ -59,17 +62,31 @@ new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 as learnt from the given dataset.
 }
 \description{
+Learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset} (see the \code{Details} section).
+}
+\details{
 Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
 Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
 and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
 Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
 the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
-}
-\details{
+
 The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
 It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
 to the method if \code{algo = 'sm'} is given as parameter to the method.
 
 Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation.
+}
+\examples{
+\dontrun{
+mydataset <- BNDataset("data.file", header.file")
+
+# starting from a BN
+net <- BN(mydataset)
+net <- learn.network(net, mydataset)
+
+# start directly from the dataset
+net <- learn.network(mydataset)
+}
 }
 

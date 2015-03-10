@@ -1,13 +1,35 @@
 #' @rdname learn.network
-#' @aliases learn.network,BN,BNDataset
+#' @aliases learn.network,BN
 setMethod("learn.network",
-          c("BN","BNDataset"),
-          function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+          c("BN"),
+          function(x, y = NULL, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
           {
+            if (is.null(y) || class(y) != "BNDataset")
+              stop("A BNDataset must be provided in order to learn a network from it. ",
+                   "Please take a look at the documentation of the method: > ?learn.network")
+            
+            bn <- x
+            dataset <- y
             bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
-                                  bootstrap, kayering, max.fanin.layers, max.fanin,
+                                  bootstrap, layering, max.fanin.layers, max.fanin,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            return(bn)
+          })
+#' @rdname learn.network
+#' @aliases learn.network,BNDataset
+setMethod("learn.network",
+          c("BNDataset"),
+          function(x, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+          {
+            dataset <- x
+            bn <- BN(dataset)
+            bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
+                                  bootstrap, layering, max.fanin.layers, max.fanin,
                                   layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
             bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)

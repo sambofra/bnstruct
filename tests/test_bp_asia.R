@@ -11,7 +11,7 @@ print(mydata)
 other <- BNDataset(data = mydata@raw.data, variables = variables(mydata), node.sizes = mydata@node.sizes, discreteness = rep('d',8))
 print(other)
 
-net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
+net <- learn.network(mydata) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8
 # set.node.sizes(net) <- c(2,2,2,2,2,2,2,2)
@@ -49,8 +49,8 @@ net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
 # # 
 # slot(net, "cpts") <- cpts
 
-net <- learn.structure(net, mydata, algo="mmhc")
-net <- learn.params(net, mydata)
+#net <- learn.structure(net, mydata, algo="mmhc")
+#net <- learn.params(net, mydata)
  
 # print(net)
 # unlist(lapply(net@cpts, sum))
