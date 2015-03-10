@@ -146,9 +146,8 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
 #'   \item{\code{num.items}:}{number of observations (rows) in the dataset}
 #'   \item{\code{has.rawdata}:}{TRUE if the dataset contains data read from a file}
-#'   \item{\code{has.impdata}:}{TRUE if the dataset contains imputed data (computed from raw data)}
+#'   \item{\code{has.imputed.data}:}{TRUE if the dataset contains imputed data (computed from raw data)}
 #'   \item{\code{raw.data}:}{matrix containing raw data}
-#'   \item{\code{imputation}:}{TRUE if it dataset contains imputed data}
 #'   \item{\code{imputed.data}:}{matrix containing imputed data}
 #'   \item{\code{has.boots}:}{dataset has bootstrap samples}
 #'   \item{\code{boots}:}{list of bootstrap samples}
@@ -178,44 +177,42 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' @exportClass BNDataset
 setClass("BNDataset",
          representation(
-           name          = "character",
-           header.file   = "character",
-           data.file     = "character",
-           variables     = "character",
-           node.sizes    = "numeric",
-           num.variables = "numeric",
-           discreteness  = "logical",
-           num.items     = "numeric",
-           has.rawdata   = "logical",
-           has.impdata   = "logical",
-           raw.data      = "matrix",
-           imputation    = "logical",
-           imputed.data  = "matrix",
-           has.boots     = "logical",
-           boots         = "list",
-           has.imp.boots = "logical",
-           imp.boots     = "list",
-           num.boots     = "numeric"
+           name             = "character",
+           header.file      = "character",
+           data.file        = "character",
+           variables        = "character",
+           node.sizes       = "numeric",
+           num.variables    = "numeric",
+           discreteness     = "logical",
+           num.items        = "numeric",
+           has.rawdata      = "logical",
+           has.imputed.data = "logical",
+           raw.data         = "matrix",
+           imputed.data     = "matrix",
+           has.boots        = "logical",
+           boots            = "list",
+           has.imp.boots    = "logical",
+           imp.boots        = "list",
+           num.boots        = "numeric"
          ),
          prototype(
-           name          = "",
-           header.file   = "",
-           data.file     = "",
-           variables     = c(""),
-           node.sizes    = c(0),
-           num.variables = 0,
-           discreteness  = c(TRUE),
-           num.items     = 0,
-           has.rawdata   = FALSE,
-           has.impdata   = FALSE,
-           raw.data      = matrix(c(0)),
-           imputation    = FALSE,
-           imputed.data  = matrix(c(0)),
-           has.boots     = FALSE,
-           boots         = list(NULL),
-           has.imp.boots = FALSE,
-           imp.boots     = list(NULL),
-           num.boots     = 0
+           name             = "",
+           header.file      = "",
+           data.file        = "",
+           variables        = c(""),
+           node.sizes       = c(0),
+           num.variables    = 0,
+           discreteness     = c(TRUE),
+           num.items        = 0,
+           has.rawdata      = FALSE,
+           has.imputed.data = FALSE,
+           raw.data         = matrix(c(0)),
+           imputed.data     = matrix(c(0)),
+           has.boots        = FALSE,
+           boots            = list(NULL),
+           has.imp.boots    = FALSE,
+           imp.boots        = list(NULL),
+           num.boots        = 0
          )
         )
 

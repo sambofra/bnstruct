@@ -95,9 +95,8 @@ as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respecti
   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
   \item{\code{num.items}:}{number of observations (rows) in the dataset}
   \item{\code{has.rawdata}:}{TRUE if the dataset contains data read from a file}
-  \item{\code{has.impdata}:}{TRUE if the dataset contains imputed data (computed from raw data)}
+  \item{\code{has.imputed.data}:}{TRUE if the dataset contains imputed data (computed from raw data)}
   \item{\code{raw.data}:}{matrix containing raw data}
-  \item{\code{imputation}:}{TRUE if it dataset contains imputed data}
   \item{\code{imputed.data}:}{matrix containing imputed data}
   \item{\code{has.boots}:}{dataset has bootstrap samples}
   \item{\code{boots}:}{list of bootstrap samples}

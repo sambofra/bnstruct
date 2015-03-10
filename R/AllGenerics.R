@@ -1026,9 +1026,8 @@ setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 setGeneric("num.items", function(x) standardGeneric("num.items"))
 
 # has.rawdata
-# has.impdata
+# has.imputed.data
 # raw.data
-# imputation
 # imputed.data
 # already have methods (see above)
 

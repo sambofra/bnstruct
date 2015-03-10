@@ -93,7 +93,7 @@ setValidity("BNDataset",
               {
                 retval <- c(retval, "incoherent number of variables in raw dataset")
               }
-              if (object@has.impdata && ncol(object@imputed.data) != object@num.variables)
+              if (object@has.imputed.data && ncol(object@imputed.data) != object@num.variables)
               {
                 retval <- c(retval, "incoherent number of variables in imputed dataset")
               }
@@ -132,7 +132,7 @@ setValidity("BNDataset",
                 }
               }
               
-              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.impdata)
+              if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.imputed.data)
               {
                 warn <- c()
                 halt <- c()
@@ -312,7 +312,7 @@ setMethod("has.imputed.data",
           "BNDataset",
           function(x)
           {
-            return(x@has.impdata)
+            return(x@has.imputed.data)
           })
 
 
@@ -465,8 +465,7 @@ setReplaceMethod("imputed.data",
                  function(x, value)
                  {
                    slot(x, "imputed.data") <- value
-                   slot(x, "has.impdata")  <- TRUE
-                   slot(x, "imputation")   <- TRUE
+                   slot(x, "has.imputed.data")  <- TRUE
                    num.items(x) <- nrow(value)
                    validObject(x)
                    return(x)
@@ -503,7 +502,7 @@ setMethod("print",
             print(num.items(x))
             str <- "\nimputation\n"
             cat(str)
-            print(x@imputation)
+            print(x@has.imputed.data)
             str <- "\nhas.boots\n"
             cat(str)
             print(has.boots(x))
@@ -536,7 +535,7 @@ setMethod("impute",
             # assumes raw data is ok
             object@imputed.data <- knn.impute(object@raw.data, k.impute,
                                               setdiff(1:length(object@node.sizes), c()))
-            object@has.impdata  <- TRUE
+            object@has.imputed.data  <- TRUE
             return(object)
           })
 
