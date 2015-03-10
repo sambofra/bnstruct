@@ -831,7 +831,7 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' sem(x, dataset)
 #' }
 #' 
-#' @exportMethod sem
+# exportMethod sem
 setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
                            alpha = 0.05, ess = 1, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
