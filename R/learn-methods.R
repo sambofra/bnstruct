@@ -1,3 +1,18 @@
+#' @rdname learn.network
+#' @aliases learn.network,BN,BNDataset
+setMethod("learn.network",
+          c("BN","BNDataset"),
+          function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+          {
+            bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
+                                  bootstrap, kayering, max.fanin.layers, max.fanin,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            return(bn)
+          })
+
 #' @rdname learn.params
 #' @aliases learn.params,BN,BNDataset
 setMethod("learn.params",

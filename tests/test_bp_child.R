@@ -38,7 +38,7 @@ print(net)
 #net <- learn.structure(net, mydata, algo="mmhc", scoring.func="BIC")
 #net <- learn.params(net, mydata)
 print(dag(net))
-out <- learn.structure(net, mydata, algo = "sem", scoring.func = "BDeu", struct.threshold = 0)
+out <- learn.network(net, mydata, algo = "sem", scoring.func = "BDeu", struct.threshold = 0)
 # out <- sem(net, mydata, struct.threshold = 0, algo="mmhc", scoring.func = "BIC")#,
 #            layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
 #    0  1  1  1  1

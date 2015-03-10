@@ -6,6 +6,52 @@
 ###############################################################################
 
 
+#' learn a network (structure and parameters) of a \link{BN}.
+#' 
+#' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
+#' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
+#' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
+#' Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
+#' the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
+#' 
+#' The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
+#' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
+#' to the method if \code{algo = 'sm'} is given as parameter to the method.
+#' 
+#' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation.
+#' 
+#' @name learn.network
+#' @rdname learn.network
+#' 
+#' @param bn a \code{\link{BN}} object.
+#' @param dataset a \code{\link{BNDataset}} object.
+#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
+#'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
+#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
+#' @param alpha confidence threshold (only for \code{mmhc}).
+#' @param ess Equivalent Sample Size value.
+#' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
+#' @param cont.nodes vector containing the index of continuous variables.
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
+#' 
+#' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
+#' as learnt from the given dataset.
+#' 
+#' @exportMethod learn.network
+setGeneric("learn.network", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+                                     layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
+                                     layer.struct = NULL,
+                                     cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.network"))
+
+
 #' learn the parameters of a \link{BN}.
 #' 
 #' Learn the parameters of a \link{BN} object according to a \link{BNDataset}
