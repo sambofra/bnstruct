@@ -296,16 +296,6 @@ setReplaceMethod("node.sizes",
                  })
 
 
-#' @aliases has.data,BNDataset
-#' @rdname has.data
-setMethod("has.data",
-          "BNDataset",
-          function(x)
-          {
-            return (has.raw.data(x) || has.imputed.data(x))
-          })
-
-
 #' @rdname has.raw.data
 #' @aliases has.raw.data,BNDataset
 setMethod("has.raw.data",

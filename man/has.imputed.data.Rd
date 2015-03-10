@@ -30,6 +30,6 @@ has.imputed.data(x) # TRUE
 }
 }
 \seealso{
-\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+\code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
 

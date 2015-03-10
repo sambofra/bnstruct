@@ -436,29 +436,6 @@ setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 ###############################################################################
 
 
-#' check if a BNDataset contains any data.
-#' 
-#' Check whether a \code{\link{BNDataset}} object actually contains raw or imputed data.
-#' 
-#' @name has.data
-#' @rdname has.data
-#' 
-#' @param x a \code{\link{BNDataset}}.
-#' 
-#' @examples
-#' \dontrun{
-#' x <- BNDataset()
-#' has.data(x) # FALSE
-#' 
-#' x <- read.dataset(x, "file.header", "file.data")
-#' has.data(x) # TRUE
-#' }
-#' 
-#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
-#' 
-#' @exportMethod has.data
-setGeneric("has.data", function(x) standardGeneric("has.data"))
-
 #' check if a BNDataset contains raw data.
 #' 
 #' Check whether a \code{\link{BNDataset}} object actually contains raw data.
@@ -477,7 +454,7 @@ setGeneric("has.data", function(x) standardGeneric("has.data"))
 #' has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+#' @seealso \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.raw.data
 setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
@@ -503,7 +480,7 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' has.imputed.data(x) # TRUE
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.imputed.data
 setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
@@ -518,7 +495,7 @@ setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
 #' 
 #' @exportMethod raw.data
 setGeneric("raw.data", function(x) standardGeneric("raw.data"))
@@ -533,7 +510,7 @@ setGeneric("raw.data", function(x) standardGeneric("raw.data"))
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}
 #' 
 #' @exportMethod imputed.data
 setGeneric("imputed.data", function(x) standardGeneric("imputed.data"))
@@ -549,7 +526,7 @@ setGeneric("imputed.data", function(x) standardGeneric("imputed.data"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod raw.data<-
 setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
@@ -565,7 +542,7 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod imputed.data<-
 setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"))

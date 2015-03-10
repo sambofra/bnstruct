@@ -19,6 +19,6 @@ raw.data(x) <- value
 Insert raw data in a \code{\link{BNDataset}} object.
 }
 \seealso{
-\code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
+\code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 }
 

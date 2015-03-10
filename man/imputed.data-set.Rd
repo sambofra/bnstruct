@@ -19,6 +19,6 @@ imputed.data(x) <- value
 Insert imputed data in a \code{\link{BNDataset}} object.
 }
 \seealso{
-\code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
+\code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 }
 

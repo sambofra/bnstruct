@@ -29,7 +29,7 @@ sem(x, dataset, struct.threshold = 10, param.threshold = 0.001,
 \item{param.threshold}{threshold for convergence of the parameter learning step, used as stopping criterion.}
 
 \item{scoring.func}{the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
-(default - \code{BDeu} currently not supported for \code{sem}).}
+(default - \code{BDeu} supported  as linear approximation).}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 
@@ -54,15 +54,9 @@ starting the Hill Climbing from an empty graph.}
 \item{...}{further potential arguments for method.}
 }
 \value{
-a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
-        and the imputed dataset (\code{"BNDataset"}).
+a (\code{"BN"}) network with the new structure.
 }
 \description{
 Learn structure and parameters of a network with the Structural EM algorithm.
-}
-\examples{
-\dontrun{
-sem(x, dataset)
-}
 }
 
