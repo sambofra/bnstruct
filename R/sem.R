@@ -29,13 +29,17 @@ setMethod("sem",
             if (sum(dag(net)) == 0)
             {
               w.net <- net
-              if (use.cpc)
-                cpc <- mmpc( raw.data(dataset), node.sizes(w.net), cont.nodes, alpha, layering, layer.struct=c() )
-              else
-                cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
-              dag(w.net) <- hc( raw.data(dataset), node.sizes(w.net), scoring.func, cpc, cont.nodes )
+              #if (use.cpc)
+              #  cpc <- mmpc( raw.data(dataset), node.sizes(w.net), cont.nodes, alpha, layering, layer.struct=c() )
+              #else
+              #  cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+              #dag(w.net) <- hc( raw.data(dataset), node.sizes(w.net), scoring.func, cpc, cont.nodes )
               
-              w.net <- learn.params(w.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
+              w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+                                     alpha=alpha, ess = ess, bootstrap = bootstrap,
+                                     layering = layering, max.fanin.layers = max.fanin.layers,
+                                     max.fanin = max.fanin, cont.nodes = cont.nodes,
+                                     use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
             }
             else
             {
@@ -47,9 +51,7 @@ setMethod("sem",
             w.eng     <- InferenceEngine(w.net)
 
             if (scoring.func == 0)
-            {
               warning("Using the linear approximation of BDeu scoring function in SEM.")
-            }
             
             #if (scoring.func == 1 || scoring.func == 2) # AIC or BIC
             #{
@@ -60,12 +62,12 @@ setMethod("sem",
               new.eng     <- out$InferenceEngine
               new.dataset <- out$BNDataset
               
-              new.net <- learn.structure(BN(new.dataset), new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+              new.net <- learn.network(new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
                                          alpha = alpha, ess = ess, bootstrap = bootstrap,
                                          layering = layering, max.fanin.layers = max.fanin.layers,
                                          max.fanin = max.fanin, cont.nodes = cont.nodes,
                                          use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
-              new.net <- learn.params(new.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
+              #new.net <- learn.params(new.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
               
               difference <- shd(dag(w.net), dag(new.net))
               
@@ -77,8 +79,8 @@ setMethod("sem",
               if (difference <= struct.threshold) break
             }
             
-            updated.bn(w.eng) <- new.net
+            # updated.bn(w.eng) <- new.net
             #}
             
-            return(list("InferenceEngine" = w.eng, "BNDataset" = w.dataset))
+            return(w.net)
           })

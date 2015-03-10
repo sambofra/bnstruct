@@ -809,7 +809,7 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
 #' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
 #' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
-#' (default - \code{BDeu} currently not supported for \code{sem}).
+#' (default - \code{BDeu} supported  as linear approximation).
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
@@ -823,13 +823,7 @@ setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) sta
 #' starting the Hill Climbing from an empty graph.
 #' @param ... further potential arguments for method.
 #' 
-#' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
-#'         and the imputed dataset (\code{"BNDataset"}).
-#'
-#' @examples
-#' \dontrun{
-#' sem(x, dataset)
-#' }
+#' @return a (\code{"BN"}) network with the new structure.
 #' 
 # exportMethod sem
 setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",

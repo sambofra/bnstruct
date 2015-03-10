@@ -171,16 +171,6 @@ setMethod("learn.structure",
             if (algo == "sem")
             {
               other.args <- list(...)
-
-              if ("mmpc" %in% names(other.args))
-              {
-                mmpc <- as.logical(other.args$mmpc)
-                print(mmpc)
-              }
-              else
-              {
-                mmpc <- TRUE
-              }
               
               if ("tabu.tenure" %in% names(other.args))
               {
@@ -201,15 +191,14 @@ setMethod("learn.structure",
                 #struct.threshold <- 10
               }
 
-              sem.output <- sem(bn, dataset, param.threshold = 0.001,
-                                scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
-                                alpha = 0.05, ess = 1, bootstrap = FALSE,
-                                layering = c(), max.fanin.layers = NULL,
-                                max.fanin = num.variables(dataset), cont.nodes = c(),
-                                use.imputed.data = use.imputed.data,
-                                use.cpc = use.cpc, ...)
+              bn <- sem(bn, dataset, param.threshold = 0.001,
+                        scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
+                        alpha = 0.05, ess = 1, bootstrap = FALSE,
+                        layering = c(), max.fanin.layers = NULL,
+                        max.fanin = num.variables(dataset), cont.nodes = c(),
+                        use.imputed.data = use.imputed.data,
+                        use.cpc = use.cpc, ...)
               
-              bn <- updated.bn(sem.output$InferenceEngine)
             } # end if (algo == sem)
             
             if (algo == "mmhc") # default
