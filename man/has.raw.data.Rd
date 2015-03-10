@@ -9,13 +9,22 @@
 \usage{
 has.raw.data(x)
 
+has.raw.data(x)
+
 \S4method{has.raw.data}{BNDataset}(x)
 }
 \arguments{
 \item{x}{a \code{\link{BNDataset}}.}
+
+\item{x}{a \code{\link{BNDataset}} object.}
+}
+\value{
+\code{TRUE} if dataset has raw data.
 }
 \description{
 Check whether a \code{\link{BNDataset}} object actually contains raw data.
+
+Return \code{TRUE} if the given dataset contains raw data, \code{FALSE} otherwise.
 }
 \examples{
 \dontrun{
@@ -27,6 +36,8 @@ has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 }
 }
 \seealso{
+\code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+
 \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
 

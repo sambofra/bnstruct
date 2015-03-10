@@ -92,7 +92,6 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' _all_ of the informations, in order to avoid problems later on during the execution.
 #' Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
 #' to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
-#' 
 #' The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
 #' The default range of values for a discrete variable \code{X} is \code{[1,|X|]}, with \code{|X|} being
 #' the cardinality of \code{X}. The same applies for the levels of quantization for continuous variables.
@@ -100,17 +99,14 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' starting value (for the whole dataset) with the \code{starts.from} parameter. E.g. by \code{starts.from=0}
 #' we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
 #' Please keep in mind that the internal representation of bnstruct starts from 1,
-#' and the original starting values are then lost.
-#' 
+#' and the original starting values are then lost. 
 #' It is possible to use two files, one for the data and one for the metadata,
 #' instead of providing manually all of the info. 
-#' 
 #' bnstruct requires the data files to be in a format subsequently described.
 #' The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
 #' with the values for each variable separated by a space or a tab. Values for each variable have to be
 #' numbers, starting from \code{1} in case of discrete variables.
 #' Data files can have a first row containing the names of the corresponding variables.
-#'
 #' In addition to the data file, a header file containing additional informations can also be provided.
 #' An header file has to be composed by three rows of tab-delimited values:
 #' 1. list of names of the variables, in the same order of the data file;
@@ -119,7 +115,6 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' 3. a list that indicates, for each variable, if the variable is continuous
 #'   (\code{c} or \code{C}), and thus has to be quantized before learning,
 #'   or discrete (\code{d} or \code{D}).
-#'   
 #' In case of need of more advanced options when reading a dataset from files, please refer to the
 #' documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
 #' as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).

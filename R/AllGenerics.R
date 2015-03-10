@@ -1031,6 +1031,40 @@ setGeneric("num.items", function(x) standardGeneric("num.items"))
 # imputed.data
 # already have methods (see above)
 
+#' check whether a \code{\link{BNDataset}} has raw data or not.
+#' 
+#' Return \code{TRUE} if the given dataset contains raw data, \code{FALSE} otherwise.
+#' 
+#' @name has.raw.data
+#' @rdname has.raw.data
+#'
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return \code{TRUE} if dataset has raw data.
+#' 
+#' @seealso \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+#' 
+#' @exportMethod has.raw.data
+setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
+
+
+#' check whether a \code{\link{BNDataset}} has imputed data or not.
+#' 
+#' Return \code{TRUE} if the given dataset contains imputed data, \code{FALSE} otherwise.
+#' 
+#' @name has.imputed.data
+#' @rdname has.imputed.data
+#'
+#' @param x a \code{\link{BNDataset}} object.
+#' 
+#' @return \code{TRUE} if dataset has imputed data.
+#' 
+#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+#' 
+#' @exportMethod has.imputed.data
+setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
+
+
 #' check whether a \code{\link{BNDataset}} has bootstrap samples or not.
 #' 
 #' Return \code{TRUE} if the given dataset contains samples for bootstrap, \code{FALSE} otherwise.

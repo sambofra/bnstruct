@@ -302,7 +302,7 @@ setMethod("has.raw.data",
           "BNDataset",
           function(x)
           {
-            return(x@has.raw.data)
+            return(slot(x, "has.raw.data"))
           })
 
 
@@ -312,7 +312,7 @@ setMethod("has.imputed.data",
           "BNDataset",
           function(x)
           {
-            return(x@has.imputed.data)
+            return(slot(x, "has.imputed.data"))
           })
 
 
@@ -323,7 +323,7 @@ setMethod("raw.data",
           function(x)
           {
             if (has.raw.data(x))
-              return (x@raw.data)
+               return (x@raw.data)
             return (NULL)
           })
 
@@ -472,7 +472,7 @@ setReplaceMethod("imputed.data",
                  })
 
 
-# redefition of print() for BNDataset objects
+# redefinition of print() for BNDataset objects
 #' @rdname print
 #' @aliases print,BNDataset
 setMethod("print",
@@ -502,7 +502,7 @@ setMethod("print",
             print(num.items(x))
             str <- "\nimputation\n"
             cat(str)
-            print(x@has.imputed.data)
+            print(has.imputed.data(x))
             str <- "\nhas.boots\n"
             cat(str)
             print(has.boots(x))

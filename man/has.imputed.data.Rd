@@ -9,13 +9,22 @@
 \usage{
 has.imputed.data(x)
 
+has.imputed.data(x)
+
 \S4method{has.imputed.data}{BNDataset}(x)
 }
 \arguments{
 \item{x}{a \code{\link{BNDataset}}.}
+
+\item{x}{a \code{\link{BNDataset}} object.}
+}
+\value{
+\code{TRUE} if dataset has imputed data.
 }
 \description{
 Check whether a \code{\link{BNDataset}} object actually contains imputed data.
+
+Return \code{TRUE} if the given dataset contains imputed data, \code{FALSE} otherwise.
 }
 \examples{
 \dontrun{
@@ -30,6 +39,8 @@ has.imputed.data(x) # TRUE
 }
 }
 \seealso{
+\code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
+
 \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
 
