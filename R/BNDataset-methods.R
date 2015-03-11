@@ -122,12 +122,11 @@ setValidity("BNDataset",
                 }
                 if (length(halt) > 0)
                 {
-                  wrongs <- paste(c("Dataset contains out of bounds vales for variables ", halt), sep=" ")
+                  wrongs <- strcat("Dataset contains values out of bounds for variables ", halt, sep=" ")
                   retval <- c(retval, wrongs)
-                }
-                if (length(warn) > 0)
+                } else if (length(warn) > 0)
                 {
-                  wrongs <- paste(c("Not all of the possible values have been observed for variables ", warn), sep = " ")
+                  wrongs <- strcat("Not all of the possible values have been observed for variables ", warn, sep = " ")
                   warning(wrongs)
                 }
               }
@@ -151,12 +150,11 @@ setValidity("BNDataset",
                 }
                 if (length(halt) > 0)
                 {
-                  wrongs <- paste(c("Dataset contains out of bounds vales for variables ", halt), sep=" ")
+                  wrongs <- strcat("Dataset contains values out of bounds for variables ", halt, sep=" ")
                   retval <- c(retval, wrongs)
-                }
-                if (length(warn) > 0)
+                } else if (length(warn) > 0)
                 {
-                  wrongs <- paste(c("Not all of the possible values have been observed for variables ", warn), sep= " ")
+                  wrongs <- strcat("Not all of the possible values have been observed for variables ", warn, sep= " ")
                   warning(wrongs)
                 }
               }
@@ -491,28 +489,28 @@ setMethod("print",
             cat(str)
             str <- "\nvariables\n"
             cat(str)
-            print(variables(x))
+            cat(variables(x))
             str <- "\ndiscreteness\n"
             cat(str)
-            print(discreteness(x))
+            cat(discreteness(x))
             str <- "\nnode.sizes\n"
             cat(str)
-            print(node.sizes(x))
+            cat(node.sizes(x))
             str <- "\nnum.items\n"
             cat(str)
-            print(num.items(x))
+            cat(num.items(x))
             str <- "\nimputation\n"
             cat(str)
-            print(has.imputed.data(x))
+            cat(has.imputed.data(x))
             str <- "\nhas.boots\n"
             cat(str)
-            print(has.boots(x))
+            cat(has.boots(x))
             str <- "\nhas.imputed.boots\n"
             cat(str)
-            print(has.imputed.boots(x))
+            cat(has.imputed.boots(x))
             str <- "\nnum.boots\n"
             cat(str)
-            print(num.boots(x))
+            cat(num.boots(x))
             
             
             if (show.raw.data == TRUE && has.raw.data(x))
@@ -525,6 +523,8 @@ setMethod("print",
               cat("\nImputed data:\n")
               print(imputed.data(x))
             }
+            
+            cat("\n")
           })
 
 #' @rdname impute
@@ -544,7 +544,7 @@ setMethod("impute",
 #' @aliases bootstrap,BNDataset
 setMethod("bootstrap",
           "BNDataset",
-          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10, na.string.symbol = '?', ...)
+          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
           {
             # assumes raw data is ok
             object@has.boots <- TRUE
@@ -580,7 +580,7 @@ setMethod("bootstrap",
 #' @aliases boot,BNDataset
 setMethod("boot",
           c("BNDataset", "numeric"),
-          function(dataset, index, imputed = FALSE, ...)
+          function(dataset, index, imputed = FALSE)
           {
             if (!imuputed && !dataset@has.boots)
               stop('No bootstrap samples available for dataset.')

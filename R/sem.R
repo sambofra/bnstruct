@@ -43,11 +43,6 @@ setMethod("sem",
             w.dataset <- dataset
             w.eng     <- InferenceEngine(w.net)
 
-            if (scoring.func == 0)
-              warning("Using the linear approximation of BDeu scoring function in SEM.")
-            
-            #if (scoring.func == 1 || scoring.func == 2) # AIC or BIC
-            #{
             repeat
             {
               out <- em(w.eng, dataset, param.threshold)
@@ -60,20 +55,18 @@ setMethod("sem",
                                          layering = layering, max.fanin.layers = max.fanin.layers,
                                          max.fanin = max.fanin, cont.nodes = cont.nodes,
                                          use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
-              #new.net <- learn.params(new.net, dataset, ess = ess, use.imputed.data=use.imputed.data)
               
               difference <- shd(dag(w.net), dag(new.net))
               
               w.net     <- new.net
               w.dataset <- new.dataset
-              w.eng     <- InferenceEngine(w.net)
-              # w.eng     <- belief.propagation(w.eng)
-              cat("SHD between networks is ", difference, "\n")
-              if (difference <= struct.threshold) break
+              
+              if (difference <= struct.threshold)
+                break
+              else
+                w.eng     <- InferenceEngine(w.net)
             }
-            
-            # updated.bn(w.eng) <- new.net
-            #}
+
             
             return(w.net)
           })

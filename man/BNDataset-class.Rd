@@ -22,10 +22,6 @@ or path/name of the file containing header information for the dataset (discrete
 
 \item{node.sizes}{vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).}
 
-\item{header.file}{the \code{header} file.}
-
-\item{data.file}{the \code{data} file.}
-
 \item{...}{further arguments for reading a dataset from files (see documentation for \code{read.dataset}).}
 }
 \value{
@@ -52,6 +48,7 @@ The key informations needed are:
 (if continuous).
 Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
 _all_ of the informations, in order to avoid problems later on during the execution.
+
 Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
 to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
 The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
@@ -62,6 +59,7 @@ starting value (for the whole dataset) with the \code{starts.from} parameter. E.
 we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
 Please keep in mind that the internal representation of bnstruct starts from 1,
 and the original starting values are then lost.
+
 It is possible to use two files, one for the data and one for the metadata,
 instead of providing manually all of the info.
 bnstruct requires the data files to be in a format subsequently described.
@@ -69,6 +67,7 @@ The actual data has to be in (a text file containing data in) tabular format, on
 with the values for each variable separated by a space or a tab. Values for each variable have to be
 numbers, starting from \code{1} in case of discrete variables.
 Data files can have a first row containing the names of the corresponding variables.
+
 In addition to the data file, a header file containing additional informations can also be provided.
 An header file has to be composed by three rows of tab-delimited values:
 1. list of names of the variables, in the same order of the data file;
@@ -106,14 +105,14 @@ as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respecti
 \examples{
 \dontrun{
 # create from files
-dataset <- read.dataset("file.header", "file.data")
+dataset <- BNDataset("file.data", "file.header")
 
 # other way: create from raw dataset and metadata
 data <- matrix(c(1:16), nrow = 4, ncol = 4)
-dataset <- BNDataset(name = "MyData", data = data,
+dataset <- BNDataset(data = data,
+                     discreteness = rep('d',4)
                      variables = c("a", "b", "c", "d"),
-                     node.sizes = c(4,8,12,16),
-                     discreteness = rep('d',4))
+                     node.sizes = c(4,8,12,16),)
 }
 }
 \seealso{

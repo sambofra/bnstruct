@@ -8,10 +8,10 @@
 \title{Perform bootstrap.}
 \usage{
 bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
-  k.impute = 10, na.string.symbol = "?", ...)
+  k.impute = 10)
 
 \S4method{bootstrap}{BNDataset}(object, num.boots = 100, seed = 0,
-  imputation = FALSE, k.impute = 10, na.string.symbol = "?", ...)
+  imputation = FALSE, k.impute = 10)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -20,21 +20,16 @@ bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
 
 \item{seed}{random seed.}
 
-\item{imputation}{\code{TRUE} if imputation has to be performed.}
+\item{imputation}{\code{TRUE} if imputation has to be performed. Default is \code{FALSE}.}
 
 \item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).}
-
-\item{na.string.symbol}{character that denotes NA in the dataset (useful only if imputation == TRUE).}
-
-\item{...}{potential further arguments of methods.}
 }
 \description{
 Create a list of \code{num.boots} samples of the original dataset.
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.data", "file.header")
 dataset <- bootstrap(dataset, num.boots = 1000)
 }
 }

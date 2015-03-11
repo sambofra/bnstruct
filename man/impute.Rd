@@ -23,8 +23,7 @@ Impute a \code{\link{BNDataset}} raw data with missing values.
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.data", "file.header")
 dataset <- impute(dataset)
 }
 }

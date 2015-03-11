@@ -437,13 +437,13 @@ setMethod("print",
             cat(str)
             str <- "\nvariables\n"
             cat(str)
-            print(variables(x))
+            cat(variables(x))
             str <- "\ndiscreteness\n"
             cat(str)
-            print(discreteness(x))
+            cat(discreteness(x))
             str <- "\nnode.sizes\n"
             cat(str)
-            print(node.sizes(x))
+            cat(node.sizes(x))
             
             if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
             {
@@ -468,6 +468,8 @@ setMethod("print",
               print(cpts(x))
               
             }
+            
+            cat("\n")
             
           })
 

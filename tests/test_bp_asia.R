@@ -4,15 +4,15 @@ library("bnstruct")
 # asia_10000 <- read.dataset(asia_10000, "../bnstruct/inst/extdata/asia_10000.header", "../bnstruct/inst/extdata/asia_10000.data", imputation = FALSE, bootstrap=FALSE)
 # save(asia_10000, file="data/asia_10000.rda")
 # break
-#mydata <- asia()
+mydata <- asia()
 #mydata@name <- "Asia"
 # print(mydata)
 
 #other <- BNDataset(data = mydata@raw.data, variables = variables(mydata), node.sizes = mydata@node.sizes, discreteness = rep('d',8))
 #print(other)
-mydata <- BNDataset("/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.data",
-                    "/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.header",
-                    starts.from=0)
+# mydata <- BNDataset("/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.data",
+#                     "/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.header",
+#                     starts.from=0)
 net <- learn.network(mydata) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8

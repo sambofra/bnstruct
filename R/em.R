@@ -2,7 +2,7 @@
 #' @aliases em,InferenceEngine,BNDataset
 setMethod("em",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, threshold = 0.001)
+          function(x, dataset, threshold = 0.001, ess = 1)
           {
             # We assume:
             # 1) there is a BN with learnt or known parameters
@@ -24,6 +24,8 @@ setMethod("em",
             #     - in case of parents with missing values: take variables in topological order
             #   - compute values according to distribution
 
+            bnstruct.start.log("starting EM algorithm ...")
+            
             rawdata  <- raw.data(dataset)
             if (test.updated.bn(x))
               orig.bn <- updated.bn(x)
@@ -159,7 +161,7 @@ setMethod("em",
                 bis.dataset <- dataset
                 imputed.data(bis.dataset) <- bis.data
                 num.items(bis.dataset) <- num.items - length(still.has.NAs)
-                bis.net <- learn.params(bn, bis.dataset)
+                bis.net <- learn.params(bn, bis.dataset, ess=ess)
 
                 for (bis.row in still.has.NAs)
                 {
@@ -173,17 +175,19 @@ setMethod("em",
               storage.mode(imp.data) <- "integer"
               imputed.data(dataset)  <- imp.data
               
-              bn <- learn.params(bn, dataset)
+              bn <- learn.params(bn, dataset, ess=ess)
 
               if (first.iteration)
                 first.iteration <- FALSE
               else
                 difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
-              print(difference)
-              # readLines(file("stdin"),1)
+
               orig.bn <- bn
             }
             
             updated.bn(x) <- bn
+            
+            bnstruct.end.log("EM algorithm completed.")
+            
             return(list("InferenceEngine" = x, "BNDataset" = dataset))
           })

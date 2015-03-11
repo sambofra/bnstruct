@@ -428,11 +428,40 @@ strcat <- function(..., sep = '')
 {
   s <- ""
   args <- list(...)
-  for (i in args)
+  for (i in unlist(args))
   {
     s <- paste(s, as.character(i), sep=sep)
   }
   return(s)
+}
+
+
+# output log messages
+bnstruct.log <- function(...)
+{
+  m <- ""
+  
+  if (.GlobalEnv$bnstruct.log.indent.tracker > 0)
+    for (i in seq_len(.GlobalEnv$bnstruct.log.indent.tracker))
+      m <- paste(m, "... ", sep='')
+  
+  m <- strcat(m, "bnstruct :: ")
+  m <- strcat(m, ...)
+  cat(m, "\n")
+}
+
+# output begin-of-action log messages
+bnstruct.start.log <- function(...)
+{
+  bnstruct.log(...)
+  assign("bnstruct.log.indent.tracker", bnstruct.log.indent.tracker + 1, envir = .GlobalEnv)
+}
+
+# output begin-of-action log messages
+bnstruct.end.log <- function(...)
+{
+  assign("bnstruct.log.indent.tracker", max(0,bnstruct.log.indent.tracker - 1), envir = .GlobalEnv)
+  bnstruct.log(...)
 }
 
 fast.bincombinations <- function(p)

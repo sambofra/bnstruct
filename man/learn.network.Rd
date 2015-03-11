@@ -27,6 +27,8 @@ learn.network(x, ...)
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
 then also the \code{dataset} parameter must be given.}
 
+\item{...}{potential further arguments for methods.}
+
 \item{y}{a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.}
 
 \item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}

@@ -35,7 +35,7 @@ File has to be in format (describe...)
 \examples{
 \dontrun{
 dataset <- BNDataset()
-dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
+dataset <- read.dataset(dataset, "file.data", "file.header")
 }
 }
 \seealso{

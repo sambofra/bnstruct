@@ -46,6 +46,8 @@ setMethod("learn.params",
             # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
             # so that the sum over the last dimension is always 1
 
+            bnstruct.start.log("learning network parameters ... ")
+            
             # just to play safe
             if (use.imputed.data)
               data <- as.matrix(imputed.data(dataset))
@@ -90,6 +92,9 @@ setMethod("learn.params",
             #return( cpts )
             
             cpts(bn) <- cpts
+
+            bnstruct.end.log("parameter learning done.")
+
             return(bn)
           }
 )
@@ -144,6 +149,7 @@ setMethod("learn.structure",
             
             if (algo == "sm")
             {
+              bnstruct.start.log("learning the structure using SM ...")
               if (bootstrap)
               {
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
@@ -163,6 +169,7 @@ setMethod("learn.structure",
                 dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes,
                                max.fanin, layering, max.fanin.layers, ess)
               }
+              bnstruct.end.log("learning using SM completed.")
             } # end if algo == sm
             
             if (algo == "sem")
@@ -187,6 +194,7 @@ setMethod("learn.structure",
               {
                 #struct.threshold <- 10
               }
+              bnstruct.start.log("learning the structure using SEM ...")
 
               bn <- sem(bn, dataset, param.threshold = 0.001,
                         scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
@@ -196,10 +204,12 @@ setMethod("learn.structure",
                         use.imputed.data = use.imputed.data,
                         use.cpc = use.cpc, ...)
               
+              bnstruct.end.log("learning using SEM completed.")
             } # end if (algo == sem)
             
             if (algo == "mmhc") # default
             {
+              bnstruct.start.log("learning the structure using MMHC ...")
               if (bootstrap)
               {
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
@@ -226,6 +236,7 @@ setMethod("learn.structure",
                   cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
+              bnstruct.end.log("learning using MMHC completed.")
             } # end if algo == mmhc
             
             struct.algo(bn) <- algo

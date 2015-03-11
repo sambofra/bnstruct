@@ -7,26 +7,23 @@
 \alias{boot,BNDataset,numeric-method}
 \title{get selected element of bootstrap list.}
 \usage{
-boot(dataset, index, imputed = TRUE, ...)
+boot(dataset, index, imputed = FALSE)
 
-\S4method{boot}{BNDataset,numeric}(dataset, index, imputed = TRUE, ...)
+\S4method{boot}{BNDataset,numeric}(dataset, index, imputed = FALSE)
 }
 \arguments{
 \item{dataset}{a \code{\link{BNDataset}} object.}
 
 \item{index}{the index of the requested sample.}
 
-\item{imputed}{\code{TRUE} if samples from imputed dataset are to be used.}
-
-\item{...}{potential further arguments of methods (ignored).}
+\item{imputed}{\code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.}
 }
 \description{
 Given a \code{\link{BNDataset}}, return the sample corresponding to given index.
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.data", "file.header")
 dataset <- bootstrap(dataset, num.boots = 1000)
 
 for (i in 1:num.boots(dataset))

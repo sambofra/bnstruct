@@ -44,6 +44,7 @@
 #' (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 #' starting the Hill Climbing from an empty graph.
+#' @param ... potential further arguments for methods.
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 #' as learnt from the given dataset.
@@ -568,7 +569,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, header="file.header", dataset="file.data")
+#' dataset <- read.dataset(dataset, "file.data", "file.header")
 #' }
 #' 
 #' @exportMethod read.dataset
@@ -588,8 +589,7 @@ setGeneric("read.dataset", function(object, data.file, header.file, data.with.he
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.data", "file.header")
 #' dataset <- impute(dataset)
 #' }
 #' 
@@ -607,21 +607,18 @@ setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
 #' @param object the \code{\link{BNDataset}} object.
 #' @param num.boots number of sampled datasets for bootstrap.
 #' @param seed random seed.
-#' @param imputation \code{TRUE} if imputation has to be performed.
-#' @param na.string.symbol character that denotes NA in the dataset (useful only if imputation == TRUE).
+#' @param imputation \code{TRUE} if imputation has to be performed. Default is \code{FALSE}.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
-#' @param ... potential further arguments of methods.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.data", "file.header")
 #' dataset <- bootstrap(dataset, num.boots = 1000)
 #' }
 #' 
 #' @exportMethod bootstrap
-setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10,
-                                 na.string.symbol = '?', ...) standardGeneric("bootstrap"))
+setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
+                             standardGeneric("bootstrap"))
 
 
 #' get selected element of bootstrap list.
@@ -633,15 +630,13 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' 
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param index the index of the requested sample.
-#' @param imputed \code{TRUE} if samples from imputed dataset are to be used.
-#' @param ... potential further arguments of methods (ignored).
+#' @param imputed \code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.
 #' 
 #' @seealso bootstrap
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.data", "file.header")
 #' dataset <- bootstrap(dataset, num.boots = 1000)
 #' 
 #' for (i in 1:num.boots(dataset))
@@ -651,7 +646,7 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' @seealso \code{\link{bootstrap}}
 #' 
 #' @exportMethod boot
-setGeneric("boot", function(dataset, index, imputed = TRUE, ...) standardGeneric("boot"))
+setGeneric("boot", function(dataset, index, imputed = FALSE) standardGeneric("boot"))
 
 
 ###############################################################################
@@ -1024,45 +1019,6 @@ setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 #' 
 #' @exportMethod num.items
 setGeneric("num.items", function(x) standardGeneric("num.items"))
-
-# has.raw.data
-# has.imputed.data
-# raw.data
-# imputed.data
-# already have methods (see above)
-
-#' check whether a \code{\link{BNDataset}} has raw data or not.
-#' 
-#' Return \code{TRUE} if the given dataset contains raw data, \code{FALSE} otherwise.
-#' 
-#' @name has.raw.data
-#' @rdname has.raw.data
-#'
-#' @param x a \code{\link{BNDataset}} object.
-#' 
-#' @return \code{TRUE} if dataset has raw data.
-#' 
-#' @seealso \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
-#' 
-#' @exportMethod has.raw.data
-setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
-
-
-#' check whether a \code{\link{BNDataset}} has imputed data or not.
-#' 
-#' Return \code{TRUE} if the given dataset contains imputed data, \code{FALSE} otherwise.
-#' 
-#' @name has.imputed.data
-#' @rdname has.imputed.data
-#'
-#' @param x a \code{\link{BNDataset}} object.
-#' 
-#' @return \code{TRUE} if dataset has imputed data.
-#' 
-#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
-#' 
-#' @exportMethod has.imputed.data
-setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 
 
 #' check whether a \code{\link{BNDataset}} has bootstrap samples or not.

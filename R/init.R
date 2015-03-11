@@ -5,6 +5,8 @@
 		MAX_NODES <- 64
 	else
 		MAX_NODES <- 32
+  
+	assign("bnstruct.log.indent.tracker", 0, envir = .GlobalEnv)
 }#.ONLOAD
 
 .onUnload = function(lib) 
