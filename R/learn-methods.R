@@ -116,30 +116,19 @@ setMethod("learn.structure",
             if (bootstrap)
             {
               if (!has.boots(dataset))
-              {
                 stop("Bootstrap samples not available. Please generate samples before learning with bootstrap.\nSee > ?bootstrap for help.")
-              }
-              else
-              {
-                if (use.imputed.data && has.imputed.data(dataset))
-                  data   <- imputed.data(dataset)
-                else if (use.imputed.data && !has.imputed.data(dataset))
-                  stop("Imputed data not available. Please impute data before learning.\nSee > ?impute for help.")
-                else
-                  data   <- raw.data(dataset)
-                num.boots <- num.boots(dataset)
-              }
+
+              num.boots <- num.boots(dataset)
             }
             else
-            { # not bootstrap (default)
+            {
+              # not bootstrap (default)
               if (use.imputed.data && has.imputed.data(dataset))
-              {  data   <- imputed.data(dataset) }
+                data   <- imputed.data(dataset)
               else if (use.imputed.data && !has.imputed.data(dataset))
-              {  stop("Imputed data not available. Please impute data before learning.\nSee > ?impute for help.") }
+                stop("Imputed data not available. Please impute data before learning.\nSee > ?impute for help.")
               else
-              {
                 data <- raw.data(dataset)
-              }
             }
             
             scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))

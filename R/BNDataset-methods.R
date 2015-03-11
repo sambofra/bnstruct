@@ -324,7 +324,7 @@ setMethod("raw.data",
           {
             if (has.raw.data(x))
                return (x@raw.data)
-            return (NULL)
+            stop("The dataset contains no data.")
           })
 
 
@@ -336,7 +336,8 @@ setMethod("imputed.data",
           {
             if (has.imputed.data(x))
               return (x@imputed.data)
-            return (NULL)
+            stop("The dataset contains no imputed data. ",
+                 "Please impute data before learning.\nSee > ?impute for help.")
           })
 
 
@@ -579,27 +580,21 @@ setMethod("bootstrap",
 #' @aliases boot,BNDataset
 setMethod("boot",
           c("BNDataset", "numeric"),
-          function(dataset, index, imputed = TRUE, ...)
+          function(dataset, index, imputed = FALSE, ...)
           {
-            if (!(dataset@has.boots || dataset@has.imputed.boots))
-            {
-              message('WARNING: No bootstrap samples available for dataset.\n')
-              return(NULL)
-            }
+            if (!imuputed && !dataset@has.boots)
+              stop('No bootstrap samples available for dataset.')
+            
+            if (imputed && !dataset@has.imputed.boots)
+              stop('No imputed bootstrap samples available for dataset. ',
+                   "Please impute data before learning.\nSee > ?impute for help.")
             
             if (index <= 0 || index > dataset@num.boots)
-            {
-              message('WARNING: index out of range for dataset.\n')
-              return(NULL)
-            }
+              stop('Sample index out of range for dataset.\n')
             
-            if (imputed && dataset@has.imputed.boots)
+            if (imputed)
               return(dataset@imp.boots[[index]])
             
-            if (dataset@has.boots)
-              return(dataset@boots[[index]])
-            
-            # if !has.boots && !imputed && has.imputed.boots - though I don't know if this will ever happen
-            return(NULL)
+            return(dataset@boots[[index]])
           })
 

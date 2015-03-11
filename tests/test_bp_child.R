@@ -13,7 +13,6 @@ library("bnstruct")
 mydata <- BNDataset("/home/alberto/didattica/tesi/bnstruct/inst/extdata/Child_data_na_5000.data",
                     "/home/alberto/didattica/tesi/bnstruct/inst/extdata/Child_data_na_5000.header",
                     starts.from=0)
-
 net <- BN(mydata)
 #slot(net, "name") <- "Child"
 #slot(net, "num.nodes") <- 20

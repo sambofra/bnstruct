@@ -12,7 +12,6 @@ setMethod("sem",
             
             num.nodes <- num.nodes(net)
 
-            # starting from an empty network: learn a starting point using MMHC
             if (is.character(scoring.func))
               scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
 
@@ -21,20 +20,14 @@ setMethod("sem",
               message("scoring function not recognized, using BIC")
               scoring.func <- 2
             }
-            else {
+            else
               scoring.func <- scoring.func - 1
-            }
             # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
 
+            # starting from an empty network: learn a starting point using MMHC
             if (sum(dag(net)) == 0)
             {
               w.net <- net
-              #if (use.cpc)
-              #  cpc <- mmpc( raw.data(dataset), node.sizes(w.net), cont.nodes, alpha, layering, layer.struct=c() )
-              #else
-              #  cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
-              #dag(w.net) <- hc( raw.data(dataset), node.sizes(w.net), scoring.func, cpc, cont.nodes )
-              
               w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
                                      alpha=alpha, ess = ess, bootstrap = bootstrap,
                                      layering = layering, max.fanin.layers = max.fanin.layers,
