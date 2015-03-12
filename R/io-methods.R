@@ -105,9 +105,12 @@ setMethod("read.dsc", c("character"),
             file.name <- x
             all.file  <- readChar(file.name, file.info(file.name)$size)
             all.file  <- gsub('\n', ' ', all.file)
+            all.file  <- gsub('\r', ' ', all.file)
+            all.file  <- gsub('\t', ' ', all.file)
             all.file  <- gsub('"', '', all.file)
+            all.file  <- gsub("\\[", " \\[ ", all.file)
             
-            lines        <- unlist(strsplit(all.file, "node|probability"))
+            lines        <- unlist(strsplit(all.file, "node |probability"))
             num.nodes    <- (length(lines) - 1) / 2
             network.name <- lines[1]
             network.name <- gsub(" ", "", unlist(strsplit(network.name, "belief network"), F, F)[2])
@@ -124,9 +127,14 @@ setMethod("read.dsc", c("character"),
             nodes <- sapply(1:num.nodes, function(x) gsub(" ", "", lines[x]))
             probs <- sapply((num.nodes+1):(2*num.nodes), function(x) gsub(" ", "", lines[x]))
             
+            #             print(nodes)
+            #             print(probs)
+            
             for (i in 1:num.nodes)
             {
+              #               print(nodes[i])
               tmp <- unlist(strsplit(nodes[i], "\\{|\\}"))
+              #print(tmp)
               variables[i] <- tmp[1]
               tmp2 <- unlist(strsplit(tmp[2], "\\:|\\[|\\]"))
               if (tolower(tmp2[2]) == "continuous") discreteness[i] <- FALSE
@@ -136,7 +144,7 @@ setMethod("read.dsc", c("character"),
             variables(net)    <- variables
             discreteness(net) <- discreteness
             node.sizes(net)   <- node.sizes
-
+            
             dag <- ""
             prob.list <- rep("", num.nodes)
             
@@ -170,7 +178,7 @@ setMethod("read.dsc", c("character"),
             
             for (i in 1:num.nodes)
             {
-              family <- c(which(dag(net)[,i]!=0), i)
+              family <- c(i, which(dag(net)[,i]!=0))
               if (length(family) > 1)
               {
                 ps <- unlist(strsplit(prob.list[i], "\\(\\*\\)\\:|\\,|\\;|\\:"))
@@ -180,9 +188,29 @@ setMethod("read.dsc", c("character"),
                 ps <- unlist(strsplit(prob.list[i], "\\,|\\;"))
               }
               ps <- ps[which(ps != "")]
-              suppressWarnings(ps <- ps[which(!is.na(as.numeric(ps)))])
+              print(ps)
+              # suppressWarnings(ps <- ps[which(!is.na(as.numeric(ps)))])
+              nps <- c()
+              to.remove <- FALSE
+              for (ips in 1:length(ps))
+              {
+                curr.n <- suppressWarnings(as.numeric(ps[ips]))
+                if (length(family) > 2 && is.na(curr.n))
+                {
+                  to.remove <- !to.remove
+                }
+                if (!to.remove && !is.na(curr.n))
+                {
+                  nps <- c(nps, curr.n)
+                }
+              }
+              ps <- nps
+              print(ps)
               ps <- array(as.numeric(ps), dim=node.sizes[family])
+              print(ps)
               cpts[[i]] <- ps
+              #             cpts[[i]] <- sort.dimensions(ps, c(length(family):1))$potential
+              print(cpts[[i]])
               
               dms <- NULL
               dns <- NULL
@@ -199,7 +227,7 @@ setMethod("read.dsc", c("character"),
             
             cpts(net) <- cpts
             
-            return(net)  
+            return(net)
           })
 
 

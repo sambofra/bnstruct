@@ -7,9 +7,10 @@
 \alias{em,InferenceEngine,BNDataset-method}
 \title{expectation-maximization algorithm.}
 \usage{
-em(x, dataset, threshold = 0.001, k.impute = 10, ...)
+em(x, dataset, threshold = 0.001, ess = 1)
 
-\S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001)
+\S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001,
+  ess = 1)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
@@ -18,9 +19,7 @@ em(x, dataset, threshold = 0.001, k.impute = 10, ...)
 
 \item{threshold}{threshold for convergence, used as stopping criterion.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
-\item{...}{further potential arguments for method.}
+\item{ess}{Equivalent Sample Size value.}
 }
 \value{
 a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),

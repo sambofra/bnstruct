@@ -630,7 +630,7 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' 
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param index the index of the requested sample.
-#' @param imputed \code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.
+#' @param use.imputed.data \code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.
 #' 
 #' @seealso bootstrap
 #' 
@@ -646,7 +646,7 @@ setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation =
 #' @seealso \code{\link{bootstrap}}
 #' 
 #' @exportMethod boot
-setGeneric("boot", function(dataset, index, imputed = FALSE) standardGeneric("boot"))
+setGeneric("boot", function(dataset, index, use.imputed.data = FALSE) standardGeneric("boot"))
 
 
 ###############################################################################
@@ -754,8 +754,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param threshold threshold for convergence, used as stopping criterion.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param ... further potential arguments for method.
+#' @param ess Equivalent Sample Size value.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
 #'         and the imputed dataset (\code{"BNDataset"}).
@@ -766,7 +765,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' }
 #' 
 #' @exportMethod em
-setGeneric("em", function(x, dataset, threshold = 0.001, k.impute = 10, ...) standardGeneric("em"))
+setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneric("em"))
 
 
 #' Structural Expectation-Maximization algorithm.

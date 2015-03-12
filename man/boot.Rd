@@ -7,16 +7,16 @@
 \alias{boot,BNDataset,numeric-method}
 \title{get selected element of bootstrap list.}
 \usage{
-boot(dataset, index, imputed = FALSE)
+boot(dataset, index, use.imputed.data = FALSE)
 
-\S4method{boot}{BNDataset,numeric}(dataset, index, imputed = FALSE)
+\S4method{boot}{BNDataset,numeric}(dataset, index, use.imputed.data = FALSE)
 }
 \arguments{
 \item{dataset}{a \code{\link{BNDataset}} object.}
 
 \item{index}{the index of the requested sample.}
 
-\item{imputed}{\code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.}
+\item{use.imputed.data}{\code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.}
 }
 \description{
 Given a \code{\link{BNDataset}}, return the sample corresponding to given index.

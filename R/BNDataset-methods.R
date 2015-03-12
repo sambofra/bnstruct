@@ -39,6 +39,12 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
     return(dataset)
   }
   
+  other.args <- list(...)
+  if ("starts.from" %in% names(other.args))
+    starts.from <- other.args$starts.from
+  else
+    starts.from <- 1
+  
   if(length(variables) > 1)
   {
     variables(dataset) <- variables
@@ -53,7 +59,7 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
   
   if (!is.null(data))
   {
-    raw.data(dataset) <- as.matrix(data)
+    raw.data(dataset) <- as.matrix(data) + (1 - starts.from)
     if (is.null(variables)) {
       variables(dataset) <- rownames(data)
       warning("Variable names guessed from data. Please check for consistency with your actual data.")
@@ -534,9 +540,11 @@ setMethod("impute",
           function(object, k.impute = 10)
           {
             # assumes raw data is ok
+            bnstruct.start.log("performing imputation ...")
             object@imputed.data <- knn.impute(object@raw.data, k.impute,
                                               setdiff(1:length(object@node.sizes), c()))
             object@has.imputed.data  <- TRUE
+            bnstruct.end.log("imputation finished.")
             return(object)
           })
 
@@ -580,19 +588,19 @@ setMethod("bootstrap",
 #' @aliases boot,BNDataset
 setMethod("boot",
           c("BNDataset", "numeric"),
-          function(dataset, index, imputed = FALSE)
+          function(dataset, index, use.imputed.data = FALSE)
           {
-            if (!imuputed && !dataset@has.boots)
+            if (!use.imputed.data && !dataset@has.boots)
               stop('No bootstrap samples available for dataset.')
             
-            if (imputed && !dataset@has.imputed.boots)
+            if (use.imputed.data && !dataset@has.imputed.boots)
               stop('No imputed bootstrap samples available for dataset. ',
                    "Please impute data before learning.\nSee > ?impute for help.")
             
             if (index <= 0 || index > dataset@num.boots)
               stop('Sample index out of range for dataset.\n')
             
-            if (imputed)
+            if (use.imputed.data)
               return(dataset@imp.boots[[index]])
             
             return(dataset@boots[[index]])

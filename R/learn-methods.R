@@ -155,7 +155,7 @@ setMethod("learn.structure",
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
                 for( i in seq_len(num.boots(dataset)) )
                 {
-                  data <- boot(dataset, i, imputed = use.imputed.data)
+                  data <- boot(dataset, i, use.imputed.data = use.imputed.data)
                   
                   dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering,
                             max.fanin.layers, ess)
@@ -215,7 +215,7 @@ setMethod("learn.structure",
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
                 for( i in seq_len(num.boots(dataset)) )
                 {
-                  data <- boot(dataset, i, imputed=use.imputed.data)
+                  data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   
                   if (use.cpc)
                     cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )

@@ -160,6 +160,8 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' @docType class
 #' @aliases BNDataset,BNDataset-class
 #' 
+#' @usage BNDataset(data, discreteness, variables = NULL, node.sizes = NULL, ...)
+#' 
 #' @examples
 #' \dontrun{
 #' # create from files
@@ -168,9 +170,9 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' # other way: create from raw dataset and metadata
 #' data <- matrix(c(1:16), nrow = 4, ncol = 4)
 #' dataset <- BNDataset(data = data,
-#'                      discreteness = rep('d',4)
+#'                      discreteness = rep('d',4),
 #'                      variables = c("a", "b", "c", "d"),
-#'                      node.sizes = c(4,8,12,16),)
+#'                      node.sizes = c(4,8,12,16))
 #' }
 #'
 #' @exportClass BNDataset

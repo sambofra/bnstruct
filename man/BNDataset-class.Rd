@@ -8,6 +8,8 @@
 \alias{initialize,BNDataset-method}
 \title{BNDataset class.}
 \usage{
+BNDataset(data, discreteness, variables = NULL, node.sizes = NULL, ...)
+
 \S4method{initialize}{BNDataset}(.Object)
 }
 \arguments{
@@ -110,9 +112,9 @@ dataset <- BNDataset("file.data", "file.header")
 # other way: create from raw dataset and metadata
 data <- matrix(c(1:16), nrow = 4, ncol = 4)
 dataset <- BNDataset(data = data,
-                     discreteness = rep('d',4)
+                     discreteness = rep('d',4),
                      variables = c("a", "b", "c", "d"),
-                     node.sizes = c(4,8,12,16),)
+                     node.sizes = c(4,8,12,16))
 }
 }
 \seealso{
