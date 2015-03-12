@@ -13,13 +13,20 @@
 \newcommand{\Rclass}[1]{{\textit{#1}}}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+concordance=TRUE
+)
+@
+
 
 \title{R package for Bayesian Network Structure Learning}
 \author{Francesco Sambo, Alberto Franzin}
 \maketitle
 
-<<echo=FALSE,print=false,include=FALSE,results=hide>>=
+<<echo=FALSE,include=FALSE>>=
 library(bnstruct)
 @
 
@@ -28,16 +35,65 @@ Bayesian Networks are a powerful tool for probabilistic inference among a set
 of variables, modeled using a directed acyclic graph. However, one often does not
 have the network, but only a set of observations, and wants to reconstruct the
 network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
-learning the structure and parameters of the network, also in presence of missing data,
-and a set of additional tools to use Bayesian Networks, such as methods to perform
+learning the structure and parameters of the network in various situations, such as
+in presence of missing data, for which it is possible to perform \textit{imputation}
+(guessing the missing values, by looking at the data). The package also contains methods
+for learning using the Bootstrap technique.
+Finally, \Rpackage{bnstruct}, has a set of additional tools to use Bayesian Networks, such as methods to perform
 belief propagation.
 
 This document is intended to show some examples of how \Rpackage{bnstruct} can be used
 to learn and use Bayesian Networks. First we describe how to manage data sets,
 how to use them to discover a Bayesian Network, and finally how to perform some
-operations on a network.
+operations on a network. Complete reference for classes and methods can be found in the package documentation.
 
-Complete reference for classes and methods can be found in the package documentation.
+\subsection{Overview}
+We provide here some general informations about the context for understanding
+and using properly this document.
+
+\subsubsection{The data}
+A \emph{dataset} is a collection of rows, each of which is composed by the same number
+of values. Each value corresponds to an observation of a \emph{variable}, which is a feature,
+an event or an entity considered significant and therefore measured. In a Bayesian Network,
+each variable is associated to a node. The number of variables is the \emph{size} of the
+network. Each variable has a certain range of values it can take. If the variable can take
+any possible value in its range, it is called a \emph{continuous} variable; otherwise,
+if a variable can only take some values in its range, it is a \emph{discrete} variable.
+The number of values a variable can take is called its \emph{cardinality}.
+A continuous variable has infinite cardinality; however, in order to deal with it,
+we have to restrict its domain to a smaller set of values, in order to be able to
+treat it as a discrete variable; this process is called \emph{quantization}, the
+number of values it can take is called the number of \emph{levels} of the quantization step,
+and we will therefore call the cardinality of a continuous variable the number of its
+quantization levels, with a little abuse of terminology.
+
+In many real-life applications and contexts, it often happens that some observations in
+the dataset we are studying are absent, for many reasons. In this case, one may want to
+``guess'' a reasonable (according to the other observations) value that would have been
+present in the dataset, if the observations was successful. This inference task is
+called \emph{imputation}. In this case, the dataset with the ``holes filled''
+is called the \emph{imputed dataset}, while the original dataset with missing values is
+referred to as the \emph{raw dataset}.
+In section \ref{sec:imputation} we show how to perform imputation in \Rpackage{bnstruct}.
+
+Another common operation on data is the employment of resampling techniques in order
+to estimate properties of a distribution from an approximate one. This usually allows
+to have more confidence in the results. We implement the \emph{bootstrap} technique,
+and provide it to generate samples of a dataset, with the chance of using it on both raw and imputed data.
+
+\subsubsection{Bayesian Networks}
+After introducing the data, we are now ready to talk about \emph{Bayesian Networks}. A Bayesian Network
+(hereafter sometimes simply \emph{network}, \emph{net} or \emph{BN} for brevity) is a probabilistic graphical model that encodes
+the conditional dependency relationships of a set of variables using a Directed Acyclic Graph (DAG).
+Each node of the graph represents one variable of the dataset; we will therefore interchange
+the terms \emph{node} and \emph{variable} when no confusion arises. The set of directed edges
+connecting the nodes forms the \emph{structure} of the network, while the set of conditional
+probabilities associated with each variable forms the set of \emph{parameters} of the net.
+
+The problems of learning the structure and the parameters of a network from data define the
+\emph{structure learning} and \emph{parameter learning} tasks, respectively. 
+
+COMPLETARE
 
 \section{Installation}
 
@@ -45,7 +101,7 @@ The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com
 
 In order to install the package, it suffices to launch\\
 \verb!R CMD INSTALL path/to/bnstruct!\\
-from a terminal, or to use R command \verb!install_packages!.
+from a terminal, or to use R command \verb!install.packages!.
 
 Being hosted on GitHub, it is also possible to use Hadley Wickham's \texttt{install\_github} tool from
 an R session:
@@ -54,9 +110,11 @@ library("devtools")
 install_github("sambofra/bnstruct")
 @
 
+For Windows platforms, a binary executable will be provided.
+
 \Rpackage{bnstruct} requires R $\geq 2.10$,
 and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
-Package \Rpackage{Rgraphviz} is requested in order to plot graphs, but it is not mandatory.
+Package \Rpackage{Rgraphviz} is requested in order to plot graphs, but is not mandatory.
 
 
 \section{Data sets}
@@ -64,17 +122,49 @@ The class that \Rpackage{bnstruct} provides to manage datasets is \Robject{BNDat
 It contains all of the data and the informations related to it: raw and imputed data, raw and imputed
 bootstrap samples, and variable names and cardinality.
 
-<<bndataset.constructor>>=
-dataset <- BNDataset(name="Example")
-# creates an enpty BNDataset object
+\subsection{Creating a BNDataset}
+There are two ways to build a BNDataset: using two files containing respectively header informations
+and data, and manually providing the data table and the related header informations
+(variable names, cardinality and discreteness).
+
+<<bndataset.constructor, eval=FALSE>>=
+dataset.from.data <- BNDataset(data = data,
+                               discreteness = rep('d',4),
+                               variables = c("a", "b", "c", "d"),
+                               node.sizes = c(4,8,12,16))
+
+dataset.from.file <- BNDataset("path/to/data.file",
+                               "path/to/header.file")
 @
 
+The key informations needed are:
+\begin{enumerate}
+\item the data;
+\item the state of variables (discrete or continuous);
+\item the names of the variables;
+\item the cardinalities of the variables (if discrete), or the number of levels they have to be quantized into
+(if continuous). 
+\end{enumerate}
+Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
+\textit{all} of the informations, in order to avoid problems later on during the execution.
 
-\subsection{Data format}
-\Rpackage{bnstruct} requires the data files to be in a format we describe in this section. 
+Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
+to specify a different character for NAs, it is possible to provide also the \texttt{na.string.symbol} parameter.
+The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
+The default range of values for a discrete variable \texttt{X} is \texttt{[1,|X|]}, with \texttt{|X|} being
+the cardinality of \texttt{X}. The same applies for the levels of quantization for continuous variables.
+If the value ranges for the data are different from the expected ones, it is possible to specify a different
+starting value (for the whole dataset) with the \texttt{starts.from} parameter. E.g. by \texttt{starts.from=0}
+we assume that the values of the variables in the dataset have range \texttt{[0,|X|-1]}.
+Please keep in mind that the internal representation of bnstruct starts from 1,
+and the original starting values are then lost. 
+
+It is possible to use two files, one for the data and one for the metadata,
+instead of providing manually all of the info. 
+bnstruct requires the data files to be in a format subsequently described.
 The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
 with the values for each variable separated by a space or a tab. Values for each variable have to be
-numbers, starting from \texttt{0} in case of discrete variables.
+numbers, starting from \texttt{1} in case of discrete variables.
 Data files can have a first row containing the names of the corresponding variables.
 
 In addition to the data file, a header file containing additional informations can also be provided.
@@ -82,52 +172,73 @@ An header file has to be composed by three rows of tab-delimited values:
 \begin{enumerate}
 \item list of names of the variables, in the same order of the data file;
 \item a list of integers representing the cardinality of the variables, in case of discrete variables,
-      or the number of levels each variable has to be quantized in, in case of continuous variables;
-\item a list that indicates, for each variable, if the variable is continuous (\texttt{c} or \texttt{C}), and thus has to be quantized before learning,
+ or the number of levels each variable has to be quantized in, in case of continuous variables;
+\item a list that indicates, for each variable, if the variable is continuous
+ (\texttt{c} or \texttt{C}), and thus has to be quantized before learning,
  or discrete (\texttt{d} or \texttt{D}).
 \end{enumerate}
+In case of need of more advanced options when reading a dataset from files, please refer to the
+documentation of the \texttt{read.dataset} method. Imputation and bootstrap are also available
+as separate routines (\texttt{impute} and \texttt{bootstrap}, respectively).
 
 We provide two sample datasets, one with complete data (the \texttt{Asia} network) and one with missing values
 (the \texttt{Child} network), in the \texttt{extdata} subfolder;
-the user can refer to them as an example.
+the user can refer to them as an example. The two datasets have been created with
 
-\subsection{Importing a dataset}
-The preferred way to create a \Rclass{BNDataset} object is by reading a dataset from a file.
-In order to accomplish this, we provide the \Rmethod{read.dataset} method.
-
-<<read.dataset,eval=FALSE>>=
-dataset <- BNDataset(name="Example")
-dataset <- read.dataset(dataset,
-                        header.file = "path/to/file.header",
-                        data.file   = "path/to/file.data")
+<<create.sample.datasets, eval=FALSE>>=
+asia <- BNDataset("asia_10000.data",
+                  "asia_10000.header",
+                  starts.from=0)
+child <- BNDataset("Child_data_na_5000.data",
+                   "Child_data_na_5000.header",
+                   starts.from=0)
 @
 
-The sample datasets we provide come with two custom loaders:
-<<sample.datasets>>=
-asia.data  <- asia()
-child.data <- child()
+and are also available with
+
+<<sample.datasets.accessors,eval=FALSE>>=
+asia  <- asia()
+child <- child()
 @
 
-\subsection{Creating a \Robject{BNDataset} from data}
-Another possible way for creating a \Robject{BNDataset} is to create it from a \Rclass{data.frame} or a \Rclass{matrix}
-and some metadata. This is useful, for example, for instantiating a dataset after the data has already been 
-processed in some way.
 
-In particular, it is requested to provide the data, in \texttt{data.frame} or \texttt{matrix} form, and three additional
-vectors of informations on the domain: one containing the names of the variables, another one containing values indicating
-the cardinality (for discrete variables) or the quantization domain (for continuous variables) of the variables,
-and the last one containing the status of the variables (\texttt{c} for continuous, \texttt{d} for discrete). Please note that
-all of the metadata are required when choosing this option, and it is also suggested that the slot names
-are specified when passing data and metadata as parameters to the constructor;
-when no dataset name is provided, the slot names are mandatory.
-
-<<bndataset2,eval=FALSE>>==
-data <- matrix(c(1:16), nrow = 4, ncol = 4)
-dataset <- BNDataset(name = "MyData", data = data,
-                     variables = c("a", "b", "c", "d"),
-                     node.sizes = c(4,8,12,16),
-                     discreteness = rep('d',4))
-@
+% \subsection{Importing a dataset}
+% The preferred way to create a \Rclass{BNDataset} object is by reading a dataset from a file.
+% In order to accomplish this, we provide the \Rmethod{read.dataset} method.
+% 
+% <<read.dataset,eval=FALSE>>=
+% dataset <- BNDataset(name="Example")
+% dataset <- read.dataset(dataset,
+%                         header.file = "path/to/file.header",
+%                         data.file   = "path/to/file.data")
+% @
+% 
+% The sample datasets we provide come with two custom loaders:
+% <<sample.datasets>>=
+% asia.data  <- asia()
+% child.data <- child()
+% @
+% 
+% \subsection{Creating a \Robject{BNDataset} from data}
+% Another possible way for creating a \Robject{BNDataset} is to create it from a \Rclass{data.frame} or a \Rclass{matrix}
+% and some metadata. This is useful, for example, for instantiating a dataset after the data has already been 
+% processed in some way.
+% 
+% In particular, it is requested to provide the data, in \texttt{data.frame} or \texttt{matrix} form, and three additional
+% vectors of informations on the domain: one containing the names of the variables, another one containing values indicating
+% the cardinality (for discrete variables) or the quantization domain (for continuous variables) of the variables,
+% and the last one containing the status of the variables (\texttt{c} for continuous, \texttt{d} for discrete). Please note that
+% all of the metadata are required when choosing this option, and it is also suggested that the slot names
+% are specified when passing data and metadata as parameters to the constructor;
+% when no dataset name is provided, the slot names are mandatory.
+% 
+% <<bndataset2,eval=FALSE>>==
+% data <- matrix(c(1:16), nrow = 4, ncol = 4)
+% dataset <- BNDataset(name = "MyData", data = data,
+%                      variables = c("a", "b", "c", "d"),
+%                      node.sizes = c(4,8,12,16),
+%                      discreteness = rep('d',4))
+% @
 
 \subsection{Imputation}
 A dataset may contain various kinds of missing data, namely unobserved variables,
@@ -136,96 +247,81 @@ second kind of missing data. The process of guessing the missing values is calle
 
 We provide the \Rmethod{impute} function to perform imputation.
 <<imputation1,eval=FALSE>>=
-dataset <- BNDataset(name="Example")
-dataset <- read.dataset(dataset,
-                        header.file = "path/to/file.header",
-                        data.file   = "path/to/file.data")
+dataset <- BNDataset(data.file   = "path/to/file.data",
+                     header.file = "path/to/file.header")
 dataset <- impute(dataset)
 @
 
 Imputation is accomplished with the k-Nearest Neighbour algorithm. The number of neighbours to be used
 can be chosen specifying the \Rfunarg{k.impute} parameter.
-Imputation can also be performed during the loading of a dataset, as shown in the following example.
-<<imputation2,eval=FALSE>>=
-dataset <- BNDataset(name="Example")
-dataset <- read.dataset(dataset,
-                        header.file = "path/to/file.header",
-                        data.file   = "path/to/file.data",
-                        imputation  = TRUE,
-                        k.impute    = 10)
-@
 
-Note that, when imputed data is present, it has higher priority over raw data when using a dataset
-(see section \ref{sec:usingdata}).
-
-The sample dataset available using the \Rmethod{child()} method contains both raw and imputed data.
 
 \subsection{Bootstrap}
 \Robject{BNDataset} objects have also room for bootstrap samples, i.e. random samples with replacement of the original data with the same number of observations, both for raw and imputed data.
 We provide the \Rmethod{bootstrap} method for this.
 <<bootstrap1,eval=FALSE>>=
-dataset <- BNDataset(name="Example")
-dataset <- read.dataset(dataset,
-                        header.file = "path/to/file.header",
-                        data.file   = "path/to/file.data")
+dataset <- BNDataset("path/to/file.data",
+                     "path/to/file.header")
 dataset <- bootstrap(dataset, num.boots = 100)
+dataset <- impute(dataset)
 dataset.with.imputed.samples <- bootstrap(dataset,
-                            num.boots = 100, imputation = TRUE)
-@
-
-Again, the generation of bootstrap samples can be performed while loading a dataset.
-<<bootstrap2,eval=FALSE>>=
-dataset <- BNDataset(name="Example")
-dataset <- read.dataset(dataset,
-                        header.file = "path/to/file.header",
-                        data.file   = "path/to/file.data",
-                        bootstrap   = TRUE,
-                        num.boots   = 100,
-                        imputation  = TRUE)
+                                          num.boots = 100,
+                                          imputation = TRUE)
 @
 
 The sample datasets provided have no bootstrap samples in them.
+
 
 \subsection{Using data}
 \label{sec:usingdata}
 After a \Robject{BNDataset} has been created, it is ready to be used.
 The complete list of methods available for a \Robject{BNDataset} object is available
 in the package documentation; we are not going to cover all of the methods in this brief series
-of examples, but we just show how to retrieve data.
+of examples.
 
 The main operation that can be done with a \Robject{BNDataset} is to get the data it contains.
-The main methods we provide are \Rmethod{get.raw.data}, \Rmethod{get.imputed.data} and \Rmethod{get.data}. \Rmethod{get.data} is just a proxy
-for one of the other two methods.
-As previously mentioned, imputed data (if present) has higher priority over raw data, since it is supposed to be more useful.
-Therefore, if imputed data is present, \Rmethod{get.data} will behave as \Rmethod{get.imputed.data}; otherwise,
-it will return the raw dataset just like \Rmethod{get.raw.data}.
+The main methods we provide are \Rmethod{raw.data} and \Rmethod{imputed.data}, which provide the raw and the
+imputed data, respectively. The data must be present in the object; conversely, an error will be raised.
+To avoid an abrupt termination of the execution in case of error, one may run these methods in a
+\Rmethod{tryCatch()} construct and manage the errors in case they happen. Another alternative is to test
+the presence of data before attempting to retrieve it, using the tester methods \Rmethod{has.raw.data} and
+\Rmethod{has.imputed.data}.
 
-<<getdata1,eval=FALSE>>=
-dataset.1 <- child()
+<<getdata1,eval=TRUE>>=
+options(max.print = 200, width = 60)
+
+dataset <- child()
 # if we want raw data
-get.raw.data(dataset.1)
-# if we want imputed dataset, the following are equivalent
-get.imputed.data(dataset.1)
-get.data(dataset.1)
+raw.data(dataset)
+
+# if we want imputed dataset: this raises an error
+imputed.data(dataset)
+
+# with tryCatch we manage the error
+tryCatch(
+  imp.data <- imputed.data(dataset),
+  error = function(e) {
+    cat("Hey! Something went wrong. No imputed data present?")
+    imp.data <<- NULL
+  }
+)
+imp.data
+
+# test before trying
+if (has.imputed.data(dataset)) {
+  imp.data <- imputed.data(dataset)
+} else {
+  imp.data <- NULL
+}
+imp.data
+
+# now perform imputation on the dataset
+dataset <- impute(dataset)
+imputed.data(dataset)
+
 @
 
-<<getdata1.1,eval=FALSE>>=
-dataset.2 <- asia()
-# we can only get raw data, the following are equivalent
-get.raw.data(dataset.2)
-get.data(dataset.2)
-@
-
-We can check if a dataset has imputed data or not with the \Rmethod{has.imputed.data} method.
-<<getdata2,eval=FALSE>>=
-dataset.1 <- child()
-has.imputed.data(dataset.1) # TRUE
-@
-
-<<getdata2.1,eval=FALSE>>=
-dataset.2 <- asia()
-has.imputed.data(dataset.2) # FALSE
-@
+-----------------------------------------------------
 
 In order to retrieve bootstrap samples, one can use the \Rmethod{boots} and \Rmethod{imp.boots} methods for samples
 made of raw and imputed data. The presence of imputed samples can be tested using \Rmethod{has.imp.boots}.
