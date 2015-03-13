@@ -525,3 +525,32 @@ setMethod("write.dsc","BN",
             print(rows)
             write(rows, file=file.name)
           })
+
+
+# output log messages
+bnstruct.log <- function(...)
+{
+  m <- ""
+  
+  if (.GlobalEnv$bnstruct.log.indent.tracker > 0)
+    for (i in seq_len(.GlobalEnv$bnstruct.log.indent.tracker))
+      m <- paste(m, "... ", sep='')
+  
+  m <- strcat(m, "bnstruct :: ")
+  m <- strcat(m, ...)
+  message(m)
+}
+
+# output begin-of-action log messages
+bnstruct.start.log <- function(...)
+{
+  bnstruct.log(...)
+  assign("bnstruct.log.indent.tracker", bnstruct.log.indent.tracker + 1, envir = .GlobalEnv)
+}
+
+# output begin-of-action log messages
+bnstruct.end.log <- function(...)
+{
+  assign("bnstruct.log.indent.tracker", max(0,bnstruct.log.indent.tracker - 1), envir = .GlobalEnv)
+  bnstruct.log(...)
+}
