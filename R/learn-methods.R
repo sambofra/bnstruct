@@ -15,7 +15,9 @@ setMethod("learn.network",
             bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
                                   layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
-            bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            
+            if (!bootstrap)
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
 #' @rdname learn.network
@@ -31,7 +33,9 @@ setMethod("learn.network",
             bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
                                   layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
-            bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            
+            if (!bootstrap)
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
 
@@ -122,6 +126,9 @@ setMethod("learn.structure",
             {
               if (!has.boots(dataset))
                 stop("Bootstrap samples not available. Please generate samples before learning with bootstrap.\nSee > ?bootstrap for help.")
+              
+              if (use.imputed.data && !has.imputed.boots(dataset))
+                stop("Imputed samples not available. Please generate imputed samples before learning.\nSee > ?bootstrap for help.")
 
               num.boots <- num.boots(dataset)
             }
@@ -217,13 +224,14 @@ setMethod("learn.structure",
                 {
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   
-                  if (use.cpc)
+                  if (use.cpc){
                     cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  }
                   else
-                    cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
-                  
-                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
-                  
+                  {
+                    cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                  }
+                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes)
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
                 wpdag(bn) <- finalPDAG
@@ -233,7 +241,7 @@ setMethod("learn.structure",
                 if (use.cpc)
                   cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
                 else
-                  cpc <- matrix(rep(0, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                  cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
               bnstruct.end.log("learning using MMHC completed.")
