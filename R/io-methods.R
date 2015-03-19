@@ -532,8 +532,9 @@ bnstruct.log <- function(...)
 {
   m <- ""
   
-  if (.GlobalEnv$bnstruct.log.indent.tracker > 0)
-    for (i in seq_len(.GlobalEnv$bnstruct.log.indent.tracker))
+  blit <- get("bnstruct.log.indent.tracker", .bnstruct.env)
+  if (blit > 0)
+    for (i in seq_len(blit))
       m <- paste(m, "... ", sep='')
   
   m <- strcat(m, "bnstruct :: ")
@@ -545,12 +546,12 @@ bnstruct.log <- function(...)
 bnstruct.start.log <- function(...)
 {
   bnstruct.log(...)
-  assign("bnstruct.log.indent.tracker", bnstruct.log.indent.tracker + 1, envir = .GlobalEnv)
+  assign("bnstruct.log.indent.tracker", get("bnstruct.log.indent.tracker", .bnstruct.env) + 1, envir = .bnstruct.env)
 }
 
 # output begin-of-action log messages
 bnstruct.end.log <- function(...)
 {
-  assign("bnstruct.log.indent.tracker", max(0,bnstruct.log.indent.tracker - 1), envir = .GlobalEnv)
+  assign("bnstruct.log.indent.tracker", max(0,get("bnstruct.log.indent.tracker", .bnstruct.env) - 1), envir = .bnstruct.env)
   bnstruct.log(...)
 }
