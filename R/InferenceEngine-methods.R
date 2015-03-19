@@ -276,26 +276,26 @@ setMethod("test.updated.bn",
             !is.null(slot(x, "updated.bn"))
           )
 
-#' @rdname layering
-#' @aliases layering,InferenceEngine
-setMethod("layering",
-          "InferenceEngine",
-          function(x, updated.bn = TRUE, ...)
-          {
-            if (updated.bn)
-              layers <- topological.sort(dag(updated.bn(x)))
-            else
-              layers <- topological.sort(dag(bn(x)))
-            layers <- array(layers, dimnames = variables(bn(x)))
-            layers
-          })
+# # ' @rdname layering
+# # ' @aliases layering,InferenceEngine
+# setMethod("layering",
+#           "InferenceEngine",
+#           function(x, updated.bn = TRUE, ...)
+#           {
+#             if (updated.bn)
+#               layers <- topological.sort(dag(updated.bn(x)))
+#             else
+#               layers <- topological.sort(dag(bn(x)))
+#             layers <- array(layers, dimnames = variables(bn(x)))
+#             layers
+#           })
 
 
 #' @rdname get.most.probable.values
 #' @aliases get.most.probable.values,InferenceEngine
 setMethod("get.most.probable.values",
           "InferenceEngine",
-          function(x, ...)
+          function(x)
           {
 #             if (is.null(jpts(x))) # don't know if this works...
 #               return(get.most.probable.values(bn(x)))
@@ -493,7 +493,7 @@ setMethod("print",
               str <- paste(str, "with ", sep = '')
               str <- paste(str, num.nodes(x), sep = '')
               str <- paste(str, " cliques", sep = '')
-              cat(str)
+              cat(str,"\n")
               
               if (num.nodes(x) > 0)
               {          

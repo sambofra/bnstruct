@@ -68,16 +68,35 @@ Learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset
 }
 \details{
 Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
-Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
-and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
-Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
-the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
+We provide three algorithms in order to learn the structure of the network, that can be chosen with the \code{algo} parameter.
+The first is the Silander-Myllym\"aki (\code{sm})
+exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
+with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
+meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the
+documentation in package manual for more details on the method parameters.
 
-The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
-It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
-to the method if \code{algo = 'sm'} is given as parameter to the method.
+The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\code{mmhc}), that performs a statistical
+sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method,
+at the cost of a (likely)
+lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
+mainly the confidence threshold of the statistical pruning.
 
-Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation.
+The third method is the Structural Expectation-Maximization (\code{sem}) algorithm,
+for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
+the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
+due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \code{struct.threshold}
+and \code{param.threshold}, for the structure and the parameter convergence, respectively.
+
+Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
+We provide three of the most popular scoring functions, \code{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
+\code{AIC} (Akaike Information Criterion) and \code{BIC} (Bayesian Information Criterion). The scoring function
+can be chosen using the \code{scoring.func} parameter.
+
+Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (if not using bootstrap).
+
+See documentation for \code{\link{learn.structure}} and \code{\link{learn params}} for more informations.
 }
 \examples{
 \dontrun{
@@ -90,5 +109,8 @@ net <- learn.network(net, mydataset)
 # start directly from the dataset
 net <- learn.network(mydataset)
 }
+}
+\seealso{
+learn.structure learn.params
 }
 

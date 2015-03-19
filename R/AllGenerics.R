@@ -11,16 +11,35 @@
 #' Learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset} (see the \code{Details} section).
 #' 
 #' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
-#' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
-#' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
-#' Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
-#' the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
+#' We provide three algorithms in order to learn the structure of the network, that can be chosen with the \code{algo} parameter.
+#' The first is the Silander-Myllym\"aki (\code{sm})
+#' exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+#' the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
+#' with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
+#' meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
+#' documentation in package manual for more details on the method parameters.
 #' 
-#' The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
-#' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
-#' to the method if \code{algo = 'sm'} is given as parameter to the method.
+#' The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\code{mmhc}), that performs a statistical
+#' sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method,
+#' at the cost of a (likely)
+#' lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+#' of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
+#' mainly the confidence threshold of the statistical pruning.
 #' 
-#' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation.
+#' The third method is the Structural Expectation-Maximization (\code{sem}) algorithm,
+#' for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
+#' the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
+#' due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \code{struct.threshold}
+#' and \code{param.threshold}, for the structure and the parameter convergence, respectively.
+#' 
+#' Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
+#' We provide three of the most popular scoring functions, \code{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
+#' \code{AIC} (Akaike Information Criterion) and \code{BIC} (Bayesian Information Criterion). The scoring function
+#' can be chosen using the \code{scoring.func} parameter.
+#' 
+#' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (if not using bootstrap).
+#' 
+#' See documentation for \code{\link{learn.structure}} and \code{\link{learn params}} for more informations.
 #' 
 #' @name learn.network
 #' @rdname learn.network
@@ -48,6 +67,8 @@
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 #' as learnt from the given dataset.
+#' 
+#' @seealso learn.structure learn.params
 #' 
 #' @examples
 #' \dontrun{
@@ -84,12 +105,13 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
+#' @seealso learn.network
+#' 
 #' @examples
 #' \dontrun{
 #' ## first create a BN and learn its structure from a dataset
-#' dataset <- BNDataset(name = "MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' bn <- BN()
+#' dataset <- BNDataset("file.header", "file.data")
+#' bn <- BN(dataset)
 #' bn <- learn.structure(bn, dataset)
 #' bn <- learn.params(bn, dataset, ess=1)
 #' }
@@ -101,14 +123,31 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' learn the structure of a network.
 #' 
 #' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
-#' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
-#' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
-#' Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
-#' the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
+#'
+#' We provide three algorithms in order to learn the structure of the network, that can be chosen with the \code{algo} parameter.
+#' The first is the Silander-Myllym\"aki (\code{sm})
+#' exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+#' the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
+#' with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
+#' meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
+#' documentation in package manual for more details on the method parameters.
 #' 
-#' The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
-#' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
-#' to the method if \code{algo = 'sm'} is given as parameter to the method.
+#' The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\code{mmhc}), that performs a statistical
+#' sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method, at the cost of a (likely)
+#' lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+#' of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
+#' mainly the confidence threshold of the statistical pruning.
+#' 
+#' The third method is the Structural Expectation-Maximization (\code{sem}) algorithm,
+#' for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
+#' the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
+#' due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \code{struct.threshold}
+#' and \code{param.threshold}, for the structure and the parameter convergence, respectively.
+#' 
+#' Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
+#' We provide three of the most popular scoring functions, \code{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
+#' \code{AIC} (Akaike Information Criterion) and \code{BIC} (Bayesian Information Criterion). The scoring function
+#' can be chosen using the \code{scoring.func} parameter.
 #' 
 #' @name learn.structure
 #' @rdname learn.structure
@@ -135,11 +174,12 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
+#' @seealso learn.network
+#' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset(name = "MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' bn <- BN()
+#' dataset <- BNDataset("file.header", "file.data")
+#' bn <- BN(dataset)
 #' # use MMHC
 #' bn <- learn.structure(bn, dataset, alpha=0.05, ess=1, bootstrap=FALSE)
 #' 
@@ -165,22 +205,20 @@ setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="B
 #' @name layering
 #' @rdname layering
 #' 
-#' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
-#' @param updated.bn \code{TRUE} if \code{x} is an InferenceEngine and the updated network is chosen (kept only for compatibility with other methods).
-#' @param ... potential further arguments for methods.
+#' @param x a \code{\link{BN}} object.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset(name="MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' x <- BN(dataset)
+#' x <- learn.network(x, dataset)
 #' layering(x)
-#' eng <- InferenceEngine(x)
-#' layering(x, updated.bn=TRUE)
 #' }
 #' 
 #' @return a vector containing layers the nodes can be divided into.
-setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layering"))
+#' 
+#' @exportMethod layering
+setGeneric("layering", function(x) standardGeneric("layering"))
 
 
 #' compute the most probable values to be observed.
@@ -192,7 +230,6 @@ setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layeri
 #' @rdname get.most.probable.values
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
-#' @param ... potential further arguments of methods.
 #' 
 #' @return array containing, in each position, the most probable value for the corresponding variable.
 #' 
@@ -207,7 +244,7 @@ setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layeri
 #' }
 #'  
 #' @exportMethod get.most.probable.values
-setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
+setGeneric("get.most.probable.values", function(x) standardGeneric("get.most.probable.values"))
 
 
 #' sample a row vector of values for a network.
@@ -260,20 +297,19 @@ setGeneric("sample.dataset", function(x, n=100) standardGeneric("sample.dataset"
 setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 
 
-#' query BN given observations
-#' 
-#' @name query
-#' @rdname query
-#' 
-#' @param x a BN.
-#' @param observed.vars vector of observed variables.
-#' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
-#' @param ... potential further arguments for method.
-#' 
-#' @return most probable values given observations
-#' 
-#' @exportMethod query
-setGeneric("query", function(x, observed.vars=c(), observed.vals=c(), ...) standardGeneric("query"))
+# ' query BN given observations
+# ' 
+# ' @name query
+# ' @rdname query
+# ' 
+# ' @param x a BN.
+# ' @param observed.vars vector of observed variables.
+# ' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
+# ' 
+# ' @return most probable values given observations
+# ' 
+# ' @exportMethod query
+# setGeneric("query", function(x, observed.vars=c(), observed.vals=c()) standardGeneric("query"))
 
 
 #' save a \code{\link{BN}} picture as \code{.eps} file.
@@ -551,7 +587,46 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 
 #' Read a dataset from file.
 #' 
-#' File has to be in format (describe...)
+#' There are two ways to build a BNDataset: using two files containing respectively header informations
+#' and data, and manually providing the data table and the related header informations
+#' (variable names, cardinality and discreteness).
+#' 
+#' The key informations needed are:
+#' 1. the data;
+#' 2. the state of variables (discrete or continuous);
+#' 3. the names of the variables;
+#' 4. the cardinalities of the variables (if discrete), or the number of levels they have to be quantized into
+#' (if continuous). 
+#' Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
+#' _all_ of the informations, in order to avoid problems later on during the execution.
+#' 
+#' Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
+#' to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
+#' The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
+#' The default range of values for a discrete variable \code{X} is \code{[1,|X|]}, with \code{|X|} being
+#' the cardinality of \code{X}. The same applies for the levels of quantization for continuous variables.
+#' If the value ranges for the data are different from the expected ones, it is possible to specify a different
+#' starting value (for the whole dataset) with the \code{starts.from} parameter. E.g. by \code{starts.from=0}
+#' we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
+#' Please keep in mind that the internal representation of bnstruct starts from 1,
+#' and the original starting values are then lost. 
+#' 
+#' It is possible to use two files, one for the data and one for the metadata,
+#' instead of providing manually all of the info. 
+#' bnstruct requires the data files to be in a format subsequently described.
+#' The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
+#' with the values for each variable separated by a space or a tab. Values for each variable have to be
+#' numbers, starting from \code{1} in case of discrete variables.
+#' Data files can have a first row containing the names of the corresponding variables.
+#' 
+#' In addition to the data file, a header file containing additional informations can also be provided.
+#' An header file has to be composed by three rows of tab-delimited values:
+#' 1. list of names of the variables, in the same order of the data file;
+#' 2. a list of integers representing the cardinality of the variables, in case of discrete variables,
+#'   or the number of levels each variable has to be quantized in, in case of continuous variables;
+#' 3. a list that indicates, for each variable, if the variable is continuous
+#'   (\code{c} or \code{C}), and thus has to be quantized before learning,
+#'   or discrete (\code{d} or \code{D}).
 #' 
 #' @name read.dataset
 #' @rdname read.dataset
@@ -584,8 +659,8 @@ setGeneric("read.dataset", function(object, data.file, header.file, data.with.he
 #' @rdname impute
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param ... potential further arguments of methods.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode,
+#' for continuous variables the median value is instead taken.
 #' 
 #' @examples
 #' \dontrun{
@@ -668,10 +743,11 @@ setGeneric("boot", function(dataset, index, use.imputed.data = FALSE) standardGe
 #' @param object an \code{\link{InferenceEngine}} object.
 #' @param ... potential further arguments for methods.
 #' 
+#' @seealso InferenceEngine
+#' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' net <- BN(dataset)
 #' eng <- InferenceEngine()
 #' eng <- build.junction.tree(eng)
@@ -699,8 +775,7 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' bn <- BN(dataset)
 #' ie <- InferenceEngine(bn)
 #' ie <- belief.propagation(ie)
@@ -728,8 +803,7 @@ setGeneric("belief.propagation", function(ie, observations = NULL,
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' bn <- BN(dataset)
 #' ie <- InferenceEngine(bn)
 #' test.updated.bn(ie) # FALSE
@@ -767,34 +841,34 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneric("em"))
 
 
-#' Structural Expectation-Maximization algorithm.
-#' 
-#' Learn structure and parameters of a network with the Structural EM algorithm.
-#' 
-#' @name sem
-#' @rdname sem
-#' 
-#' @param x a \code{\link{BN}} object.
-#' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
-#' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
-#' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
-#' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
-#' (default - \code{BDeu} supported  as linear approximation).
-#' @param alpha confidence threshold (only for \code{mmhc}).
-#' @param ess Equivalent Sample Size value.
-#' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param cont.nodes vector containing the index of continuous variables.
-#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
-#' (if available, a check is performed). Default is to use raw dataset
-#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
-#' starting the Hill Climbing from an empty graph.
-#' @param ... further potential arguments for method.
-#' 
-#' @return a (\code{"BN"}) network with the new structure.
-#' 
+# ' Structural Expectation-Maximization algorithm.
+# ' 
+# ' Learn structure and parameters of a network with the Structural EM algorithm.
+# ' 
+# ' @name sem
+# ' @rdname sem
+# ' 
+# ' @param x a \code{\link{BN}} object.
+# ' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
+# ' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
+# ' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
+# ' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
+# ' (default - \code{BDeu} supported  as linear approximation).
+# ' @param alpha confidence threshold (only for \code{mmhc}).
+# ' @param ess Equivalent Sample Size value.
+# ' @param bootstrap \code{TRUE} to use bootstrap samples. 
+# ' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+# ' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+# ' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+# ' @param cont.nodes vector containing the index of continuous variables.
+# ' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+# ' (if available, a check is performed). Default is to use raw dataset
+# ' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+# ' starting the Hill Climbing from an empty graph.
+# ' @param ... further potential arguments for method.
+# ' 
+# ' @return a (\code{"BN"}) network with the new structure.
+# ' 
 # exportMethod sem
 setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
                            alpha = 0.05, ess = 1, bootstrap = FALSE,

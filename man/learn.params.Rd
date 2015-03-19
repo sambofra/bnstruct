@@ -31,11 +31,13 @@ using MAP (Maximum A Posteriori) estimation.
 \examples{
 \dontrun{
 ## first create a BN and learn its structure from a dataset
-dataset <- BNDataset(name = "MyDataset")
-dataset <- read.dataset(dataset, "file.header", "file.data")
-bn <- BN()
+dataset <- BNDataset("file.header", "file.data")
+bn <- BN(dataset)
 bn <- learn.structure(bn, dataset)
 bn <- learn.params(bn, dataset, ess=1)
 }
+}
+\seealso{
+learn.network
 }
 

@@ -741,7 +741,8 @@ is created directly from a network.
 \end{knitrout}
 
 Optionally, a list of observations can be provided to the \Robject{InferenceEngine}, at its creation or later on.
-The list of observations is a list of two vector, one for the observed variables (not necessarily in order),
+The list of observations is a list of two vector, one for the observed variables
+(variable indices or names can be provided, not necessarily in order - better is to list them in order of observation),
 and one for the observed values for the corresponding variables. In case of multiple observations of the same variable, the last one (the most recent one) is considered.
 
 \begin{knitrout}
@@ -750,7 +751,8 @@ and one for the observed values for the corresponding variables. In case of mult
 \hlstd{> }\hlstd{dataset} \hlkwb{<-} \hlkwd{child}\hlstd{()}
 \hlstd{> }\hlstd{net}     \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset)}
 \hlstd{> }
-\hlstd{> }\hlcom{# suppose we have observed variable 1 taking value 2, and variable 4 taking value 1:}
+\hlstd{> }\hlcom{# suppose we have observed variable 1 taking value 2}
+\hlstd{> }\hlcom{# and variable 4 taking value 1:}
 \hlstd{> }\hlstd{obs} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlstr{"observed.vars"} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{4}\hlstd{),}
 \hlstd{+ }            \hlstr{"observed.vals"} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{1}\hlstd{))}
 \hlstd{> }

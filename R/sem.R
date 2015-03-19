@@ -1,5 +1,5 @@
-#' @rdname sem
-#' @aliases sem,InferenceEngine,BNDataset
+# ' @rdname sem
+# ' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
           c("BN","BNDataset"),
           function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",

@@ -9,16 +9,14 @@
 \alias{get.most.probable.values,InferenceEngine-method}
 \title{compute the most probable values to be observed.}
 \usage{
-get.most.probable.values(x, ...)
+get.most.probable.values(x)
 
-\S4method{get.most.probable.values}{BN}(x, ...)
+\S4method{get.most.probable.values}{BN}(x)
 
-\S4method{get.most.probable.values}{InferenceEngine}(x, ...)
+\S4method{get.most.probable.values}{InferenceEngine}(x)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} or \code{\link{InferenceEngine}} object.}
-
-\item{...}{potential further arguments of methods.}
 }
 \value{
 array containing, in each position, the most probable value for the corresponding variable.

@@ -554,14 +554,16 @@ engine  <- InferenceEngine(net)
 @
 
 Optionally, a list of observations can be provided to the \Robject{InferenceEngine}, at its creation or later on.
-The list of observations is a list of two vector, one for the observed variables (not necessarily in order),
+The list of observations is a list of two vector, one for the observed variables
+(variable indices or names can be provided, not necessarily in order - better is to list them in order of observation),
 and one for the observed values for the corresponding variables. In case of multiple observations of the same variable, the last one (the most recent one) is considered.
 
 <<infeng2,eval=FALSE>>=
 dataset <- child()
 net     <- learn.network(dataset)
 
-# suppose we have observed variable 1 taking value 2, and variable 4 taking value 1:
+# suppose we have observed variable 1 taking value 2
+# and variable 4 taking value 1:
 obs <- list("observed.vars" = c(1,4),
             "observed.vals" = c(2,1))
 

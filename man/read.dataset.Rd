@@ -30,7 +30,47 @@ read.dataset(object, data.file, header.file, data.with.header = FALSE,
 \item{starts.from}{starting value for entries in the dataset (observed values, default is 1).}
 }
 \description{
-File has to be in format (describe...)
+There are two ways to build a BNDataset: using two files containing respectively header informations
+and data, and manually providing the data table and the related header informations
+(variable names, cardinality and discreteness).
+}
+\details{
+The key informations needed are:
+1. the data;
+2. the state of variables (discrete or continuous);
+3. the names of the variables;
+4. the cardinalities of the variables (if discrete), or the number of levels they have to be quantized into
+(if continuous).
+Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
+_all_ of the informations, in order to avoid problems later on during the execution.
+
+Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
+to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
+The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
+The default range of values for a discrete variable \code{X} is \code{[1,|X|]}, with \code{|X|} being
+the cardinality of \code{X}. The same applies for the levels of quantization for continuous variables.
+If the value ranges for the data are different from the expected ones, it is possible to specify a different
+starting value (for the whole dataset) with the \code{starts.from} parameter. E.g. by \code{starts.from=0}
+we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
+Please keep in mind that the internal representation of bnstruct starts from 1,
+and the original starting values are then lost.
+
+It is possible to use two files, one for the data and one for the metadata,
+instead of providing manually all of the info.
+bnstruct requires the data files to be in a format subsequently described.
+The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
+with the values for each variable separated by a space or a tab. Values for each variable have to be
+numbers, starting from \code{1} in case of discrete variables.
+Data files can have a first row containing the names of the corresponding variables.
+
+In addition to the data file, a header file containing additional informations can also be provided.
+An header file has to be composed by three rows of tab-delimited values:
+1. list of names of the variables, in the same order of the data file;
+2. a list of integers representing the cardinality of the variables, in case of discrete variables,
+  or the number of levels each variable has to be quantized in, in case of continuous variables;
+3. a list that indicates, for each variable, if the variable is continuous
+  (\code{c} or \code{C}), and thus has to be quantized before learning,
+  or discrete (\code{d} or \code{D}).
 }
 \examples{
 \dontrun{

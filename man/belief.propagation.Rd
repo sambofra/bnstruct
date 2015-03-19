@@ -30,8 +30,7 @@ In the current version of \code{bnstruct}, belief propagation can be computed on
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.header", "file.data")
 bn <- BN(dataset)
 ie <- InferenceEngine(bn)
 ie <- belief.propagation(ie)

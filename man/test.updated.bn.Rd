@@ -23,8 +23,7 @@ a fallback and use the original network if no belief propagation has been perfor
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.header", "file.data")
 bn <- BN(dataset)
 ie <- InferenceEngine(bn)
 test.updated.bn(ie) # FALSE

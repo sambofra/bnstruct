@@ -23,11 +23,13 @@ and store it into an InferenceEngine.
 }
 \examples{
 \dontrun{
-dataset <- BNDataset()
-dataset <- read.dataset(dataset, "file.header", "file.data")
+dataset <- BNDataset("file.header", "file.data")
 net <- BN(dataset)
 eng <- InferenceEngine()
 eng <- build.junction.tree(eng)
 }
+}
+\seealso{
+InferenceEngine
 }
 

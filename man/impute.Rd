@@ -14,9 +14,8 @@ impute(object, k.impute = 10)
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
-
-\item{...}{potential further arguments of methods.}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode,
+for continuous variables the median value is instead taken.}
 }
 \description{
 Impute a \code{\link{BNDataset}} raw data with missing values.
