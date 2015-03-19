@@ -48,7 +48,7 @@ setMethod("em",
             while(difference > threshold || first.iteration)
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
-              eng      <- belief.propagation(eng,bn)            
+              eng      <- belief.propagation(eng)            
               imp.data <- matrix(data=rep(0, prod(dim(rawdata))),
                                  nrow=nrow(rawdata),
                                  ncol=ncol(rawdata))
@@ -80,15 +80,19 @@ setMethod("em",
                   to.evaluate.next <- c()
                   for (i in to.evaluate)
                   {
-                    target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(cl))})))
+                    # TODO: PROFILING: which is really better?
+                    #target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(cl))})))
+                    target.cliques <- which(sapply(cliques, function(cl) {i %in% cl}))
                     
                     tc <- 1
                     while (tc  <= length(target.cliques))
                     {
                       target.clique  <- target.cliques[tc]
                       jpt            <- j[[target.clique]]
+                      # TODO: PROFILING: can this be improved?
                       d              <- c(match(names(dimnames(jpt)),var.names))
                       
+                      # TODO: PROFILING: is there anything better than intersect?
                       if (length(intersect(d, overall.obsd.vars)) == length(d)-1)
                       {
                         dd <- d
@@ -116,6 +120,7 @@ setMethod("em",
                         {
                           tc <- length(target.cliques) + 100
                           
+                          # TODO: PROFILING: can this be done more efficiently?
                           wm <- which(!is.na(match(c(jpt),max(jpt))))
                           if (length(wm) == 1)
                           {
@@ -125,8 +130,8 @@ setMethod("em",
                           {
                             mpv[i] <- sample(wm,1) #,replace=TRUE
                           }
-                          overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                         }
+                        overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                       }
                       tc <- tc + 1
                     }
@@ -167,7 +172,8 @@ setMethod("em",
                 {
                   bis.ie <- InferenceEngine(bis.net)
                   ov     <- which(!is.na(imp.data[bis.row]))
-                  bis.ie.1 <- belief.propagation(bis.ie, observed.vars = ov, observed.vals = (imp.data[bis.row])[ov])
+                  bis.ie.1 <- belief.propagation(bis.ie, list("observed.vars" = ov,
+                                                              "observed.vals" = (imp.data[bis.row])[ov]))
                   imp.data[bis.row,] <- get.most.probable.values(bis.ie.1)
                 }
               }

@@ -21,10 +21,12 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
 {
   dataset <- new("BNDataset")
   
-  # this is here for 2 purposes:
-  # 1. spare changes all over the package in order to remove name field
-  # 2. keep a suggestion on how to get variable name
-  name(dataset) <- deparse(substitute(dataset))
+  # # this is here for 2 purposes:
+  # # 1. spare changes all over the package in order to remove name field
+  # # 2. keep a suggestion on how to get variable name
+  # # name(dataset) <- deparse(substitute(dataset))
+  # above: seems heavy...
+  name(dataset) <- "BNDataset"
   
   # The presence of ONLY data and discreteness, and them being 2 strings, mean that two files are passed:
   # - data file (data)
@@ -554,6 +556,11 @@ setMethod("bootstrap",
           "BNDataset",
           function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
           {
+            if (imputation)
+              bnstruct.start.log("Generating bootstrap samples with imputation ...")
+            else
+              bnstruct.start.log("Generating bootstrap samples ...")
+            
             # assumes raw data is ok
             object@has.boots <- TRUE
             object@num.boots <- num.boots
@@ -580,6 +587,8 @@ setMethod("bootstrap",
                 
               }
             }
+            
+            bnstruct.end.log("Bootstrap samples generated.")
             return(object)
           })
 

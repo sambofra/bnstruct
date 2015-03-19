@@ -690,11 +690,10 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' @rdname belief.propagation
 #' 
 #' @param ie an \code{\link{InferenceEngine}} object.
-#' @param net a \code{\link{BN}} object.
-#' @param observed.vars list of observed variables.
-#' @param observed.vals values taken by variables listed in \code{observed.vars}.
+#' @param observations list of observations, consisting in two vector, \code{observed.vars} for the observed variables,
+#' and \code{observed.vals} for the values taken by variables listed in \code{observed.vars}. If no observations
+#' are provided, the \code{InferenceEngine} will use the ones it already contains.
 #' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
-#' @param ... potential further arguments of methods.
 #' 
 #' @return updated \code{\link{InferenceEngine}} object.
 #' 
@@ -711,8 +710,8 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' }
 #' 
 #' @exportMethod belief.propagation
-setGeneric("belief.propagation", function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL,
-                                          return.potentials = FALSE, ...) standardGeneric("belief.propagation"))
+setGeneric("belief.propagation", function(ie, observations = NULL,
+                                          return.potentials = FALSE) standardGeneric("belief.propagation"))
 
 
 #' check if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.
