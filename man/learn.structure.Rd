@@ -21,7 +21,7 @@ learn.structure(bn, dataset, algo = params@learning.algo,
   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
   num.boots = params@num.boots, imputation = TRUE,
   k.impute = params@k.impute, na.string.symbol = "?", seed = params@seed,
-  params)
+  params = BNParams())
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -32,7 +32,7 @@ learn.structure(bn, dataset, algo = params@learning.algo,
 
 \item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
 
-\item{alpha}{confidence threshold (only for \code{mmhc}).}
+\item{alpha}{confidence threshold (for \code{mmhc} and \code{eocp}).}
 
 \item{ess}{Equivalent Sample Size value.}
 

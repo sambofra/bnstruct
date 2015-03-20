@@ -6,7 +6,7 @@
 #' 
 setMethod("initialize",
           "BN",
-          function(.Object, dataset = NULL, ...)
+          function(.Object, dataset = NULL, variables = c(), node.sizes = c(), discreteness = c())
           {
             x <- .Object
             
@@ -19,7 +19,23 @@ setMethod("initialize",
               discreteness(x) <- discreteness(dataset)
               dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
               wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              validObject(x)
+              return(x)
             }
+            
+            if (!is.null(variables) && !is.null(node.sizes) && !is.null(discreteness))
+            {
+              name(x)         <- name(dataset)
+              num.nodes(x)    <- num.variables(dataset)
+              variables(x)    <- variables(dataset)
+              node.sizes(x)   <- node.sizes(dataset)
+              discreteness(x) <- discreteness(dataset)
+              dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              validObject(x)
+              return(x)
+            }
+            
             validObject(x)
             return(x)
           })
@@ -46,7 +62,6 @@ setMethod("initialize",
 #'
 #' @param dataset a \code{\link{BNDataset}} object containing the dataset the network is built upon, if any. The remaining parameters
 #'        are considered only if a starting dataset is provided.
-#' @param ... potential further arguments of methods.
 #' 
 #' @return BN object.
 #' 
@@ -61,9 +76,9 @@ setMethod("initialize",
 #' 
 #' 
 #' @export
-BN <- function(dataset = NULL, ...)
+BN <- function(dataset = NULL, variables = c(), node.sizes = c(), discreteness = c())
 {
-  object <- new("BN", dataset = dataset, ...)
+  object <- new("BN", dataset = dataset, variables = c(), node.sizes = c(), discreteness = c())
   return(object)
 }
 
@@ -552,6 +567,8 @@ setMethod("sample.row", "BN",
             variables <- variables(bn)
             node.sizes <- node.sizes(bn)
             
+            copy <- cpts
+            
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
             
             sorted.nodes <- topological.sort(dag)
@@ -567,39 +584,103 @@ setMethod("sample.row", "BN",
                                      )
                                    )
             )
-            
+
+            print("sorted.nodes")
+            print(variables[sorted.nodes])
+#             readLines(file("stdin"),1)
             
             for (node in sorted.nodes)
             {
+              print("node")
+              print(node)
               pot  <- cpts[[node]]
               vars <- c(unlist(dim.vars[[node]]))
-              
+              print(pot)
+              print("((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((")
+              print(copy[[node]])
+              print("))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))")
+              print(vars)
               # sum out parent variables
-              if (length(dim.vars[[node]]) > 1)
+              if (length(c(unlist(dim.vars[[node]]))) > 1)
               {
+                print("parents")
+                print(setdiff(vars, node))
+                parents <- setdiff(vars, node)
+                for (parent in parents)
+                  print(cpts[[parent]])
+                print("-")
+#                 readLines(file("stdin"),1)
                 # find the dimensions corresponding to the current variable
-                for (parent in setdiff(vars, node))
-                {
-                  out  <- marginalize(pot, vars, parent)
-                  pot  <- out$potential
-                  vars <- out$vars
-                  pot <- pot / sum(pot)
-                }
+#                 for (parent in parents)
+#                 {
+#                   print(parent)
+#                   npot              <- rep(0, node.sizes[parent])
+#                   npot[mpv[parent]] <- 1
+#                   print("***************")
+#                   print(pot)
+#                   print("°°°°°°°°°°°°°°°")
+#                   out <- mult(pot, vars,
+#                               npot, c(parent),
+#                               node.sizes)
+#                   pot  <- out$potential
+#                   vars <- out$vars
+#                   print(pot)
+#                   print(vars)
+#                   print("###############")
+#                   #               npot[mpv[node]] <- 1
+# #                   out  <- marginalize(pot, vars, parent)
+# #                   pot  <- out$potential
+# #                   vars <- out$vars
+#                   # pot <- pot / sum(pot)
+#                 }
+                remaining <- match(node, vars)
+                pot  <- apply(pot, remaining, sum)
+                vars <- vars[remaining]
+              }
+              else
+              {
+                print("no parents")
+                print(pot)
               }
               
-              mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
+              # pot  <- pot / sum(pot)
+              print(pot)
               
+              mpv[node] <- sample(1:node.sizes[node], 1, replace=T, prob=pot)
+              print(mpv[node])
               # propagate information from parent nodes to children
-              children <- which(dag[node,] > 0)
+              children        <- which(dag[node,] > 0)
+              npot            <- rep(0, node.sizes[node])
+              npot[c(mpv[node])] <- 1
+              cpts[[node]] <- npot
+              dim.vars[[node]] <- c(node)
+              print("node")
+              print(variables[node])
+              print("children")
+              print(variables[children])
+#               readLines(file("stdin"),1)
               if (length(children) > 0)
               {
                 for (child in children)
                 {
+                  print("and now")
+                  print(variables[child])
+#                   readLines(file("stdin"),1)
+                  print("prima")
+                  print(cpts[[child]])
+                  print(dim.vars[[child]])
                   out <- mult(cpts[[child]], dim.vars[[child]],
-                              pot, c(node),
+                              npot, c(node),
                               node.sizes)
                   cpts[[child]]     <- out$potential
                   dim.vars[[child]] <- out$vars
+                  remaining <- c(1:length(dim.vars[[child]]))[-which(dim.vars[[child]] == node)]
+                  cpts[[child]]  <- apply(cpts[[child]], remaining, sum)
+                  dim.vars[[child]] <- dim.vars[[child]][remaining]
+                  dag[node,child] <- 0
+                  print("dopo")
+                  print(cpts[[child]])
+                  print(dim.vars[[child]])
                 }
               }
             }
@@ -738,9 +819,10 @@ topological.sort <- function(dgraph)
   i <- 1
   while( length(fringe) > 0 )
   {
+    print(fringe)
     ind <- head(fringe,1) # pop
     fringe <- tail(fringe,-1)
-    order[ind] <- i
+    order[i] <- ind
     i <- i + 1 
     
     for( j in which(dgraph[ind,] != 0) )

@@ -65,7 +65,7 @@ setMethod("learn.structure",
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
                    num.boots = params@num.boots, imputation = TRUE, k.impute = params@k.impute,
-                   na.string.symbol='?', seed = params@seed, params)
+                   na.string.symbol='?', seed = params@seed, params=BNParams())
           {
             num.nodes(bn)  <- num.variables(dataset)
             node.sizes(bn) <- node.sizes(dataset)
@@ -180,6 +180,8 @@ setMethod("learn.structure",
               {
                 cpc     <- mmpc( data, node.sizes, cont.nodes, alpha, layering )
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
+                #print(dag(bn))
+                #readLines(file("stdin"),1)
               }
             }
             struct.algo(bn) <- algo

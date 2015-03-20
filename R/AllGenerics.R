@@ -55,7 +55,7 @@ setGeneric("learn.params", function(bn, dataset, ess=params@ess, ..., params) st
 #' @param dataset a \code{\link{BNDataset}}.
 #' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
 #' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
-#' @param alpha confidence threshold (only for \code{mmhc}).
+#' @param alpha confidence threshold (for \code{mmhc} and \code{eocp}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param num.boots number of bootstrap samples to generate, if needed.
@@ -97,7 +97,7 @@ setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        cont.nodes=c(), raw.data=FALSE, num.boots=params@num.boots,
                                        imputation = TRUE, k.impute = params@k.impute,
-                                       na.string.symbol='?', seed = params@seed, ..., params) standardGeneric("learn.structure"))
+                                       na.string.symbol='?', seed = params@seed, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -556,7 +556,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' @param data.file the \code{data} file.
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
-#' @param header.flag \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
+#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
 #' @param imputation \code{TRUE} if imputation has to be performed.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
 #' @param bootstrap \code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.
@@ -573,7 +573,7 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
+setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, data.with.header = FALSE,
                                     na.string.symbol = '?', sep.symbol = '', k.impute = params@k.impute,
                                     bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
                                     starts.from = 0, ..., params)

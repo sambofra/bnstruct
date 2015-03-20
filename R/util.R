@@ -43,6 +43,19 @@ fancy.cpt <- function( cpt )
 # }
 
 # Compute Structural Hamming Distance between graphs g1 and g2
+#' compute the Structural Hamming Distance between two adjacency matrices.
+#' 
+#' Compute the Structural Hamming Distance between two adjacency matrices, that is,
+#' the distance, in terms of edges, between two network structures. The lower the \code{shd},
+#' the more similar are the two network structures.
+#' 
+#' @name shd
+#' @rdname shd
+#' 
+#' @param g1 first adjacency matrix.
+#' @param g2 second adjacency matrix.
+#' 
+#' @export shd
 shd <- function(g1, g2)
 {
   dif <- (g1 != g2)
@@ -86,7 +99,7 @@ quantize.matrix <- function(data, levels)
     {
       quantiles <- quantile( data[,i], probs = (0:levels[i])/levels[i], na.rm = TRUE )
       # cut the range using the quantiles as break points.
-      quant[,i] <- as.matrix( cut( data[,i], quantiles, labels=FALSE, include.lowest=TRUE),nr,1 )
+      quant[,i] <- as.matrix( cut( data[,i], unique(quantiles), labels=FALSE, include.lowest=TRUE),nr,1 ) #unique(quantiles)
     }
   }
   

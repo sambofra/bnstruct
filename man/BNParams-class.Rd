@@ -30,17 +30,41 @@ Does not check for their correctness (it's assumed they are correct).
 \section{Slots}{
 
 \describe{
-\item{\code{CPX_PARAM_SCRIND}}{= "numeric",}
+\item{\code{ess}}{Equivalent Sample Size value.}
 
-\item{\code{CPX_PARAM_PRELINEAR}}{= "numeric",}
+\item{\code{alpha}}{confidence threshold (for \code{mmhc} and \code{eocp}).}
 
-\item{\code{CPX_PARAM_PREIND}}{= "numeric",}
+\item{\code{learning.algo}}{algorithm to use for structure learning: one among \code{mmhc} (Max-min Hill Climbing, default),
+\code{sm} (Silander-Myllymaki) and \code{eocp} (Edge Orientation with candidate parents).}
 
-\item{\code{CPX_PARAM_MIPCBREDLP}}{= "numeric",}
+\item{\code{scoring.func}}{scoring function to be used for structure learning: one among \code{BDeu} (default),
+\code{AIC} and \code{BIC}.}
 
-\item{\code{CPX_PARAM_MIPSEARCH}}{= "numeric",}
+\item{\code{max.parents}}{maximum number of parents for each node in the network (a value <0 means "all of the other nodes of the network").}
 
-\item{\code{cplex_presolve_algo}}{= "numeric"}
+\item{\code{num.boots}}{number of bootstrap samples to generate, if needed.}
+
+\item{\code{k.impute}}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.}
+
+\item{\code{seed}}{random seed.}
+
+\item{\code{em_convergence}}{threshold for convergence of the EM algorithm as difference in the CPTs between two successive iterations,
+used as stopping criterion.}
+
+\item{\code{sem_convergence}}{threshold for convergence of the SEM algorithm as Structural Hamming Distance between the networks
+computed in two successive iterations, used as stopping criterion.}
+
+\item{\code{CPX_PARAM_SCRIND}}{"numeric",}
+
+\item{\code{CPX_PARAM_PRELINEAR}}{"numeric",}
+
+\item{\code{CPX_PARAM_PREIND}}{"numeric",}
+
+\item{\code{CPX_PARAM_MIPCBREDLP}}{"numeric",}
+
+\item{\code{CPX_PARAM_MIPSEARCH}}{"numeric",}
+
+\item{\code{cplex_presolve_algo}}{"numeric"}
 }}
 \examples{
 \dontrun{

@@ -13,7 +13,7 @@ eocp <- function(data, node.sizes, scoring.func, cont.nodes, alpha, layering, pa
   setIntParmCPLEX(cplex.problem$env, CPX_PARAM_MIPSEARCH, params@CPX_PARAM_MIPSEARCH);
   presolveCPLEX(cplex.problem$env, cplex.problem$prob, params@cplex_presolve_algo);
   
-  initialization <- orientation.init(cplex.problem, cpcs.table, data, node.sizes, scoring.func)
+  initialization <- orientation.init(cplex.problem, cpcs.table, data, node.sizes, scoring.func, params)
   
 #   save.scores(instance.name,
 #               num.nodes, c(initialization$cpcs.scores), initialization$cpcs.vars,
@@ -31,7 +31,7 @@ eocp <- function(data, node.sizes, scoring.func, cont.nodes, alpha, layering, pa
   return(out$dag)
 }
 
-orientation.init <- function(cplex.problem, graph, data, node.sizes, scoring.func = 0)
+orientation.init <- function(cplex.problem, graph, data, node.sizes, scoring.func = 0, params)
 {
   # graph : the skeleton
   num.nodes <- nrow(graph)
@@ -104,14 +104,23 @@ orientation.init <- function(cplex.problem, graph, data, node.sizes, scoring.fun
     inserted.in.last.round <- 1
     to.be.inserted <- 0
     
-    if (len.cpc > 0)
+    if (params@max.parents < 0)
     {
-      for (j in 1L:len.cpc)
+      max.parents <- len.cpc
+    }
+    else
+    {
+      max.parents <- min(len.cpc, params@max.parents)
+    }
+    
+    if (max.parents > 0)
+    {
+      for (j in 1L:max.parents)
       {
         print(j)
-        start.num = 2 ** j - 1
-        last.num  = 2 ** len.cpc - 1 - (2 ** (len.cpc - j) - 1) + 1
-        curr.num  = start.num
+        start.num <- 2 ** j - 1
+        last.num  <- 2 ** len.cpc - 1 - (2 ** (len.cpc - j) - 1) + 1
+        curr.num  <- start.num
         
         inserted.in.last.round <- 0
         
