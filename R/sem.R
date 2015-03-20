@@ -25,7 +25,7 @@ setMethod("sem",
             # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
 
             # starting from an empty network: learn a starting point using MMHC
-            if (sum(dag(net)) == 0)
+            if (is.na(sum(dag(net))) || sum(dag(net)) == 0)
             {
               w.net <- net
               w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],

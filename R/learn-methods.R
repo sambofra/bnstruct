@@ -203,11 +203,11 @@ setMethod("learn.structure",
               }
               bnstruct.start.log("learning the structure using SEM ...")
 
-              bn <- sem(bn, dataset, param.threshold = 0.001,
+              bn <- sem(bn, dataset, param.threshold,
                         scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
-                        alpha = 0.05, ess = 1, bootstrap = FALSE,
-                        layering = c(), max.fanin.layers = NULL,
-                        max.fanin = num.variables(dataset), cont.nodes = c(),
+                        alpha = alpha, ess = ess, bootstrap = bootstrap,
+                        layering = layering, max.fanin.layers = max.fanin.layers,
+                        max.fanin = max.fanin, cont.nodes = cont.nodes,
                         use.imputed.data = use.imputed.data,
                         use.cpc = use.cpc, ...)
               

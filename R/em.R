@@ -130,8 +130,8 @@ setMethod("em",
                           {
                             mpv[i] <- sample(wm,1) #,replace=TRUE
                           }
+                          overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                         }
-                        overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                       }
                       tc <- tc + 1
                     }
