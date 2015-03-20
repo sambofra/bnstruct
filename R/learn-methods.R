@@ -270,7 +270,8 @@ setMethod("learn.structure",
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes )
               }
               bnstruct.end.log("learning using MMHC completed.")
-            }
+            } # end if algo == mmhc
+            
             struct.algo(bn) <- algo
             
             return(bn)
