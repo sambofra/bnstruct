@@ -2,7 +2,7 @@
 #' @aliases belief.propagation,InferenceEngine
 setMethod("belief.propagation",
           c("InferenceEngine"),
-          function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL, return.potentials = FALSE, ...){
+          function(ie, observations = NULL, return.potentials = FALSE){
             {
               ###############################
               # moved inside in order to eliminate a NOTE in R CMD check
@@ -28,12 +28,12 @@ setMethod("belief.propagation",
               
               ##############################
               
-              if (missing(net))
-              {
-                net <- bn(ie)
-              }
+              # if (missing(net))
+              # {
+              net <- bn(ie)
+              # }
               
-              if (missing(observed.vars))
+              if (missing(observations))
               {
                 obs <- observations(ie)
                 observed.vars <- obs$observed.vars
@@ -41,6 +41,8 @@ setMethod("belief.propagation",
               }
               else
               {
+                observed.vars <- observations[[1]]
+                observed.vals <- observations[[2]]
                 obs <- unique.observations(observed.vars, observed.vals)
                 observed.vars <- obs$observed.vars
                 observed.vals <- obs$observed.vals
@@ -61,21 +63,18 @@ setMethod("belief.propagation",
               
               dim.vars   <- lapply(1:num.nodes,
                                    function(x)
-                                     as.list(
+                                     #as.list(
                                        match(
                                          c(unlist(
                                           names(dimnames(cpts[[x]])), F, F
                                          )),
                                          variables
                                        )
-                                   )
+                                   #)
                             )
 
               
               node.sizes <- node.sizes(net)
-              
-              observed.vars <- c(unlist(observed.vars, F, F))
-              observed.vals <- c(unlist(observed.vals, F, F))
               
               # potentials is a list containing the probability tables of each clique
               potentials <- as.list(rep(as.list(c(1)), num.cliqs))
@@ -122,6 +121,7 @@ setMethod("belief.propagation",
 #                                                   }
 #                 ))
                 
+                # TODO: PROFILING: is there anything better?
                 target.clique <- which.min(lapply(1:num.cliqs,
                                                   function(x){
                                                     length(which(!is.na(match(
@@ -589,7 +589,7 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   {
     cpt1 <- as.vector(cpt1) %o% as.vector(cpt2)
   }
- else
+  else
     # otherwise, we have to manage the shared variables: consider P(C|A) x P(AB); unlisting the cpts we obtain
     # [ac !ac a!c !a!c], and
     # [ab !ab a!b !a!b]
@@ -654,14 +654,14 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
     
   }
   
-  vars1 <- unlist(vars1, F, F)
-  vars2 <- unlist(vars2, F, F)
+  #vars1 <- unlist(vars1, F, F)
+  #vars2 <- unlist(vars2, F, F)
   
   # - compute variables for the resulting cpt; if there were no shared variables, then
   #   it suffices to concatenate 
   if (length(common.vars) > 0)
   {
-    # new.where <- which(vars2 == common.vars)
+    # TODO: PROFILING: anything better than this?
     new.where <- which(is.na(match(vars2, common.vars)) == FALSE) # ugly, but should be more robust
     vars1     <- c(vars2[-new.where], vars1)
   }
@@ -673,8 +673,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   cpt1 <- array(c(cpt1), c(node.sizes[vars1]))
 
   out  <- sort.dimensions(cpt1, vars1)
-  
-  return(list("potential"=out$potential, "vars"=out$vars))
+
+ return(list("potential"=out$potential, "vars"=out$vars))
 }
 
 
@@ -774,14 +774,14 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   return(list("potential"=out$potential, "vars"=out$vars))
 }
 
-sort.dimensions <- function(cpt, vars)
+sort.dimensions <- function(cpt, new.ordering)
 {
   # Permute array dimensions of the cpt accoring to the dimension names.
   # Dimensions (each corresponding to a variable) will be sorted in numerical order.
   # cpt  : conditional probability table
   # vars : dimension names
   
-  new.ordering <- unlist(vars, F, F)
+  # new.ordering <- unlist(vars, F, F)
   if (length(new.ordering) > 1)
   {
     # look if there is some variable out of order (preceding a variable with a lower number)
@@ -800,9 +800,9 @@ sort.dimensions <- function(cpt, vars)
     if (!is.ordered) # permute
     {
       dd           <- data.frame(c1 = new.ordering,
-                                 c2 = c(1:length(new.ordering)))
+                                 c2 = 1:length(new.ordering))
       dd           <- dd[with(dd,order(c1)),]
-      new.ordering <- new.ordering[c(dd[,"c2"])]
+      new.ordering <- new.ordering[dd[,"c2"]]
       cpt          <- aperm(cpt, c(dd[,"c2"]))
     }
   }

@@ -2,7 +2,7 @@
 #' @aliases em,InferenceEngine,BNDataset
 setMethod("em",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, threshold = params@em_convergence, k.impute = params@k.impute, ..., params)
+          function(x, dataset, threshold = params@em_convergence, ess=params@ess, params)
           {
             # We assume:
             # 1) there is a BN with learnt or known parameters
@@ -24,13 +24,14 @@ setMethod("em",
             #     - in case of parents with missing values: take variables in topological order
             #   - compute values according to distribution
 
-            # raw.data   <- get.imputed.data(dataset)
-            raw.data   <- get.raw.data(dataset)
-            imputed.data <- get.imputed.data(dataset)
+            bnstruct.start.log("starting EM algorithm ...")
+            
+            rawdata  <- raw.data(dataset)
             if (test.updated.bn(x))
               orig.bn <- updated.bn(x)
             else
-              orig.bn    <- bn(x)
+              orig.bn <- bn(x)
+            
             bak.bn     <- orig.bn
             bn         <- orig.bn
             eng        <- x
@@ -47,15 +48,15 @@ setMethod("em",
             while(difference > threshold || first.iteration)
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
-              eng      <- belief.propagation(eng,bn)            
-              imp.data <- matrix(data=rep(0, prod(dim(raw.data))),
-                                 nrow=nrow(raw.data),
-                                 ncol=ncol(raw.data))
+              eng      <- belief.propagation(eng)            
+              imp.data <- matrix(data=rep(0, prod(dim(rawdata))),
+                                 nrow=nrow(rawdata),
+                                 ncol=ncol(rawdata))
               
               still.has.NAs <- c()
               for (row in 1:num.items)
               {
-                y             <- raw.data[row,]
+                y             <- rawdata[row,]
                 # mpv           <- rep(0, num.nodes)
                 obsd.vars     <- which(!is.na(y))
                 obsd.vals     <- y[obsd.vars]
@@ -79,15 +80,19 @@ setMethod("em",
                   to.evaluate.next <- c()
                   for (i in to.evaluate)
                   {
-                    target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(cl))})))
+                    # TODO: PROFILING: which is really better?
+                    #target.cliques <- which(!is.na(sapply(cliques, function(cl) {match(i, c(cl))})))
+                    target.cliques <- which(sapply(cliques, function(cl) {i %in% cl}))
                     
                     tc <- 1
                     while (tc  <= length(target.cliques))
                     {
                       target.clique  <- target.cliques[tc]
                       jpt            <- j[[target.clique]]
+                      # TODO: PROFILING: can this be improved?
                       d              <- c(match(names(dimnames(jpt)),var.names))
                       
+                      # TODO: PROFILING: is there anything better than intersect?
                       if (length(intersect(d, overall.obsd.vars)) == length(d)-1)
                       {
                         dd <- d
@@ -115,6 +120,7 @@ setMethod("em",
                         {
                           tc <- length(target.cliques) + 100
                           
+                          # TODO: PROFILING: can this be done more efficiently?
                           wm <- which(!is.na(match(c(jpt),max(jpt))))
                           if (length(wm) == 1)
                           {
@@ -126,15 +132,8 @@ setMethod("em",
                           }
                           overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                         }
-                        #  else
-                        #  {
-                        #  # print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-                        #  }
+
                       }
-                      #  else
-                      # {
-                      #   print("too many unobserved vars in current clique")
-                      # }
                       tc <- tc + 1
                     }
   
@@ -168,13 +167,14 @@ setMethod("em",
                 bis.dataset <- dataset
                 imputed.data(bis.dataset) <- bis.data
                 num.items(bis.dataset) <- num.items - length(still.has.NAs)
-                bis.net <- learn.params(bn, bis.dataset)
+                bis.net <- learn.params(bn, bis.dataset, ess=ess, params=params)
 
                 for (bis.row in still.has.NAs)
                 {
                   bis.ie <- InferenceEngine(bis.net)
                   ov     <- which(!is.na(imp.data[bis.row]))
-                  bis.ie.1 <- belief.propagation(bis.ie, observed.vars = ov, observed.vals = (imp.data[bis.row])[ov])
+                  bis.ie.1 <- belief.propagation(bis.ie, list("observed.vars" = ov,
+                                                              "observed.vals" = (imp.data[bis.row])[ov]))
                   imp.data[bis.row,] <- get.most.probable.values(bis.ie.1)
                 }
               }
@@ -182,17 +182,19 @@ setMethod("em",
               storage.mode(imp.data) <- "integer"
               imputed.data(dataset)  <- imp.data
               
-              bn <- learn.params(bn, dataset)
+              bn <- learn.params(bn, dataset, ess=ess, params=params)
 
               if (first.iteration)
                 first.iteration <- FALSE
               else
                 difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
-              print(difference)
-              # readLines(file("stdin"),1)
+
               orig.bn <- bn
             }
             
             updated.bn(x) <- bn
+            
+            bnstruct.end.log("EM algorithm completed.")
+            
             return(list("InferenceEngine" = x, "BNDataset" = dataset))
           })

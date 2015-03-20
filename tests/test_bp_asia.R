@@ -6,12 +6,15 @@ library("bnstruct")
 # break
 mydata <- asia()
 #mydata@name <- "Asia"
-print(mydata)
+# print(mydata)
 
-other <- BNDataset(data = mydata@raw.data, variables = variables(mydata), node.sizes = mydata@node.sizes, discreteness = rep('d',8))
-print(other)
-
-net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
+#other <- BNDataset(data = mydata@raw.data, variables = variables(mydata), node.sizes = mydata@node.sizes, discreteness = rep('d',8))
+#print(other)
+# mydata <- BNDataset("/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.data",
+#                     "/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.header",
+#                     starts.from=0)
+params = BNParams()
+net <- learn.network(mydata, params=params) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8
 # set.node.sizes(net) <- c(2,2,2,2,2,2,2,2)
@@ -49,8 +52,8 @@ net <- BN(mydata) #, algo = "sm", scoring.func = "BIC")
 # # 
 # slot(net, "cpts") <- cpts
 
-net <- learn.structure(net, mydata, algo="mmhc")
-net <- learn.params(net, mydata)
+#net <- learn.structure(net, mydata, algo="mmhc")
+#net <- learn.params(net, mydata)
  
 # print(net)
 # unlist(lapply(net@cpts, sum))

@@ -306,7 +306,7 @@ setReplaceMethod("struct.algo",
 #' @rdname layering
 setMethod("layering",
           "BN",
-          function(x, ...)
+          function(x)
           {
             layers <- topological.sort(dag(x))
             layers <- array(layers, dimnames = variables(x))
@@ -318,7 +318,7 @@ setMethod("layering",
 #' @rdname get.most.probable.values
 setMethod("get.most.probable.values",
           "BN",
-          function(x, ...)
+          function(x)
           {
             bn   <- x
             dag  <- dag(bn)
@@ -391,20 +391,20 @@ setMethod("get.most.probable.values",
           })
 
 
-#' @rdname query
-#' @aliases query,BN
-setMethod("query",
-          "BN",
-          function(x, observed.vars, observed.vals)
-          {
-#             obs <- unique.observations(observed.vars, observed.vals)
-#             observed.vars <- obs$observed.vars
-#             observed.vals <- obs$observed.vals
-#             cpts <- cpts(x)
-#             cpts <- lapply(1:length(cpts), function(x) {
-#                               if (!match(x, observed.vars)){}
-#                             })
-          })
+# # ' @rdname query
+# # ' @aliases query,BN
+# setMethod("query",
+#           "BN",
+#           function(x, observed.vars, observed.vals)
+#           {
+# #             obs <- unique.observations(observed.vars, observed.vals)
+# #             observed.vars <- obs$observed.vars
+# #             observed.vals <- obs$observed.vals
+# #             cpts <- cpts(x)
+# #             cpts <- lapply(1:length(cpts), function(x) {
+# #                               if (!match(x, observed.vars)){}
+# #                             })
+#           })
 
 
 # redefition of print() for BN objects
@@ -424,13 +424,13 @@ setMethod("print",
             cat(str)
             str <- "\nvariables\n"
             cat(str)
-            print(variables(x))
+            cat(variables(x))
             str <- "\ndiscreteness\n"
             cat(str)
-            print(discreteness(x))
+            cat(discreteness(x))
             str <- "\nnode.sizes\n"
             cat(str)
-            print(node.sizes(x))
+            cat(node.sizes(x))
             
             if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
             {
@@ -455,6 +455,8 @@ setMethod("print",
               print(cpts(x))
               
             }
+            
+            cat("\n")
             
           })
 

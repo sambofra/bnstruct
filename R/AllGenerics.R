@@ -6,6 +6,90 @@
 ###############################################################################
 
 
+#' learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.
+#' 
+#' Learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset} (see the \code{Details} section).
+#' 
+#' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
+#' We provide three algorithms in order to learn the structure of the network, that can be chosen with the \code{algo} parameter.
+#' The first is the Silander-Myllym\"aki (\code{sm})
+#' exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+#' the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
+#' with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
+#' meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
+#' documentation in package manual for more details on the method parameters.
+#' 
+#' The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\code{mmhc}), that performs a statistical
+#' sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method,
+#' at the cost of a (likely)
+#' lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+#' of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
+#' mainly the confidence threshold of the statistical pruning.
+#' 
+#' The third method is the Structural Expectation-Maximization (\code{sem}) algorithm,
+#' for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
+#' the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
+#' due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \code{struct.threshold}
+#' and \code{param.threshold}, for the structure and the parameter convergence, respectively.
+#' 
+#' Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
+#' We provide three of the most popular scoring functions, \code{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
+#' \code{AIC} (Akaike Information Criterion) and \code{BIC} (Bayesian Information Criterion). The scoring function
+#' can be chosen using the \code{scoring.func} parameter.
+#' 
+#' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (if not using bootstrap).
+#' 
+#' See documentation for \code{\link{learn.structure}} and \code{\link{learn params}} for more informations.
+#' 
+#' @name learn.network
+#' @rdname learn.network
+#' 
+#' @param x can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
+#' then also the \code{dataset} parameter must be given.
+#' @param y a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.
+#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
+#'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
+#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
+#' @param alpha confidence threshold (only for \code{mmhc}).
+#' @param ess Equivalent Sample Size value.
+#' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
+#' @param cont.nodes vector containing the index of continuous variables.
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
+#' @param ... potential further arguments for methods.
+#' 
+#' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
+#' as learnt from the given dataset.
+#' 
+#' @seealso learn.structure learn.params
+#' 
+#' @examples
+#' \dontrun{
+#' mydataset <- BNDataset("data.file", header.file")
+#' 
+#' # starting from a BN
+#' net <- BN(mydataset)
+#' net <- learn.network(net, mydataset)
+#' 
+#' # start directly from the dataset
+#' net <- learn.network(mydataset)
+#' }
+#' 
+#' @exportMethod learn.network
+setGeneric("learn.network", function(x, ..., params)#dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+                                     #layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
+                                     #layer.struct = NULL,
+                                     #cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...)
+  standardGeneric("learn.network"))
+
+
 #' learn the parameters of a \link{BN}.
 #' 
 #' Learn the parameters of a \link{BN} object according to a \link{BNDataset}
@@ -17,68 +101,87 @@
 #' @param bn a \code{\link{BN}} object.
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param ess Equivalent Sample Size value.
-#' @param ... potential further arguments of methods.
+#' @param use.imputed.data use imputed data.
 #' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
+#' @seealso learn.network
+#' 
 #' @examples
 #' \dontrun{
 #' ## first create a BN and learn its structure from a dataset
-#' dataset <- BNDataset(name = "MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' bn <- BN()
+#' dataset <- BNDataset("file.header", "file.data")
+#' bn <- BN(dataset)
 #' bn <- learn.structure(bn, dataset)
 #' bn <- learn.params(bn, dataset, ess=1, params)
 #' }
 #' 
 #' @exportMethod learn.params
-setGeneric("learn.params", function(bn, dataset, ess=params@ess, ..., params) standardGeneric("learn.params"))
+setGeneric("learn.params", function(bn, dataset, ess=params@ess, use.imputed.data=F, params) standardGeneric("learn.params"))
 
 
 #' learn the structure of a network.
 #' 
 #' Learn the structure (the directed acyclic graph) of a \code{\link{BN}} object according to a \code{\link{BNDataset}}.
-#' Currently, two algorithms are supported (can be specified using the \code{algo} option): \code{'sm'}, the Silander-Myllymaki exact algorithm,
-#' and \code{'mmhc'}, the Max-Min Hill-Climbing heuristic algorithm (default).
-#' Three scoring functions are also provided: \code{'BDeu'}, the Bayesian-Dirichlet equivalent uniform score, \code{'AIC'},
-#' the Akaike Information criterion, and \code{'BIC'}, the Bayesian Information criterion.
+#'
+#' We provide three algorithms in order to learn the structure of the network, that can be chosen with the \code{algo} parameter.
+#' The first is the Silander-Myllym\"aki (\code{sm})
+#' exact search-and-score algorithm, that performs a complete evaluation of the search space in order to discover
+#' the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
+#' with more than 25--30 nodes. Even for small networks, users are strongly encouraged to provide
+#' meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
+#' documentation in package manual for more details on the method parameters.
 #' 
-#' The Silander-Myllymaki algorithm can take a very long time, and it is not feasible for networks of more than 20-30 nodes.
-#' It is strongly recommended that valid \code{layering}, \code{max.fanin.layers} and \code{max.fanin} parameters are passed
-#' to the method if \code{algo = 'sm'} is given as parameter to the method.
+#' The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\code{mmhc}), that performs a statistical
+#' sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method, at the cost of a (likely)
+#' lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+#' of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
+#' mainly the confidence threshold of the statistical pruning.
+#' 
+#' The third method is the Structural Expectation-Maximization (\code{sem}) algorithm,
+#' for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
+#' the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
+#' due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \code{struct.threshold}
+#' and \code{param.threshold}, for the structure and the parameter convergence, respectively.
+#' 
+#' Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
+#' We provide three of the most popular scoring functions, \code{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
+#' \code{AIC} (Akaike Information Criterion) and \code{BIC} (Bayesian Information Criterion). The scoring function
+#' can be chosen using the \code{scoring.func} parameter.
 #' 
 #' @name learn.structure
 #' @rdname learn.structure
 #' 
 #' @param bn a \code{\link{BN}} object.
 #' @param dataset a \code{\link{BNDataset}}.
-#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
-#' @param alpha confidence threshold (for \code{mmhc} and \code{eocp}).
+#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
+#'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
+#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
+#' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param num.boots number of bootstrap samples to generate, if needed.
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
-#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-#'     (if available, otherwise the raw dataset will be used anyway).
-#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
-#' @param na.string.symbol symbol for \code{NA} values (missing data).
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param seed random seed.
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
 #' @param ... potential further arguments for method.
 #' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
+#' @seealso learn.network
+#' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset(name = "MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' bn <- BN()
+#' dataset <- BNDataset("file.header", "file.data")
+#' bn <- BN(dataset)
 #' # use MMHC
 #' bn <- learn.structure(bn, dataset, alpha=0.05, ess=1, bootstrap=FALSE)
 #' 
@@ -87,7 +190,7 @@ setGeneric("learn.params", function(bn, dataset, ess=params@ess, ..., params) st
 #' mfl <- as.matrix(read.table(header=F,
 #' text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 #' bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-#'                       layering=layers, max.fanin.layers=mfl, raw.data=FALSE, params)
+#'                       layering=layers, max.fanin.layers=mfl, use.imputed.data=FALSE, params)
 #' }
 #' 
 #' @exportMethod learn.structure
@@ -95,9 +198,8 @@ setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo,
                                        scoring.func=params@scoring.func, alpha=params@alpha,
                                        ess=params@ess, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
-                                       cont.nodes=c(), raw.data=FALSE, num.boots=params@num.boots,
-                                       imputation = TRUE, k.impute = params@k.impute,
-                                       na.string.symbol='?', seed = params@seed, ...) standardGeneric("learn.structure"))
+                                       layer.struct = NULL,
+                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ..., params) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -107,22 +209,20 @@ setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo,
 #' @name layering
 #' @rdname layering
 #' 
-#' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
-#' @param updated.bn \code{TRUE} if \code{x} is an InferenceEngine and the updated network is chosen (kept only for compatibility with other methods).
-#' @param ... potential further arguments for methods.
+#' @param x a \code{\link{BN}} object.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset(name="MyDataset")
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' x <- BN(dataset)
+#' x <- learn.network(x, dataset)
 #' layering(x)
-#' eng <- InferenceEngine(x)
-#' layering(x, updated.bn=TRUE)
 #' }
 #' 
 #' @return a vector containing layers the nodes can be divided into.
-setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layering"))
+#' 
+#' @exportMethod layering
+setGeneric("layering", function(x) standardGeneric("layering"))
 
 
 #' compute the most probable values to be observed.
@@ -134,7 +234,6 @@ setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layeri
 #' @rdname get.most.probable.values
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
-#' @param ... potential further arguments of methods.
 #' 
 #' @return array containing, in each position, the most probable value for the corresponding variable.
 #' 
@@ -149,7 +248,7 @@ setGeneric("layering", function(x, updated.bn=TRUE, ...) standardGeneric("layeri
 #' }
 #'  
 #' @exportMethod get.most.probable.values
-setGeneric("get.most.probable.values", function(x, ...) standardGeneric("get.most.probable.values"))
+setGeneric("get.most.probable.values", function(x) standardGeneric("get.most.probable.values"))
 
 
 #' sample a row vector of values for a network.
@@ -202,20 +301,19 @@ setGeneric("sample.dataset", function(x, n=100) standardGeneric("sample.dataset"
 setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 
 
-#' query BN given observations
-#' 
-#' @name query
-#' @rdname query
-#' 
-#' @param x a BN.
-#' @param observed.vars vector of observed variables.
-#' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
-#' @param ... potential further arguments for method.
-#' 
-#' @return most probable values given observations
-#' 
-#' @exportMethod query
-setGeneric("query", function(x, observed.vars=c(), observed.vals=c(), ...) standardGeneric("query"))
+# ' query BN given observations
+# ' 
+# ' @name query
+# ' @rdname query
+# ' 
+# ' @param x a BN.
+# ' @param observed.vars vector of observed variables.
+# ' @param observed.vals vector of observed values for corresponding variables in \code{observed.vars}.
+# ' 
+# ' @return most probable values given observations
+# ' 
+# ' @exportMethod query
+# setGeneric("query", function(x, observed.vars=c(), observed.vals=c()) standardGeneric("query"))
 
 
 #' save a \code{\link{BN}} picture as \code{.eps} file.
@@ -379,29 +477,6 @@ setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 ###############################################################################
 
 
-#' check if a BNDataset contains any data.
-#' 
-#' Check whether a \code{\link{BNDataset}} object actually contains raw or imputed data.
-#' 
-#' @name has.data
-#' @rdname has.data
-#' 
-#' @param x a \code{\link{BNDataset}}.
-#' 
-#' @examples
-#' \dontrun{
-#' x <- BNDataset()
-#' has.data(x) # FALSE
-#' 
-#' x <- read.dataset(x, "file.header", "file.data")
-#' has.data(x) # TRUE
-#' }
-#' 
-#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
-#' 
-#' @exportMethod has.data
-setGeneric("has.data", function(x) standardGeneric("has.data"))
-
 #' check if a BNDataset contains raw data.
 #' 
 #' Check whether a \code{\link{BNDataset}} object actually contains raw data.
@@ -420,7 +495,7 @@ setGeneric("has.data", function(x) standardGeneric("has.data"))
 #' has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.raw.data
 setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
@@ -446,73 +521,45 @@ setGeneric("has.raw.data", function(x) standardGeneric("has.raw.data"))
 #' has.imputed.data(x) # TRUE
 #' }
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 #' 
 #' @exportMethod has.imputed.data
 setGeneric("has.imputed.data", function(x) standardGeneric("has.imputed.data"))
 
-#' get data of a BNDataset.
-#' 
-#' Return data contained in a \code{\link{BNDataset}} object, if any.
-#' Preference is given to imputed data, if available, because the imputed dataset
-#' is (supposed to be), in general, more useful. To obtain specifically raw or imputed data,
-#' one must revert to \code{\link{get.raw.data}()} and \code{\link{get.imputed.data}()}, respectively.
-#' 
-#' @name get.data
-#' @rdname get.data
-#' 
-#' @param x a \code{\link{BNDataset}}.
-#' 
-#' @examples
-#' \dontrun{
-#' x <- BNDataset()
-#' x <- read.dataset(x, "file.header", "file.data")
-#' get.data(x) # returns raw dataset, the only one present in dataset
-#' 
-#' x <- impute(x)
-#' get.data(x) # returns imputed dataset, since it is present now
-#' }
-#' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.raw.data}}, \code{\link{get.imputed.data}}
-#' 
-#' @exportMethod get.data
-setGeneric("get.data", function(x) standardGeneric("get.data"))
 
 #' get raw data of a BNDataset.
 #' 
 #' Return raw data contained in a \code{\link{BNDataset}} object, if any.
 #' 
-#' @name get.raw.data
-#' @rdname get.raw.data
+#' @name raw.data
+#' @rdname raw.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.imputed.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
 #' 
-#' @exportMethod get.raw.data
-setGeneric("get.raw.data", function(x) standardGeneric("get.raw.data"))
+#' @exportMethod raw.data
+setGeneric("raw.data", function(x) standardGeneric("raw.data"))
 
 
 #' get imputed data of a BNDataset.
 #' 
 #' Return imputed data contained in a \code{\link{BNDataset}} object, if any.
 #' 
-#' @name get.imputed.data
-#' @rdname get.imputed.data
+#' @name imputed.data
+#' @rdname imputed.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{get.raw.data}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}
 #' 
-#' @exportMethod get.imputed.data
-setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
+#' @exportMethod imputed.data
+setGeneric("imputed.data", function(x) standardGeneric("imputed.data"))
 
 
 #' add raw data.
 #' 
 #' Insert raw data in a \code{\link{BNDataset}} object.
-#' 
-#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}}.
 #' 
 #' @name raw.data<-
 #' @rdname raw.data-set
@@ -520,7 +567,7 @@ setGeneric("get.imputed.data", function(x) standardGeneric("get.imputed.data"))
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.raw.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod raw.data<-
 setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
@@ -530,15 +577,13 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 #' 
 #' Insert imputed data in a \code{\link{BNDataset}} object.
 #' 
-#' Users are encouraged to not use this method whenever possible, in favour of \code{\link{read.dataset}} with flag \code{imputation = TRUE}.
-#' 
 #' @name imputed.data<-
 #' @rdname imputed.data-set
 #' 
 #' @param x a \code{\link{BNDataset}}.
 #' @param value a matrix of integers containing a dataset.
 #' 
-#' @seealso \code{\link{has.data}}, \code{\link{has.imputed.data}}, \code{\link{get.data}}, \code{\link{read.dataset}}
+#' @seealso \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 #' 
 #' @exportMethod imputed.data<-
 setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"))
@@ -546,37 +591,69 @@ setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"
 
 #' Read a dataset from file.
 #' 
-#' File has to be in format (describe...)
+#' There are two ways to build a BNDataset: using two files containing respectively header informations
+#' and data, and manually providing the data table and the related header informations
+#' (variable names, cardinality and discreteness).
+#' 
+#' The key informations needed are:
+#' 1. the data;
+#' 2. the state of variables (discrete or continuous);
+#' 3. the names of the variables;
+#' 4. the cardinalities of the variables (if discrete), or the number of levels they have to be quantized into
+#' (if continuous). 
+#' Names and cardinalities/leves can be guessed by looking at the data, but it is strongly advised to provide
+#' _all_ of the informations, in order to avoid problems later on during the execution.
+#' 
+#' Data can be provided in form of data.frame or matrix. It can contain NAs. By default, NAs are indicated with '?';
+#' to specify a different character for NAs, it is possible to provide also the \code{na.string.symbol} parameter.
+#' The values contained in the data have to be numeric (real for continuous variables, integer for discrete ones).
+#' The default range of values for a discrete variable \code{X} is \code{[1,|X|]}, with \code{|X|} being
+#' the cardinality of \code{X}. The same applies for the levels of quantization for continuous variables.
+#' If the value ranges for the data are different from the expected ones, it is possible to specify a different
+#' starting value (for the whole dataset) with the \code{starts.from} parameter. E.g. by \code{starts.from=0}
+#' we assume that the values of the variables in the dataset have range \code{[0,|X|-1]}.
+#' Please keep in mind that the internal representation of bnstruct starts from 1,
+#' and the original starting values are then lost. 
+#' 
+#' It is possible to use two files, one for the data and one for the metadata,
+#' instead of providing manually all of the info. 
+#' bnstruct requires the data files to be in a format subsequently described.
+#' The actual data has to be in (a text file containing data in) tabular format, one tuple per row,
+#' with the values for each variable separated by a space or a tab. Values for each variable have to be
+#' numbers, starting from \code{1} in case of discrete variables.
+#' Data files can have a first row containing the names of the corresponding variables.
+#' 
+#' In addition to the data file, a header file containing additional informations can also be provided.
+#' An header file has to be composed by three rows of tab-delimited values:
+#' 1. list of names of the variables, in the same order of the data file;
+#' 2. a list of integers representing the cardinality of the variables, in case of discrete variables,
+#'   or the number of levels each variable has to be quantized in, in case of continuous variables;
+#' 3. a list that indicates, for each variable, if the variable is continuous
+#'   (\code{c} or \code{C}), and thus has to be quantized before learning,
+#'   or discrete (\code{d} or \code{D}).
 #' 
 #' @name read.dataset
 #' @rdname read.dataset
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param header.file the \code{header} file.
 #' @param data.file the \code{data} file.
+#' @param header.file the \code{header} file.
+#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
-#' @param data.with.header \code{TRUE} if the first row of \code{dataset} file is an header (e.g. it contains the variable names).
-#' @param imputation \code{TRUE} if imputation has to be performed.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
-#' @param bootstrap \code{TRUE} if bootstrap has to be performed; prepares a list of datasets sampled from the original one.
-#' @param num.boots number of sampled datasets for bootstrap (useful only if bootstrap == TRUE).
-#' @param seed random seed (useful only if bootstrap == TRUE).
-#' @param starts.from starting value for entries in the dataset (observed values, default is 0).
-#' @param ... potential further arguments of methods.
-#' @param params a \code{\link{BNParams}} object.
+#' @param starts.from starting value for entries in the dataset (observed values, default is 1).
+#' 
+#' @seealso BNDataset
 #' 
 #' @examples
 #' \dontrun{
 #' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, header="file.header", dataset="file.data", params = myparams)
+#' dataset <- read.dataset(dataset, "file.data", "file.header")
 #' }
 #' 
 #' @exportMethod read.dataset
-setGeneric("read.dataset", function(object, header.file, data.file, imputation = FALSE, data.with.header = FALSE,
-                                    na.string.symbol = '?', sep.symbol = '', k.impute = params@k.impute,
-                                    bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
-                                    starts.from = 0, ..., params)
+setGeneric("read.dataset", function(object, data.file, header.file, data.with.header = FALSE,
+                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1)
                             standardGeneric("read.dataset"))
 
 
@@ -586,19 +663,18 @@ setGeneric("read.dataset", function(object, header.file, data.file, imputation =
 #' @rdname impute
 #' 
 #' @param object the \code{\link{BNDataset}} object.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param ... potential further arguments of methods.
-#' @param params a \code{\link{BNParams}} object.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode,
+#' for continuous variables the median value is instead taken.
+#' @param params parameters.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
-#' dataset <- impute(dataset, params = myparams)
+#' dataset <- BNDataset("file.data", "file.header")
+#' dataset <- impute(dataset)
 #' }
 #' 
 #' @exportMethod impute
-setGeneric("impute", function(object, k.impute=params@k.impute, ..., params) standardGeneric("impute"))
+setGeneric("impute", function(object, k.impute=params@k.impute, params) standardGeneric("impute"))
 
 
 #' Perform bootstrap.
@@ -611,51 +687,48 @@ setGeneric("impute", function(object, k.impute=params@k.impute, ..., params) sta
 #' @param object the \code{\link{BNDataset}} object.
 #' @param num.boots number of sampled datasets for bootstrap.
 #' @param seed random seed.
-#' @param imputation \code{TRUE} if imputation has to be performed.
-#' @param na.string.symbol character that denotes NA in the dataset (useful only if imputation == TRUE).
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
-#' @param ... potential further arguments of methods.
-#' @param params a \code{\link{BNParams}} object.
+#' @param imputation \code{TRUE} if imputation has to be performed. Default is \code{FALSE}.
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables
+#' the median value is instead taken (useful only if imputation == TRUE).
+#' @param params parameters.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data", params = myparams)
-#' dataset <- bootstrap(dataset, num.boots = 1000, params = myparams)
+#' dataset <- BNDataset("file.data", "file.header")
+#' dataset <- bootstrap(dataset, num.boots = 1000)
 #' }
 #' 
 #' @exportMethod bootstrap
-setGeneric("bootstrap", function(object, num.boots = params@num.boots, seed = params@seed,
-                                 imputation = FALSE, k.impute = params@k.impute,
-                                 na.string.symbol = '?', ..., params) standardGeneric("bootstrap"))
+setGeneric("bootstrap", function(object, num.boots = params@num.boots, seed = params@seed, imputation = FALSE, k.impute = params@k.impute, params)
+                             standardGeneric("bootstrap"))
 
 
 #' get selected element of bootstrap list.
 #' 
 #' Given a \code{\link{BNDataset}}, return the sample corresponding to given index.
 #' 
-#' @name get.boot
-#' @rdname get.boot
+#' @name boot
+#' @rdname boot
 #' 
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param index the index of the requested sample.
-#' @param imputed \code{TRUE} if samples from imputed dataset are to be used.
-#' @param ... potential further arguments of methods (ignored).
+#' @param use.imputed.data \code{TRUE} if samples from imputed dataset are to be used. Default if \code{FALSE}.
+#' 
+#' @seealso bootstrap
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.data", "file.header")
 #' dataset <- bootstrap(dataset, num.boots = 1000)
 #' 
 #' for (i in 1:num.boots(dataset))
-#'    print(get.boot(dataset, i))
+#'    print(boot(dataset, i))
 #' }
 #' 
 #' @seealso \code{\link{bootstrap}}
 #' 
-#' @exportMethod get.boot
-setGeneric("get.boot", function(dataset, index, imputed = TRUE, ...) standardGeneric("get.boot"))
+#' @exportMethod boot
+setGeneric("boot", function(dataset, index, use.imputed.data = FALSE) standardGeneric("boot"))
 
 
 ###############################################################################
@@ -677,10 +750,11 @@ setGeneric("get.boot", function(dataset, index, imputed = TRUE, ...) standardGen
 #' @param object an \code{\link{InferenceEngine}} object.
 #' @param ... potential further arguments for methods.
 #' 
+#' @seealso InferenceEngine
+#' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' net <- BN(dataset)
 #' eng <- InferenceEngine()
 #' eng <- build.junction.tree(eng)
@@ -699,18 +773,16 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' @rdname belief.propagation
 #' 
 #' @param ie an \code{\link{InferenceEngine}} object.
-#' @param net a \code{\link{BN}} object.
-#' @param observed.vars list of observed variables.
-#' @param observed.vals values taken by variables listed in \code{observed.vars}.
+#' @param observations list of observations, consisting in two vector, \code{observed.vars} for the observed variables,
+#' and \code{observed.vals} for the values taken by variables listed in \code{observed.vars}. If no observations
+#' are provided, the \code{InferenceEngine} will use the ones it already contains.
 #' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
-#' @param ... potential further arguments of methods.
 #' 
 #' @return updated \code{\link{InferenceEngine}} object.
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' bn <- BN(dataset)
 #' ie <- InferenceEngine(bn)
 #' ie <- belief.propagation(ie)
@@ -720,8 +792,8 @@ setGeneric("build.junction.tree", function(object, ...) standardGeneric("build.j
 #' }
 #' 
 #' @exportMethod belief.propagation
-setGeneric("belief.propagation", function(ie, net = NULL, observed.vars = NULL, observed.vals = NULL,
-                                          return.potentials = FALSE, ...) standardGeneric("belief.propagation"))
+setGeneric("belief.propagation", function(ie, observations = NULL,
+                                          return.potentials = FALSE) standardGeneric("belief.propagation"))
 
 
 #' check if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.
@@ -738,8 +810,7 @@ setGeneric("belief.propagation", function(ie, net = NULL, observed.vars = NULL, 
 #' 
 #' @examples
 #' \dontrun{
-#' dataset <- BNDataset()
-#' dataset <- read.dataset(dataset, "file.header", "file.data")
+#' dataset <- BNDataset("file.header", "file.data")
 #' bn <- BN(dataset)
 #' ie <- InferenceEngine(bn)
 #' test.updated.bn(ie) # FALSE
@@ -763,8 +834,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param threshold threshold for convergence, used as stopping criterion.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param ... further potential arguments for method.
+#' @param ess Equivalent Sample Size value.
 #' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
@@ -772,61 +842,51 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' 
 #' @examples
 #' \dontrun{
-#' em(x, dataset, params = params)
+#' em(x, dataset, params)
 #' }
 #' 
 #' @exportMethod em
 setGeneric("em", function(x, dataset, threshold = params@em_convergence,
-                          k.impute = params@k.impute, ..., params) standardGeneric("em"))
+                          ess = params@ess, params) standardGeneric("em"))
 
 
-#' Structural Expectation-Maximization algorithm.
-#' 
-#' Learn struvture and parameters of a network with the Structural EM algorithm.
-#' 
-#' @name sem
-#' @rdname sem
-#' 
-#' @param x an \code{\link{InferenceEngine}}
-#' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
-#' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
-#' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
-#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki) and \code{mmhc} (Max-Min Hill Climbing, default).
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
-#' @param alpha confidence threshold (only for \code{mmhc}).
-#' @param ess Equivalent Sample Size value.
-#' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param num.boots number of bootstrap samples to generate, if needed.
-#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param cont.nodes vector containing the index of continuous variables.
-#' @param raw.data \code{TRUE} to learn the structure from the raw dataset. Default is to use imputed dataset
-#'     (if available, otherwise the raw dataset will be used anyway).
-#' @param imputation \code{TRUE} if imputation is needed; if \code{bootstrap=TRUE}, imputed samples will be also used.
-#' @param na.string.symbol symbol for \code{NA} values (missing data).
-#' @param seed random seed.
-#' @param ... further potential arguments for method.
-#' @param params a \code{\link{BNParams}} object.
-#' 
-#' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
-#'         and the imputed dataset (\code{"BNDataset"}).
-#'
-#' @examples
-#' \dontrun{
-#' sem(x, dataset)
-#' }
-#' 
-#' @exportMethod sem
+# ' Structural Expectation-Maximization algorithm.
+# ' 
+# ' Learn structure and parameters of a network with the Structural EM algorithm.
+# ' 
+# ' @name sem
+# ' @rdname sem
+# ' 
+# ' @param x a \code{\link{BN}} object.
+# ' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
+# ' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
+# ' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
+# ' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
+# ' (default - \code{BDeu} supported  as linear approximation).
+# ' @param alpha confidence threshold (only for \code{mmhc}).
+# ' @param ess Equivalent Sample Size value.
+# ' @param bootstrap \code{TRUE} to use bootstrap samples. 
+# ' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+# ' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+# ' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+# ' @param cont.nodes vector containing the index of continuous variables.
+# ' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+# ' (if available, a check is performed). Default is to use raw dataset
+# ' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+# ' starting the Hill Climbing from an empty graph.
+# ' @param ... further potential arguments for method.
+# ' @param params a \code{\link{BNParams}} object.
+# ' 
+# ' @return a (\code{"BN"}) network with the new structure.
+# ' 
+# export Method sem
 setGeneric("sem", function(x, dataset, struct.threshold = params@sem_convergence,
                            param.threshold = params@em_convergence, k.impute = params@k.impute, 
                            algo = params@learning.algo, scoring.func = params@scoring.func,
                            alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
-                           max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                           num.boots = params@num.boots, imputation = TRUE, na.string.symbol='?',
-                           seed = params@seed, ..., params) standardGeneric("sem"))
+                           max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
+                           use.cpc = T, ..., params) standardGeneric("sem"))
 
 
 ###############################################################################
@@ -1044,12 +1104,6 @@ setGeneric("num.variables", function(x) standardGeneric("num.variables"))
 #' @exportMethod num.items
 setGeneric("num.items", function(x) standardGeneric("num.items"))
 
-# has.rawdata
-# has.impdata
-# raw.data
-# imputation
-# imputed.data
-# already have methods (see above)
 
 #' check whether a \code{\link{BNDataset}} has bootstrap samples or not.
 #' 
@@ -1062,7 +1116,7 @@ setGeneric("num.items", function(x) standardGeneric("num.items"))
 #' 
 #' @return \code{TRUE} if dataset has bootstrap samples.
 #' 
-#' @seealso \code{\link{has.imp.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
+#' @seealso \code{\link{has.imputed.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod has.boots
 setGeneric("has.boots", function(x) standardGeneric("has.boots"))
@@ -1072,8 +1126,8 @@ setGeneric("has.boots", function(x) standardGeneric("has.boots"))
 #' 
 #' Return \code{TRUE} if the given dataset contains samples for bootstrap from inputed dataset, \code{FALSE} otherwise.
 #' 
-#' @name has.imp.boots
-#' @name has.imp.boots
+#' @name has.imputed.boots
+#' @name has.imputed.boots
 #'
 #' @param x a \code{\link{BNDataset}} object.
 #' 
@@ -1081,8 +1135,8 @@ setGeneric("has.boots", function(x) standardGeneric("has.boots"))
 #' 
 #' @seealso \code{\link{has.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 #' 
-#' @exportMethod has.imp.boots
-setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
+#' @exportMethod has.imputed.boots
+setGeneric("has.imputed.boots", function(x) standardGeneric("has.imputed.boots"))
 
 
 #' get list of bootstrap samples of a \code{\link{BNDataset}}.
@@ -1096,7 +1150,7 @@ setGeneric("has.imp.boots", function(x) standardGeneric("has.imp.boots"))
 #' 
 #' @return the list of bootstrap samples.
 #' 
-#' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{imp.boots}}
+#' @seealso \code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{imp.boots}}
 #' 
 #' @exportMethod boots
 setGeneric("boots", function(x) standardGeneric("boots"))
@@ -1113,7 +1167,7 @@ setGeneric("boots", function(x) standardGeneric("boots"))
 #' 
 #' @return the list of bootstrap samples from imputed data.
 #' 
-#' @seealso \code{\link{has.boots}}, \code{\link{has.imp.boots}}, \code{\link{boots}}
+#' @seealso \code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{boots}}
 #' 
 #' @exportMethod imp.boots
 setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))

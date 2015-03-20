@@ -2,10 +2,8 @@
 #' @aliases read.dataset,BNDataset,character,character
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
-          function(object, header.file, data.file, imputation = FALSE, header.flag = FALSE,
-                   na.string.symbol = '?', sep.symbol = '', k.impute = params@k.impute,
-                   bootstrap = FALSE, num.boots = params@num.boots, seed = params@seed,
-                   starts.from = 1, ..., params)
+          function(object, data.file, header.file, data.with.header = FALSE,
+                   na.string.symbol = '?', sep.symbol = '', starts.from = 1)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
@@ -17,7 +15,7 @@ setMethod("read.dataset",
             discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
             
             a <- read.delim(data.file, na.strings = na.string.symbol,
-                            header = header.flag, sep = sep.symbol) + (1 - starts.from)
+                            header = data.with.header, sep = sep.symbol) + (1 - starts.from)
             raw.data(object)      <- as.matrix(a)
             num.variables(object) <- ncol(object@raw.data)
             num.items(object)     <- nrow(object@raw.data)
@@ -163,12 +161,12 @@ setMethod("read.dsc", c("character"),
             nodes <- sapply(1:num.nodes, function(x) gsub(" ", "", lines[x]))
             probs <- sapply((num.nodes+1):(2*num.nodes), function(x) gsub(" ", "", lines[x]))
             
-#             print(nodes)
-#             print(probs)
+            #             print(nodes)
+            #             print(probs)
             
             for (i in 1:num.nodes)
             {
-#               print(nodes[i])
+              #               print(nodes[i])
               tmp <- unlist(strsplit(nodes[i], "\\{|\\}"))
               #print(tmp)
               variables[i] <- tmp[1]
@@ -180,7 +178,7 @@ setMethod("read.dsc", c("character"),
             variables(net)    <- variables
             discreteness(net) <- discreteness
             node.sizes(net)   <- node.sizes
-
+            
             dag <- ""
             prob.list <- rep("", num.nodes)
             
@@ -241,12 +239,12 @@ setMethod("read.dsc", c("character"),
                 }
               }
               ps <- nps
-               print(ps)
+              print(ps)
               ps <- array(as.numeric(ps), dim=node.sizes[family])
               print(ps)
               cpts[[i]] <- ps
- #             cpts[[i]] <- sort.dimensions(ps, c(length(family):1))$potential
-print(cpts[[i]])
+              #             cpts[[i]] <- sort.dimensions(ps, c(length(family):1))$potential
+              print(cpts[[i]])
               
               dms <- NULL
               dns <- NULL
@@ -263,7 +261,7 @@ print(cpts[[i]])
             
             cpts(net) <- cpts
             
-            return(net)  
+            return(net)
           })
 
 
@@ -561,3 +559,33 @@ setMethod("write.dsc","BN",
             print(rows)
             write(rows, file=file.name)
           })
+
+
+# output log messages
+bnstruct.log <- function(...)
+{
+  m <- ""
+  
+  blit <- get("bnstruct.log.indent.tracker", .bnstruct.env)
+  if (blit > 0)
+    for (i in seq_len(blit))
+      m <- paste(m, "... ", sep='')
+  
+  m <- strcat(m, "bnstruct :: ")
+  m <- strcat(m, ...)
+  message(m)
+}
+
+# output begin-of-action log messages
+bnstruct.start.log <- function(...)
+{
+  bnstruct.log(...)
+  assign("bnstruct.log.indent.tracker", get("bnstruct.log.indent.tracker", .bnstruct.env) + 1, envir = .bnstruct.env)
+}
+
+# output begin-of-action log messages
+bnstruct.end.log <- function(...)
+{
+  assign("bnstruct.log.indent.tracker", max(0,get("bnstruct.log.indent.tracker", .bnstruct.env) - 1), envir = .bnstruct.env)
+  bnstruct.log(...)
+}

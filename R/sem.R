@@ -1,68 +1,73 @@
-#' @rdname sem
-#' @aliases sem,InferenceEngine,BNDataset
+# ' @rdname sem
+# ' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
-          c("InferenceEngine","BNDataset"),
+          c("BN","BNDataset"),
           function(x, dataset, struct.threshold = params@sem_convergence,
-                   param.threshold = params@em_convergence, k.impute = params@k.impute,
-                   algo = params@learning.algo, scoring.func = params@scoring.func,
+                   param.threshold = params@em_convergence, scoring.func = params@scoring.func,
                    alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
-                   max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE,
-                   num.boots = params@num.boots, imputation = TRUE, na.string.symbol='?',
-                   seed = params@seed, ..., params)
+                   max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
+                   use.cpc = TRUE, ..., params)
           {
-            if(test.updated.bn(x))
-              net <- updated.bn(x)
-            else
-              net <- bn(x)
-            
-            if (missing(algo))
-              struct.algo  <- struct.algo(net)
-            else
-              struct.algo  <- algo
-            
-            if (missing(scoring.func))
-              scoring.func <- scoring.func(net)
-            else
-              scoring.func <- scoring.func
+            net <- x
 
-            w.net     <- net
-            w.dataset <- dataset
-            w.eng     <- InferenceEngine(net) #x
-            
-            if (scoring.func == "BDeu")
-              next
-            
-            if (scoring.func == "AIC" || scoring.func == "BIC")
+            num.nodes <- num.nodes(net)
+
+            if (is.character(scoring.func))
+              scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
+
+            if (is.na(scoring.func))
             {
-              repeat
-              {
-                #w.eng     <- InferenceEngine(w.net)
-                
-                out <- em(w.eng, dataset, param.threshold, k.impute, ...,  params)
-                
-                new.eng     <- out$InferenceEngine
-                new.dataset <- out$BNDataset
-                
-                new.net <- learn.structure(updated.bn(new.eng), new.dataset, struct.algo, scoring.func,
-                                           alpha = alpha, ess = ess, bootstrap = bootstrap,
-                                           layering = layering, max.fanin.layers = max.fanin.layers,
-                                           max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data,
-                                           num.boots = num.boots, imputation = imputation, na.string.symbol=na.string.symbol,
-                                           seed = seed, ..., params)
-                
-                difference <- shd(dag(w.net), dag(new.net))
-                print(difference)
-                if (difference <= struct.threshold) break
-                
-                w.net     <- new.net
-                w.dataset <- new.dataset
-                w.eng     <- InferenceEngine(w.net)
-                # w.eng     <- belief.propagation(w.eng)
-              }
-              
-              updated.bn(w.eng) <- new.net
+              message("scoring function not recognized, using BIC")
+              scoring.func <- 2
+            }
+            else
+              scoring.func <- scoring.func - 1
+            # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
+
+            # starting from an empty network: learn a starting point using MMHC
+            if (is.na(sum(dag(net))) || sum(dag(net)) == 0)
+            {
+              w.net <- net
+              w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+                                     alpha=alpha, ess = ess, bootstrap = bootstrap,
+                                     layering = layering, max.fanin.layers = max.fanin.layers,
+                                     max.fanin = max.fanin, cont.nodes = cont.nodes,
+                                     use.imputed.data = use.imputed.data, use.cpc = use.cpc, ..., params=params)
+            }
+            else
+            {
+              # start from an already learnt network
+              w.net     <- net
             }
             
-            return(list("InferenceEngine" = w.eng, "BNDataset" = w.dataset))
+            w.dataset <- dataset
+            w.eng     <- InferenceEngine(w.net)
+
+            repeat
+            {
+              out <- em(w.eng, dataset, param.threshold, params=params)
+              
+              new.eng     <- out$InferenceEngine
+              new.dataset <- out$BNDataset
+              
+              new.net <- learn.network(new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+                                         alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                         layering = layering, max.fanin.layers = max.fanin.layers,
+                                         max.fanin = max.fanin, cont.nodes = cont.nodes,
+                                         use.imputed.data = use.imputed.data, use.cpc = use.cpc, ..., params=params)
+              
+              difference <- shd(dag(w.net), dag(new.net))
+              
+              w.net     <- new.net
+              w.dataset <- new.dataset
+              
+              if (difference <= struct.threshold)
+                break
+              else
+                w.eng     <- InferenceEngine(w.net)
+            }
+
+            
+            return(w.net)
           })

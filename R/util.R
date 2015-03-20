@@ -89,7 +89,7 @@ quantize.matrix <- function(data, levels)
   
   quant <- matrix(0,nr,nc)
   
-  print(levels)
+  # print(levels)
   
   for( i in 1:nc )
   {
@@ -104,7 +104,7 @@ quantize.matrix <- function(data, levels)
   }
   
   storage.mode(quant) <- "integer"
-  print(sapply(1:nc,function(x)max(quant[,x])))
+  # print(sapply(1:nc,function(x)max(quant[,x])))
   colnames(quant) <- colnames(data)
   return(quant)
 }
@@ -428,12 +428,13 @@ strcat <- function(..., sep = '')
 {
   s <- ""
   args <- list(...)
-  for (i in args)
+  for (i in unlist(args))
   {
     s <- paste(s, as.character(i), sep=sep)
   }
   return(s)
 }
+
 
 fast.bincombinations <- function(p)
 {
