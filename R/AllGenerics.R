@@ -39,7 +39,7 @@
 #' 
 #' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (if not using bootstrap).
 #' 
-#' See documentation for \code{\link{learn.structure}} and \code{\link{learn params}} for more informations.
+#' See documentation for \code{\link{learn.structure}} and \code{\link{learn.params}} for more informations.
 #' 
 #' @name learn.network
 #' @rdname learn.network
@@ -72,7 +72,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' mydataset <- BNDataset("data.file", header.file")
+#' mydataset <- BNDataset("data.file", "header.file")
 #' 
 #' # starting from a BN
 #' net <- BN(mydataset)
