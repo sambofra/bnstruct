@@ -47,10 +47,16 @@
 #' @param x can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
 #' then also the \code{dataset} parameter must be given.
 #' @param y a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.
-#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
-#'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
-#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
+#' @param algo the algorithm to use. Currently, one among:
+#'        \code{sm} (Silander-Myllymaki),
+#'        \code{mmhc} (Max-Min Hill Climbing, default) and
+#'        \code{sem} (Structural Expectation Maximization).
+#' @param scoring.func the scoring function to use. Currently, one among
+#'        \code{BDeu}, \code{AIC}, \code{BIC}.
+#' @param initial.network network srtructure to be used as starting point for structure search.
+#'        Can take different values:
+#'        a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
+#'        or the string \code{random.chain} to sample a random chain as starting point.
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
@@ -156,8 +162,11 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param dataset a \code{\link{BNDataset}}.
 #' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
 #'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
-#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
+#' @param initial.network network srtructure to be used as starting point for structure search.
+#'        Can take different values:
+#'        a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
+#'        or the string \code{random.chain} to sample a random chain as starting point.
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
@@ -192,7 +201,8 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' }
 #' 
 #' @exportMethod learn.structure
-setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", initial.network=NULL,
+                                       alpha=0.05, ess=1, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
                                        cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.structure"))

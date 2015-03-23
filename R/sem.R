@@ -3,7 +3,7 @@
 setMethod("sem",
           c("BN","BNDataset"),
           function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
                    use.cpc = TRUE, ...)
@@ -25,19 +25,21 @@ setMethod("sem",
             # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
 
             # starting from an empty network: learn a starting point using MMHC
-            if (is.na(sum(dag(net))) || sum(dag(net)) == 0)
+            if (is.null(initial.network) || is.na(sum(dag(net))) || sum(dag(net)) == 0)
             {
-              w.net <- net
-              w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
-                                     alpha=alpha, ess = ess, bootstrap = bootstrap,
-                                     layering = layering, max.fanin.layers = max.fanin.layers,
-                                     max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                     use.imputed.data = F, use.cpc = use.cpc, ...)
+              #w.net <- net
+              #w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
+              #                       alpha=alpha, ess = ess, bootstrap = bootstrap,
+              #                       layering = layering, max.fanin.layers = max.fanin.layers,
+              #                       max.fanin = max.fanin, cont.nodes = cont.nodes,
+              #                       use.imputed.data = F, use.cpc = use.cpc, ...)
+              w.net <- sample.chain(dataset)
+              
             }
             else
             {
               # start from an already learnt network
-              w.net     <- net
+              w.net     <- initial.network #net
             }
             
             w.dataset <- dataset
@@ -51,10 +53,11 @@ setMethod("sem",
               new.dataset <- out$BNDataset
               
               new.net <- learn.network(new.dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
-                                         alpha = alpha, ess = ess, bootstrap = bootstrap,
-                                         layering = layering, max.fanin.layers = max.fanin.layers,
-                                         max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                         use.imputed.data = T, use.cpc = use.cpc, ...)
+                                       initial.network = w.net, # NULL,
+                                       alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                       layering = layering, max.fanin.layers = max.fanin.layers,
+                                       max.fanin = max.fanin, cont.nodes = cont.nodes,
+                                       use.imputed.data = T, use.cpc = use.cpc, ...)
               
               difference <- shd(dag(w.net), dag(new.net))
               

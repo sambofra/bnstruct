@@ -8,14 +8,14 @@
 \title{learn the structure of a network.}
 \usage{
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
-  use.cpc = TRUE, ...)
+  initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), layer.struct = NULL,
+  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin.layers = NULL,
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
+  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
   cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
 }
@@ -27,8 +27,12 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
 \item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
 (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).}
 
-\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}
-(only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.}
+\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.}
+
+\item{initial.network}{network srtructure to be used as starting point for structure search.
+Can take different values:
+a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
+or the string \code{random.chain} to sample a random chain as starting point.}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 

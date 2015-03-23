@@ -77,6 +77,19 @@ is.acyclic <- function(g)
   return(TRUE)
 }
 
+# sample a random chain from a dataset
+sample.chain <- function( dataset )
+{
+  net <- BN(dataset)
+  net.dag <- dag(net)
+  n <- num.nodes(net)
+  chain <- sample(n,n)
+  for( i in 2:n )
+    net.dag[chain[i-1],chain[i]] <- 1
+  dag(net) <- net.dag
+  return( suppressMessages(learn.params(net,dataset)) )
+}
+
 # Quantize each column i of the continuous matrix data in a number of levels 
 # equal to levels[i]
 # 

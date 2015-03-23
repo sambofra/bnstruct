@@ -8,7 +8,7 @@ PKGSRC := $(shell basename `pwd`)
 doc: man pdf html
 
 man:
-	cd R; Rscript -e "library(bnstruct); roxygen2::roxygenize()"
+	Rscript -e "library(bnstruct); roxygen2::roxygenize()"
 
 pdf: vignettes/bnstruct.Rnw vignettes/bibtex.bib
 	cd vignettes; \

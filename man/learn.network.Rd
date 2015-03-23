@@ -12,16 +12,16 @@
 learn.network(x, ...)
 
 \S4method{learn.network}{BN}(x, y = NULL, algo = "mmhc",
-  scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin.layers = NULL,
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
+  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
   cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
 
 \S4method{learn.network}{BNDataset}(x, algo = "mmhc", scoring.func = "BDeu",
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
-  use.cpc = TRUE, ...)
+  initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
+  layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(dataset), layer.struct = NULL,
+  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
@@ -31,11 +31,18 @@ then also the \code{dataset} parameter must be given.}
 
 \item{y}{a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.}
 
-\item{algo}{the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
-(Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).}
+\item{algo}{the algorithm to use. Currently, one among:
+\code{sm} (Silander-Myllymaki),
+\code{mmhc} (Max-Min Hill Climbing, default) and
+\code{sem} (Structural Expectation Maximization).}
 
-\item{scoring.func}{the scoring function to use. Currently, one among \code{BDeu}
-(only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.}
+\item{scoring.func}{the scoring function to use. Currently, one among
+\code{BDeu}, \code{AIC}, \code{BIC}.}
+
+\item{initial.network}{network srtructure to be used as starting point for structure search.
+Can take different values:
+a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
+or the string \code{random.chain} to sample a random chain as starting point.}
 
 \item{alpha}{confidence threshold (only for \code{mmhc}).}
 
