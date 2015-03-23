@@ -1,4 +1,5 @@
-#' @describeIn learn.network
+#' @rdname learn.network
+#' @aliases learn.network,BN
 setMethod("learn.network",
           c("BN"),
           function(x, y = NULL, algo = params@learning.algo, scoring.func = params@scoring.func,
@@ -14,13 +15,14 @@ setMethod("learn.network",
             dataset <- y
             bn <- learn.structure(bn, dataset, algo, scoring.func, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ..., params=params)
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
             
             if (!bootstrap)
-              bn <- learn.params(bn, dataset, ess, use.imputed.data, params=params)
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
-#' @describeIn learn.network
+#' @rdname learn.network
+#' @aliases learn.network,BNDataset
 setMethod("learn.network",
           c("BNDataset"),
           function(x, algo = params@learning.algo, scoring.func = params@scoring.func,
@@ -204,7 +206,7 @@ setMethod("learn.structure",
               }
               bnstruct.start.log("learning the structure using SEM ...")
 
-              bn <- sem(bn, dataset, param.threshold = params@em_convergence,
+              bn <- sem(bn, dataset,
                         scoring.func = c("BDeu", "AIC", "BIC")[scoring.func + 1],
                         alpha = alpha, ess = ess, bootstrap = bootstrap,
                         layering = layering, max.fanin.layers = max.fanin.layers,

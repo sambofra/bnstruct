@@ -72,7 +72,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' mydataset <- BNDataset("data.file", header.file")
+#' mydataset <- BNDataset("data.file", "header.file")
 #' 
 #' # starting from a BN
 #' net <- BN(mydataset)
