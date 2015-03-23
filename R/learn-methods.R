@@ -1,5 +1,4 @@
-#' @rdname learn.network
-#' @aliases learn.network,BN
+#' @describeIn learn.network
 setMethod("learn.network",
           c("BN"),
           function(x, y = NULL, algo = params@learning.algo, scoring.func = params@scoring.func,
@@ -21,8 +20,7 @@ setMethod("learn.network",
               bn <- learn.params(bn, dataset, ess, use.imputed.data, params=params)
             return(bn)
           })
-#' @rdname learn.network
-#' @aliases learn.network,BNDataset
+#' @describeIn learn.network
 setMethod("learn.network",
           c("BNDataset"),
           function(x, algo = params@learning.algo, scoring.func = params@scoring.func,

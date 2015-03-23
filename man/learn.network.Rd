@@ -3,13 +3,11 @@
 \docType{methods}
 \name{learn.network}
 \alias{learn.network}
-\alias{learn.network,BN}
 \alias{learn.network,BN-method}
-\alias{learn.network,BNDataset}
 \alias{learn.network,BNDataset-method}
 \title{learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.}
 \usage{
-learn.network(x, ...)
+learn.network(x, ..., params)
 
 \S4method{learn.network}{BN}(x, y = NULL, algo = params@learning.algo,
   scoring.func = params@scoring.func, alpha = params@alpha,
@@ -23,7 +21,7 @@ learn.network(x, ...)
   ess = params@ess, bootstrap = FALSE, layering = c(),
   max.fanin.layers = NULL, max.fanin = num.variables(dataset),
   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
-  use.cpc = TRUE, ..., params.)
+  use.cpc = TRUE, ..., params = params)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
@@ -98,8 +96,14 @@ can be chosen using the \code{scoring.func} parameter.
 
 Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (if not using bootstrap).
 
-See documentation for \code{\link{learn.structure}} and \code{\link{learn params}} for more informations.
+See documentation for \code{\link{learn.structure}} and \code{\link{learn.params}} for more informations.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{BN}: 
+
+\item \code{BNDataset}: 
+}}
 \examples{
 \dontrun{
 mydataset <- BNDataset("data.file", header.file")
