@@ -175,9 +175,16 @@ $Y$ change, given that variable $X$ is taking value $x\prime$?''.
 
 The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
 
-In order to install the package, it suffices to launch\\
-\verb!R CMD INSTALL path/to/bnstruct!\\
-from a terminal, or to use R command \verb!install.packages!.
+In order to install the package, it suffices to open a shell and run
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+git clone https://github.com/sambofra/bnstruct.git
+cd bnstruct
+make install
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
 Being hosted on GitHub, it is also possible to use the \texttt{install\_github} tool from
 an R session:

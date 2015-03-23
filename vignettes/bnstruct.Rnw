@@ -135,9 +135,12 @@ $Y$ change, given that variable $X$ is taking value $x\prime$?''.
 
 The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
 
-In order to install the package, it suffices to launch\\
-\verb!R CMD INSTALL path/to/bnstruct!\\
-from a terminal, or to use R command \verb!install.packages!.
+In order to install the package, it suffices to open a shell and run
+<<installmake,engine='bash',eval=FALSE>>=
+git clone https://github.com/sambofra/bnstruct.git
+cd bnstruct
+make install
+@
 
 Being hosted on GitHub, it is also possible to use the \texttt{install\_github} tool from
 an R session:
@@ -411,7 +414,7 @@ The method of choice to create a \Robject{BN} object is, however, to create it f
 When constructing a network starting from a dataset, the first operation we may want to perform is to learn
 a network that may have generated that dataset, in particular its structure and its parameters.
 \Rpackage{bnstruct} provides the \Rmethod{learn.network} method for this task.
-<<structurelearn1, eval=FALSE>>=
+<<learn.network, eval=FALSE>>=
 dataset <- child()
 net     <- learn.network(dataset)
 @
@@ -447,7 +450,7 @@ We provide three of the most popular scoring functions, \texttt{BDeu} (Bayesian-
 \texttt{AIC} (Akaike Information Criterion) and \texttt{BIC} (Bayesian Information Criterion). The scoring function
 can be chosen using the \texttt{scoring.func} parameter.
 
-<<structurelearn2, eval=FALSE>>=
+<<learn.network.2, eval=FALSE>>=
 dataset <- child()
 net.1   <- learn.network(dataset,
                          algo = "sem",
@@ -464,7 +467,7 @@ bootstrap samples to learn what we call a \textit{weighted partially DAG}, in or
 absence of an edge in the structure (\citet*{friedman1999data}). This can be done by providing the constructor or the \Rmethod{learn.network}
 method a \Robject{BNDataset} with bootstrap samples, and the additional parameter \Rfunarg{bootstrap = TRUE}.
 
-<<structurelearn4, eval=FALSE>>=
+<<learn.network.3, eval=FALSE>>=
 dataset <- child()
 dataset <- bootstrap(dataset, 100, imputation = TRUE)
 net.1   <- learn.network(dataset,
