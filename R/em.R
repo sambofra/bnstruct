@@ -166,7 +166,7 @@ setMethod("em",
                 bis.dataset <- dataset
                 imputed.data(bis.dataset) <- bis.data
                 num.items(bis.dataset) <- num.items - length(still.has.NAs)
-                bis.net <- learn.params(bn, bis.dataset, ess=ess)
+                bis.net <- learn.params(bn, bis.dataset, ess=ess, use.imputed.data=T)
 
                 for (bis.row in still.has.NAs)
                 {
@@ -181,7 +181,7 @@ setMethod("em",
               storage.mode(imp.data) <- "integer"
               imputed.data(dataset)  <- imp.data
               
-              bn <- learn.params(bn, dataset, ess=ess)
+              bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
 
               if (first.iteration)
                 first.iteration <- FALSE

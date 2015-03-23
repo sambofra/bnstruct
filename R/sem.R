@@ -32,7 +32,7 @@ setMethod("sem",
                                      alpha=alpha, ess = ess, bootstrap = bootstrap,
                                      layering = layering, max.fanin.layers = max.fanin.layers,
                                      max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                     use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
+                                     use.imputed.data = F, use.cpc = use.cpc, ...)
             }
             else
             {
@@ -54,7 +54,7 @@ setMethod("sem",
                                          alpha = alpha, ess = ess, bootstrap = bootstrap,
                                          layering = layering, max.fanin.layers = max.fanin.layers,
                                          max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                         use.imputed.data = use.imputed.data, use.cpc = use.cpc, ...)
+                                         use.imputed.data = T, use.cpc = use.cpc, ...)
               
               difference <- shd(dag(w.net), dag(new.net))
               
