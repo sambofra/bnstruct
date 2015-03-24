@@ -629,6 +629,27 @@ can be chosen using the \texttt{scoring.func} parameter.
 \end{kframe}
 \end{knitrout}
 
+It is also possible to provide an initial network as starting point for the structure search. This can be
+done using the \texttt{initial.network} argument, which accepts three kinds of inputs:
+\begin{itemize}
+\item a \Robject{BN} object (with a structure);
+\item a \Robject{matrix} containing the adjacency matrix representing the structure of a network;
+\item the string \texttt{random.chain} for starting from a randomly sampled chain-like network.
+\end{itemize}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlstd{dataset} \hlkwb{<-} \hlkwd{child}\hlstd{()}
+\hlstd{> }\hlstd{net.1}   \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,}
+\hlstd{+ }                         \hlkwc{initial.network} \hlstd{=} \hlstr{"random.chain"}\hlstd{)}
+\hlstd{> }\hlstd{net.2}   \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,}
+\hlstd{+ }                         \hlkwc{algo} \hlstd{=} \hlstr{"sem"}\hlstd{,}
+\hlstd{+ }                         \hlkwc{initial.network} \hlstd{= net.1)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 The structure learning task by default computes the structure as a DAG. We can however use
 bootstrap samples to learn what we call a \textit{weighted partially DAG}, in order to get a weighted confidence on the presence or
 absence of an edge in the structure (\citet*{friedman1999data}). This can be done by providing the constructor or the \Rmethod{learn.network}
@@ -852,14 +873,16 @@ the \texttt{sem-BDeu} pair.
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/childtest-2} 
 \begin{kframe}\begin{alltt}
-\hlstd{> }\hlcom{# SEM, BDeu}
+\hlstd{> }\hlcom{# SEM, BDeu using previous network as starting point}
 \hlstd{> }\hlstd{net} \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,} \hlkwc{algo} \hlstd{=} \hlstr{"sem"}\hlstd{,}
 \hlstd{+ }                     \hlkwc{scoring.func} \hlstd{=} \hlstr{"BDeu"}\hlstd{,}
-\hlstd{+ }                     \hlkwc{struct.threshold} \hlstd{=} \hlnum{0}\hlstd{)}
+\hlstd{+ }                     \hlkwc{initial.network} \hlstd{= net,}
+\hlstd{+ }                     \hlkwc{struct.threshold} \hlstd{=} \hlnum{10}\hlstd{,}
+\hlstd{+ }                     \hlkwc{param.threshold} \hlstd{=} \hlnum{0.001}\hlstd{)}
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
 \hlstd{> }\hlkwd{plot}\hlstd{(net)}
 \end{alltt}
 \end{kframe}
@@ -872,7 +895,7 @@ the \texttt{sem-BDeu} pair.
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
 \hlstd{> }\hlstd{updated.engine}  \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{InferenceEngine}
 \hlstd{> }\hlstd{updated.dataset} \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{BNDataset}
 \end{alltt}

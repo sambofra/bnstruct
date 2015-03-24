@@ -2,7 +2,7 @@
 # ' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
           c("BN","BNDataset"),
-          function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
+          function(x, dataset, struct.threshold = 0, param.threshold = 0, scoring.func = "BDeu",
                    initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
@@ -17,8 +17,8 @@ setMethod("sem",
 
             if (is.na(scoring.func))
             {
-              message("scoring function not recognized, using BIC")
-              scoring.func <- 2
+              message("scoring function not recognized, using BDeu")
+              scoring.func <- 0
             }
             else
               scoring.func <- scoring.func - 1

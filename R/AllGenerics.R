@@ -880,7 +880,8 @@ setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneri
 # ' @return a (\code{"BN"}) network with the new structure.
 # ' 
 # exportMethod sem
-setGeneric("sem", function(x, dataset, struct.threshold = 10, param.threshold = 0.001, scoring.func = "BIC",
+setGeneric("sem", function(x, dataset, struct.threshold = 0, param.threshold = 0, scoring.func = "BDeu",
+                           initial.network = NULL,
                            alpha = 0.05, ess = 1, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,

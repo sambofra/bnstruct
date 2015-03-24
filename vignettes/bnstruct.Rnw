@@ -462,6 +462,23 @@ net.2   <- learn.network(dataset,
                          use.imputed.data = TRUE)
 @
 
+It is also possible to provide an initial network as starting point for the structure search. This can be
+done using the \texttt{initial.network} argument, which accepts three kinds of inputs:
+\begin{itemize}
+\item a \Robject{BN} object (with a structure);
+\item a \Robject{matrix} containing the adjacency matrix representing the structure of a network;
+\item the string \texttt{random.chain} for starting from a randomly sampled chain-like network.
+\end{itemize}
+
+<<learn.network.chain, eval=FALSE>>=
+dataset <- child()
+net.1   <- learn.network(dataset,
+                         initial.network = "random.chain")
+net.2   <- learn.network(dataset,
+                         algo = "sem",
+                         initial.network = net.1)
+@
+
 The structure learning task by default computes the structure as a DAG. We can however use
 bootstrap samples to learn what we call a \textit{weighted partially DAG}, in order to get a weighted confidence on the presence or
 absence of an edge in the structure (\citet*{friedman1999data}). This can be done by providing the constructor or the \Rmethod{learn.network}
@@ -629,10 +646,12 @@ imp.dataset <- impute(dataset)
 net <- learn.network(imp.dataset, use.imputed.data = TRUE)
 plot(net)
 
-# SEM, BDeu
+# SEM, BDeu using previous network as starting point
 net <- learn.network(dataset, algo = "sem",
                      scoring.func = "BDeu",
-                     struct.threshold = 0)
+                     initial.network = net,
+                     struct.threshold = 10,
+                     param.threshold = 0.001)
 plot(net)
 
 # we update the probabilities with EM from the raw dataset,

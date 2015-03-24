@@ -5,6 +5,7 @@ PKGSRC := $(shell basename `pwd`)
 
 # all: doc install
 
+# be careful when generating documentation, it can a very long time!
 doc: man pdf html
 
 man:

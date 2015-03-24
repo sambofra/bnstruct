@@ -533,6 +533,21 @@ net.2   <- learn.network(dataset,
                          use.imputed.data = TRUE)
 ```
 
+It is also possible to provide an initial network as starting point for the structure search. This can be
+done using the `initial.network` argument, which accepts three kinds of inputs:
+1. a `BN` object (with a structure);
+2. a `matrix` containing the adjacency matrix representing the structure of a network;
+3. the string `random.chain` for starting from a randomly sampled chain-like network.
+
+```{r, learn.network.chain, eval=FALSE}
+dataset <- child()
+net.1   <- learn.network(dataset,
+                         initial.network = "random.chain")
+net.2   <- learn.network(dataset,
+                         algo = "sem",
+                         initial.network = net.1)
+```
+
 The structure learning task by default computes the structure as a DAG.
 We can however use bootstrap samples to learn what we call a *weighted
 partially DAG*, in order to get a weighted confidence on the presence or
@@ -727,7 +742,7 @@ dataset. We compare the default `mmhc-BDeu` pair on available case
 analysis (raw data with missing values) and on imputed data, and the
 `sem-BDeu` pair.
 
-```{r childtest, eval=TRUE, cache=TRUE}
+```{r childtestmd, eval=TRUE, cache=TRUE}
 dataset <- child()
 
 # learning with available cases analysis, MMHC, BDeu
@@ -739,10 +754,12 @@ imp.dataset <- impute(dataset)
 net <- learn.network(imp.dataset, use.imputed.data = TRUE)
 plot(net)
 
-# SEM, BDeu
+# SEM, BDeu using previous network as starting point
 net <- learn.network(dataset, algo = "sem",
                      scoring.func = "BDeu",
-                     struct.threshold = 0)
+                     initial.network = net,
+                     struct.threshold = 10,
+                     param.threshold = 0.001)
 plot(net)
 
 # we update the probabilities with EM from the raw dataset,
