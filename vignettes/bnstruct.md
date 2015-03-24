@@ -3,19 +3,19 @@
 
 ## Authors: Francesco Sambo, Alberto Franzin
 
-```{r include=FALSE}
-library(knitr)
-opts_chunk$set(
-concordance=TRUE,
-prompt=TRUE,
-error=TRUE,
-comment=""
-)
+
+
+
+
+```r
+> library(bnstruct)
 ```
 
-
-```{r}
-library(bnstruct)
+```
+Loading required package: bitops
+Loading required package: igraph
+Loading required package: methods
+Loading required package: Matrix
 ```
 
 <a name="introduction"></a>Introduction
@@ -168,9 +168,10 @@ make install
 Being hosted on GitHub, it is also possible to use the `install_github`
 tool from an R session:
 
-```{r installgithub, eval=FALSE}
-library("devtools")
-install_github("sambofra/bnstruct")
+
+```r
+> library("devtools")
+> install_github("sambofra/bnstruct")
 ```
 
 For Windows platforms, a binary executable will be provided.
@@ -196,14 +197,15 @@ respectively header informations and data, and manually providing the
 data table and the related header informations (variable names,
 cardinality and discreteness).
 
-```{r bndataset.constructor, eval=FALSE}
-dataset.from.data <- BNDataset(data = data,
-                               discreteness = rep('d',4),
-                               variables = c("a", "b", "c", "d"),
-                               node.sizes = c(4,8,12,16))
 
-dataset.from.file <- BNDataset("path/to/data.file",
-                               "path/to/header.file")
+```r
+> dataset.from.data <- BNDataset(data = data,
++                                discreteness = rep('d',4),
++                                variables = c("a", "b", "c", "d"),
++                                node.sizes = c(4,8,12,16))
+> 
+> dataset.from.file <- BNDataset("path/to/data.file",
++                                "path/to/header.file")
 ```
 
 The key informations needed are:
@@ -270,20 +272,22 @@ network, [5](#ref5)), in the `extdata` subfolder; the
 user can refer to them as an example. The two datasets have been created
 with
 
-```{r create.sample.datasets, eval=FALSE}
-asia <- BNDataset("asia_10000.data",
-                  "asia_10000.header",
-                  starts.from=0)
-child <- BNDataset("Child_data_na_5000.data",
-                   "Child_data_na_5000.header",
-                   starts.from=0)
+
+```r
+> asia <- BNDataset("asia_10000.data",
++                   "asia_10000.header",
++                   starts.from=0)
+> child <- BNDataset("Child_data_na_5000.data",
++                    "Child_data_na_5000.header",
++                    starts.from=0)
 ```
 
 and are also available with
 
-```{r sample.datasets.accessors, eval=FALSE}
-asia  <- asia()
-child <- child()
+
+```r
+> asia  <- asia()
+> child <- child()
 ```
 
 
@@ -297,10 +301,11 @@ of guessing the missing values is called *imputation*.
 
 We provide the `impute` function to perform imputation.
 
-```{r imputation1, eval=FALSE}
-dataset <- BNDataset(data.file   = "path/to/file.data",
-                     header.file = "path/to/file.header")
-dataset <- impute(dataset)
+
+```r
+> dataset <- BNDataset(data.file   = "path/to/file.data",
++                      header.file = "path/to/file.header")
+> dataset <- impute(dataset)
 ```
 
 
@@ -321,13 +326,14 @@ samples, also the raw samples will be generated.
 
 We provide the `bootstrap` method for this.
 
-```{r bootstrap1, eval=FALSE}
-dataset <- BNDataset("path/to/file.data",
-                     "path/to/file.header")
-dataset <- bootstrap(dataset, num.boots = 100)
-dataset.with.imputed.samples <- bootstrap(dataset,
-                                          num.boots = 100,
-                                          imputation = TRUE)
+
+```r
+> dataset <- BNDataset("path/to/file.data",
++                      "path/to/file.header")
+> dataset <- bootstrap(dataset, num.boots = 100)
+> dataset.with.imputed.samples <- bootstrap(dataset,
++                                           num.boots = 100,
++                                           imputation = TRUE)
 ```
 
 
@@ -342,11 +348,12 @@ brief series of examples.
 
 For example, one may want to see the dataset.
 
-```{r dataset.print, eval=FALSE}
-# the following are equivalent:
-print(dataset)
-show(dataset)
-dataset # from inside an R session
+
+```r
+> # the following are equivalent:
+> print(dataset)
+> show(dataset)
+> dataset # from inside an R session
 ```
 
 
@@ -365,37 +372,126 @@ they happen. Another alternative is to test the presence of data before
 attempting to retrieve it, using the tester methods
 `has.raw.data` and `has.imputed.data`.
 
-```{r getdata1, eval=TRUE, cache=TRUE}
-options(max.print = 200, width = 60)
 
-dataset <- child()
-# if we want raw data
-raw.data(dataset)
+```r
+> options(max.print = 200, width = 60)
+> 
+> dataset <- child()
+> # if we want raw data
+> raw.data(dataset)
+```
 
-# if we want imputed dataset: this raises an error
-imputed.data(dataset)
+```
+        V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+   [1,]  2  3  3 NA  1 NA  1  1  2   1   1   1  NA   2   2
+   [2,] NA NA  2  1  1  2  1  2  2   1   2   1   2   2  NA
+   [3,]  2  3  1  2  1 NA NA  2  2   1   2   2   2   2   2
+   [4,]  2  4  1  1  1  3 NA  1  2  NA   3  NA   1   2   1
+   [5,]  2  2  1 NA  2  4  1  1  1   1  NA   1  NA   2  NA
+   [6,] NA  2 NA  2  1  4 NA  3  2   1   3   1   3   2   2
+   [7,]  2  2  1  2 NA  4 NA  3 NA   1  NA   1   1  NA  NA
+   [8,] NA  1  1 NA  3  1  1  1  2   2   2   1   4   2   2
+   [9,]  2  3  2  2  1  3  1  2  2   1   2   1   2   2   2
+  [10,]  2  4  1  1  1  3 NA NA  2  NA   3   3   2   2   1
+        V16 V17 V18 V19 V20
+   [1,]   2   3   2   1   2
+   [2,]   2   2   1   2   2
+   [3,]   1   2   1   2   2
+   [4,]   3   1  NA   1  NA
+   [5,]  NA   1   1   2   2
+   [6,]   2   1   1   3   2
+   [7,]  NA   1   1   1  NA
+   [8,]   1   1  NA   4  NA
+   [9,]  NA   1   1   2   2
+  [10,]   1   1   2   2  NA
+ [ reached getOption("max.print") -- omitted 4990 rows ]
+```
 
-# with tryCatch we manage the error
-tryCatch(
-  imp.data <- imputed.data(dataset),
-  error = function(e) {
-    cat("Hey! Something went wrong. No imputed data present maybe?")
-    imp.data <<- NULL
-  }
-)
-imp.data
+```r
+> # if we want imputed dataset: this raises an error
+> imputed.data(dataset)
+```
 
-# test before trying
-if (has.imputed.data(dataset)) {
-  imp.data <- imputed.data(dataset)
-} else {
-  imp.data <- NULL
-}
-imp.data
+```
+Error in imputed.data(dataset): The dataset contains no imputed data. Please impute data before learning.
+See > ?impute for help.
+```
 
-# now perform imputation on the dataset
-dataset <- impute(dataset)
-imputed.data(dataset)
+```r
+> # with tryCatch we manage the error
+> tryCatch(
++   imp.data <- imputed.data(dataset),
++   error = function(e) {
++     cat("Hey! Something went wrong. No imputed data present maybe?")
++     imp.data <<- NULL
++   }
++ )
+```
+
+```
+Hey! Something went wrong. No imputed data present maybe?
+```
+
+```r
+> imp.data
+```
+
+```
+NULL
+```
+
+```r
+> # test before trying
+> if (has.imputed.data(dataset)) {
++   imp.data <- imputed.data(dataset)
++ } else {
++   imp.data <- NULL
++ }
+> imp.data
+```
+
+```
+NULL
+```
+
+```r
+> # now perform imputation on the dataset
+> dataset <- impute(dataset)
+```
+
+```
+bnstruct :: performing imputation ...
+bnstruct :: imputation finished.
+```
+
+```r
+> imputed.data(dataset)
+```
+
+```
+        V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+   [1,]  2  3  3  2  1  3  1  1  2   1   1   1   1   2   2
+   [2,]  2  4  2  1  1  2  1  2  2   1   2   1   2   2   1
+   [3,]  2  3  1  2  1  3  1  2  2   1   2   2   2   2   2
+   [4,]  2  4  1  1  1  3  1  1  2   1   3   1   1   2   1
+   [5,]  2  2  1  2  2  4  1  1  1   1   3   1   1   2   2
+   [6,]  2  2  1  2  1  4  1  3  2   1   3   1   3   2   2
+   [7,]  2  2  1  2  2  4  1  3  2   1   3   1   1   2   2
+   [8,]  2  1  1  2  3  1  1  1  2   2   2   1   4   2   2
+   [9,]  2  3  2  2  1  3  1  2  2   1   2   1   2   2   2
+  [10,]  2  4  1  1  1  3  1  2  2   1   3   3   2   2   1
+        V16 V17 V18 V19 V20
+   [1,]   2   3   2   1   2
+   [2,]   2   2   1   2   2
+   [3,]   1   2   1   2   2
+   [4,]   3   1   1   1   2
+   [5,]   1   1   1   2   2
+   [6,]   2   1   1   3   2
+   [7,]   1   1   1   1   2
+   [8,]   1   1   1   4   2
+   [9,]   1   1   1   2   2
+  [10,]   1   1   2   2   2
+ [ reached getOption("max.print") -- omitted 4990 rows ]
 ```
 
 In order to retrieve bootstrap samples, one can use the
@@ -410,14 +506,15 @@ index out of range) will raise an error. The method
 We also provide the `boot` method to directly access a
 single sample.
 
-```{r getboot.2, eval=FALSE}
-# get raw samples
-for (i in 1:num.boots(dataset))
-  print( boot(dataset, i) )
 
-# get imputed samples
-for (i in 1:num.boots(dataset))
-  print( boot(dataset, i, use.imputed.data = TRUE) )
+```r
+> # get raw samples
+> for (i in 1:num.boots(dataset))
++   print( boot(dataset, i) )
+> 
+> # get imputed samples
+> for (i in 1:num.boots(dataset))
++   print( boot(dataset, i, use.imputed.data = TRUE) )
 ```
 
 
@@ -446,9 +543,10 @@ bootstrap samples.
 The following code will create a `BN` object for the
 `Child` network, with no structure nor parameters.
 
-```{r bn2, eval=FALSE}
-dataset <- child()
-net     <- BN(dataset)
+
+```r
+> dataset <- child()
+> net     <- BN(dataset)
 ```
 
 
@@ -468,9 +566,10 @@ that dataset, in particular its structure and its parameters.
 `bnstruct` provides the `learn.network` method
 for this task.
 
-```{r learn.network, eval=FALSE}
-dataset <- child()
-net     <- learn.network(dataset)
+
+```r
+> dataset <- child()
+> net     <- learn.network(dataset)
 ```
 
 The `learn.network` method returns a new `BN`
@@ -521,16 +620,17 @@ equivalent uniform, default), `AIC` (Akaike Information Criterion) and
 `BIC` (Bayesian Information Criterion). The scoring function can be
 chosen using the `scoring.func` parameter.
 
-```{r learn.network.2, eval=FALSE}
-dataset <- child()
-net.1   <- learn.network(dataset,
-                         algo = "sem",
-                         scoring.func = "AIC")
-dataset <- impute(dataset)
-net.2   <- learn.network(dataset,
-                         algo = "mmhc",
-                         scoring.func = "BDeu",
-                         use.imputed.data = TRUE)
+
+```r
+> dataset <- child()
+> net.1   <- learn.network(dataset,
++                          algo = "sem",
++                          scoring.func = "AIC")
+> dataset <- impute(dataset)
+> net.2   <- learn.network(dataset,
++                          algo = "mmhc",
++                          scoring.func = "BDeu",
++                          use.imputed.data = TRUE)
 ```
 
 It is also possible to provide an initial network as starting point for the structure search. This can be
@@ -540,13 +640,14 @@ done using the `initial.network` argument, which accepts three kinds of inputs:
 * a `matrix` containing the adjacency matrix representing the structure of a network;
 * the string `random.chain` for starting from a randomly sampled chain-like network.
 
-```{r, learn.network.chain, eval=FALSE}
-dataset <- child()
-net.1   <- learn.network(dataset,
-                         initial.network = "random.chain")
-net.2   <- learn.network(dataset,
-                         algo = "sem",
-                         initial.network = net.1)
+
+```r
+> dataset <- child()
+> net.1   <- learn.network(dataset,
++                          initial.network = "random.chain")
+> net.2   <- learn.network(dataset,
++                          algo = "sem",
++                          initial.network = net.1)
 ```
 
 The structure learning task by default computes the structure as a DAG.
@@ -557,19 +658,20 @@ done by providing the constructor or the `learn.network`
 method a `BNDataset` with bootstrap samples, and the
 additional parameter `bootstrap = TRUE`.
 
-```{r learn.network.3, eval=FALSE}
-dataset <- child()
-dataset <- bootstrap(dataset, 100, imputation = TRUE)
-net.1   <- learn.network(dataset,
-                         algo = "mmhc",
-                         scoring.func = "AIC",
-                         bootstrap = TRUE)
-# or, for learning from imputed data
-net.2   <- learn.network(dataset,
-                         algo = "mmhc",
-                         scoring.func = "AIC",
-                         bootstrap = TRUE,
-                         use.imputed.data = TRUE)
+
+```r
+> dataset <- child()
+> dataset <- bootstrap(dataset, 100, imputation = TRUE)
+> net.1   <- learn.network(dataset,
++                          algo = "mmhc",
++                          scoring.func = "AIC",
++                          bootstrap = TRUE)
+> # or, for learning from imputed data
+> net.2   <- learn.network(dataset,
++                          algo = "mmhc",
++                          scoring.func = "AIC",
++                          bootstrap = TRUE,
++                          use.imputed.data = TRUE)
 ```
 
 Structure learning can be performed also using the
@@ -611,17 +713,19 @@ network. The `bnstruct` package provides the
 access the structure of a network learnt without and with bootstrap
 (respectively).
 
-```{r dag1, eval=FALSE}
-dag(net)
-wpdag(net)
+
+```r
+> dag(net)
+> wpdag(net)
 ```
 
 
 Then we may want to retrieve the parameters, using the
 `cpts()` method.
 
-```{r cpts2, eval=FALSE}
-cpts(net)
+
+```r
+> cpts(net)
 ```
 
 
@@ -638,20 +742,22 @@ structure to be plotted, the `plot.wpdag` logical parameter
 is provided. As usual, more details are available in the inline
 documentation of the method.
 
-```{r plotprint, eval=FALSE}
-plot(net) # regular DAG
-plot(net, plot.wpdag=T) # wpdag
+
+```r
+> plot(net) # regular DAG
+> plot(net, plot.wpdag=T) # wpdag
 ```
 
 
 As it is for `BNDataset`s, we have several equivalent
 options to print a network.
 
-```{r show, eval=FALSE}
-# TFAE
-print(net)
-show(net)
-net
+
+```r
+> # TFAE
+> print(net)
+> show(net)
+> net
 ```
 
 <a name="inference"></a>Inference
@@ -661,10 +767,11 @@ Inference is performed in `bnstruct` using an
 `InferenceEngine` object. An `InferenceEngine`
 is created directly from a network.
 
-```{r infeng1, eval=FALSE}
-dataset <- child()
-net     <- learn.network(dataset)
-engine  <- InferenceEngine(net)
+
+```r
+> dataset <- child()
+> net     <- learn.network(dataset)
+> engine  <- InferenceEngine(net)
 ```
 
 Optionally, a list of observations can be provided to the
@@ -676,21 +783,22 @@ observed values for the corresponding variables. In case of multiple
 observations of the same variable, the last one (the most recent one) is
 considered.
 
-```{r infeng2, eval=FALSE}
-dataset <- child()
-net     <- learn.network(dataset)
 
-# suppose we have observed variable 1 taking value 2
-# and variable 4 taking value 1:
-obs <- list("observed.vars" = c(1,4),
-            "observed.vals" = c(2,1))
-
-# the following are equivalent:
-engine  <- InferenceEngine(net, obs)
-
-# and
-engine  <- InferenceEngine(net)
-observations(engine) <- obs
+```r
+> dataset <- child()
+> net     <- learn.network(dataset)
+> 
+> # suppose we have observed variable 1 taking value 2
+> # and variable 4 taking value 1:
+> obs <- list("observed.vars" = c(1,4),
++             "observed.vals" = c(2,1))
+> 
+> # the following are equivalent:
+> engine  <- InferenceEngine(net, obs)
+> 
+> # and
+> engine  <- InferenceEngine(net)
+> observations(engine) <- obs
 ```
 
 The `InferenceEngine` class provides methods for belief
@@ -708,12 +816,13 @@ contains. The `belief.propagation` method returns an
 `InferenceEngine` with an `updated.bn` updated
 network.
 
-```{r infeng3, eval=FALSE}
-obs <- list("observed.vars" = c(1,4),
-            "observed.vals" = c(2,1))
-engine  <- InferenceEngine(net)
-engine  <- belief.propagation(engine, obs)
-new.net <- updated.bn(engine)
+
+```r
+> obs <- list("observed.vars" = c(1,4),
++             "observed.vals" = c(2,1))
+> engine  <- InferenceEngine(net)
+> engine  <- belief.propagation(engine, obs)
+> new.net <- updated.bn(engine)
 ```
 
 The EM algorithm is instead performed by the `em` method.
@@ -723,13 +832,14 @@ Its arguments are an `InferenceEngine` and a
 `ess`), and it returns a list consisting in an updated
 `InferenceEngine` and an updated `BNDataset`.
 
-```{r infeng4, eval=FALSE}
-dataset <- child()
-net     <- learn.network(dataset)
-engine  <- InferenceEngine(net)
-results <- em(engine, dataset)
-updated.engine  <- results$InferenceEngine
-updated.dataset <- results$BNDataset
+
+```r
+> dataset <- child()
+> net     <- learn.network(dataset)
+> engine  <- InferenceEngine(net)
+> results <- em(engine, dataset)
+> updated.engine  <- results$InferenceEngine
+> updated.dataset <- results$BNDataset
 ```
 
 Two small but complete examples
@@ -743,43 +853,175 @@ dataset. We compare the default `mmhc-BDeu` pair on available case
 analysis (raw data with missing values) and on imputed data, and the
 `sem-BDeu` pair.
 
-```{r childtestmd, eval=TRUE, cache=TRUE}
-dataset <- child()
 
-# learning with available cases analysis, MMHC, BDeu
-net <- learn.network(dataset)
-plot(net)
+```r
+> dataset <- child()
+> 
+> # learning with available cases analysis, MMHC, BDeu
+> net <- learn.network(dataset)
+```
 
-# learning with imputed data, MMHC, BDeu
-imp.dataset <- impute(dataset)
-net <- learn.network(imp.dataset, use.imputed.data = TRUE)
-plot(net)
+```
+bnstruct :: learning the structure using MMHC ...
+bnstruct :: learning using MMHC completed.
+bnstruct :: learning network parameters ... 
+bnstruct :: parameter learning done.
+```
 
-# SEM, BDeu using previous network as starting point
-net <- learn.network(dataset, algo = "sem",
-                     scoring.func = "BDeu",
-                     initial.network = net,
-                     struct.threshold = 10,
-                     param.threshold = 0.001)
-plot(net)
+```r
+> plot(net)
+```
 
-# we update the probabilities with EM from the raw dataset,
-# starting from the first network
-engine  <- InferenceEngine(net)
-results <- em(engine, dataset)
-updated.engine  <- results$InferenceEngine
-updated.dataset <- results$BNDataset
+![plot of chunk childtestmd](figure/childtestmd-1.png) 
+
+```r
+> # learning with imputed data, MMHC, BDeu
+> imp.dataset <- impute(dataset)
+```
+
+```
+bnstruct :: performing imputation ...
+bnstruct :: imputation finished.
+```
+
+```r
+> net <- learn.network(imp.dataset, use.imputed.data = TRUE)
+```
+
+```
+bnstruct :: learning the structure using MMHC ...
+bnstruct :: learning using MMHC completed.
+bnstruct :: learning network parameters ... 
+bnstruct :: parameter learning done.
+```
+
+```r
+> plot(net)
+```
+
+![plot of chunk childtestmd](figure/childtestmd-2.png) 
+
+```r
+> # SEM, BDeu using previous network as starting point
+> net <- learn.network(dataset, algo = "sem",
++                      scoring.func = "BDeu",
++                      initial.network = net,
++                      struct.threshold = 10,
++                      param.threshold = 0.001)
+```
+
+```
+bnstruct :: learning the structure using SEM ...
+... bnstruct :: starting EM algorithm ...
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... bnstruct :: EM algorithm completed.
+... bnstruct :: learning the structure using MMHC ...
+... bnstruct :: learning using MMHC completed.
+... bnstruct :: learning network parameters ... 
+... bnstruct :: parameter learning done.
+... bnstruct :: starting EM algorithm ...
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... bnstruct :: EM algorithm completed.
+... bnstruct :: learning the structure using MMHC ...
+... bnstruct :: learning using MMHC completed.
+... bnstruct :: learning network parameters ... 
+... bnstruct :: parameter learning done.
+... bnstruct :: starting EM algorithm ...
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... ... bnstruct :: learning network parameters ... 
+... ... bnstruct :: parameter learning done.
+... bnstruct :: EM algorithm completed.
+... bnstruct :: learning the structure using MMHC ...
+... bnstruct :: learning using MMHC completed.
+... bnstruct :: learning network parameters ... 
+... bnstruct :: parameter learning done.
+bnstruct :: learning using SEM completed.
+bnstruct :: learning network parameters ... 
+bnstruct :: parameter learning done.
+```
+
+```r
+> plot(net)
+```
+
+![plot of chunk childtestmd](figure/childtestmd-3.png) 
+
+```r
+> # we update the probabilities with EM from the raw dataset,
+> # starting from the first network
+> engine  <- InferenceEngine(net)
+> results <- em(engine, dataset)
+```
+
+```
+bnstruct :: starting EM algorithm ...
+... bnstruct :: learning network parameters ... 
+... bnstruct :: parameter learning done.
+... bnstruct :: learning network parameters ... 
+... bnstruct :: parameter learning done.
+bnstruct :: EM algorithm completed.
+```
+
+```r
+> updated.engine  <- results$InferenceEngine
+> updated.dataset <- results$BNDataset
 ```
 
 The second example is about learning with bootstrap. This time we use
 the `Asia` dataset.
 
-```{r asiatest, eval=TRUE, cache=TRUE}
-dataset <- asia()
-dataset <- bootstrap(dataset)
-net <- learn.network(dataset, bootstrap = TRUE)
-plot(net)
+
+```r
+> dataset <- asia()
+> dataset <- bootstrap(dataset)
 ```
+
+```
+bnstruct :: Generating bootstrap samples ...
+bnstruct :: Bootstrap samples generated.
+```
+
+```r
+> net <- learn.network(dataset, bootstrap = TRUE)
+```
+
+```
+bnstruct :: learning the structure using MMHC ...
+bnstruct :: learning using MMHC completed.
+```
+
+```r
+> plot(net)
+```
+
+![plot of chunk asiatest](figure/asiatest-1.png) 
 
 <a name="references"></a>References
 ==========
