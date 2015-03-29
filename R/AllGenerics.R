@@ -837,6 +837,7 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param threshold threshold for convergence, used as stopping criterion.
+#' @param max.em.iterations maximum number of iterations to run in case of no convergence.
 #' @param ess Equivalent Sample Size value.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
@@ -848,7 +849,8 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' }
 #' 
 #' @exportMethod em
-setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneric("em"))
+setGeneric("em", function(x, dataset, threshold = 0.001,
+                          max.em.iterations = 10, ess = 1) standardGeneric("em"))
 
 
 # ' Structural Expectation-Maximization algorithm.
@@ -862,6 +864,7 @@ setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneri
 # ' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 # ' @param struct.threshold threshold for convergence of the structure learning step, used as stopping criterion.
 # ' @param param.threshold threshold for convergence of the parameter learning step, used as stopping criterion.
+# ' @param max.em.iterations maximum number of iterations to run in case of no convergence.
 # ' @param scoring.func the scoring function to use. Currently, one among \code{AIC} and \code{BIC}
 # ' (default - \code{BDeu} supported  as linear approximation).
 # ' @param alpha confidence threshold (only for \code{mmhc}).
@@ -880,8 +883,8 @@ setGeneric("em", function(x, dataset, threshold = 0.001, ess = 1) standardGeneri
 # ' @return a (\code{"BN"}) network with the new structure.
 # ' 
 # exportMethod sem
-setGeneric("sem", function(x, dataset, struct.threshold = 0, param.threshold = 0, scoring.func = "BDeu",
-                           initial.network = NULL,
+setGeneric("sem", function(x, dataset, struct.threshold = 0, param.threshold = 0,
+                           max.em.iterations = 10, scoring.func = "BDeu", initial.network = NULL,
                            alpha = 0.05, ess = 1, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,

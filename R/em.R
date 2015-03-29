@@ -2,7 +2,7 @@
 #' @aliases em,InferenceEngine,BNDataset
 setMethod("em",
           c("InferenceEngine","BNDataset"),
-          function(x, dataset, threshold = 0.001, ess = 1)
+          function(x, dataset, threshold = 0.001, max.em.iterations = 10, ess = 1)
           {
             # We assume:
             # 1) there is a BN with learnt or known parameters
@@ -43,9 +43,10 @@ setMethod("em",
             cliques    <- jt.cliques(x)
             
             # ndataset <- dataset
-            first.iteration <- TRUE
-            difference      <- threshold + 1
-            while(difference > threshold || first.iteration)
+            no.iterations <- 1
+            difference    <- threshold + 1
+            prev.log.lik  <- 0
+            while((difference > threshold && no.iterations <= max.em.iterations) || no.iterations < 2)
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
               eng      <- belief.propagation(eng)            
@@ -183,12 +184,12 @@ setMethod("em",
               
               bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
 
-              if (first.iteration)
-                first.iteration <- FALSE
-              else
-                difference <- sum(abs(c(unlist(cpts(bn))) - c(unlist(cpts(orig.bn)))))
+              no.iterations <- no.iterations + 1
+              curr.log.lik  <- log.likelihood(bn, dataset, ess=ess, use.imputed.data = T)
+              difference    <- prev.log.lik - curr.log.lik
 
-              orig.bn <- bn
+              orig.bn      <- bn
+              prev.log.lik <- curr.log.lik
             }
             
             updated.bn(x) <- bn

@@ -2,7 +2,8 @@
 # ' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
           c("BN","BNDataset"),
-          function(x, dataset, struct.threshold = 0, param.threshold = 0, scoring.func = "BDeu",
+          function(x, dataset, struct.threshold = 0, param.threshold = 0, max.em.iterations = 10,
+                   scoring.func = "BDeu",
                    initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
@@ -47,7 +48,7 @@ setMethod("sem",
 
             repeat
             {
-              out <- em(w.eng, dataset, param.threshold)
+              out <- em(w.eng, dataset, param.threshold, max.em.iterations, ess)
               
               new.eng     <- out$InferenceEngine
               new.dataset <- out$BNDataset

@@ -14,6 +14,44 @@ fancy.cpt <- function( cpt )
   return( cpt )
 }
 
+
+# Compute log likelihood of the network on the database.
+# Takes a BN and a BNDataset as input.
+log.likelihood <- function(net, dataset, sf = scoring.func(net),
+                           ess = 1, use.imputed.data = FALSE)
+{
+  dag <- dag(net)
+  storage.mode(dag) <- "integer"
+  
+  node.sizes <- node.sizes(net)
+  storage.mode(node.sizes) <- "integer"
+  n.nodes <- num.nodes(net)
+  
+  if (use.imputed.data)
+    data <- imputed.data(dataset)
+  else
+    data <- raw.data(dataset)
+  storage.mode(data) <- "integer"
+  
+  scoring.func <- match(tolower(sf), c("bdeu", "aic", "bic"))
+  if (is.na(scoring.func))
+  {
+    bnstruct.log("scoring function not recognized, using BDeu")
+    scoring.func <- 0
+  }
+  else {
+    scoring.func <- scoring.func - 1
+  }
+  
+  curr.score.nodes <- array(0,n.nodes)
+  
+  for( i in 1L:n.nodes )
+    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(dag[,i]!=0)-1L, scoring.func,
+                                  ess, PACKAGE = "bnstruct" )
+  
+  return(sum(curr.score.nodes))
+}
+
 # # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
 # # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
 # # so that the sum over the last dimension is always 1

@@ -156,7 +156,7 @@ setMethod("learn.structure",
             scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
             if (is.na(scoring.func))
             {
-              message("scoring function not recognized, using BDeu")
+              bnstruct.log("scoring function not recognized, using BDeu")
               scoring.func <- 0
             }
             else {

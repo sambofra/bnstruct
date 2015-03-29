@@ -605,8 +605,8 @@ mainly the confidence threshold of the statistical pruning.
 The third method is the Structural Expectation-Maximization (\texttt{sem}) algorithm (\citet{friedman1997learning,friedman1998bayesian}),
 for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
 the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
-due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \Rfunarg{struct.threshold}
-and \Rfunarg{param.threshold}, for the structure and the parameter convergence, respectively.
+due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \Rfunarg{struct.threshold}, \Rfunarg{param.threshold} and \Rfunarg{max.em.iterations},
+for the structure and the parameter convergence and the maximum number of iterations of EM, respectively.
 
 Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
 We provide three of the most popular scoring functions, \texttt{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
@@ -816,7 +816,7 @@ updated network.
 \end{knitrout}
 
 The EM algorithm is instead performed by the \Rmethod{em} method. Its arguments are an \Robject{InferenceEngine}
-and a \Robject{BNDataset} (optionally: a convergence \Rfunarg{threshold} and the Equivalent Sample Size \Rfunarg{ess}),
+and a \Robject{BNDataset} (optionally: a convergence \Rfunarg{threshold}, the Equivalent Sample Size \Rfunarg{ess} and the maximum number of iterations \Rfunarg{max.em.iterations}),
 and it returns a list consisting in an updated \Robject{InferenceEngine} and an updated \Robject{BNDataset}.
 
 \begin{knitrout}
@@ -882,7 +882,7 @@ the \texttt{sem-BDeu} pair.
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
 \hlstd{> }\hlkwd{plot}\hlstd{(net)}
 \end{alltt}
 \end{kframe}
@@ -895,7 +895,7 @@ the \texttt{sem-BDeu} pair.
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
 \hlstd{> }\hlstd{updated.engine}  \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{InferenceEngine}
 \hlstd{> }\hlstd{updated.dataset} \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{BNDataset}
 \end{alltt}

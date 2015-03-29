@@ -510,9 +510,9 @@ Expectation-Maximization (in order to “fill in” the holes in the
 dataset) and structure learning from the guessed dataset, until
 convergence. The structure learning used inside SEM, due to
 computational reasons, is MMHC. Convergence of SEM can be controlled
-with the parameters `struct.threshold` and
-`param.threshold`, for the structure and the parameter
-convergence, respectively.
+with the parameters `struct.threshold`,
+`param.threshold` and `max.em.iterations`, for the structure and the parameter
+convergence and the maximum number of iterations of EM, respectively.
 
 Search-and-score methods also need a scoring function to compute an
 estimated measure of each configuration of nodes. We provide three of
@@ -719,8 +719,8 @@ new.net <- updated.bn(engine)
 The EM algorithm is instead performed by the `em` method.
 Its arguments are an `InferenceEngine` and a
 `BNDataset` (optionally: a convergence
-`threshold` and the Equivalent Sample Size
-`ess`), and it returns a list consisting in an updated
+`threshold`, the Equivalent Sample Size
+`ess` and the maximum number of iterations `max.em.iterations`), and it returns a list consisting in an updated
 `InferenceEngine` and an updated `BNDataset`.
 
 ```{r infeng4, eval=FALSE}

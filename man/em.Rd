@@ -7,10 +7,10 @@
 \alias{em,InferenceEngine,BNDataset-method}
 \title{expectation-maximization algorithm.}
 \usage{
-em(x, dataset, threshold = 0.001, ess = 1)
+em(x, dataset, threshold = 0.001, max.em.iterations = 10, ess = 1)
 
 \S4method{em}{InferenceEngine,BNDataset}(x, dataset, threshold = 0.001,
-  ess = 1)
+  max.em.iterations = 10, ess = 1)
 }
 \arguments{
 \item{x}{an \code{\link{InferenceEngine}}.}
@@ -18,6 +18,8 @@ em(x, dataset, threshold = 0.001, ess = 1)
 \item{dataset}{observed dataset with missing values for the Bayesian Network of \code{x}.}
 
 \item{threshold}{threshold for convergence, used as stopping criterion.}
+
+\item{max.em.iterations}{maximum number of iterations to run in case of no convergence.}
 
 \item{ess}{Equivalent Sample Size value.}
 }
