@@ -2,8 +2,8 @@
 # ' @aliases sem,InferenceEngine,BNDataset
 setMethod("sem",
           c("BN","BNDataset"),
-          function(x, dataset, struct.threshold = 0, param.threshold = 0, max.em.iterations = 10,
-                   scoring.func = "BDeu",
+          function(x, dataset, struct.threshold = 0, param.threshold = 0, 
+                   max.sem.iterations = 25, max.em.iterations = 10, scoring.func = "BDeu",
                    initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
                    max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
@@ -45,6 +45,8 @@ setMethod("sem",
             
             w.dataset <- dataset
             w.eng     <- InferenceEngine(w.net)
+            
+            sem.iterations <- 0
 
             repeat
             {
@@ -65,7 +67,9 @@ setMethod("sem",
               w.net     <- new.net
               w.dataset <- new.dataset
               
-              if (difference <= struct.threshold)
+              sem.iterations <- sem.iterations + 1
+              
+              if (difference <= struct.threshold || sem.iterations >= max.sem.iterations)
                 break
               else
                 w.eng     <- InferenceEngine(w.net)
