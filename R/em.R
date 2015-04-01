@@ -252,5 +252,6 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
         ll <- ll + log(jpt[data[row,node]])
       }
     }
+  
   return(ll)
 }
