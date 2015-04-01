@@ -299,11 +299,12 @@ setMethod("get.most.probable.values",
           {
 #             if (is.null(jpts(x))) # don't know if this works...
 #               return(get.most.probable.values(bn(x)))
-            jpts      <- jpts(x)
-            num.nodes <- num.nodes(bn(x))
-            cliques   <- jt.cliques(x)
-            num.cliqs <- length(cliques)
-            variables <- variables(bn(x))
+            jpts       <- jpts(x)
+            num.nodes  <- num.nodes(bn(x))
+            cliques    <- jt.cliques(x)
+            num.cliqs  <- length(cliques)
+            variables  <- variables(bn(x))
+            node.sizes <- node.sizes(bn(x))
             
             mpv <- array(rep(0, num.nodes), dim=c(num.nodes), dimnames=list(variables))
 

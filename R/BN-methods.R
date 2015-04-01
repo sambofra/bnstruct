@@ -578,8 +578,8 @@ setMethod("sample.row", "BN",
             bn   <- x
             dag  <- dag(bn)
             cpts <- cpts(bn)
-            num.nodes <- num.nodes(bn)
-            variables <- variables(bn)
+            num.nodes  <- num.nodes(bn)
+            variables  <- variables(bn)
             node.sizes <- node.sizes(bn)
             
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))

@@ -178,7 +178,7 @@ setMethod("learn.structure",
               else if (class(initial.network) == "character" &&
                        tolower(initial.network) == "random.chain")
                 init.net <- sample.chain(dataset)
-              else # string != "ranoom.chain"
+              else # string != "random.chain"
                 init.net <- NULL
               if (!is.null(init.net))
                 validObject(init.net)
@@ -249,7 +249,7 @@ setMethod("learn.structure",
                 in.dag <- dag(init.net)
               else
                 in.dag <- NULL
-              
+                            
               if (bootstrap)
               {
                 finalPDAG <- matrix(0,num.nodes,num.nodes)
