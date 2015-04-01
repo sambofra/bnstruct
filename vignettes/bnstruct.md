@@ -610,8 +610,9 @@ dataset) and structure learning from the guessed dataset, until
 convergence. The structure learning used inside SEM, due to
 computational reasons, is MMHC. Convergence of SEM can be controlled
 with the parameters `struct.threshold`,
-`param.threshold` and `max.em.iterations`, for the structure and the parameter
-convergence and the maximum number of iterations of EM, respectively.
+`param.threshold`, `max.sem.iterations` and `max.em.iterations`,
+for the structure and the parameter
+convergence and the maximum number of iterations of SEM and EM, respectively.
 
 Search-and-score methods also need a scoring function to compute an
 estimated measure of each configuration of nodes. We provide three of

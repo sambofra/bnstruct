@@ -605,8 +605,9 @@ mainly the confidence threshold of the statistical pruning.
 The third method is the Structural Expectation-Maximization (\texttt{sem}) algorithm (\citet{friedman1997learning,friedman1998bayesian}),
 for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
 the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
-due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \Rfunarg{struct.threshold}, \Rfunarg{param.threshold} and \Rfunarg{max.em.iterations},
-for the structure and the parameter convergence and the maximum number of iterations of EM, respectively.
+due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \Rfunarg{struct.threshold},
+\Rfunarg{param.threshold}, \Rfunarg{max.sem.iterations} and \Rfunarg{max.em.iterations},
+for the structure and the parameter convergence and the maximum number of iterations of SEM and EM, respectively.
 
 Search-and-score methods also need a scoring function to compute an estimated measure of each configuration of nodes.
 We provide three of the most popular scoring functions, \texttt{BDeu} (Bayesian-Dirichlet equivalent uniform, default),
