@@ -185,9 +185,9 @@ setMethod("em",
               bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
 
               no.iterations <- no.iterations + 1
-              curr.log.lik  <- log.likelihood(bn, dataset, ess=ess, use.imputed.data = T)
+              curr.log.lik  <- log.likelihood(dataset, bn, use.imputed.data = T)
               difference    <- prev.log.lik - curr.log.lik
-
+              
               orig.bn      <- bn
               prev.log.lik <- curr.log.lik
             }
@@ -198,3 +198,59 @@ setMethod("em",
             
             return(list("InferenceEngine" = x, "BNDataset" = dataset))
           })
+
+
+# Compute log likelihood of the dataset given the network.
+# Takes a BNDataset and a BN as input.
+log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
+{
+  dag        <- dag(net)
+  node.sizes <- node.sizes(net)
+  n.nodes    <- num.nodes(net)
+  variables  <- variables(dataset)
+  
+  parents    <- lapply(1:n.nodes, function(x) which(dag[,x] != 0))
+  jpts       <- lapply(cpts(net), function(x) x / sum(x))
+  dim.vars   <- lapply(1:n.nodes,
+                       function(x)
+                         match(
+                           c(unlist(
+                             names(dimnames(jpts[[x]])), F, F
+                           )),
+                           variables
+                         )
+  )
+  
+  if (use.imputed.data)
+    data <- imputed.data(dataset)
+  else
+    data <- raw.data(dataset)
+  
+  sorted.nodes <- topological.sort(dag)
+  vals         <- rep(0, n.nodes)
+  ll           <- 0
+  
+  for (row in 1:nrow(data))
+    for (node in sorted.nodes)
+    {
+      if (length(parents[[node]]) == 0) {
+        vals[node] <- data[row,node]
+        ll <- ll + log(jpts[[node]][data[row,node]])
+      } else {
+        jpt  <- jpts[[node]]
+        vars <- c(unlist(dim.vars[[node]]))
+        for (p in parents[[node]]) {
+          sumout          <- rep(0, node.sizes[p])
+          sumout[vals[p]] <- 1
+          out  <- mult(jpt, vars, sumout, c(p), node.sizes)
+          jpt  <- out$potential
+          vars <- out$vars
+        }
+        jpt <- c(jpt[which(jpt != 0)])
+        if (length(jpt) != node.sizes[node]) stop("AHIAHIAHI")
+        vals[node] <- data[row,node]
+        ll <- ll + log(jpt[data[row,node]])
+      }
+    }
+  return(ll)
+}

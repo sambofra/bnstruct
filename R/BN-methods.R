@@ -770,7 +770,7 @@ topological.sort <- function(dgraph)
   {
     ind <- head(fringe,1) # pop
     fringe <- tail(fringe,-1)
-    order[ind] <- i
+    order[i] <- ind
     i <- i + 1 
     
     for( j in which(dgraph[ind,] != 0) )
