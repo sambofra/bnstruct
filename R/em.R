@@ -247,7 +247,6 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
           vars <- out$vars
         }
         jpt <- c(jpt[which(jpt != 0)])
-        if (length(jpt) != node.sizes[node]) stop("AHIAHIAHI")
         vals[node] <- data[row,node]
         ll <- ll + log(jpt[data[row,node]])
       }
@@ -255,3 +254,4 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
   
   return(ll)
 }
+
