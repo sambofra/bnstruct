@@ -1,4 +1,5 @@
 # prepare the package for release
+# taken from https://github.com/yihui/knitr/blob/master/Makefile
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC := $(shell basename `pwd`)
