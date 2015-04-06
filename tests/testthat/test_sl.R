@@ -11,7 +11,7 @@ s <- sapply(1:num.nodes(net), function(x) {
   prod(node.sizes(net)[parents])
 })
 
-test_that("fuuck", {
+test_that("sum of cpts", {
   expect_equal(sum(unlist(cpts(net))), sum(s))
 })
 
