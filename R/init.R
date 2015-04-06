@@ -1,6 +1,7 @@
+#' @useDynLib bnstruct
 .onLoad = function(lib, pkg) 
 {
-   library.dynam("bnstruct", package = pkg, lib.loc = lib)
+  # library.dynam("bnstruct", package = pkg, lib.loc = lib)
 	if( R.version$arch == "x86_64" )
 		MAX_NODES <- 64
 	else
@@ -12,5 +13,5 @@
 
 .onUnload = function(lib) 
 {
-  library.dynam.unload("bnstruct", libpath = lib)
+  # library.dynam.unload("bnstruct", libpath = lib)
 }#.ONUNLOAD

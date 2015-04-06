@@ -42,3 +42,6 @@ check: build
 check-cran: build
 	cd ..;\
 	R CMD check --as-cran  $(PKGNAME)_$(PKGVERS).tar.gz
+
+test:
+	Rscript -e "devtools::test()"
