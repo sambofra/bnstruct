@@ -355,8 +355,8 @@ setMethod("get.most.probable.values",
             return(mpv)
           })
 
-# #' @rdname sample.row
-# #' @aliases sample.row,InferenceEngine
+# # ' @rdname sample.row
+# # ' @aliases sample.row,InferenceEngine
 # setMethod("sample.row",
 #           "InferenceEngine",
 #           function(x)
