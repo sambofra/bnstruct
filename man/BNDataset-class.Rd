@@ -17,7 +17,8 @@ BNDataset(data, discreteness, variables = NULL, node.sizes = NULL, ...)
 
 \item{data}{raw data.frame or path/name of the file containing the raw dataset (see 'Details').}
 
-\item{discreteness}{a vector of elements in \{\code{c},\code{d}\} for continuous and discrete variables (respectively),
+\item{discreteness}{a vector of booleans for continuous and discrete variables
+(\code{TRUE} and \code{FALSE}, respectively),
 or path/name of the file containing header information for the dataset (discreteness, variable names, cardinality - see 'Details').}
 
 \item{variables}{vector of variable names.}
