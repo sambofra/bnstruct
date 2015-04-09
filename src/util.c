@@ -363,3 +363,11 @@ double log_likelihood ( unsigned int * d, unsigned int n_nodes, unsigned int n_c
 	
 	return logl;
 }
+
+int long_loop(void) {
+  long i, a = 2;
+  for (i = 0; i < 10^10 ; i++) {
+    a = (a + i) % 123456;
+  }
+  return (a);
+}

@@ -26,6 +26,40 @@ setMethod("read.dataset",
               quit(status = 1)
             }
             
+            if (imputation)
+            {
+              # perform imputation
+              imputed.data(object) <- knn.impute(get.raw.data(object), k.impute,
+                                                setdiff(1:length(node.sizes(object)), c()))
+            }
+            
+            set.seed(seed)
+            if (bootstrap && num.boots >= 1)
+            {
+              object@num.boots <- num.boots
+              object@has.boots <- TRUE
+              print(object@has.boots)
+              print(object@num.boots)
+              boot.sample <- matrix(sample.int(num.items(object),
+                                               size = num.boots * num.items(object),
+                                               replace=TRUE),
+                                    num.items(object), num.boots)
+              
+              if (imputation)
+                object@has.imp.boots <- TRUE
+              
+              for (i in 1:num.boots)
+              {
+                object@boots[[i]] <- object@raw.data[boot.sample[,i],]
+                
+                if (imputation)
+                  object@imp.boots[[i]] <- knn.impute(object@boots[[i]],
+                                                      k.impute,
+                                                      setdiff(1:length(node.sizes(object)),c()) )
+                
+              }
+            }
+            
             validObject(object)
             return(object)
           })

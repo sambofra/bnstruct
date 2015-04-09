@@ -6,10 +6,7 @@
 #' 
 setMethod("initialize",
           "BN",
-          function(.Object, dataset = NULL, ...)#,
-#                    algo = "mmhc", scoring.func = "BDeu", alpha = 0.05, ess = 1, bootstrap = FALSE,
-#                    layering = c(), max.fanin.layers = NULL,
-#                    max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+          function(.Object, dataset = NULL, variables = c(), node.sizes = c(), discreteness = c())
           {
             x <- .Object
             
@@ -22,16 +19,23 @@ setMethod("initialize",
               discreteness(x) <- discreteness(dataset)
               dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
               wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
-#               validObject(x)
-# 
-#               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
-#                                    layering = layering, max.fanin.layers = max.fanin.layers,
-#                                    max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data)
-#               
-#               validObject(x)
-# 
-#               x <- learn.params(x, dataset, ess = ess)
+              validObject(x)
+              return(x)
             }
+            
+            if (!is.null(variables) && !is.null(node.sizes) && !is.null(discreteness))
+            {
+              name(x)         <- name(dataset)
+              num.nodes(x)    <- num.variables(dataset)
+              variables(x)    <- variables(dataset)
+              node.sizes(x)   <- node.sizes(dataset)
+              discreteness(x) <- discreteness(dataset)
+              dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              validObject(x)
+              return(x)
+            }
+            
             validObject(x)
             return(x)
           })
@@ -85,13 +89,9 @@ setMethod("initialize",
 #' 
 #' 
 #' @export
-BN <- function(dataset = NULL, ...)#, algo = "mmhc", scoring.func = 0, alpha = 0.05, ess = 1, bootstrap = FALSE,
-#                layering = c(), max.fanin.layers = NULL,
-#                max.fanin = num.variables(dataset), cont.nodes = c(), raw.data = FALSE, ...)
+BN <- function(dataset = NULL, variables = c(), node.sizes = c(), discreteness = c())
 {
-  object <- new("BN", dataset = dataset, ...)#, scoring.func = scoring.func, algo = algo, alpha = alpha, ess = ess, bootstrap = bootstrap,
-#                 layering = layering, max.fanin.layers = max.fanin.layers,
-#                 max.fanin = max.fanin, cont.nodes = cont.nodes, raw.data = raw.data, ...)
+  object <- new("BN", dataset = dataset, variables = c(), node.sizes = c(), discreteness = c())
   return(object)
 }
 
@@ -578,8 +578,8 @@ setMethod("sample.row", "BN",
             bn   <- x
             dag  <- dag(bn)
             cpts <- cpts(bn)
-            num.nodes  <- num.nodes(bn)
-            variables  <- variables(bn)
+            num.nodes <- num.nodes(bn)
+            variables <- variables(bn)
             node.sizes <- node.sizes(bn)
             
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
@@ -589,13 +589,16 @@ setMethod("sample.row", "BN",
             
             dim.vars   <- lapply(1:num.nodes,
                                  function(x)
+                                   as.list(
                                      match(
                                        c(unlist(
                                          names(dimnames(cpts[[x]]))
                                        )),
                                        c(variables)
                                      )
+                                   )
             )
+            
             
             for (node in sorted.nodes)
             {
@@ -615,7 +618,6 @@ setMethod("sample.row", "BN",
                 mpv[node] <- sample(1:node.sizes[node], 1, replace=T, prob=cpt)
               }
             }
-                
             return(mpv)
           })
 
@@ -629,7 +631,9 @@ setMethod("sample.dataset",c("BN"),
             obs <- matrix(rep(0, num.nodes * n), nrow = n, ncol = num.nodes)
             
             for (i in 1:n)
+            {
               obs[i,] <- sample.row(x)
+            }
             
             storage.mode(obs) <- "integer"
             

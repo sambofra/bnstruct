@@ -113,7 +113,7 @@ quantize.matrix <- function(data, levels)
     {
       quantiles <- quantile( data[,i], probs = (0:levels[i])/levels[i], na.rm = TRUE )
       # cut the range using the quantiles as break points.
-      quant[,i] <- as.matrix( cut( data[,i], quantiles, labels=FALSE, include.lowest=TRUE),nr,1 )
+      quant[,i] <- as.matrix( cut( data[,i], unique(quantiles), labels=FALSE, include.lowest=TRUE),nr,1 ) #unique(quantiles)
     }
   }
   

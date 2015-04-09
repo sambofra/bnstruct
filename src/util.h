@@ -34,5 +34,7 @@ double bdeu_score( unsigned int * d, unsigned int n_nodes, unsigned int n_cases,
  */
 double log_likelihood( unsigned int * d, unsigned int n_nodes, unsigned int n_cases, unsigned int * ns, 
   unsigned int ni, unsigned int * pa, unsigned int n_pa, double penalty );
+
+int long_loop(void);
 	
 #endif

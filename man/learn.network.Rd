@@ -9,19 +9,21 @@
 \alias{learn.network,BNDataset-method}
 \title{learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.}
 \usage{
-learn.network(x, ...)
+learn.network(x, ..., params)
 
-\S4method{learn.network}{BN}(x, y = NULL, algo = "mmhc",
-  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+\S4method{learn.network}{BN}(x, y = NULL, algo = params@learning.algo,
+  scoring.func = params@scoring.func, alpha = params@alpha,
+  ess = params@ess, bootstrap = FALSE, layering = c(),
+  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, ..., params)
 
-\S4method{learn.network}{BNDataset}(x, algo = "mmhc", scoring.func = "BDeu",
-  initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+\S4method{learn.network}{BNDataset}(x, algo = params@learning.algo,
+  scoring.func = params@scoring.func, alpha = params@alpha,
+  ess = params@ess, bootstrap = FALSE, layering = c(),
+  max.fanin.layers = NULL, max.fanin = num.variables(dataset),
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, ..., params = params)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},

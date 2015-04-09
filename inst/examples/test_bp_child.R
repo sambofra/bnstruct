@@ -26,7 +26,6 @@ net <- BN(mydata)
 #    0  0  8  7  7
 #    0  0  0 14  6
 #    0  0  0  0 19")), max.fanin=3)
-print(net)
 #net <- learn.structure(net, mydata, algo="mmhc", scoring.func = "BIC")
 # net <- learn.structure(net, mydata, algo="sm", scoring.func = "BIC",
 # layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
@@ -40,8 +39,12 @@ print(net)
 # em(inf.eng, mydata)
 #net <- learn.structure(net, mydata, algo="mmhc", scoring.func="BIC")
 #net <- learn.params(net, mydata)
-print(dag(net))
-out <- learn.network(net, mydata, algo = "sem", scoring.func = "BDeu", struct.threshold = 0)
+params <- BNParams()
+params@learning.algo <- "sem"
+params@scoring.func <- "BDeu"
+params@sem_convergence <- 0
+print(params)
+out <- learn.network(net, mydata, params = params)
 # out <- sem(net, mydata, struct.threshold = 0, algo="mmhc", scoring.func = "BIC")#,
 #            layering= c(1,2,3,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5), max.fanin.layers=as.matrix(read.table(header=F,text="
 #    0  1  1  1  1

@@ -7,11 +7,12 @@
 \alias{bootstrap,BNDataset-method}
 \title{Perform bootstrap.}
 \usage{
-bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
-  k.impute = 10)
+bootstrap(object, num.boots = params@num.boots, seed = params@seed,
+  imputation = FALSE, k.impute = params@k.impute, params)
 
-\S4method{bootstrap}{BNDataset}(object, num.boots = 100, seed = 0,
-  imputation = FALSE, k.impute = 10)
+\S4method{bootstrap}{BNDataset}(object, num.boots = params@num.boots,
+  seed = params@seed, imputation = FALSE, k.impute = params@k.impute,
+  params)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -22,7 +23,10 @@ bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
 
 \item{imputation}{\code{TRUE} if imputation has to be performed. Default is \code{FALSE}.}
 
-\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).}
+\item{k.impute}{number of neighbours to be used; for discrete variables we use mode, for continuous variables
+the median value is instead taken (useful only if imputation == TRUE).}
+
+\item{params}{parameters.}
 }
 \description{
 Create a list of \code{num.boots} samples of the original dataset.

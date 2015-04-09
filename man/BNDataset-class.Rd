@@ -10,10 +10,12 @@
 \usage{
 BNDataset(data, discreteness, variables = NULL, node.sizes = NULL, ...)
 
-\S4method{initialize}{BNDataset}(.Object)
+\S4method{initialize}{BNDataset}(.Object, ...)
 }
 \arguments{
 \item{.Object}{an empty BNDataset.}
+
+\item{...}{further arguments for reading a dataset from files (see documentation for \code{read.dataset}).}
 
 \item{data}{raw data.frame or path/name of the file containing the raw dataset (see 'Details').}
 
@@ -24,8 +26,6 @@ or path/name of the file containing header information for the dataset (discrete
 \item{variables}{vector of variable names.}
 
 \item{node.sizes}{vector of variable cardinalities (for discrete variables) or quantization ranges (for continuous variables).}
-
-\item{...}{further arguments for reading a dataset from files (see documentation for \code{read.dataset}).}
 }
 \value{
 BNDataset object.

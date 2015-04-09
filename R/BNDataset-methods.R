@@ -9,7 +9,7 @@
 #' 
 #' @return a BNDataset object.
 setMethod("initialize",
-          "BNDataset", function(.Object)  
+          "BNDataset", function(.Object, ...)  
           {
             validObject(.Object)
             return(.Object)
@@ -543,7 +543,7 @@ setMethod("print",
 #' @aliases impute,BNDataset
 setMethod("impute",
           "BNDataset",
-          function(object, k.impute = 10)
+          function(object, k.impute = params@k.impute, params)
           {
             # assumes raw data is ok
             bnstruct.start.log("performing imputation ...")
@@ -558,7 +558,8 @@ setMethod("impute",
 #' @aliases bootstrap,BNDataset
 setMethod("bootstrap",
           "BNDataset",
-          function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
+          function(object, num.boots = params@num.boots, seed = params@seed,
+                   imputation = FALSE, k.impute = params@k.impute, params)
           {
             if (imputation)
               bnstruct.start.log("Generating bootstrap samples with imputation ...")

@@ -1,3 +1,6 @@
+#' @include aaConstants.R
+NULL
+
 setClassUnion("missingOrNumeric", c("missing","numeric"))
 setClassUnion("missingOrLogical", c("missing","logical"))
 setClassUnion("missingOrInteger", c("missing","integer"))
@@ -278,3 +281,82 @@ setClass("InferenceEngine",
 
 ####
 setClassUnion("AllTheClasses", c("BN", "BNDataset", "InferenceEngine"))
+
+
+###############################################################################
+#
+# BNParams class
+#
+###############################################################################
+
+#' BNParams class
+#' 
+#' Contains all of the parameters available for the algorithms contained in the package.
+#' 
+#' @slot ess Equivalent Sample Size value.
+#' @slot alpha confidence threshold (for \code{mmhc} and \code{eocp}).
+#' @slot learning.algo algorithm to use for structure learning: one among \code{mmhc} (Max-min Hill Climbing, default),
+#'         \code{sm} (Silander-Myllymaki) and \code{eocp} (Edge Orientation with candidate parents).
+#' @slot scoring.func scoring function to be used for structure learning: one among \code{BDeu} (default),
+#'         \code{AIC} and \code{BIC}.
+#' @slot max.parents maximum number of parents for each node in the network (a value <0 means "all of the other nodes of the network").
+#' @slot num.boots number of bootstrap samples to generate, if needed.
+#' @slot k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken.
+#' @slot seed random seed.
+#' @slot em_convergence threshold for convergence of the EM algorithm as difference in the CPTs between two successive iterations,
+#'          used as stopping criterion.
+#' @slot sem_convergence threshold for convergence of the SEM algorithm as Structural Hamming Distance between the networks
+#'         computed in two successive iterations, used as stopping criterion.
+#' @slot CPX_PARAM_SCRIND "numeric",
+#' @slot CPX_PARAM_PRELINEAR "numeric",
+#' @slot CPX_PARAM_PREIND "numeric",
+#' @slot CPX_PARAM_MIPCBREDLP "numeric",
+#' @slot CPX_PARAM_MIPSEARCH "numeric",
+#' @slot cplex_presolve_algo "numeric"
+#'
+#' 
+#' @name BNParams-class
+#' @docType class
+#' @rdname BNParams-class
+#' @aliases BNParams,BNParams-class
+#' 
+#' @exportClass BNParams
+setClass("BNParams",
+         representation(
+           ess                  = "numeric",
+           alpha                = "numeric",
+           learning.algo        = "character",
+           scoring.func         = "character",
+           max.parents          = "numeric",
+           num.boots            = "numeric",
+           k.impute             = "numeric",
+           seed                 = "integer",
+           em_convergence       = "numeric",
+           sem_convergence      = "numeric",
+           CPX_PARAM_PRELINEAR  = "integer",
+           CPX_PARAM_SCRIND     = "integer",
+           CPX_PARAM_PREIND     = "integer",
+           CPX_PARAM_MIPCBREDLP = "integer",
+           CPX_PARAM_MIPSEARCH  = "integer",
+           cplex_presolve_algo  = "integer"
+         ),
+         prototype(
+           ess                  = 1,
+           alpha                = 0.05,
+           learning.algo        = "mmhc",
+           scoring.func         = "BDeu",
+           max.parents          = -1,
+           num.boots            = 100,
+           k.impute             = 10,
+           seed                 = 0L,
+           em_convergence       = 0.001,
+           sem_convergence      = 0,
+           CPX_PARAM_PRELINEAR  = 0L,
+           CPX_PARAM_SCRIND     = CPX_ON,
+           CPX_PARAM_PREIND     = CPX_OFF,
+           CPX_PARAM_MIPCBREDLP = CPX_OFF,
+           CPX_PARAM_MIPSEARCH  = CPX_MIPSEARCH_TRADITIONAL,
+           cplex_presolve_algo  = CPX_ALG_NONE
+         )
+        )
+

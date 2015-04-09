@@ -89,7 +89,7 @@
 #' }
 #' 
 #' @exportMethod learn.network
-setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
+setGeneric("learn.network", function(x, ..., params)#dataset, algo="mmhc", scoring.func="BDeu", alpha=0.05, ess=1, bootstrap=FALSE,
                                      #layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                      #layer.struct = NULL,
                                      #cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...)
@@ -108,6 +108,7 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' @param dataset a \code{\link{BNDataset}} object.
 #' @param ess Equivalent Sample Size value.
 #' @param use.imputed.data use imputed data.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return new \code{\link{BN}} object with conditional probabilities.
 #' 
@@ -119,11 +120,11 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' dataset <- BNDataset("file.header", "file.data")
 #' bn <- BN(dataset)
 #' bn <- learn.structure(bn, dataset)
-#' bn <- learn.params(bn, dataset, ess=1)
+#' bn <- learn.params(bn, dataset, ess=1, params)
 #' }
 #' 
 #' @exportMethod learn.params
-setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) standardGeneric("learn.params"))
+setGeneric("learn.params", function(bn, dataset, ess=params@ess, use.imputed.data=F, params) standardGeneric("learn.params"))
 
 
 #' learn the structure of a network.
@@ -162,11 +163,8 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param dataset a \code{\link{BNDataset}}.
 #' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmhc}
 #'        (Max-Min Hill Climbing, default) and \code{sem} (Structural Expectation Maximization).
-#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu}, \code{AIC}, \code{BIC}.
-#' @param initial.network network srtructure to be used as starting point for structure search.
-#'        Can take different values:
-#'        a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
-#'        or the string \code{random.chain} to sample a random chain as starting point.
+#' @param scoring.func the scoring function to use. Currently, one among \code{BDeu} 
+#'        (only for \code{algo == mmhc} or \code{sm}), \code{AIC}, \code{BIC}.
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
@@ -197,15 +195,16 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' mfl <- as.matrix(read.table(header=F,
 #' text='0 1 1 1 1 0 1 1 1 1 0 0 8 7 7 0 0 0 14 6 0 0 0 0 19'))
 #' bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
-#'                       layering=layers, max.fanin.layers=mfl, use.imputed.data=FALSE)
+#'                       layering=layers, max.fanin.layers=mfl, use.imputed.data=FALSE, params)
 #' }
 #' 
 #' @exportMethod learn.structure
-setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", initial.network=NULL,
-                                       alpha=0.05, ess=1, bootstrap=FALSE,
+setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo, initial.network=NULL,
+                                       scoring.func=params@scoring.func, alpha=params@alpha,
+                                       ess=params@ess, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
-                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.structure"))
+                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ..., params) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -671,6 +670,7 @@ setGeneric("read.dataset", function(object, data.file, header.file, data.with.he
 #' @param object the \code{\link{BNDataset}} object.
 #' @param k.impute number of neighbours to be used; for discrete variables we use mode,
 #' for continuous variables the median value is instead taken.
+#' @param params parameters.
 #' 
 #' @examples
 #' \dontrun{
@@ -679,7 +679,7 @@ setGeneric("read.dataset", function(object, data.file, header.file, data.with.he
 #' }
 #' 
 #' @exportMethod impute
-setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
+setGeneric("impute", function(object, k.impute=params@k.impute, params) standardGeneric("impute"))
 
 
 #' Perform bootstrap.
@@ -693,7 +693,9 @@ setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
 #' @param num.boots number of sampled datasets for bootstrap.
 #' @param seed random seed.
 #' @param imputation \code{TRUE} if imputation has to be performed. Default is \code{FALSE}.
-#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables the median value is instead taken (useful only if imputation == TRUE).
+#' @param k.impute number of neighbours to be used; for discrete variables we use mode, for continuous variables
+#' the median value is instead taken (useful only if imputation == TRUE).
+#' @param params parameters.
 #' 
 #' @examples
 #' \dontrun{
@@ -702,7 +704,7 @@ setGeneric("impute", function(object, k.impute=10) standardGeneric("impute"))
 #' }
 #' 
 #' @exportMethod bootstrap
-setGeneric("bootstrap", function(object, num.boots = 100, seed = 0, imputation = FALSE, k.impute = 10)
+setGeneric("bootstrap", function(object, num.boots = params@num.boots, seed = params@seed, imputation = FALSE, k.impute = params@k.impute, params)
                              standardGeneric("bootstrap"))
 
 
@@ -837,20 +839,20 @@ setGeneric("test.updated.bn", function(x) standardGeneric("test.updated.bn"))
 #' @param x an \code{\link{InferenceEngine}}.
 #' @param dataset observed dataset with missing values for the Bayesian Network of \code{x}.
 #' @param threshold threshold for convergence, used as stopping criterion.
-#' @param max.em.iterations maximum number of iterations to run in case of no convergence.
 #' @param ess Equivalent Sample Size value.
+#' @param params a \code{\link{BNParams}} object.
 #' 
 #' @return a list containing: an \code{\link{InferenceEngine}} with a new updated network (\code{"InferenceEngine"}),
 #'         and the imputed dataset (\code{"BNDataset"}).
 #' 
 #' @examples
 #' \dontrun{
-#' em(x, dataset)
+#' em(x, dataset, params)
 #' }
 #' 
 #' @exportMethod em
-setGeneric("em", function(x, dataset, threshold = 0.001,
-                          max.em.iterations = 10, ess = 1) standardGeneric("em"))
+setGeneric("em", function(x, dataset, threshold = params@em_convergence,
+                          max.em.iterations = 10, ess = params@ess, params) standardGeneric("em"))
 
 
 # ' Structural Expectation-Maximization algorithm.
@@ -880,16 +882,19 @@ setGeneric("em", function(x, dataset, threshold = 0.001,
 # ' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 # ' starting the Hill Climbing from an empty graph.
 # ' @param ... further potential arguments for method.
+# ' @param params a \code{\link{BNParams}} object.
 # ' 
 # ' @return a (\code{"BN"}) network with the new structure.
 # ' 
-# exportMethod sem
-setGeneric("sem", function(x, dataset, struct.threshold = 0, param.threshold = 0, max.sem.iterations = 25,
-                           max.em.iterations = 10, scoring.func = "BDeu", initial.network = NULL,
-                           alpha = 0.05, ess = 1, bootstrap = FALSE,
+# export Method sem
+setGeneric("sem", function(x, dataset, struct.threshold = params@sem_convergence, max.sem.iterations = 25,
+                           max.em.iterations = 10,
+                           param.threshold = params@em_convergence, k.impute = params@k.impute, 
+                           algo = params@learning.algo, scoring.func = params@scoring.func,
+                           alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
-                           use.cpc = T, ...) standardGeneric("sem"))
+                           use.cpc = T, ..., params) standardGeneric("sem"))
 
 
 ###############################################################################

@@ -2,10 +2,11 @@
 #' @aliases learn.network,BN
 setMethod("learn.network",
           c("BN"),
-          function(x, y = NULL, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(x, y = NULL, algo = params@learning.algo, scoring.func = params@scoring.func,
+                   initial.network = NULL,
+                   alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ..., params)
           {
             if (is.null(y) || class(y) != "BNDataset")
               stop("A BNDataset must be provided in order to learn a network from it. ",
@@ -25,19 +26,20 @@ setMethod("learn.network",
 #' @aliases learn.network,BNDataset
 setMethod("learn.network",
           c("BNDataset"),
-          function(x, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(x, algo = params@learning.algo, scoring.func = params@scoring.func,
+                   initial.network = NULL,
+                   alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ..., params=params)
           {
             dataset <- x
             bn <- BN(dataset)
             bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ..., params=params)
             
             if (!bootstrap)
-              bn <- learn.params(bn, dataset, ess, use.imputed.data)
+              bn <- learn.params(bn, dataset, ess, use.imputed.data, params=params)
             return(bn)
           })
 
@@ -45,7 +47,7 @@ setMethod("learn.network",
 #' @aliases learn.params,BN,BNDataset
 setMethod("learn.params",
           c("BN", "BNDataset"),
-          function(bn, dataset, ess = 1, use.imputed.data = FALSE)
+          function(bn, dataset, ess = params@ess, use.imputed.data = FALSE, params)
           {
             # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
             # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
@@ -108,8 +110,9 @@ setMethod("learn.params",
 #' @aliases learn.structure,BN,BNDataset
 setMethod("learn.structure",
           c("BN", "BNDataset"),
-          function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+          function(bn, dataset, algo = params@learning.algo, scoring.func = params@scoring.func,
+                   initial.network = NULL,
+                   alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
           {
@@ -236,11 +239,33 @@ setMethod("learn.structure",
                         layering = layering, max.fanin.layers = max.fanin.layers,
                         max.fanin = max.fanin, cont.nodes = cont.nodes,
                         use.imputed.data = use.imputed.data,
-                        use.cpc = use.cpc, ...)
+                        use.cpc = use.cpc, ..., params = params)
               
               bnstruct.end.log("learning using SEM completed.")
             } # end if (algo == sem)
-            
+           
+            if (algo == "eocp")
+            {
+              if (!require(cplexAPI))
+                stop ("This function requires the cplexAPI package")
+
+              if (bootstrap)
+              {
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                  for( i in seq_len(num.boots(dataset)) )
+                  {
+                    data <- get.boot(dataset, i, imputed=!raw.data)
+                    dag <- eocp(data, node.sizes, scoring.func, cont.nodes, alpha, layering, params)
+                    finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                  }
+                wpdag(bn) <- finalPDAG
+              }
+              else
+              {
+                dag(bn) <- eocp(data, node.sizes, scoring.func, cont.nodes, alpha, layering, params)
+              }
+            }
+ 
             if (algo == "mmhc") # default
             {
               bnstruct.start.log("learning the structure using MMHC ...")

@@ -13,7 +13,8 @@ mydata <- asia()
 # mydata <- BNDataset("/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.data",
 #                     "/home/alberto/didattica/tesi/bnstruct/inst/extdata/asia_10000.header",
 #                     starts.from=0)
-net <- learn.network(mydata) #, algo = "sm", scoring.func = "BIC")
+params = BNParams()
+net <- learn.network(mydata, params=params) #, algo = "sm", scoring.func = "BIC")
 # set.name(net) <- "Asia"
 # set.num.nodes(net) <- 8
 # set.node.sizes(net) <- c(2,2,2,2,2,2,2,2)

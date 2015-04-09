@@ -7,10 +7,10 @@
 \alias{learn.params,BN,BNDataset-method}
 \title{learn the parameters of a \link{BN}.}
 \usage{
-learn.params(bn, dataset, ess = 1, use.imputed.data = F)
+learn.params(bn, dataset, ess = params@ess, use.imputed.data = F, params)
 
-\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = 1,
-  use.imputed.data = FALSE)
+\S4method{learn.params}{BN,BNDataset}(bn, dataset, ess = params@ess,
+  use.imputed.data = FALSE, params)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -20,6 +20,8 @@ learn.params(bn, dataset, ess = 1, use.imputed.data = F)
 \item{ess}{Equivalent Sample Size value.}
 
 \item{use.imputed.data}{use imputed data.}
+
+\item{params}{a \code{\link{BNParams}} object.}
 }
 \value{
 new \code{\link{BN}} object with conditional probabilities.
@@ -34,7 +36,7 @@ using MAP (Maximum A Posteriori) estimation.
 dataset <- BNDataset("file.header", "file.data")
 bn <- BN(dataset)
 bn <- learn.structure(bn, dataset)
-bn <- learn.params(bn, dataset, ess=1)
+bn <- learn.params(bn, dataset, ess=1, params)
 }
 }
 \seealso{
