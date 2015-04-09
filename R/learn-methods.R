@@ -16,7 +16,7 @@ setMethod("learn.network",
             dataset <- y
             bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ..., params=params)
             
             if (!bootstrap)
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
@@ -114,7 +114,7 @@ setMethod("learn.structure",
                    initial.network = NULL,
                    alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ..., params)
           {
             
             # setup

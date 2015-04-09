@@ -199,8 +199,8 @@ setGeneric("learn.params", function(bn, dataset, ess=params@ess, use.imputed.dat
 #' }
 #' 
 #' @exportMethod learn.structure
-setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo, initial.network=NULL,
-                                       scoring.func=params@scoring.func, alpha=params@alpha,
+setGeneric("learn.structure", function(bn, dataset, algo=params@learning.algo,
+                                       scoring.func=params@scoring.func, initial.network=NULL, alpha=params@alpha,
                                        ess=params@ess, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
@@ -887,11 +887,11 @@ setGeneric("em", function(x, dataset, threshold = params@em_convergence,
 # ' @return a (\code{"BN"}) network with the new structure.
 # ' 
 # export Method sem
-setGeneric("sem", function(x, dataset, struct.threshold = params@sem_convergence, max.sem.iterations = 25,
+setGeneric("sem", function(x, dataset, struct.threshold = params@sem_convergence,
+                           param.threshold = params@em_convergence, max.sem.iterations = 25,
                            max.em.iterations = 10,
-                           param.threshold = params@em_convergence, k.impute = params@k.impute, 
-                           algo = params@learning.algo, scoring.func = params@scoring.func,
-                           alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
+                           scoring.func = params@scoring.func,
+                           initial.network = NULL, alpha = params@alpha, ess = params@ess, bootstrap = FALSE,
                            layering = c(), max.fanin.layers = NULL,
                            max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
                            use.cpc = T, ..., params) standardGeneric("sem"))
