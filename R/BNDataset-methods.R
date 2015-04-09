@@ -110,22 +110,22 @@ setValidity("BNDataset",
               {
                 retval <- c(retval, "incoherent number of variable statuses")
               }
-              
+                            
               if (object@num.variables > 0 && length(object@node.sizes) == object@num.variables && object@has.raw.data)
               {
                 warn <- c()
                 halt <- c()
                 for (var in 1:object@num.variables)
                 {
-                  if (object@discreteness[var] &&
-                      min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > 1 ||
-                      max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < object@node.sizes[var])
+                  if ( object@discreteness[var] &&
+                      (min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > 1 ||
+                       max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < object@node.sizes[var]))
                   {
                     warn <- c(warn, var)
                   }
-                  if (object@discreteness[var] &&
-                      min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < 1 ||
-                      max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > object@node.sizes[var])
+                  if ( object@discreteness[var] &&
+                      (min(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) < 1 ||
+                       max(object@raw.data[,var][which(!is.na(object@raw.data[,var]))]) > object@node.sizes[var]))
                   {
                     halt <- c(halt, var)
                   }
@@ -147,15 +147,15 @@ setValidity("BNDataset",
                 halt <- c()
                 for (var in 1:object@num.variables)
                 {
-                  if (object@discreteness[var] &&
-                      min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > 1 ||
-                      max(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < object@node.sizes[var])
+                  if ( object@discreteness[var] &&
+                      (min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > 1 ||
+                       max(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < object@node.sizes[var]))
                   {
                     warn <- c(warn, var)
                   }
-                  if (object@discreteness[var] &&
-                      min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < 1 ||
-                      max(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > object@node.sizes[var])
+                  if ( object@discreteness[var] &&
+                      (min(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) < 1 ||
+                       max(object@imputed.data[,var][which(!is.na(object@imputed.data[,var]))]) > object@node.sizes[var]))
                   {
                     halt <- c(halt, var)
                   }
