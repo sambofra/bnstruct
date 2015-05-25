@@ -124,7 +124,7 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'
 #'  
 #' @param data raw data.frame or path/name of the file containing the raw dataset (see 'Details').
-#' @param discreteness a vector of booleans for continuous and discrete variables
+#' @param discreteness a vector of booleans indicating if the variables are discrete or continuous
 #'   (\code{TRUE} and \code{FALSE}, respectively),
 #'   or path/name of the file containing header information for the dataset (discreteness, variable names, cardinality - see 'Details').
 #' @param variables vector of variable names.
