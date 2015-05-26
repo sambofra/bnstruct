@@ -638,7 +638,9 @@ setMethod("sample.dataset",c("BN"),
             return(bnd)
           })
 
-
+#' convert a DAG to a CPDAG
+#' 
+#' @export
 dag.to.cpdag <- function(object, layering = NULL)
 {
   return(abs(label.edges(object, layering)))
