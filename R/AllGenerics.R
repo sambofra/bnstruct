@@ -475,6 +475,22 @@ setGeneric("struct.algo", function(x) standardGeneric("struct.algo"))
 setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 
 
+#' Initialize a WPDAG from a DAG.
+#' 
+#' Given a \code{\link{BN}} object with a \code{dag}, return a network
+#' with its \code{wpdag} set as the CPDAG computed starting from the \code{dag}.
+#' 
+#' @name wpdag.from.dag
+#' @rdname wpdag.from.dag
+#' 
+#' @param x a \code{\link{BN}} object.
+#' 
+#' @return a \code{\link{BN}} object with an initialized \code{wpdag}.
+#' 
+#' @exportMethod wpdag.from.dag
+setGeneric("wpdag.from.dag", function(x) standardGeneric("wpdag.from.dag"))
+
+
 ###############################################################################
 ###############################################################################
 
