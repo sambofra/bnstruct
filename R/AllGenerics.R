@@ -611,6 +611,32 @@ setGeneric("raw.data<-", function(x, value) standardGeneric("raw.data<-"))
 setGeneric("imputed.data<-", function(x, value) standardGeneric("imputed.data<-"))
 
 
+#' Subset a \code{\link{BNDataset}} to get only complete cases.
+#' 
+#' Given a \code{\link{BNDataset}}, return a copy of the original object where
+#' the \code{raw.data} consists only in the observations that do not contain missing values.
+#' 
+#' Non-missingness can be required on a subset of variables (by default, on all variables).
+#' 
+#' If present, imputed data and bootstrap samples are eliminated from the
+#' new \code{\link{BNDataset}}, as using this method *after* using \code{\link{impute}}
+#' or \code{\link{bootstrap}}, there may likely be a loss of correspondence between
+#' the subsetted \code{raw.data} and the previously generated \code{imputed.data}
+#' and \code{bootstrap} samples.
+#' 
+#' @name complete
+#' @rdname complete
+#' 
+#' @param x a \code{\link{BNDataset}}.
+#' @param complete.vars vector containing the indices of the variables to be considered
+#' for the subsetting; variables not included in the vector can still contain \code{NA}s.
+#' 
+#' @return a copy of the original \code{\link{BNDataset}} containing only complete observations.
+#' 
+#' @exportMethod complete
+setGeneric("complete", function(x, complete.vars=seq_len(num.variables(x))) standardGeneric("complete"))
+
+
 #' Read a dataset from file.
 #' 
 #' There are two ways to build a BNDataset: using two files containing respectively header informations
