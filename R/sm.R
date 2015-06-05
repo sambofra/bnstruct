@@ -36,7 +36,11 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	{
 		n.layers <- length(unique(layering))
 		if( is.null(max.fanin.layers) )
-		  max.fanin.layers <- array(max.fanin)
+		{
+      # derive max.fanin.layers from layering
+		  max.fanin.layers <- array(cumsum(table(layering)))
+      max.fanin.layers[1] <- 0 # default, no parents for nodes at layer 1
+		}
 	}
 
   if( ( !is.array(max.fanin.layers) ) || 
