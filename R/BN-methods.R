@@ -174,6 +174,16 @@ setMethod("scoring.func", "BN", function(x) { return(slot(x, "scoring.func")) } 
 #' @rdname struct.algo
 setMethod("struct.algo", "BN", function(x) { return(slot(x, "struct.algo") ) } )
 
+#' @aliases wpdag.from.dag,BN
+#' @rdname wpdag.from.dag
+setMethod("wpdag.from.dag",
+          "BN",
+          function(x) {
+            net <- x
+            wpdag(net) <- dag.to.cpdag(dag(x))
+            return(net)
+          } )
+
 #' @name name<-
 #' @aliases name<-,BN-method
 #' @docType methods

@@ -482,6 +482,27 @@ setReplaceMethod("imputed.data",
                    return(x)
                  })
 
+#' @rdname complete
+#' @aliases complete,BNDataset
+setMethod("complete",
+          "BNDataset",
+          function(x, complete.vars=seq_len(num.variables(x)))
+          {
+            y <- x
+            rd <- raw.data(y)
+            raw.data(y)  <- rd[complete.cases(rd[,complete.vars]),]
+            num.items(y) <- nrow(raw.data(y))
+            slot(y, "imputed.data")      <- matrix(c(0))
+            slot(y, "has.imputed.data")  <- FALSE
+            slot(y, "boots")             <- list(NULL)
+            slot(y, "has.boots")         <- FALSE
+            slot(y, "imp.boots")         <- list(NULL)
+            slot(y, "has.imputed.boots") <- FALSE
+            slot(y, "num.boots")         <- 0
+            validObject(y)
+            return(y)
+          })
+
 
 # redefinition of print() for BNDataset objects
 #' @rdname print
