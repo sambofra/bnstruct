@@ -7,12 +7,14 @@
 \alias{wpdag.from.dag,BN-method}
 \title{Initialize a WPDAG from a DAG.}
 \usage{
-wpdag.from.dag(x)
+wpdag.from.dag(x, layering = layering(x))
 
-\S4method{wpdag.from.dag}{BN}(x)
+\S4method{wpdag.from.dag}{BN}(x, layering = layering(x))
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object.}
+
+\item{layering}{vector containing the layers each node belongs to.}
 }
 \value{
 a \code{\link{BN}} object with an initialized \code{wpdag}.
@@ -20,5 +22,14 @@ a \code{\link{BN}} object with an initialized \code{wpdag}.
 \description{
 Given a \code{\link{BN}} object with a \code{dag}, return a network
 with its \code{wpdag} set as the CPDAG computed starting from the \code{dag}.
+}
+\examples{
+\dontrun{
+net <- learn.network(dataset, layering=layering)
+wp.net <- wpdag.from.dag(net, layering=layering)
+}
+}
+\seealso{
+\code{\link{dag.to.cpdag}}
 }
 

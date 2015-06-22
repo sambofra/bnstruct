@@ -4,9 +4,28 @@
 \alias{dag.to.cpdag}
 \title{convert a DAG to a CPDAG}
 \usage{
-dag.to.cpdag(object, layering = NULL)
+dag.to.cpdag(dag.adj.matrix, layering = NULL)
+}
+\arguments{
+\item{dag.adj.matrix}{the adjacency matrix representing the DAG of a \code{\link{BN}}.}
+
+\item{layering}{vector containing the layers each node belongs to.}
+}
+\value{
+the adjacency matrix representing a CPDAG for the network.
 }
 \description{
-convert a DAG to a CPDAG
+Convert the adjacency matrix representing the DAG of a \code{\link{BN}}
+into the adjacency matrix representing a CPDAG for the network.
+}
+\examples{
+\dontrun{
+net <- learn.network(dataset, layering=layering)
+pdag <- dag.to.cpdag(dag(net), layering)
+wpdag(net) <- pdag
+}
+}
+\seealso{
+\code{\link{wpdag.from.dag}}
 }
 

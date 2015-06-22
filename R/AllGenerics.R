@@ -484,11 +484,20 @@ setGeneric("struct.algo<-", function(x, value) standardGeneric("struct.algo<-"))
 #' @rdname wpdag.from.dag
 #' 
 #' @param x a \code{\link{BN}} object.
+#' @param layering vector containing the layers each node belongs to.
 #' 
 #' @return a \code{\link{BN}} object with an initialized \code{wpdag}.
 #' 
+#' @examples
+#' \dontrun{
+#' net <- learn.network(dataset, layering=layering)
+#' wp.net <- wpdag.from.dag(net, layering)
+#' }
+#' 
+#' @seealso \code{\link{dag.to.cpdag}}
+#' 
 #' @exportMethod wpdag.from.dag
-setGeneric("wpdag.from.dag", function(x) standardGeneric("wpdag.from.dag"))
+setGeneric("wpdag.from.dag", function(x, layering=NULL) standardGeneric("wpdag.from.dag"))
 
 
 ###############################################################################

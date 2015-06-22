@@ -178,9 +178,13 @@ setMethod("struct.algo", "BN", function(x) { return(slot(x, "struct.algo") ) } )
 #' @rdname wpdag.from.dag
 setMethod("wpdag.from.dag",
           "BN",
-          function(x) {
+          function(x, layering=NULL) {
+            if (class(x) != "BN" || class(dag(x)) != "matrix")
+              stop("The first parameter must be a 'BN' object containing a valid adjacency matrix.")
+            if (!any(!is.na(dag(x))))
+              stop("The adjacency matrix of the network must have at least one non-null value.")
             net <- x
-            wpdag(net) <- dag.to.cpdag(dag(x))
+            wpdag(net) <- dag.to.cpdag(dag(x), layering)
             return(net)
           } )
 
@@ -650,10 +654,34 @@ setMethod("sample.dataset",c("BN"),
 
 #' convert a DAG to a CPDAG
 #' 
+#' Convert the adjacency matrix representing the DAG of a \code{\link{BN}}
+#' into the adjacency matrix representing a CPDAG for the network.
+#' 
+#' @name dag.to.cpdag
+#' @rdname dag.to.cpdag
+#' 
+#' @param dag.adj.matrix the adjacency matrix representing the DAG of a \code{\link{BN}}.
+#' @param layering vector containing the layers each node belongs to.
+#' 
+#' @return the adjacency matrix representing a CPDAG for the network.
+#' 
+#' @seealso \code{\link{wpdag.from.dag}}
+#' 
+#' @examples
+#' \dontrun{
+#' net <- learn.network(dataset, layering=layering)
+#' pdag <- dag.to.cpdag(dag(net), layering)
+#' wpdag(net) <- pdag
+#' }
+#' 
 #' @export
-dag.to.cpdag <- function(object, layering = NULL)
+dag.to.cpdag <- function(dag.adj.matrix, layering = NULL)
 {
-  return(abs(label.edges(object, layering)))
+  if (class(dag.adj.matrix) != "matrix")
+    stop("The first parameter must be a 'matrix' representing the adjacency matrix of a network.")
+  if (!any(!is.na(dag.adj.matrix)))
+    stop("The adjacency matrix must have at least one non-null value.")
+  return(abs(label.edges(dag.adj.matrix, layering)))
 }
 
 
