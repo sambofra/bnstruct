@@ -510,7 +510,7 @@ plot.BN <-
           {
             
             # check for Rgraphviz
-            if (!require(Rgraphviz))
+            if (!requireNamespace("Rgraphviz", quietly=T))
               stop("this function requires the Rgraphviz package.")
             
             # adjacency matrix
