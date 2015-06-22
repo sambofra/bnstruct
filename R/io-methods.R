@@ -560,6 +560,9 @@ bnstruct.end.log <- function(...)
 #' 
 #' Reset internal logging methods, e.g. in case of user interruption.
 #' 
+#' @name bnstruct.reset.log
+#' @rdname bnstruct.reset.log
+#' 
 #' @export
 bnstruct.reset.log <- function()
 {
