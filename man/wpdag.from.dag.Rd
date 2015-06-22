@@ -7,9 +7,9 @@
 \alias{wpdag.from.dag,BN-method}
 \title{Initialize a WPDAG from a DAG.}
 \usage{
-wpdag.from.dag(x, layering = layering(x))
+wpdag.from.dag(x, layering = NULL)
 
-\S4method{wpdag.from.dag}{BN}(x, layering = layering(x))
+\S4method{wpdag.from.dag}{BN}(x, layering = NULL)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object.}
@@ -26,7 +26,7 @@ with its \code{wpdag} set as the CPDAG computed starting from the \code{dag}.
 \examples{
 \dontrun{
 net <- learn.network(dataset, layering=layering)
-wp.net <- wpdag.from.dag(net, layering=layering)
+wp.net <- wpdag.from.dag(net, layering)
 }
 }
 \seealso{
