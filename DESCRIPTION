@@ -1,7 +1,7 @@
 Package: bnstruct
-Description: Bayesian Network structure learning from data with missing values
+Description: Bayesian Network Structure Learning from Data with Missing Values
 Type: Package
-Title: Bayesian network structure learning from data with missing values
+Title: Bayesian Network Structure Learning from Data with Missing Values
 Version: 1.0
 Date: 2012-02-13
 Depends:
@@ -14,7 +14,7 @@ Suggests:
     Rgraphviz,
     knitr,
     testthat
-Author: Francesco Sambo
-Maintainer: Francesco Sambo <francesco.sambo@dei.unipd.it>
+Authors@R: c(person("Francesco", "Sambo", role=c("aut","cre"), email="francesco.sambo@dei.unipd.it"),
+             person("Alberto", "Franzin", role=c("aut"), email="afranzin@ulb.ac.be"))
 License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
