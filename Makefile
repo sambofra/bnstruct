@@ -3,6 +3,8 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC := $(shell basename `pwd`)
+WINBUILD_FTP_COMMANDS="user anonymous anonymous\nbinary\ncd R-devel\nput $(PKGNAME)_$(PKGVERS).tar.gz\nquit\n"
+
 
 # all: doc install
 
@@ -45,3 +47,8 @@ check-cran: build
 
 test:
 	Rscript -e "devtools::test()"
+
+winbuild:
+	@echo "Winbuild: http://win-builder.r-project.org/"
+	cd .. && echo $(WINBUILD_FTP_COMMANDS) | ftp -v -p -e -g -i -n win-builder.r-project.org
+
