@@ -58,8 +58,9 @@ setMethod("learn.params",
               data <- as.matrix(imputed.data(dataset))
             else
               data <- as.matrix(raw.data(dataset))
+            
 
-            storage.mode(data) <- "integer"
+            # storage.mode(data) <- "integer"
             
             node.sizes <- node.sizes(bn)
             dag        <- dag(bn)
@@ -68,6 +69,14 @@ setMethod("learn.params",
             
 #             storage.mode(dag) <- "integer"
             storage.mode(node.sizes) <- "integer"
+
+            # quantize data of continuous nodes 
+            cont.nodes <- which(!discreteness(bn))
+            levels <- rep( 0, n.nodes )
+            levels[cont.nodes] <- node.sizes[cont.nodes]
+            
+            # data <- quantize.with.na.matrix( data, levels )
+            data <- quantize.matrix( data, levels )
 
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)
@@ -79,6 +88,7 @@ setMethod("learn.params",
               family <- c( which(dag[,i]!=0), i )
               counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
+              counts <- array(c(counts), c(node.sizes[family]))
               cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )
               dms <- NULL
               dns <- NULL
