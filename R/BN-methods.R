@@ -568,8 +568,7 @@ plot.BN <-
             names(node.fill) <- node.names
             graph::nodeRenderInfo(g) <- list(fill=node.fill)
             
-            #renderGraph(g)
-            Rgraphviz::plot(g)
+            Rgraphviz::renderGraph(g)
           }
 
 # save BN as eps file
