@@ -512,6 +512,8 @@ plot.BN <-
             # check for Rgraphviz
             if (!requireNamespace("Rgraphviz", quietly=T))
               stop("this function requires the Rgraphviz package.")
+            if (!requireNamespace("graph", quietly=T))
+              stop("this function requires the graph package.")
             
             # adjacency matrix
             if (plot.wpdag || (!is.element(1,dag(x)) && length(which(wpdag(x) != 0)) > 0))
@@ -543,10 +545,11 @@ plot.BN <-
             else
               node.names <- as.character(1:num.nodes)
             # build graph
-            g <- graphAM( mat.th, edgemode="directed")
-            nodes(g) <- node.names
-            en <- edgeNames(g,recipEdges="distinct")
-            g <- layoutGraph(g)
+            rownames(mat.th) <- node.names
+            colnames(mat.th) <- node.names
+            g <- new("graphAM", adjMat=mat.th, edgemode="directed")
+            en <- Rgraphviz::edgeNames(g,recipEdges="distinct")
+            g <- Rgraphviz::layoutGraph(g)
             
             # set edge darkness proportional to confidence
             conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
@@ -554,18 +557,19 @@ plot.BN <-
             names(col) <- en
             
             # remove arrowheads from undirected edges
-            ahs <- edgeRenderInfo(g)$arrowhead
-            ats <- edgeRenderInfo(g)$arrowtail
-            dirs <- edgeRenderInfo(g)$direction
+            ahs <- graph::edgeRenderInfo(g)$arrowhead
+            ats <- graph::edgeRenderInfo(g)$arrowtail
+            dirs <- graph::edgeRenderInfo(g)$direction
             ahs[dirs=="both"] <- ats[dirs=="both"] <- "none"
-            edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
+            graph::edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
             
             # node colors
             node.fill <- as.list(node.col)
             names(node.fill) <- node.names
-            nodeRenderInfo(g) <- list(fill=node.fill)
+            graph::nodeRenderInfo(g) <- list(fill=node.fill)
             
-            renderGraph(g)
+            #renderGraph(g)
+            Rgraphviz::plot(g)
           }
 
 # save BN as eps file

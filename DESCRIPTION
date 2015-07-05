@@ -11,6 +11,7 @@ Depends:
     Matrix,
     methods
 Suggests:
+    graph,
     Rgraphviz,
     knitr,
     testthat
