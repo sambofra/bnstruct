@@ -129,3 +129,100 @@ stat.mode <- function(x)
   tab <- tabulate(match(x, ux))
   ux[which(tab == max(tab))]
 }
+
+
+#' tune the parameter k of the knn algorithm used in imputation.
+#' 
+#' @param data a data frame
+#' @param cat.var vector containing the categorical variables
+#' @param k.min minimum value for k
+#' @param k.max maximum value for k
+#' @param frac.miss fraction of missing values to add
+#' @param n.iter number of iterations for each k
+#' 
+#' @return matrix of error distributions
+#' 
+#' @export tune.knn.impute
+tune.knn.impute <- function( data, cat.var = 1:ncol(data), k.min = 1, k.max = 20, frac.miss = 0.1, n.iter = 20, seed = 0 )
+{
+  n.var <- dim(data)[2]
+  num.var <- setdiff(1:n.var,cat.var)
+  num.var.range <- diff(apply(data[,num.var],2,range,na.rm = T,finite=T))
+  
+  storage.mode(data) <- "double"
+  storage.mode(num.var) <- "integer"
+  
+  # results: error distribution for each k
+  err.dist <- matrix(0,n.iter,k.max-k.min+1)
+  err.dist.ref <- rep(0,n.iter)
+  
+  set.seed(seed)
+  
+  # probability of a new missing value for each variable
+  miss.p.var <- frac.miss * colSums(is.na(data)) / (nrow(data) - colSums(is.na(data)))  
+  for ( it in 1:n.iter )
+  {
+    cat("iter:",it,"\n")
+    err.all <- matrix(0,0,k.max-k.min+1)
+    err.ref = c()
+    miss.data <- data
+    # add missingness
+    for ( var in 1:ncol(data) )
+    {
+      nomiss <- which(!is.na(data[,var]))
+      miss.data[ nomiss[ runif(length(nomiss)) < miss.p.var[var] ], var] <- NA
+    }
+    
+    new.na.cases <- (rowSums(is.na(miss.data) &! is.na(data)) > 0)
+    neigh <- rep(0,k.max)
+    
+    # compute neighbours and impute
+    for( i in 1:nrow(miss.data) )
+    {
+      if( new.na.cases[i] )
+      {
+        d <- .Call( "heom_dist", miss.data[i,], miss.data, 
+                    num.var, num.var.range, PACKAGE = "bnstruct" )
+        s <- sort(d, index.return=TRUE)$ix
+        
+        for( j in which(is.na(miss.data[i,]) &!is.na(data[i,])) )
+        {
+          # find the k.max closest neighbours with nonmissing value for j
+          ind.neigh <- 1
+          ind.s <- 2
+          while( ind.neigh < k.max + 1)
+          {
+            if( !is.na(miss.data[s[ind.s],j]) )
+            {
+              neigh[ind.neigh] <- miss.data[s[ind.s],j]
+              ind.neigh <- ind.neigh + 1
+            }
+            ind.s <- ind.s + 1
+          }
+          
+          # compute imputation error with k.min to k.max neighbours,
+          # with HEOM distance
+          err.k <- rep(0,k.max-k.min+1)
+          for( k in k.min:k.max )
+          {
+            if( j %in% cat.var )
+              err.k[k-k.min+1] <- (stat.mode.ord(neigh[1:k]) != data[i,j])
+            else
+              err.k[k-k.min+1] <- abs(median(neigh[1:k]) - data[i,j]) /
+              num.var.range[num.var==j]
+          }
+          if( j %in% cat.var )
+            err.ref <- c(err.ref,stat.mode.ord(miss.data[
+              !is.na(miss.data[,j]),j]) != data[i,j])
+          else err.ref <- c(err.ref,
+                            abs(median(miss.data[,j],na.rm=T) - data[i,j]) / 
+                              num.var.range[num.var==j])
+          # add to results
+          err.all <- rbind(err.all, err.k)
+        }
+      }
+    }
+    err.dist[it,] <- colMeans(err.all)
+  }
+  return(err.dist)
+}
