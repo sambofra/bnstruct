@@ -19,6 +19,8 @@ tune.knn.impute(data, cat.var = 1:ncol(data), k.min = 1, k.max = 20,
 \item{frac.miss}{fraction of missing values to add}
 
 \item{n.iter}{number of iterations for each k}
+
+\item{seed}{random seed}
 }
 \value{
 matrix of error distributions
