@@ -212,15 +212,16 @@ SEXP compute_counts_nas( SEXP data, SEXP node_sizes )
 	
 	// precomputed here for speed
 	int strides[n_nodes];
-	for( i = 0; i < n_nodes; i++ )
+	for( i = 0; i < n_nodes; i++ ){
 		strides[i] = i * n_cases;
+	}
 	
 	// allocate output
 	SEXP result;
 	PROTECT( result = allocVector(REALSXP, cum_prod_sizes[n_nodes]) );
 	double * counts = REAL(result);
 	memset( counts, 0, sizeof(double) * cum_prod_sizes[n_nodes] );
-	setAttrib(result, R_DimSymbol, node_sizes);
+  //setAttrib(result, R_DimSymbol, node_sizes);
 	
 	for( i = 0; i < n_cases; i++ )
 	{
