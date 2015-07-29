@@ -203,6 +203,10 @@ setMethod("learn.structure",
               tabu.tenure <- as.numeric(other.args$tabu.tenure)
             else
               tabu.tenure <- 100
+            if ("seed" %in% names(other.args))
+              set.seed(as.numeric(other.args$seed))
+            else
+              set.seed(0)
             
             #if ("struct.threshold" %in% names(other.args))
               #struct.threshold <- as.numeric(other.args$struct.threshold)
