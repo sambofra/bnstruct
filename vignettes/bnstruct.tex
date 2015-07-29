@@ -172,8 +172,17 @@ updated according to the new knowledge. Inference answers questions like ``How d
 $Y$ change, given that variable $X$ is taking value $x\prime$?''.
 
 \section{Installation}
+The latest stable version of the package is available on CRAN \url{https://cran.r-project.org},
+and can therefore be installed from an R session using
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlkwd{install.packages}\hlstd{(}\hlstr{"bnstruct"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
-The latest version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
+The latest development version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
 
 In order to install the package, it suffices to open a shell and run
 \begin{knitrout}
@@ -185,19 +194,6 @@ make install
 \end{alltt}
 \end{kframe}
 \end{knitrout}
-
-Being hosted on GitHub, it is also possible to use the \texttt{install\_github} tool from
-an R session:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{> }\hlkwd{library}\hlstd{(}\hlstr{"devtools"}\hlstd{)}
-\hlstd{> }\hlkwd{install_github}\hlstd{(}\hlstr{"sambofra/bnstruct"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-For Windows platforms, a binary executable will be provided.
 
 \Rpackage{bnstruct} requires R $\geq 2.10$,
 and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
@@ -356,8 +352,9 @@ We provide the \Rmethod{impute} function to perform imputation.
 \end{knitrout}
 
 Imputation is accomplished with the k-Nearest Neighbour algorithm. The number of neighbours to be used
-can be chosen specifying the \Rfunarg{k.impute} parameter (default is \Rfunarg{k.impute = 10}).
-
+can be chosen specifying the \Rfunarg{k.impute} parameter (default is \Rfunarg{k.impute = 10}). Given that
+the parameter is highly dataset-dependant, we also include the \Rmethod{tune.knn.impute} function to assist
+the user while choosing the best value for \Rfunarg{k}.
 
 \subsection{Bootstrap}
 \Robject{BNDataset} objects have also room for bootstrap samples (\citet{efron1994introduction}), i.e. random samples with replacement of the original data
@@ -516,6 +513,25 @@ NULL
 \end{kframe}
 \end{knitrout}
 
+Complete cases of the raw dataset, that is, rows that have no missing data, can be selected with the \Rmethod{complete} method. Please note that this method returns a new copy of the original
+\Robject{BNDataset} with no imputed data or bootstrap samples (if previously generated), as it
+is not possible to ensure consistence among data.
+It is possible to restrict the completeness requirement only to a subset of variables.
+
+By default, learning operations on the raw dataset operate with available cases.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlstd{complete.subset} \hlkwb{<-} \hlkwd{complete}\hlstd{(dataset)}
+\hlstd{> }
+\hlstd{> }\hlcom{# require completeness only on a subset of variables}
+\hlstd{> }\hlstd{complete.subset} \hlkwb{<-} \hlkwd{complete}\hlstd{(dataset,} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{7}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
 In order to retrieve bootstrap samples, one can use the \Rmethod{boots} and \Rmethod{imp.boots} methods for samples
 made of raw and imputed data. The presence of raw and imputed samples can be tested using \Rmethod{has.boots} and \Rmethod{has.imputed.boots}.
 Trying to access a non-existent sample (e.g. imputed sample when no imputation has been performed,
@@ -638,18 +654,36 @@ done using the \texttt{initial.network} argument, which accepts three kinds of i
 \item the string \texttt{random.chain} for starting from a randomly sampled chain-like network.
 \end{itemize}
 
+In order to obtain reproducible results, in case a random chain is used it is possible to provide an
+initial random seed.
+
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{> }\hlstd{dataset} \hlkwb{<-} \hlkwd{child}\hlstd{()}
 \hlstd{> }\hlstd{net.1}   \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,}
-\hlstd{+ }                         \hlkwc{initial.network} \hlstd{=} \hlstr{"random.chain"}\hlstd{)}
+\hlstd{+ }                         \hlkwc{initial.network} \hlstd{=} \hlstr{"random.chain"}\hlstd{,}
+\hlstd{+ }                         \hlkwc{seed} \hlstd{=} \hlnum{12345}\hlstd{)}
 \hlstd{> }\hlstd{net.2}   \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,}
 \hlstd{+ }                         \hlkwc{algo} \hlstd{=} \hlstr{"sem"}\hlstd{,}
 \hlstd{+ }                         \hlkwc{initial.network} \hlstd{= net.1)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
+Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
+Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
+
+In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlstd{layers} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{4}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{5}\hlstd{)}
+\hlstd{> }\hlstd{net.layer} \hlkwb{<-} \hlkwd{learn.network}\hlstd{(dataset,} \hlkwc{layering} \hlstd{= layers)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
 
 The structure learning task by default computes the structure as a DAG. We can however use
 bootstrap samples to learn what we call a \textit{weighted partially DAG}, in order to get a weighted confidence on the presence or
@@ -677,6 +711,8 @@ method a \Robject{BNDataset} with bootstrap samples, and the additional paramete
 
 Structure learning can be performed also using the \Rmethod{learn.structure} method, which has a similar syntax, only requiring as
 first parameter an already initialized network for the dataset. More details can be found in the inline helper.
+
+It is also possible to learn a WPDAG starting from a network with a DAG, using the \Rmethod{wpdag.from.dag} method.
 
 \subsubsection{Parameter learning}
 Parameter learning is the operation that learns the conditional probabilities entailed by a network,
@@ -708,8 +744,8 @@ Once a network is created, it can be used. Here we briefly mention some of the b
 manipulate a network and access its components.
 
 First of all, it is surely of interest to obtain the structure of a network. The \Rpackage{bnstruct} package
-provides the \Rmethod{dag()} and \Rmethod{wpdag()} methods in order to access the structure of a network learnt without and
-with bootstrap (respectively).
+provides the \Rmethod{dag()} and \Rmethod{wpdag()} methods in order to access the structure of 
+a network learnt without and with bootstrap (respectively).
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -883,7 +919,7 @@ the \texttt{sem-BDeu} pair.
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: scoring function not recognized, using BDeu\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: learning the structure using SEM ...\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: starting EM algorithm ...\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... ... bnstruct :: learning network parameters ... \\... ... bnstruct :: parameter learning done.\\... bnstruct :: EM algorithm completed.\\... bnstruct :: learning the structure using MMHC ...\\... bnstruct :: learning using MMHC completed.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: learning using SEM completed.\\bnstruct :: learning network parameters ... \\bnstruct :: parameter learning done.}}\begin{alltt}
 \hlstd{> }\hlkwd{plot}\hlstd{(net)}
 \end{alltt}
 \end{kframe}
@@ -896,7 +932,7 @@ the \texttt{sem-BDeu} pair.
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{bnstruct :: starting EM algorithm ...\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\... bnstruct :: learning network parameters ... \\... bnstruct :: parameter learning done.\\bnstruct :: EM algorithm completed.}}\begin{alltt}
 \hlstd{> }\hlstd{updated.engine}  \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{InferenceEngine}
 \hlstd{> }\hlstd{updated.dataset} \hlkwb{<-} \hlstd{results}\hlopt{$}\hlstd{BNDataset}
 \end{alltt}
