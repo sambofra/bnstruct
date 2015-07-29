@@ -139,6 +139,7 @@ stat.mode <- function(x)
 #' @param k.max maximum value for k
 #' @param frac.miss fraction of missing values to add
 #' @param n.iter number of iterations for each k
+#' @param seed random seed
 #' 
 #' @return matrix of error distributions
 #' 

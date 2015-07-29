@@ -93,7 +93,7 @@ child <- function()
 #' 
 #' @usage show(object)
 #' 
-#' @export
+#' @exportMethod show
 setMethod("show", "AllTheClasses", function(object) print(object))
 
 

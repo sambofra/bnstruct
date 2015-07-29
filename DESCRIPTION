@@ -12,9 +12,10 @@ Date: 2012-02-13
 Depends:
     R (>= 2.10),
     bitops,
-    igraph,
     Matrix,
     methods
+Imports:
+    igraph
 Suggests:
     graph,
     Rgraphviz,
