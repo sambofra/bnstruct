@@ -556,14 +556,6 @@ bnstruct.end.log <- function(...)
   bnstruct.log(...)
 }
 
-#' reset internal logging methods
-#' 
-#' Reset internal logging methods, e.g. in case of user interruption.
-#' 
-#' @name bnstruct.reset.log
-#' @rdname bnstruct.reset.log
-#' 
-#' @export
 bnstruct.reset.log <- function()
 {
   assign("bnstruct.log.indent.tracker", 0, envir = .bnstruct.env)

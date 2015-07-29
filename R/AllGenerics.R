@@ -60,10 +60,11 @@
 #' @param alpha confidence threshold (only for \code{mmhc}).
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
-#' @param layering vector containing the layers each node belongs to (only for \code{sm}).
+#' @param layering vector containing the layers each node belongs to.
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
+#' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset

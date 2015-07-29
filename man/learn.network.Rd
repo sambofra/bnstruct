@@ -50,13 +50,14 @@ or the string \code{random.chain} to sample a random chain as starting point.}
 
 \item{bootstrap}{\code{TRUE} to use bootstrap samples.}
 
-\item{layering}{vector containing the layers each node belongs to (only for \code{sm}).}
+\item{layering}{vector containing the layers each node belongs to.}
 
 \item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm}).}
 
 \item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
 
-\item{layer.struct}{prior knowledge for layering structure (only for \code{mmhc}).}
+\item{layer.struct}{\code{0/1} matrix for indicating which layers can contain parent nodes
+for nodes in a layer (only for \code{mmhc}).}
 
 \item{cont.nodes}{vector containing the index of continuous variables.}
 
