@@ -43,6 +43,7 @@ setMethod("learn.network",
 
 #' @rdname learn.params
 #' @aliases learn.params,BN,BNDataset
+#' @importFrom stats complete.cases median pchisq quantile runif
 setMethod("learn.params",
           c("BN", "BNDataset"),
           function(bn, dataset, ess = 1, use.imputed.data = FALSE)

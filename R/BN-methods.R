@@ -498,6 +498,8 @@ setMethod("print",
 #' @param node.col list of (\code{R}) colors for the nodes.
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' 
+#' @importFrom graphics plot
+#' @importFrom grDevices colors dev.off postscript
 #' 
 #' @name plot
 #' @aliases plot,BN plot.BN,BN

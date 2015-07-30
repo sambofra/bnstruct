@@ -4,7 +4,7 @@ Description: Bayesian Network Structure Learning from Data with Missing Values.
     the Max-Min Hill-climbing heuristic search, and the Structural
     Expectation-Maximization algorithm. Available scoring functions are
     BDeu, AIC, BIC. The package also implements methods for generating and using
-    boostrap samples, imputed data, inference.
+    bootstrap samples, imputed data, inference.
 Type: Package
 Title: Bayesian Network Structure Learning from Data with Missing Values
 Version: 1.0

@@ -1,5 +1,6 @@
 #' @rdname read.dataset
 #' @aliases read.dataset,BNDataset,character,character
+#' @importFrom utils data read.delim
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, data.file, header.file, data.with.header = FALSE,
