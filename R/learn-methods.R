@@ -36,7 +36,7 @@ setMethod("learn.network",
                                   bootstrap, layering, max.fanin.layers, max.fanin,
                                   layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
             
-            if (!bootstrap)
+            if (!bootstrap && algo != "mmpc")
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
@@ -51,6 +51,11 @@ setMethod("learn.params",
             # Learn the CPTs of each node, given data, DAG, node sizes and equivalent sample size
             # CPTs have the parents on dimensions 1:(n-1) and the child on the last dimension,
             # so that the sum over the last dimension is always 1
+            
+            if (struct.algo(bn) == "mmpc") {
+              bnstruct.start.log("no parameter learning possible for network learnt using the MMPC algorithm")
+              return(bn)
+            }
 
             bnstruct.start.log("learning network parameters ... ")
             
@@ -175,6 +180,13 @@ setMethod("learn.structure",
             }
             scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
             
+            algo <- tolower(algo)
+            if (!algo %in% c("sm", "mmhc", "sem", "mmpc", "hc")) {
+              bnstruct.log("structure learning algorithm not recognized, using MMHC")
+              bnstruct.log("(available options are: SM, MMHC, MMPC, HC, SEM)")
+              algo <- "mmhc"
+            }
+            
             # get initial.network
             if (!is.null(initial.network))
             {
@@ -255,6 +267,72 @@ setMethod("learn.structure",
               
               bnstruct.end.log("learning using SEM completed.")
             } # end if (algo == sem)
+            
+            # could be done just by changing some parameters and leaving it to
+            # mmhc, but as we have the log messages I prefer to avoid confusion
+            #
+            # I assume the following settings, otherwise it makes little sense, so I ignore them:
+            # - use.cpc = TRUE
+            # - init.net = NULL
+            #
+            # Doubt: I save the non-dag in wpdag(bn), is this ok?
+            # Saving in dag() gould cause problems in case of loops.
+            # Shall we assume the users know what they're doing?
+            if (algo == "mmpc")
+            {
+              bnstruct.start.log("learning the structure using MMPC ...")
+              
+              if (bootstrap)
+              {
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                for( i in seq_len(num.boots(dataset)) )
+                {
+                  data <- boot(dataset, i, use.imputed.data=use.imputed.data)
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  finalPDAG <- finalPDAG + cpc
+                }
+                wpdag(bn) <- finalPDAG
+              }
+              else
+              {
+                cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                wpdag(bn) <- cpc
+              }
+              bnstruct.end.log("learning using MMPC completed.")
+            } # end if algo == mmpc
+            
+            # same here.
+            # use.cpc = FALSE
+            if (algo == "hc")
+            {
+              bnstruct.start.log("learning the structure using HC ...")
+              
+              if (!is.null(init.net))
+                in.dag <- dag(init.net)
+              else
+                in.dag <- NULL
+              
+              if (bootstrap)
+              {
+                finalPDAG <- matrix(0,num.nodes,num.nodes)
+                for( i in seq_len(num.boots(dataset)) )
+                {
+                  data <- boot(dataset, i, use.imputed.data=use.imputed.data)
+                  cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                  dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                             tabu.tenure = tabu.tenure, init.net = in.dag)
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                }
+                wpdag(bn) <- finalPDAG
+              }
+              else
+              {
+                cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
+                               tabu.tenure = tabu.tenure, init.net = in.dag )
+              }
+              bnstruct.end.log("learning using HC completed.")
+            } # end if algo == hc
             
             if (algo == "mmhc") # default
             {
