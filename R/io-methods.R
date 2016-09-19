@@ -527,6 +527,170 @@ setMethod("write.dsc","BN",
             write(rows, file=file.name)
           })
 
+#' @rdname write.xgmml
+#' @aliases write.xgmml,BN
+setMethod("write.xgmml","BN",
+          function(x, filename="./", write.wpdag=FALSE, node.col = rep('white',num.nodes(x)),
+                   frac = 0.2, max.weight=max(wpdag(x)))
+          {
+            
+            get.color.code <- function(colorname) {
+              rgbcode <- col2rgb(colorname)
+              return(rgb(rgbcode[1], rgbcode[2], rgbcode[3], maxColorValue=255))
+            }
+            
+            weight.color.hex <- function(weight) {
+              weight <- 255 - weight
+              return(rgb(weight, weight, weight, maxColorValue=255))
+            }
+            
+            file.name <- strcat(filename, ".xgmml")
+            rows      <- NULL
+            rows[[1]] <- "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+            rows[[2]] <- "<graph label=\"Network\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:cy=\"http://www.cytoscape.org\" xmlns=\"http://www.cs.rpi.edu/XGMML\"  directed=\"1\">"
+            rows[[3]] <- "<att name=\"documentVersion\" value=\"1.1\"/>"
+            k         <- 4
+            
+            if (write.wpdag) {
+              g <- wpdag(x)
+              if (is.null(g))
+                bnstruct.log("error: no wpdag to be saved")
+              g <- g / max.weight
+              g[which(g < frac)] <- 0
+              g <- g * 255 # rescale for color
+            } else {
+              g <- dag(x)
+              if (is.null(g))
+                bnstruct.log("error: no dag to be saved")
+            }
+            
+            num.nodes  <- num.nodes(x)
+            
+            # pass through an igraph to get the coordinates
+            # otherwise cytoscape will put every node in the same place...
+            ig.obj <- igraph::graph_from_adjacency_matrix(g)
+            coords <- layout_nicely(ig.obj) * 3 * num.nodes # also, rescale
+            # coords <- layout_with_graphopt(ig.obj) * 3 * num.nodes # also, rescale
+            
+            for (node in 1:num.nodes)
+            {
+              rows[[k]] <- strcat("<node label=\"", variables(x)[node], "\" id=\"",node,"\">")
+              k <- k+1
+              s <- strcat("    <att type=\"string\" name=\"NODE_TYPE\" value=\"DefaultNode\"/>")
+              rows[[k]]   <- s
+              s           <- strcat("    <att type=\"string\" name=\"canonicalName\" value=\"",variables(x)[node],"\"/>")
+              rows[[k+1]] <- s
+              k           <- k+2
+              rows[[k]]   <- strcat("    <graphics type=\"ELLIPSE\" h=\"40.0\" w=\"40.0\" x=\"",coords[node,1],
+                                    "\" y=\"",coords[node,2],"\" fill=\"",get.color.code(node.col[node]),
+                                    "\" width=\"1\" outline=\"#666666\" cy:nodeTransparency=\"1.0\" cy:nodeLabel=\"",
+                                    variables(x)[node],"\" cy:borderLineType=\"solid\"/>")
+              k           <- k+1
+              rows[[k]]   <- "</node>"
+              k           <- k+1
+            }
+            
+            edge.counter <- 1
+            for (i in 1:(num.nodes-1)) {
+              for (j in (i+1):num.nodes) {
+                # undirected edge
+                if (g[i,j] > 0 && g[j,i] > 0) {
+                  rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"0\">")
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"shared interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"canonicalName\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"edge.targetArrowShape\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"edge.sourceArrowShape\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- strcat("  <att name=\"name\" value=\"",i,"-",j,"\" type=\"string\" cy:type=\"String\"/>")
+                  k         <- k + 1
+                  rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                  k         <- k + 1
+                  rows[[k]] <- strcat("  <att name=\"edge.color\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                  k         <- k + 1
+                  rows[[k]] <- strcat("  <att name=\"edge.targetArrowColor\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                  k         <- k + 1
+                  rows[[k]] <- strcat("  <att name=\"edge.sourceArrowColor\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                  k         <- k + 1
+                  rows[[k]] <- "</edge>"
+                  k         <- k + 1
+                  edge.counter <- edge.counter + 1
+                  edge.counter <- edge.counter + 1
+                } else if (g[i,j] > 0 || g[j,i] > 0) { # directed edge
+                  if (g[i,j] > 0 && g[j,i] == 0) {
+                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"1\">")
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"shared interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"canonicalName\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"edge.targetArrowShape\" value=\"DELTA\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"edge.sourceArrowShape\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"name\" value=\"",i,"-",j,"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.color\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.targetArrowColor\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.sourceArrowColor\" value=\"",weight.color.hex(g[i,j]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- "</edge>"
+                    k         <- k + 1
+                    edge.counter <- edge.counter + 1
+                  } else if (g[j,i] > 0 && g[i,j] == 0) {
+                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",j,"\" target=\"",i,"\" cy:directed=\"1\">")
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"shared interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"canonicalName\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"edge.targetArrowShape\" value=\"DELTA\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"edge.sourceArrowShape\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"name\" value=\"",j,"-",i,"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.color\" value=\"",weight.color.hex(g[j,i]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.targetArrowColor\" value=\"",weight.color.hex(g[j,i]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- strcat("  <att name=\"edge.sourceArrowColor\" value=\"",weight.color.hex(g[j,i]),"\" type=\"string\" cy:type=\"String\"/>")
+                    k         <- k + 1
+                    rows[[k]] <- "</edge>"
+                    k         <- k + 1
+                    edge.counter <- edge.counter + 1
+                  }
+                }
+              }
+            }
+            
+            rows[[k]] <- "</graph>"
+            k         <- k + 1
+            # print(rows)
+            write(rows, file=file.name)
+          })
+
 
 # output log messages
 bnstruct.log <- function(...)

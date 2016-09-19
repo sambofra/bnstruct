@@ -448,6 +448,28 @@ setGeneric("read.net", function(x) standardGeneric("read.net"))
 setGeneric("write.dsc", function(x, path="./") standardGeneric("write.dsc"))
 
 
+#' Write a network saving it in an \code{XGMML} file.
+#' 
+#' Write a network on disk, saving it in an \code{XGMML} file,
+#' for importing it in Cytoscape.
+#' 
+#' @name write.xgmml
+#' @rdname write.xgmml
+#' 
+#' @param x the \code{\link{BN}} object.
+#' @param filename file name (with relative or absolute path) to be written.
+#' @param write.wpdag write the weighted PDAG computed using bootstrap samples or the MMPC 
+#' structure algorithm, instead of the normaldag (default FALSE).
+#' @param node.col vector of colors for each node of the network (in R colornames).
+#' @param frac frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).
+#' @param max.weight maximum possible weight of an edge (used in case of \code{write.wpdag=TRUE}).
+#' 
+#' @exportMethod write.xgmml
+setGeneric("write.xgmml", function(x, filename="./", write.wpdag=FALSE,
+                                   node.col=rep("white",num.nodes(x)), frac=0.2,
+                                   max.weight=max(wpdag(x))) standardGeneric("write.xgmml"))
+
+
 #' Read the scoring function used to learn the structure of a network.
 #' 
 #' Read the scoring function used in the \code{\link{learn.structure}} method.
