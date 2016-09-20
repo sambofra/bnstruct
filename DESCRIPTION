@@ -1,7 +1,8 @@
 Package: bnstruct
 Description: Bayesian Network Structure Learning from Data with Missing Values.
     The package implements the Silander-Myllymaki complete search,
-    the Max-Min Hill-climbing heuristic search, and the Structural
+    the Max-Min Parents-and-Children, the Hill-Climbing, the
+    Max-Min Hill-climbing heuristic searches, and the Structural
     Expectation-Maximization algorithm. Available scoring functions are
     BDeu, AIC, BIC. The package also implements methods for generating and using
     bootstrap samples, imputed data, inference.
@@ -25,3 +26,4 @@ Authors@R: c(person("Francesco", "Sambo", role=c("aut","cre"), email="francesco.
              person("Alberto", "Franzin", role=c("aut"), email="afranzin@ulb.ac.be"))
 License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
+RoxygenNote: 5.0.1
