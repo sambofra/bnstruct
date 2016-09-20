@@ -593,7 +593,13 @@ setMethod("save.to.eps",
 #' @rdname sample.row
 #' @aliases sample.row,BN
 setMethod("sample.row", "BN",
-          function(x){
+          function(x, mar=0){
+            
+            if (mar < 0 || mar > 1) {
+              bnstruct.log("warning: non-admissible value for mar, set to 0")
+              mar <- 0
+            }
+            
             bn   <- x
             dag  <- dag(bn)
             cpts <- cpts(bn)
@@ -634,6 +640,11 @@ setMethod("sample.row", "BN",
                 mpv[node] <- sample(1:node.sizes[node], 1, replace=T, prob=cpt)
               }
             }
+            
+            if (mar > 0) {            
+              missing.prob <- runif(num.nodes, 0, 1)
+              mpv[which(missing.prob < mar)] <- NA
+            }
                 
             return(mpv)
           })
@@ -642,13 +653,18 @@ setMethod("sample.row", "BN",
 #' @rdname sample.dataset
 #' @aliases sample.dataset,BN
 setMethod("sample.dataset",c("BN"),
-          function(x, n = 100)
+          function(x, n = 100, mar=0)
           {
+            if (mar < 0 || mar > 1) {
+              bnstruct.log("warning: non-admissible value for mar, set to 0")
+              mar <- 0
+            }
+            
             num.nodes <- num.nodes(x)          
             obs <- matrix(rep(0, num.nodes * n), nrow = n, ncol = num.nodes)
             
             for (i in 1:n)
-              obs[i,] <- sample.row(x)
+              obs[i,] <- sample.row(x, mar)
             
             storage.mode(obs) <- "integer"
             

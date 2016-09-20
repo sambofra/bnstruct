@@ -300,11 +300,13 @@ setGeneric("get.most.probable.values", function(x) standardGeneric("get.most.pro
 #' @rdname sample.row
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
+#' @param mar fraction [0,1] of missing values in the sampled vector 
+#' (missing at random), default value is 0 (no missing values).
 #' 
 #' @return a vector of values.
 #' 
 #' @exportMethod sample.row
-setGeneric("sample.row", function(x) standardGeneric("sample.row"))
+setGeneric("sample.row", function(x, mar=0) standardGeneric("sample.row"))
 
 
 #' sample a \code{\link{BNDataset}} from a network of an inference engine.
@@ -314,11 +316,13 @@ setGeneric("sample.row", function(x) standardGeneric("sample.row"))
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
 #' @param n number of items to sample.
+#' @param mar fraction [0,1]  of missing values in the sampled dataset 
+#' (missing at random), default value is 0 (no missing values).
 #' 
 #' @return a \code{\link{BNDataset}}
 #' 
 #' @exportMethod sample.dataset
-setGeneric("sample.dataset", function(x, n=100) standardGeneric("sample.dataset"))
+setGeneric("sample.dataset", function(x, n=100, mar=0) standardGeneric("sample.dataset"))
 
 
 #' compute the list of inferred marginals of a BN.

@@ -7,12 +7,15 @@
 \alias{sample.row,BN-method}
 \title{sample a row vector of values for a network.}
 \usage{
-sample.row(x)
+sample.row(x, mar = 0)
 
-\S4method{sample.row}{BN}(x)
+\S4method{sample.row}{BN}(x, mar = 0)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} or \code{\link{InferenceEngine}} object.}
+
+\item{mar}{fraction [0,1] of missing values in the sampled vector 
+(missing at random), default value is 0 (no missing values).}
 }
 \value{
 a vector of values.
