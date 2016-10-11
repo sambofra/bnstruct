@@ -8,7 +8,7 @@
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
 \method{plot}{BN}(x, ..., use.node.names = TRUE, frac = 0.2,
-  max.weight = max(dag(x)), node.col = rep("white", nun.nodes(x)),
+  max.weight = max(dag(x)), node.col = rep("white", num.nodes(x)),
   plot.wpdag = FALSE)
 }
 \arguments{
