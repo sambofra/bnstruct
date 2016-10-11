@@ -604,7 +604,7 @@ learning has been performed using bootstrap -- more on this later).
 Here we briefly describe the two tasks performed by the method, along with the main options.
 
 \subsubsection{Structure learning}
-We provide three algorithms in order to learn the structure of the network, that can be chosen with the \texttt{algo} parameter.
+We provide five algorithms to learn the structure of the network, that can be chosen with the \texttt{algo} parameter.
 The first is the Silander-Myllym\"aki (\texttt{sm})
 exact search-and-score algorithm (see \citet*{silander2012simple}), that performs a complete evaluation of the search space in order to discover
 the best network; this algorithm may take a very long time, and can be inapplicable when discovering networks
@@ -612,13 +612,21 @@ with more than 25--30 nodes. Even for small networks, users are strongly encoura
 meaningful parameters such as the layering of the nodes, or the maximum number of parents -- refer to the 
 documentation in package manual for more details on the method parameters.
 
-The second algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\texttt{mmhc}, see \citet*{tsamardinos2006max}), that performs a statistical
-sieving of the search space followed by a greedy evaluation. It is considerably faster than the complete method, at the cost of a (likely)
-lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
-of the search space may take a long time. Also for this algorithm there are parameters that may need to be tuned,
-mainly the confidence threshold of the statistical pruning.
+The second algorithm is the Max-Min Parent-and-Children (\texttt{mmpc}, see \citet*{tsamardinos2006max}), a
+constraint-based heuristic approach that discovers the \emph{skeleton} of the network, that is, the set of edges
+connecting the variables without discovering their directionality.
 
-The third method is the Structural Expectation-Maximization (\texttt{sem}) algorithm (\citet{friedman1997learning,friedman1998bayesian}),
+Another heuristic algorithm included is a Hill Climbing method (\texttt{hc}, see \citet*{tsamardinos2006max}).
+
+The fourth algorithm (and the default one) is the Max-Min Hill-Climbing heuristic (\texttt{mmhc}, \citet*{tsamardinos2006max}),
+based on the combination of the previous two algorithms, that performs a statistical
+sieving of the search space followed by a greedy evaluation. 
+
+The heuristic algorithms provided are considerably faster than the complete method, at the cost of a (likely)
+lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
+of the search space may take a long time. Also for these algorithms there are parameters that may need to be tuned.
+
+The last method is the Structural Expectation-Maximization (\texttt{sem}) algorithm (\citet{friedman1997learning,friedman1998bayesian}),
 for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
 the holes in the dataset) and structure learning from the guessed dataset, until convergence. The structure learning used inside SEM,
 due to computational reasons, is MMHC. Convergence of SEM can be controlled with the parameters \Rfunarg{struct.threshold},
@@ -673,6 +681,8 @@ initial random seed.
 
 Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
 Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
+Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
+where each time frame can be associated to a layer.
 
 In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
 \begin{knitrout}
@@ -713,6 +723,28 @@ Structure learning can be performed also using the \Rmethod{learn.structure} met
 first parameter an already initialized network for the dataset. More details can be found in the inline helper.
 
 It is also possible to learn a WPDAG starting from a network with a DAG, using the \Rmethod{wpdag.from.dag} method.
+
+\subsubsection{Empirical evaluation of structure learning algorithms}
+\begin{figure}[!tpb]%figure1
+\centerline{\includegraphics[width=0.75\textwidth]{figure/child_crosses_1000.eps}}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network}\label{fig:childcrosses}
+%\end{figure}
+
+%\begin{figure}[!tpb]%figure2
+\centerline{\includegraphics[width=0.75\textwidth]{figure/alarm_crosses_1000.eps}}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network}\label{fig:alarmcrosses}
+\end{figure}
+
+\begin{figure}[!tpb]%figure3
+\centerline{\includegraphics[width=0.75\textwidth]{figure/hepar2_crosses_1000.eps}}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network}\label{fig:hepar2crosses}
+\end{figure}
+
+In this Section we show the results obtained by MMHC on available cases, MMHC on imputed data and SEM, with the BDeu and BIC scoring functions. Our testbed is composed by three networks available in the literature, Child (20 nodes), Alarm (37 nodes) and Hepar2 (70 nodes). For each network we consider 20 datasets of 1000 observations each, with 20\% missingness. The results for the three networks are reported, respectively, in Figures \ref{fig:childcrosses}, \ref{fig:alarmcrosses} and \ref{fig:hepar2crosses}. The datasets have been generated using our package. All the numerical parameters are set at their default value, and no prior knowledge of the network is assumed (e.g. layering).
+
+Each plot shows the distributions of both the Structural Hamming Distance (SHD, the distance in terms of edges, on the vertical axis) from the original network, and the time needed to obtain to learn the network (in seconds, on the horizontal axis).
+
+For all the three networks the overall best results are obtained using MMHC with BDeu after dataset imputation. MMHC converges in few seconds even for the large Hepar2 network; conversely, SEM takes from few minutes up to few hours, often with worse results. SEM paired with BIC failed to converge in 24 hours for all the 20 datasets.
 
 \subsubsection{Parameter learning}
 Parameter learning is the operation that learns the conditional probabilities entailed by a network,
@@ -1081,3 +1113,5 @@ The second example is about learning with bootstrap. This time we use the \textt
 \bibliography{bibtex}
 
 \end{document}
+
+% end

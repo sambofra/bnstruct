@@ -16,6 +16,12 @@ Loading required package: bitops
 Loading required package: igraph
 Loading required package: methods
 Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following objects are masked from 'package:base':
+
+    crossprod, tcrossprod
 ```
 
 <a name="introduction"></a>Introduction
