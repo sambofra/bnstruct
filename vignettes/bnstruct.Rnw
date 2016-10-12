@@ -625,6 +625,14 @@ show(net)
 net
 @
 
+For large biological networks it might be convenient to use some external specific tool for visualization.
+We provide the \Rfunarg{write.xgmml} method to export a network in the \texttt{XGMML} format, that can be
+then used for example with Cytoscape.
+<<writecyto,eval=FALSE>>=
+write.xgmml(net)
+@
+
+
 \subsection{Inference}\label{sec:infengine}
 Inference is performed in \Rpackage{bnstruct} using an \Robject{InferenceEngine} object. An \Robject{InferenceEngine}
 is created directly from a network.

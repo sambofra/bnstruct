@@ -824,6 +824,18 @@ As it is for \Robject{BNDataset}s, we have several equivalent options to print a
 \end{kframe}
 \end{knitrout}
 
+For large biological networks it might be convenient to use some external specific tool for visualization.
+We provide the \Rfunarg{write.xgmml} method to export a network in the \texttt{XGMML} format, that can be
+then used for example with Cytoscape.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlkwd{write.xgmml}\hlstd{(net)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
 \subsection{Inference}\label{sec:infengine}
 Inference is performed in \Rpackage{bnstruct} using an \Robject{InferenceEngine} object. An \Robject{InferenceEngine}
 is created directly from a network.
