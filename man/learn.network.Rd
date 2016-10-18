@@ -113,7 +113,8 @@ Structure learning sets the \code{dag} field of the \code{BN} under study, unles
 are employed. In these cases, given the possible presence of loops, the \code{wpdag} field is set.
 
 In case of missing data, the default behaviour (with no other indication from the user)
-is to learn the structure using \code{mmhc} starting from the raw dataset.
+is to learn the structure using \code{mmhc} starting from the raw dataset, using only the
+available cases with no imputation.
  
 Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (when not using bootstrap or \code{mmpc}).
 
