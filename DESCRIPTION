@@ -14,9 +14,8 @@ Depends:
     R (>= 2.10),
     bitops,
     Matrix,
+    igraph,
     methods
-Imports:
-    igraph
 Suggests:
     graph,
     Rgraphviz,
