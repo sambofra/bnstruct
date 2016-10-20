@@ -529,6 +529,7 @@ setMethod("write.dsc","BN",
 
 #' @rdname write.xgmml
 #' @aliases write.xgmml,BN
+#' @importFrom grDevices col2rgb rgb
 setMethod("write.xgmml","BN",
           function(x, filename="./", write.wpdag=FALSE, node.col = rep('white',num.nodes(x)),
                    frac = 0.2, max.weight=max(wpdag(x)))
