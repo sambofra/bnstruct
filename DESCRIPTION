@@ -22,7 +22,7 @@ Suggests:
     Rgraphviz,
     knitr,
     testthat
-Authors@R: c(person("Francesco", "Sambo", role=c("aut","cre"), email="francesco.sambo@dei.unipd.it"),
+Authors@R: c(person("Francesco", "Sambo", role=c("aut","cre"), email="francesco.sambo@unipd.it"),
              person("Alberto", "Franzin", role=c("aut"), email="afranzin@ulb.ac.be"))
 License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
