@@ -624,7 +624,7 @@ sieving of the search space followed by a greedy evaluation.
 
 The heuristic algorithms provided are considerably faster than the complete method, at the cost of a (likely)
 lower quality. Also note that in the case of a very dense network and lots of obsevations, the statistical evaluation
-of the search space may take a long time. Also for these algorithms there are parameters that may need to be tuned.
+of the search space may take a long time.% Also for these algorithms there are parameters that may need to be tuned.
 
 The last method is the Structural Expectation-Maximization (\texttt{sem}) algorithm (\citet{friedman1997learning,friedman1998bayesian}),
 for learning a network from a dataset with missing values. It iterates a sequence of Expectation-Maximization (in order to ``fill in''
@@ -682,7 +682,7 @@ initial random seed.
 Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
 Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
 Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
-where each time frame can be associated to a layer.
+where each time frame can be associated to a layer. An example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
 
 In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
 \begin{knitrout}
@@ -745,6 +745,7 @@ In this Section we show the results obtained by MMHC on available cases, MMHC on
 Each plot shows the distributions of both the Structural Hamming Distance (SHD, the distance in terms of edges, on the vertical axis) from the original network, and the time needed to obtain to learn the network (in seconds, on the horizontal axis).
 
 For all the three networks the overall best results are obtained using MMHC with BDeu after dataset imputation. MMHC converges in few seconds even for the large Hepar2 network; conversely, SEM takes from few minutes up to few hours, often with worse results. SEM paired with BIC failed to converge in 24 hours for all the 20 datasets.
+
 
 \subsubsection{Parameter learning}
 Parameter learning is the operation that learns the conditional probabilities entailed by a network,
@@ -914,10 +915,12 @@ and it returns a list consisting in an updated \Robject{InferenceEngine} and an 
 \end{knitrout}
 
 
-\section{Two small but complete examples}
+\section{Three small but complete examples}
 Here we show two small but complete examples, in order to highlight how the package can provide significant results
 with few instructions.
 
+
+\subsection{Basic Learning}
 First we show how some different learning setups perform on the \texttt{Child} dataset. We compare the default
 \texttt{mmhc-BDeu} pair on available case analysis (raw data with missing values) and on imputed data, and
 the \texttt{sem-BDeu} pair.
@@ -983,6 +986,8 @@ the \texttt{sem-BDeu} pair.
 \end{kframe}
 \end{knitrout}
 
+
+\subsection{Learning with bootstrap}
 The second example is about learning with bootstrap. This time we use the \texttt{Asia} dataset.
 
 \begin{knitrout}
@@ -1005,6 +1010,73 @@ The second example is about learning with bootstrap. This time we use the \textt
 \includegraphics[width=\maxwidth]{figure/asiatest-1} 
 
 \end{knitrout}
+
+\subsection{Naive Bayes}\label{sec:naivebayes}
+
+Finally, we show an example of the learning task of a Naive Bayes network. Suppose we have a mail dataset, equally divided in spam and legitimate mails.
+We consider four words: \texttt{buy} and \texttt{med} mainly associated to spam mails, and \texttt{bnstruct} and \texttt{learning}, observed in legitimate mails.
+We can divide the variables in two layers: one containing only the target variable, and the second one with the words.
+We then specify the presence or absence of edges in each layer, and among the layers. Edges from lower layers to upper layers are forbidden.
+For this we need to define a binary squared matrix with as many rows and columns as the number of layers, so in our example we need a 2x2 matrix.
+Each entry $m_{i,j}$ of the matrix contains 0 if no edges can go from variables in layer $i$ to variables in layer $j$, and 1 if the presence of such edges is allowed;
+the matrix should be upper triangular, and it will be transformed as such if it is not.
+
+As our Naive Bayes network has edges only from the target variable to the word variables, and not between variables in layer 2, we want edges only
+in $m_{1,2}$, so we set that cell to 1 and all the others to 0.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{> }\hlcom{# artificial dataset generation}
+\hlstd{> }\hlstd{spam} \hlkwb{<-} \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlnum{1000}\hlstd{,} \hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.5}\hlstd{,} \hlnum{0.5}\hlstd{),} \hlkwc{replace}\hlstd{=T)}
+\hlstd{> }\hlstd{buy} \hlkwb{<-} \hlkwd{sapply}\hlstd{(spam,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+\hlstd{+ }                        \hlkwa{if} \hlstd{(x} \hlopt{==} \hlnum{0}\hlstd{) \{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.8}\hlstd{,}\hlnum{0.2}\hlstd{),}\hlkwc{replace}\hlstd{=T)}
+\hlstd{+ }                        \hlstd{\}} \hlkwa{else} \hlstd{\{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.2}\hlstd{,}\hlnum{0.8}\hlstd{))\}}
+\hlstd{+ }                    \hlstd{\})}
+\hlstd{> }\hlstd{med} \hlkwb{<-} \hlkwd{sapply}\hlstd{(spam,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+\hlstd{+ }                        \hlkwa{if} \hlstd{(x} \hlopt{==} \hlnum{0}\hlstd{) \{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.95}\hlstd{,}\hlnum{0.05}\hlstd{),}\hlkwc{replace}\hlstd{=T)}
+\hlstd{+ }                        \hlstd{\}} \hlkwa{else} \hlstd{\{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.05}\hlstd{,}\hlnum{0.95}\hlstd{))\}}
+\hlstd{+ }                    \hlstd{\})}
+\hlstd{> }\hlstd{bns} \hlkwb{<-} \hlkwd{sapply}\hlstd{(spam,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+\hlstd{+ }                        \hlkwa{if} \hlstd{(x} \hlopt{==} \hlnum{0}\hlstd{) \{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.01}\hlstd{,}\hlnum{0.99}\hlstd{),}\hlkwc{replace}\hlstd{=T)}
+\hlstd{+ }                        \hlstd{\}} \hlkwa{else} \hlstd{\{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.01}\hlstd{,}\hlnum{0.99}\hlstd{))\}}
+\hlstd{+ }                        \hlstd{\})}
+\hlstd{> }\hlstd{lea} \hlkwb{<-} \hlkwd{sapply}\hlstd{(spam,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+\hlstd{+ }                        \hlkwa{if} \hlstd{(x} \hlopt{==} \hlnum{0}\hlstd{) \{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.05}\hlstd{,}\hlnum{0.95}\hlstd{),}\hlkwc{replace}\hlstd{=T)}
+\hlstd{+ }                        \hlstd{\}} \hlkwa{else} \hlstd{\{}
+\hlstd{+ }                            \hlkwd{sample}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}\hlnum{1}\hlstd{,}\hlkwc{prob}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.95}\hlstd{,}\hlnum{0.05}\hlstd{))\}}
+\hlstd{+ }                        \hlstd{\})}
+\hlstd{> }\hlstd{d} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(}\hlkwd{cbind}\hlstd{(spam,buy,med,bns,lea))}
+\hlstd{> }\hlkwd{colnames}\hlstd{(d)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"spam"}\hlstd{,}\hlstr{"buy"}\hlstd{,}\hlstr{"med"}\hlstd{,}\hlstr{"bnstruct"}\hlstd{,}\hlstr{"learn"}\hlstd{)}
+\hlstd{> }\hlkwd{library}\hlstd{(bnstruct)}
+\hlstd{> }\hlstd{spamdataset} \hlkwb{<-} \hlkwd{BNDataset}\hlstd{(d,} \hlkwd{c}\hlstd{(T,T,T,T,T),}
+\hlstd{+ }                         \hlkwd{c}\hlstd{(}\hlstr{"spam"}\hlstd{,}\hlstr{"buy"}\hlstd{,}\hlstr{"med"}\hlstd{,}\hlstr{"bnstruct"}\hlstd{,}\hlstr{"learn"}\hlstd{),}
+\hlstd{+ }                         \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{),} \hlkwc{starts.from}\hlstd{=}\hlnum{0}\hlstd{)}
+\hlstd{> }\hlstd{n} \hlkwb{<-} \hlkwd{learn.network}\hlstd{(spamdataset,}
+\hlstd{+ }                   \hlkwc{algo}\hlstd{=}\hlstr{"mmhc"}\hlstd{,}
+\hlstd{+ }                   \hlkwc{layering}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{),}
+\hlstd{+ }                   \hlkwc{layer.struct}\hlstd{=}\hlkwd{matrix}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{0}\hlstd{),}
+\hlstd{+ }                                       \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{)))}
+\hlstd{> }\hlkwd{plot}\hlstd{(n)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.6\textwidth]{figure/nb.pdf}
+    \caption{Naive Bayes for our spam example.}
+    \label{fig:nb}
+  \end{center}
+\end{figure}
 
 % -----------------------------------------------------
 % 
