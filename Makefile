@@ -12,7 +12,9 @@ WINBUILD_FTP_COMMANDS="user anonymous anonymous\nbinary\ncd R-devel\nput $(PKGNA
 doc: man pdf html
 
 man:
-	Rscript -e "library(bnstruct); roxygen2::roxygenize()"
+	Rscript -e "library(bnstruct); roxygen2::roxygenize()"; \
+        cd .. ; \
+        R CMD Rd2pdf bnstruct
 
 pdf: vignettes/bnstruct.Rnw vignettes/bibtex.bib
 	cd vignettes; \
