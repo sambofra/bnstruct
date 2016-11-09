@@ -1,7 +1,7 @@
 \documentclass{article}
-% \VignetteIndexEntry{\texttt{bnstruct}: an R package for Bayesian Network Structure Learning}
-% \VignettePackage{bnstruct}
-% \VignetteKeywords{Documentation}
+%\VignetteIndexEntry{\texttt{bnstruct}: an R package for Bayesian Network Structure Learning}
+%\VignettePackage{bnstruct}
+%\VignetteKeywords{Documentation}
 %\VignetteEngine{knitr::knitr}
 \usepackage{url}
 \usepackage[numbers]{natbib}\citeindextrue
@@ -20,6 +20,7 @@ library(knitr)
 opts_chunk$set(
 concordance=TRUE,
 prompt=TRUE,
+error=TRUE,
 comment=""
 )
 @
