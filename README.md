@@ -28,7 +28,7 @@ this void.
 Installation
 -----------
 The latest stable version of `bnstruct` is available 
-[on CRAN](https://cran.r-project.org/web/packages/bnstruct/index.html)
+[on CRAN](https://CRAN.R-project.org/package=bnstruct)
 and can be installed with
 ```{r eval=FALSE}
 install.packages("bnstruct")
