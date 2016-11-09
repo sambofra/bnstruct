@@ -36,7 +36,7 @@ install.packages("bnstruct")
 from within an R session.
 
 The latest development version of `bnstruct` can be found on GitHub
-[here](http://github.com/sambofra/bnstruct>).
+[here](https://github.com/sambofra/bnstruct).
 
 In order to install the package, it suffices to launch
 `R CMD INSTALL path/to/bnstruct`
