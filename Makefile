@@ -9,7 +9,7 @@ WINBUILD_FTP_COMMANDS="user anonymous anonymous\nbinary\ncd R-devel\nput $(PKGNA
 # all: doc install
 
 # be careful when generating documentation, it can a very long time!
-doc: man pdf html
+doc: man pdf
 
 man:
 	Rscript -e "library(bnstruct); roxygen2::roxygenize()"; \
@@ -24,13 +24,6 @@ pdf: vignettes/bnstruct.Rnw vignettes/bibtex.bib
 	pdflatex bnstruct.tex; \
 	pdflatex bnstruct.tex
     
-html: vignettes/bnstruct.html
-
-vignettes/bnstruct.html: vignettes/bnstruct.Rmd vignettes/custom.css
-	cd vignettes; \
-	Rscript -e "library(knitr); knit2html('bnstruct.Rmd', stylesheet='custom.css')";
-
-
 install:
 	cd ..;\
 	R CMD INSTALL $(PKGNAME)
