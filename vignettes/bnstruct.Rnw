@@ -544,17 +544,17 @@ It is also possible to learn a WPDAG starting from a network with a DAG, using t
 
 \subsubsection{Empirical evaluation of structure learning algorithms}
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics[width=0.75\textwidth]{figure/child_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.eps}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network}\label{fig:childcrosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure2
-\centerline{\includegraphics[width=0.75\textwidth]{figure/alarm_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.eps}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network}\label{fig:alarmcrosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
-\centerline{\includegraphics[width=0.75\textwidth]{figure/hepar2_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network}\label{fig:hepar2crosses}
 \end{figure}
 
@@ -707,7 +707,7 @@ First we show how some different learning setups perform on the \texttt{Child} d
 \texttt{mmhc-BDeu} pair on available case analysis (raw data with missing values) and on imputed data, and
 the \texttt{sem-BDeu} pair.
 
-<<childtest,eval=TRUE,cache=TRUE>>=
+<<childtest,eval=FALSE,cache=FALSE>>=
 dataset <- child()
 
 # learning with available cases analysis, MMHC, BDeu
@@ -718,7 +718,12 @@ plot(net)
 imp.dataset <- impute(dataset)
 net <- learn.network(imp.dataset, use.imputed.data = TRUE)
 plot(net)
+@
+\begin{figure}[!h]%figure3
+\centerline{\includegraphics[width=0.9\textwidth]{childtest-1.pdf}}
+\end{figure}
 
+<<childtest1cont1,eval=FALSE>>=
 # SEM, BDeu using previous network as starting point
 net <- learn.network(dataset, algo = "sem",
                      scoring.func = "BDeu",
@@ -726,7 +731,13 @@ net <- learn.network(dataset, algo = "sem",
                      struct.threshold = 10,
                      param.threshold = 0.001)
 plot(net)
+@
+\begin{figure}[!h]%figure3
+\centerline{\includegraphics[width=0.9\textwidth]{childtest-2.pdf}}
+\end{figure}
 
+
+<<childtest1cont2,eval=FALSE>>=
 # we update the probabilities with EM from the raw dataset,
 # starting from the first network
 engine  <- InferenceEngine(net)
@@ -739,12 +750,16 @@ updated.dataset <- results$BNDataset
 \subsection{Learning with bootstrap}
 The second example is about learning with bootstrap. This time we use the \texttt{Asia} dataset.
 
-<<asiatest,eval=TRUE,cache=TRUE>>=
+<<asiatest,eval=FALSE,cache=FALSE>>=
 dataset <- asia()
 dataset <- bootstrap(dataset)
 net <- learn.network(dataset, bootstrap = TRUE)
+
 plot(net)
 @
+\begin{figure}[!h]%figure3
+\centerline{\includegraphics[width=0.9\textwidth]{asiatest-1.pdf}}
+\end{figure}
 
 \subsection{Naive Bayes}\label{sec:naivebayes}
 
@@ -760,7 +775,7 @@ As our Naive Bayes network has edges only from the target variable to the word v
 in $m_{1,2}$, so we set that cell to 1 and all the others to 0.
 
 
-<<naivebayes,eval=F>>=
+<<naivebayes,eval=FALSE>>=
 # artificial dataset generation
 spam <- sample(c(0,1), 1000, prob=c(0.5, 0.5), replace=T)
 buy <- sapply(spam, function(x) {
@@ -803,7 +818,7 @@ plot(n)
 
 \begin{figure}
   \begin{center}
-    \includegraphics[width=0.6\textwidth]{figure/nb.pdf}
+    \includegraphics[width=0.6\textwidth]{nb.pdf}
     \caption{Naive Bayes for our spam example.}
     \label{fig:nb}
   \end{center}

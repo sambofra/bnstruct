@@ -10,6 +10,7 @@
 ^.*\.blg
 networks
 vignettes/bnstruct.dvi
+vignettes/bnstruct_cache
 vignettes/cache
 vignettes/figure
 vignettes/bnstruct.html
@@ -20,5 +21,6 @@ vignettes/custom.css
 vignettes/bnstruct.aux
 vignettes/bnstruct.bbl
 vignettes/bnstruct.blg
+^.*converted-to\.pdf
 bnstruct.so
 Makefile
