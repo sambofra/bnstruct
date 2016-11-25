@@ -548,7 +548,7 @@ setMethod("write.xgmml","BN",
             file.name <- strcat(filename, ".xgmml")
             rows      <- NULL
             rows[[1]] <- "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            rows[[2]] <- "<graph label=\"Network\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:cy=\"http://www.cytoscape.org\" xmlns=\"http://www.cs.rpi.edu/XGMML\"  directed=\"1\">"
+            rows[[2]] <- "<graph label=\"Network\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:cy=\"http://www.cytoscape.org\" xmlns=\"http://www.cs.rpi.edu/XGMML\"  directed=\"1\" Layout=\"Tree\">"
             rows[[3]] <- "<att name=\"documentVersion\" value=\"1.1\"/>"
             k         <- 4
             
@@ -583,7 +583,8 @@ setMethod("write.xgmml","BN",
               rows[[k+1]] <- s
               k           <- k+2
               rows[[k]]   <- strcat("    <graphics type=\"ELLIPSE\" h=\"40.0\" w=\"40.0\" x=\"",coords[node,1],
-                                    "\" y=\"",coords[node,2],"\" fill=\"",get.color.code(node.col[node]),
+                                    "\" y=\"",coords[node,2],"\" ",
+                                    " fill=\"",get.color.code(node.col[node]),
                                     "\" width=\"1\" outline=\"#666666\" cy:nodeTransparency=\"1.0\" cy:nodeLabel=\"",
                                     variables(x)[node],"\" cy:borderLineType=\"solid\"/>")
               k           <- k+1
@@ -596,7 +597,7 @@ setMethod("write.xgmml","BN",
               for (j in (i+1):num.nodes) {
                 # undirected edge
                 if (g[i,j] > 0 && g[j,i] > 0) {
-                  rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"0\">")
+                  rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"",edge.counter,"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"0\">")
                   k         <- k + 1
                   rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
                   k         <- k + 1
@@ -626,7 +627,7 @@ setMethod("write.xgmml","BN",
                   edge.counter <- edge.counter + 1
                 } else if (g[i,j] > 0 || g[j,i] > 0) { # directed edge
                   if (g[i,j] > 0 && g[j,i] == 0) {
-                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"1\">")
+                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"",edge.counter,"\" source=\"",i,"\" target=\"",j,"\" cy:directed=\"1\">")
                     k         <- k + 1
                     rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
                     k         <- k + 1
@@ -654,7 +655,7 @@ setMethod("write.xgmml","BN",
                     k         <- k + 1
                     edge.counter <- edge.counter + 1
                   } else if (g[j,i] > 0 && g[i,j] == 0) {
-                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"\" source=\"",j,"\" target=\"",i,"\" cy:directed=\"1\">")
+                    rows[[k]] <- strcat("<edge id=\"",edge.counter,"\" label=\"",edge.counter,"\" source=\"",j,"\" target=\"",i,"\" cy:directed=\"1\">")
                     k         <- k + 1
                     rows[[k]] <- "  <att name=\"shared name\" value=\"\" type=\"string\" cy:type=\"String\"/>"
                     k         <- k + 1
