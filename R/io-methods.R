@@ -541,7 +541,7 @@ setMethod("write.xgmml","BN",
             }
             
             weight.color.hex <- function(weight) {
-              weight <- 255 - weight
+              # weight <- 255 - weight
               return(rgb(weight, weight, weight, maxColorValue=255))
             }
             
@@ -610,7 +610,7 @@ setMethod("write.xgmml","BN",
                   k         <- k + 1
                   rows[[k]] <- strcat("  <att name=\"name\" value=\"",i,"-",j,"\" type=\"string\" cy:type=\"String\"/>")
                   k         <- k + 1
-                  rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                  rows[[k]] <- "<att name=\"selected\" value=\"1\" type=\"boolean\" cy:type=\"Boolean\"/>"
                   k         <- k + 1
                   rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
                   k         <- k + 1
@@ -640,7 +640,7 @@ setMethod("write.xgmml","BN",
                     k         <- k + 1
                     rows[[k]] <- strcat("  <att name=\"name\" value=\"",i,"-",j,"\" type=\"string\" cy:type=\"String\"/>")
                     k         <- k + 1
-                    rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                    rows[[k]] <- "  <att name=\"selected\" value=\"1\" type=\"boolean\" cy:type=\"Boolean\"/>"
                     k         <- k + 1
                     rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
                     k         <- k + 1
@@ -668,7 +668,7 @@ setMethod("write.xgmml","BN",
                     k         <- k + 1
                     rows[[k]] <- strcat("  <att name=\"name\" value=\"",j,"-",i,"\" type=\"string\" cy:type=\"String\"/>")
                     k         <- k + 1
-                    rows[[k]] <- "<att name=\"selected\" value=\"0\" type=\"boolean\" cy:type=\"Boolean\"/>"
+                    rows[[k]] <- "<att name=\"selected\" value=\"1\" type=\"boolean\" cy:type=\"Boolean\"/>"
                     k         <- k + 1
                     rows[[k]] <- "  <att name=\"interaction\" value=\"interacts with\" type=\"string\" cy:type=\"String\"/>"
                     k         <- k + 1
