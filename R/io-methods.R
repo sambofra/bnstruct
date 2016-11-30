@@ -531,7 +531,7 @@ setMethod("write.dsc","BN",
 #' @aliases write.xgmml,BN
 #' @importFrom grDevices col2rgb rgb
 setMethod("write.xgmml","BN",
-          function(x, filename="./", write.wpdag=FALSE, node.col = rep('white',num.nodes(x)),
+          function(x, path="./network", write.wpdag=FALSE, node.col = rep('white',num.nodes(x)),
                    frac = 0.2, max.weight=max(wpdag(x)))
           {
             
@@ -545,7 +545,7 @@ setMethod("write.xgmml","BN",
               return(rgb(weight, weight, weight, maxColorValue=255))
             }
             
-            file.name <- strcat(filename, ".xgmml")
+            file.name <- strcat(path, ".xgmml")
             rows      <- NULL
             rows[[1]] <- "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             rows[[2]] <- "<graph label=\"Network\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:cy=\"http://www.cytoscape.org\" xmlns=\"http://www.cs.rpi.edu/XGMML\"  directed=\"1\" Layout=\"Tree\">"
@@ -570,7 +570,7 @@ setMethod("write.xgmml","BN",
             # pass through an igraph to get the coordinates
             # otherwise cytoscape will put every node in the same place...
             ig.obj <- igraph::graph_from_adjacency_matrix(g)
-            coords <- layout_nicely(ig.obj) * 3 * num.nodes # also, rescale
+            coords <- igraph::layout_nicely(ig.obj) * 3 * num.nodes # also, rescale
             # coords <- layout_with_graphopt(ig.obj) * 3 * num.nodes # also, rescale
             
             for (node in 1:num.nodes)

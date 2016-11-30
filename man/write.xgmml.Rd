@@ -7,25 +7,25 @@
 \alias{write.xgmml,BN-method}
 \title{Write a network saving it in an \code{XGMML} file.}
 \usage{
-write.xgmml(x, filename = "./", write.wpdag = FALSE,
+write.xgmml(x, path = "./network", write.wpdag = FALSE,
   node.col = rep("white", num.nodes(x)), frac = 0.2,
   max.weight = max(wpdag(x)))
 
-\S4method{write.xgmml}{BN}(x, filename = "./", write.wpdag = FALSE,
+\S4method{write.xgmml}{BN}(x, path = "./network", write.wpdag = FALSE,
   node.col = rep("white", num.nodes(x)), frac = 0.2,
   max.weight = max(wpdag(x)))
 }
 \arguments{
 \item{x}{the \code{\link{BN}} object.}
 
-\item{filename}{file name (with relative or absolute path) to be written.}
+\item{path}{file name with relative or absolute path to be written.}
 
 \item{write.wpdag}{write the weighted PDAG computed using bootstrap samples or the MMPC 
 structure algorithm, instead of the normaldag (default FALSE).}
 
 \item{node.col}{vector of colors for each node of the network (in R colornames).}
 
-\item{frac}{frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).}
+\item{frac}{minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).}
 
 \item{max.weight}{maximum possible weight of an edge (used in case of \code{write.wpdag=TRUE}).}
 }
