@@ -41,7 +41,8 @@ have the network, but only a set of observations, and wants to reconstruct the
 network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
 learning the structure and parameters of the network in various situations, such as
 in presence of missing data, for which it is possible to perform \textit{imputation}
-(guessing the missing values, by looking at the data). The package also contains methods
+(guessing the missing values, by looking at the data){\color{red}, or the modeling of
+evolving systems using Dynamic Bayesian Networks.}. The package also contains methods
 for learning using the Bootstrap technique.
 Finally, \Rpackage{bnstruct}, has a set of additional tools to use Bayesian Networks, such as methods to perform
 belief propagation.
@@ -236,6 +237,25 @@ and are also available with
 asia  <- asia()
 child <- child()
 @
+
+{\color{red} If the dataset contains observations a system in consecutive instants,
+it is possible to specify the number of instants that compose the dataset,
+using the \texttt{num.time.steps} parameter to \texttt{BNDataset()} or \texttt{read.dataset}.
+The user can choose whether to provide a description for all the variables observed in the 
+entire dataset, or to give a description of the variables of a single time step.
+In the latter case, the definition will be expanded to the variables in all the instants,
+and the variables $V_1, V_2, \dots$ will be automatically renamed in $V_1\_t1, V_2\_t1, \dots$
+for the first instant, $V_1\_t2, V_2\_t2, \dots$, and so on.
+
+It is assumed that the variables in the dataset are reported in the following order: 
+$V_1\_t1, V_2\_t1, \dots, V_N\_tk, V_1\_t2, V_2\_t2, \dots, V_N\_tk$.
+
+<<evolvingdataset,eval=FALSE>>=
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps=2)
+@
+}
 
 
 % \subsection{Importing a dataset}
@@ -508,7 +528,8 @@ net.2   <- learn.network(dataset,
 Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
 Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
 Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
-where each time frame can be associated to a layer. An example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
+where each time frame can be associated to a layer. {\color{red}How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
+while a}n example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
 
 In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
 <<layering,eval=F>>=
@@ -542,17 +563,18 @@ first parameter an already initialized network for the dataset. More details can
 
 It is also possible to learn a WPDAG starting from a network with a DAG, using the \Rmethod{wpdag.from.dag} method.
 
-\subsubsection{Learning Dynamic Bayesian Networks}
+{\color{red}
+\subsubsection{Learning Dynamic Bayesian Networks}\label{sec:dbns}
 Dynamic Bayesian Networks (DBNs) are Bayesian Networks that represent the evolution in time of a system.
-The set of variables $v_1, v_2, \dots v_N$ of a DBN is repeated over a certain number $T$ of time slots,
-and variables in time slot $j$ can have descendents in successive time slots $k>j$ but not in the previous time
-slots $i<j$. From a structure learning point of view we can therefore consider the task of learning a DBN
+The set of variables $v_1, v_2, \dots v_N$ of a DBN is repeated over a certain number $T$ of time steps,
+and variables in time slot $j$ can have descendents in successive time steps $k>j$ but not in the previous time
+steps $i<j$. From a structure learning point of view we can therefore consider the task of learning a DBN
 as learning a layered larger BN.
 
 In \Rpackage{bnstruct} we provide the wrapper method \Rmethod{learn.dynamic.network} for assisting the user in
-learning DBNs. It works similarly to \Rmethod{learn.network}, but an additional parameter \Rfunarg{num.time.slots}
-can be provided, indicating the number of time slots observed. It is assumed that the dataset is composed by the 
-variables $v_{1}^{1}, v_2^1, v_3^1, \dots, v_N^1, v_1^2, v_2^2, \dots, v_N^T$ over $T$ time slots.
+learning DBNs. It works similarly to \Rmethod{learn.network}, but an additional parameter \Rfunarg{num.time.steps}
+can be provided, indicating the number of time steps observed. It is assumed that the dataset is composed by the 
+variables $v_{1}^{1}, v_2^1, v_3^1, \dots, v_N^1, v_1^2, v_2^2, \dots, v_N^T$ over $T$ instants.
 
 By default, the DBN is divided into $T$ layers, each layer corresponding to a time slot,
 in which each variable can be parent of any other variable
@@ -562,38 +584,56 @@ It is possible to provide a layering for the whole DBN using the \Rfunarg{layeri
 in the structure learning section, assigning each one of the $N \times T$ variables to a layer.
 
 It is also possible to exploit knowledge about the layering in each time slot
-by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time slots.
+by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time steps.
 However, in this case, any variable $v_x$ in time slot $i$ will still be considered a potential parent for variable
 $v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i$.
 The same applies for \Rfunarg{layer.struct}.
 
 <<dbn,eval=F>>=
 # Assume a system with 8 nodes is observed over 4 consecutive
-# time slots, of which we know the layering in each time slot.
+# time steps, of which we know the layering in each time slot.
 # The dataset contains therefore 32 variables observed.
 # We provide a layering for the single time slot, that will be
 # expanded throughout the whole DBN.
 layers <- c(1,2,2,3,3,3,3,3)
 dbn <- learn.dynamic.network(dataset,
-                             num.time.slots = 4,
+                             num.time.steps = 4,
                              layering = layers)
 @
 
+If the \texttt{BNDataset} already contains the information about the number of time steps,
+it is also possible to use \texttt{learn.network}, which will recognize the evolving system
+and treat the network as a dynamic one.
+
+<<dbn2,eval=F>>=
+# Assume a system with 8 nodes is observed over 4 consecutive
+# time steps, of which we know the layering in each time slot.
+# The dataset contains therefore 32 variables observed.
+# We provide a layering for the single time slot, that will be
+# expanded throughout the whole DBN.
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps = 2)
+dbn <- learn.network(dataset)
+@
+
+
+}
 
 \subsubsection{Empirical evaluation of structure learning algorithms}
 \begin{figure}[!tpb]%figure1
 \centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network (25 edges in the original network).}\label{fig:childcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network {\color{red}(25 edges in the original network)}.}\label{fig:childcrosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure2
 \centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network (46 edges in the original network).}\label{fig:alarmcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network {\color{red}(46 edges in the original network)}.}\label{fig:alarmcrosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
 \centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network (123 edges in the original network).}\label{fig:hepar2crosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network {\color{red}(123 edges in the original network)}.}\label{fig:hepar2crosses}
 \end{figure}
 
 In this Section we show the results obtained by MMHC on available cases, MMHC on imputed data and SEM, with the BDeu and BIC scoring functions. Our testbed is composed by three networks available in the literature, Child (20 nodes), Alarm (37 nodes) and Hepar2 (70 nodes). For each network we consider 20 datasets of 1000 observations each, with 20\% missingness. The results for the three networks are reported, respectively, in Figures \ref{fig:childcrosses}, \ref{fig:alarmcrosses} and \ref{fig:hepar2crosses}. The datasets have been generated using our package. All the numerical parameters are set at their default value, and no prior knowledge of the network is assumed (e.g. layering).
