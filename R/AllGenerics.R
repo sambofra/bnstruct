@@ -51,6 +51,9 @@
 #' In case of missing data, the default behaviour (with no other indication from the user)
 #' is to learn the structure using \code{mmhc} starting from the raw dataset, using only the
 #' available cases with no imputation.
+#' 
+#' In case of learning from a dataset containing observations of a dynamic system, \code{\link{learn.dynamic.network}}
+#' will be employed.
 #'  
 #' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (when not using bootstrap or \code{mmpc}).
 #' 
@@ -89,7 +92,7 @@
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 #' as learnt from the given dataset.
 #' 
-#' @seealso learn.structure learn.params
+#' @seealso learn.structure learn.params learn.dynamic.network
 #' 
 #' @examples
 #' \dontrun{
@@ -283,7 +286,7 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
-#' @seealso learn.network
+#' @seealso learn.network learn.dynamic.network
 #' 
 #' @examples
 #' \dontrun{
@@ -520,8 +523,10 @@ setGeneric("write.dsc", function(x, path="./") standardGeneric("write.dsc"))
 #' Write a network on disk, saving it in an \code{XGMML} file,
 #' for importing it in Cytoscape.
 #' 
-#' @name write.xgmml
-#' @rdname write.xgmml
+#' @name write_xgmml
+#' @rdname write_xgmml
+#' @aliases write_xgmml,BN
+#' @importFrom grDevices col2rgb rgb
 # 
 #' @param x the \code{\link{BN}} object.
 #' @param path file name with relative or absolute path to be written.
@@ -531,11 +536,11 @@ setGeneric("write.dsc", function(x, path="./") standardGeneric("write.dsc"))
 #' @param frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).
 #' @param max.weight maximum possible weight of an edge (used in case of \code{write.wpdag=TRUE}).
 #' 
-#' @exportMethod write.xgmml
-setGeneric("write.xgmml", function(x, path="./network", write.wpdag=FALSE,
+#' @exportMethod write_xgmml
+setGeneric("write_xgmml", function(x, path="./network", write.wpdag=FALSE,
                                    node.col=rep("white",num.nodes(x)), frac=0.2,
                                    max.weight=max(wpdag(x))) 
-   standardGeneric("write.xgmml"))
+   standardGeneric("write_xgmml"))
 
 
 #' Read the scoring function used to learn the structure of a network.
@@ -826,6 +831,7 @@ setGeneric("complete", function(x, complete.vars=seq_len(num.variables(x))) stan
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
 #' @param starts.from starting value for entries in the dataset (observed values, default is 1).
+#' @param num.time.steps number of instants composing the observations (1, unless it is a dynamic system).
 #' 
 #' @seealso BNDataset
 #' 
@@ -837,7 +843,8 @@ setGeneric("complete", function(x, complete.vars=seq_len(num.variables(x))) stan
 #' 
 #' @exportMethod read.dataset
 setGeneric("read.dataset", function(object, data.file, header.file, data.with.header = FALSE,
-                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1)
+                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1,
+                                    num.time.steps = 1)
                             standardGeneric("read.dataset"))
 
 
@@ -1369,6 +1376,21 @@ setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))
 setGeneric("num.boots", function(x) standardGeneric("num.boots"))
 
 
+#' get number of time steps observed in a \code{\link{BN}} or a \code{\link{BNDataset}}.
+#' 
+#' Return the number of time steps observed in a dataset.
+#' 
+#' @name num.time.steps
+#' @rdname num.time.steps
+#' 
+#' @param x a \code{\link{BN}} or a \code{\link{BNDataset}} object.
+#' 
+#' @return the number of time steps.
+#' 
+#' @exportMethod num.time.steps
+setGeneric("num.time.steps", function(x) standardGeneric("num.time.steps"))
+
+
 #' get the junction tree of an \code{\link{InferenceEngine}}.
 #' 
 #' Return the adjacency matrix representing the junction tree computed for a network.
@@ -1691,6 +1713,20 @@ setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
 #' 
 #' @exportMethod num.boots<-
 setGeneric("num.boots<-", function(x, value) standardGeneric("num.boots<-"))
+
+
+#' set number of time steps of a \code{\link{BN}} or a \code{\link{BNDataset}}.
+#' 
+#' Set the number of time steps of a dataset.
+#' 
+#' @name num.time.steps<-
+#' @rdname num.time.steps-set
+#' 
+#' @param x a \code{\link{BN}} or a \code{\link{BNDataset}} object.
+#' @param value the number of time steps.
+#' 
+#' @exportMethod num.time.steps<-
+setGeneric("num.time.steps<-", function(x, value) standardGeneric("num.time.steps<-"))
 
 
 #' set list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.

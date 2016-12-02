@@ -13,12 +13,20 @@ setMethod("learn.network",
             
             bn <- x
             dataset <- y
-            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                  bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            if (num.time.steps(dataset) > 1) {
+              bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
+                                          initial.network, alpha, ess,
+                                          bootstrap, layering, max.fanin.layers, max.fanin,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            } else {
+              bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                    bootstrap, layering, max.fanin.layers, max.fanin,
+                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+              
+              if (!bootstrap && algo != "mmpc")
+                bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            }
             
-            if (!bootstrap)
-              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
 #' @rdname learn.network
@@ -32,12 +40,20 @@ setMethod("learn.network",
           {
             dataset <- x
             bn <- BN(dataset)
-            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                  bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            if (num.time.steps(dataset) > 1) {
+              bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
+                                          initial.network, alpha, ess,
+                                          bootstrap, layering, max.fanin.layers, max.fanin,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            } else {
+              bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                    bootstrap, layering, max.fanin.layers, max.fanin,
+                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+              
+              if (!bootstrap && algo != "mmpc")
+                bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            }
             
-            if (!bootstrap && algo != "mmpc")
-              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
 
@@ -45,7 +61,7 @@ setMethod("learn.network",
 #' @aliases learn.dynamic.network,BN
 setMethod("learn.dynamic.network",
           c("BN"),
-          function(x, y = NULL, num.time.steps = 1, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
+          function(x, y = NULL, num.time.steps = num.time.steps(y), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
                    alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(y),
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
@@ -110,11 +126,12 @@ setMethod("learn.dynamic.network",
             }
             
             
-            bn <- learn.network(x=bn, y=dataset, algo=algo, scoring.func=scoring.func, initial.network=initial.network,
-                                alpha=alpha, ess=ess, bootstrap=bootstrap, layering=layering,
-                                max.fanin.layers=max.fanin.layers, max.fanin=max.fanin,
-                                layer.struct=layer.struct, cont.nodes=cont.nodes,
-                                use.imputed.data=use.imputed.data, use.cpc=use.cpc, ...)
+            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                  bootstrap, layering, max.fanin.layers, max.fanin,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            
+            if (!bootstrap && algo != "mmpc")
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
 
             return(bn)
           })
@@ -122,10 +139,13 @@ setMethod("learn.dynamic.network",
 #' @aliases learn.dynamic.network,BNDataset
 setMethod("learn.dynamic.network",
           c("BNDataset"),
-          function(x, num.time.steps = 1, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
+          function(x, num.time.steps = num.time.steps(x), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
                    alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(x),
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...) {
+            
+            dataset <- x
+            bn <- BN(dataset)
             
             if (num.variables(x) %% num.time.steps != 0) {
               stop("There should be the same number of variables in each time step.")
@@ -179,12 +199,13 @@ setMethod("learn.dynamic.network",
               layer.struct <- tmp.ls
             }
             
+            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                  bootstrap, layering, max.fanin.layers, max.fanin,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
             
-            bn <- learn.network(x=x, algo=algo, scoring.func=scoring.func, initial.network=initial.network,
-                                alpha=alpha, ess=ess, bootstrap=bootstrap, layering=layering,
-                                max.fanin.layers=max.fanin.layers, max.fanin=max.fanin,
-                                layer.struct=layer.struct, cont.nodes=cont.nodes,
-                                use.imputed.data=use.imputed.data, use.cpc=use.cpc, ...)
+            if (!bootstrap && algo != "mmpc")
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            
             return(bn)
           })
 

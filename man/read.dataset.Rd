@@ -8,11 +8,12 @@
 \title{Read a dataset from file.}
 \usage{
 read.dataset(object, data.file, header.file, data.with.header = FALSE,
-  na.string.symbol = "?", sep.symbol = "", starts.from = 1)
+  na.string.symbol = "?", sep.symbol = "", starts.from = 1,
+  num.time.steps = 1)
 
 \S4method{read.dataset}{BNDataset,character,character}(object, data.file,
   header.file, data.with.header = FALSE, na.string.symbol = "?",
-  sep.symbol = "", starts.from = 1)
+  sep.symbol = "", starts.from = 1, num.time.steps = 1)
 }
 \arguments{
 \item{object}{the \code{\link{BNDataset}} object.}
@@ -28,6 +29,8 @@ read.dataset(object, data.file, header.file, data.with.header = FALSE,
 \item{sep.symbol}{separator among values in the dataset.}
 
 \item{starts.from}{starting value for entries in the dataset (observed values, default is 1).}
+
+\item{num.time.steps}{number of instants composing the observations (1, unless it is a dynamic system).}
 }
 \description{
 There are two ways to build a BNDataset: using two files containing respectively header informations

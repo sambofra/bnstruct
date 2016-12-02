@@ -46,6 +46,7 @@ This is usually viable only if the user already has knowledge about the network 
   \item{\code{wpdag}:}{weighted partially dag}
   \item{\code{scoring.func}:}{scoring function used in structure learning (when performed)}
   \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
+  \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a Dynamic Bayesian Network)}
 }
 }
 \examples{

@@ -11,19 +11,19 @@
 \usage{
 learn.dynamic.network(x, ...)
 
-\S4method{learn.dynamic.network}{BN}(x, y = NULL, num.time.steps = 1,
-  algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(y),
-  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
-  use.cpc = TRUE, ...)
+\S4method{learn.dynamic.network}{BN}(x, y = NULL,
+  num.time.steps = num.time.steps(y), algo = "mmhc",
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
+  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(y), layer.struct = NULL, cont.nodes = c(),
+  use.imputed.data = FALSE, use.cpc = TRUE, ...)
 
-\S4method{learn.dynamic.network}{BNDataset}(x, num.time.steps = 1,
-  algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-  alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
-  max.fanin.layers = NULL, max.fanin = num.variables(x),
-  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
-  use.cpc = TRUE, ...)
+\S4method{learn.dynamic.network}{BNDataset}(x,
+  num.time.steps = num.time.steps(x), algo = "mmhc",
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
+  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
+  max.fanin = num.variables(x), layer.struct = NULL, cont.nodes = c(),
+  use.imputed.data = FALSE, use.cpc = TRUE, ...)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},

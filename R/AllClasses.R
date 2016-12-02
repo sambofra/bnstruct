@@ -26,6 +26,7 @@ setClassUnion("vectorOrNULL", c("vector", "NULL"))
 #'   \item{\code{wpdag}:}{weighted partially dag}
 #'   \item{\code{scoring.func}:}{scoring function used in structure learning (when performed)}
 #'   \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
+#'   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a Dynamic Bayesian Network)}
 #' }
 #' 
 #' @name BN-class
@@ -36,28 +37,30 @@ setClassUnion("vectorOrNULL", c("vector", "NULL"))
 #' @exportClass BN
 setClass("BN",
          representation(
-           name         = "character",
-           num.nodes    = "numeric",
-           variables    = "character",
-           discreteness = "logical",
-           node.sizes   = "numeric",
-           cpts         = "list",
-           dag          = "matrix",
-           wpdag        = "matrix",
-           scoring.func = "character",
-           struct.algo  = "character"
+           name           = "character",
+           num.nodes      = "numeric",
+           variables      = "character",
+           discreteness   = "logical",
+           node.sizes     = "numeric",
+           cpts           = "list",
+           dag            = "matrix",
+           wpdag          = "matrix",
+           scoring.func   = "character",
+           struct.algo    = "character",
+           num.time.steps = "numeric"
          ),
          prototype(
-           name         = "",
-           num.nodes    = 0,
-           variables    = c(""),
-           discreteness = c(TRUE),
-           node.sizes   = c(0),
-           cpts         = list(NULL),
-           dag          = matrix(),
-           wpdag        = matrix(),
-           scoring.func = "",
-           struct.algo  = ""
+           name           = "",
+           num.nodes      = 0,
+           variables      = c(""),
+           discreteness   = c(TRUE),
+           node.sizes     = c(0),
+           cpts           = list(NULL),
+           dag            = matrix(),
+           wpdag          = matrix(),
+           scoring.func   = "",
+           struct.algo    = "",
+           num.time.steps = 1
          )
         )
 
@@ -121,7 +124,16 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #' In case of need of more advanced options when reading a dataset from files, please refer to the
 #' documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
 #' as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).
-#'
+#' 
+#' In case of an evolving system to be modeled as a Dynamic Bayesian Network, it is possible to specify 
+#' only the description of the variables of a single instant; the information will be replicated for all
+#' the \code{num.time.steps} instants that compose the dataset, where \code{num.time.steps} needs to be
+#' set as parameter. In this case, it is assumed that the N variables v1, v2, ..., vN of a single instant 
+#' appear in the dataset as v1_t1, v2_t1, ..., vN_t1, v1_t2, v2_t2, ..., in this exact order.
+#' The user can however provide information for all the variables in all the instants; if it is not the case,
+#' the name of the variables will be edited to include the instant. In case of an evolving system, the
+#' \code{num.variables} slots refers anyway to the total number of variables observed in all the instants
+#' (the number of columns in the dataset), and not to a single instant.
 #'  
 #' @param data raw data.frame or path/name of the file containing the raw dataset (see 'Details').
 #' @param discreteness a vector of booleans indicating if the variables are discrete or continuous
@@ -154,6 +166,7 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   \item{\code{has.imputed.boots}:}{dataset has imputed bootstrap samples}
 #'   \item{\code{imp.boots}:}{list of imputed bootstrap samples}
 #'   \item{\code{num.boots}:}{number of bootstrap samples}
+#'   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a dynamic system)}
 #' }
 #' 
 #' @name BNDataset-class
@@ -195,7 +208,8 @@ setClass("BNDataset",
            boots             = "list",
            has.imputed.boots = "logical",
            imp.boots         = "list",
-           num.boots         = "numeric"
+           num.boots         = "numeric",
+           num.time.steps    = "numeric"
          ),
          prototype(
            name              = "",
@@ -214,7 +228,8 @@ setClass("BNDataset",
            boots             = list(NULL),
            has.imputed.boots = FALSE,
            imp.boots         = list(NULL),
-           num.boots         = 0
+           num.boots         = 0,
+           num.time.steps    = 1
          )
         )
 

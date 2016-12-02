@@ -47,17 +47,50 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
   else
     starts.from <- 1
   
+  if ("num.time.steps" %in% names(other.args))
+    num.time.steps <- other.args$num.time.steps
+  else
+    num.time.steps <- 1
+  num.time.steps(dataset) <- num.time.steps
+  
   if(length(variables) > 1)
   {
-    variables(dataset) <- variables
+    vars <- variables
+    if (length(vars) == ncol(a)) {
+      variables(dataset) <- vars
+    } else if (num.time.steps > 1 && length(vars) * num.time.steps == ncol(as.matrix(data))) {
+      copyvars <- c()
+      for (t in 1:num.time.steps) {
+        for (w in vars) {
+          copyvars <- c(copyvars, paste(w, as.character(t), sep='_t'))
+        }
+      }
+      variables(dataset) <- copyvars
+    } else {
+      stop("Incoherent number of variables in the dataset header.")
+    }
     num.variables(dataset) <- length(variables)
   }
   
-  if (length(node.sizes) > 1)
-    node.sizes(dataset) <- node.sizes
+  if (length(node.sizes) > 1) {
+    if (length(node.sizes) == ncol(as.matrix(data))) {
+      node.sizes(dataset) <- node.sizes
+    } else if (num.time.steps > 1 && length(node.sizes) * num.time.steps == ncol(as.matrix(data))) {
+      node.sizes(dataset) <- rep(node.sizes, num.time.steps)
+    } else {
+      stop("Incoherent number of variables in the dataset definition.")
+    }
+  }
   
-  if (length(discreteness) > 1)
-    discreteness(dataset) <- discreteness
+  if (length(discreteness) > 1) {
+    if (length(discreteness) == ncol(as.matrix(data))) {
+      discreteness(dataset) <- discreteness
+    } else if (num.time.steps > 1 && length(discreteness) * num.time.steps == ncol(as.matrix(data))) {
+      discreteness(dataset) <- rep(discreteness, num.time.steps)
+    } else {
+      stop("Incoherent number of variables in the dataset definition.")
+    }
+  }
   
   if (!is.null(data))
   {
@@ -171,6 +204,10 @@ setValidity("BNDataset",
                 }
               }
               
+              if (object@num.time.steps < 1) {
+                retval <- c(retval, "impossible number of time slots in the dataset")
+              }
+              
               if (is.null(retval)) return (TRUE)
               return(retval)
             }
@@ -238,6 +275,10 @@ setMethod("imp.boots", "BNDataset", function(x) return(slot(x, "imp.boots")))
 #' @rdname num.boots
 #' @aliases num.boots,BNDataset
 setMethod("num.boots", "BNDataset", function(x) return(slot(x, "num.boots")))
+
+#' @rdname num.time.steps
+#' @aliases num.time.steps,BNDataset
+setMethod("num.time.steps", "BNDataset", function(x) return(slot(x, "num.time.steps")))
 
 
 #' @name name<-
@@ -434,6 +475,19 @@ setReplaceMethod("num.boots",
                    return(x)
                  })
 
+#' @name num.time.steps<-
+#' @aliases num.time.steps<-,BNDataset-method
+#' @docType methods
+#' @rdname num.time.steps-set
+setReplaceMethod("num.time.steps",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "num.time.steps") <- value
+                   validObject(x)
+                   return(x)
+                 })
+
 
 #' @name imp.boots<-
 #' @aliases imp.boots<-,BNDataset-method
@@ -544,6 +598,11 @@ setMethod("print",
             str <- "\nnum.boots\n"
             cat(str)
             cat(num.boots(x))
+            if (num.time.steps(x) > 1) {
+              str <- "\ntime steps\n"
+              cat(str)
+              cat(num.time.steps(x))
+            }
             
             
             if (show.raw.data == TRUE && has.raw.data(x))

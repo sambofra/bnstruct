@@ -4,19 +4,52 @@
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, data.file, header.file, data.with.header = FALSE,
-                   na.string.symbol = '?', sep.symbol = '', starts.from = 1)
+                   na.string.symbol = '?', sep.symbol = '', starts.from = 1,
+                   num.time.steps = 1)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
-            
-            ls                   <- readLines(header.file)
-            variables(object)    <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
-            lns                  <- c(unlist(strsplit(ls[2], split = " ")))
-            node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
-            discreteness(object) <- c(unlist(strsplit(ls[3], split = " ")))
-            
+
             a <- read.delim(data.file, na.strings = na.string.symbol,
                             header = data.with.header, sep = sep.symbol) + (1 - starts.from)
+            a <- as.matrix(a)
+            
+            ls                   <- readLines(header.file)
+
+            vars <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
+            if (length(vars) == ncol(a)) {
+              variables(object) <- vars
+            } else if (num.time.steps > 1 && length(vars) * num.time.steps == ncol(a)) {
+              copyvars <- c()
+              for (t in 1:num.time.steps) {
+                for (w in vars) {
+                  copyvars <- c(copyvars, paste(w, as.character(t), sep='_t'))
+                }
+              }
+              variables(object) <- copyvars
+            } else {
+              stop("Incoherent number of variables in the dataset header.")
+            }
+            
+            lns                  <- c(unlist(strsplit(ls[2], split = " ")))
+            if (length(lns) == ncol(a)) {
+              node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
+            } else if (num.time.steps > 1 && length(lns) * num.time.steps == ncol(a)) {
+              node.sizes(object)   <- rep(sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) }), num.time.steps)
+            } else {
+              stop("Incoherent number of variables in the dataset header.")
+            }
+            
+            disc <- c(unlist(strsplit(ls[3], split = " ")))
+            if (length(disc) == ncol(a)) {
+              discreteness(object) <- disc
+            } else if (num.time.steps > 1 && length(disc) * num.time.steps == ncol(a)) {
+              discreteness(object) <-rep(disc, num.time.steps)
+            } else {
+              stop("Incoherent number of variables in the dataset header.")
+            }
+            
+            
             raw.data(object)      <- as.matrix(a)
             num.variables(object) <- ncol(object@raw.data)
             num.items(object)     <- nrow(object@raw.data)
@@ -527,10 +560,11 @@ setMethod("write.dsc","BN",
             write(rows, file=file.name)
           })
 
-#' @rdname write.xgmml
-#' @aliases write.xgmml,BN
-#' @importFrom grDevices col2rgb rgb
-setMethod("write.xgmml","BN",
+
+# ' @importFrom grDevices col2rgb rgb
+#' @rdname write_xgmml
+#' @aliases write_xgmml,BN
+setMethod("write_xgmml","BN",
           function(x, path="./network", write.wpdag=FALSE, node.col = rep('white',num.nodes(x)),
                    frac = 0.2, max.weight=max(wpdag(x)))
           {
