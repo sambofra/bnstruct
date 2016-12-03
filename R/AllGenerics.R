@@ -51,6 +51,9 @@
 #' In case of missing data, the default behaviour (with no other indication from the user)
 #' is to learn the structure using \code{mmhc} starting from the raw dataset, using only the
 #' available cases with no imputation.
+#' 
+#' In case of learning from a dataset containing observations of a dynamic system, \code{\link{learn.dynamic.network}}
+#' will be employed.
 #'  
 #' Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (when not using bootstrap or \code{mmpc}).
 #' 
@@ -89,7 +92,7 @@
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
 #' as learnt from the given dataset.
 #' 
-#' @seealso learn.structure learn.params
+#' @seealso learn.structure learn.params learn.dynamic.network
 #' 
 #' @examples
 #' \dontrun{
@@ -109,6 +112,68 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
                                      #layer.struct = NULL,
                                      #cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...)
   standardGeneric("learn.network"))
+
+
+#' learn a dynamic network (structure and parameters) of a \link{BN} from a \link{BNDataset}.
+#' 
+#' Learn a dynamic network (structure and parameters) of a \link{BN} from a \link{BNDataset} (see the \code{Details} section).
+#' This method is a wrapper for \code{\link{learn.network}} to simplify the learning of a dynamic network.
+#' It provides an automated generation of the \code{layering} required to represent the set of time constraints
+#' encoded in a dynamic network. In this function, it is assumed that the dataset contains the observations for each variable
+#' in all the time slots:
+#' \code{V_1^{t_1}, V_2^{t_1}, V_n^{t_1}, V_1^{t_2}, ... , V_n^{t_k}}.
+#' Variables in time slot \code{j} can be parents for any variable in time slots \code{k>j}, but not for variables \code{i<j}.
+#' If a layering is provided for a time slot, it is valid in each time slot, and not throughout the whole dynamic network;
+#' a global layering can however be provided.
+#' 
+#' The other parameters available are the ones of \code{\link{learn.network}}, refer to the documentation of that function 
+#' for more details. See also the documentation for \code{\link{learn.structure}} and \code{\link{learn.params}} for more informations.
+#'
+#' @name learn.dynamic.network
+#' @rdname learn.dynamic.network
+#' 
+#' @param x can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
+#' then also the \code{dataset} parameter must be given.
+#' @param y a \code{\link{BNDataset}} object, to be provided only if \code{x} is a \code{\link{BN}}.
+#' @param num.time.steps the number of time steps to be represented in the dynamic BN.
+#' @param algo the algorithm to use. Currently, one among \code{sm} (Silander-Myllymaki), \code{mmpc}
+#'        (Max-Min Parent-and-Children), \code{mmhc} (Max-Min Hill Climbing, default), \code{hc}
+#'        (Hill Climbing) and \code{sem} (Structural Expectation Maximization).
+#' @param scoring.func the scoring function to use. Currently, one among
+#'        \code{BDeu}, \code{AIC}, \code{BIC}.
+#' @param initial.network network structure to be used as starting point for structure search.
+#'        Can take different values:
+#'        a \code{BN} object, a matrix containing the adjacency matrix of the structure of the network,
+#'        or the string \code{random.chain} to sample a random chain as starting point.
+#' @param alpha confidence threshold (only for \code{mmhc}).
+#' @param ess Equivalent Sample Size value.
+#' @param bootstrap \code{TRUE} to use bootstrap samples. 
+#' @param layering vector containing the layers each node belongs to.
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}).
+#' @param cont.nodes vector containing the index of continuous variables.
+#' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
+#' (if available, a check is performed). Default is to use raw dataset
+#' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
+#' starting the Hill Climbing from an empty graph.
+#' @param ... potential further arguments for methods.
+#' 
+#' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
+#' as learnt from the given dataset.
+#' 
+#' @seealso learn.network learn.structure learn.params
+#' 
+#' @examples
+#' \dontrun{
+#' mydataset <- BNDataset("data.file", "header.file")
+#'
+#' net <- learn.dynamic.network(mydataset, num.time.steps=2)
+#' }
+#' 
+#' @exportMethod learn.dynamic.network
+setGeneric("learn.dynamic.network", function(x, ...) standardGeneric("learn.dynamic.network"))
 
 
 #' learn the parameters of a \link{BN}.
@@ -221,7 +286,7 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' 
 #' @return new \code{\link{BN}} object with DAG.
 #' 
-#' @seealso learn.network
+#' @seealso learn.network learn.dynamic.network
 #' 
 #' @examples
 #' \dontrun{
@@ -458,21 +523,24 @@ setGeneric("write.dsc", function(x, path="./") standardGeneric("write.dsc"))
 #' Write a network on disk, saving it in an \code{XGMML} file,
 #' for importing it in Cytoscape.
 #' 
-#' @name write.xgmml
-#' @rdname write.xgmml
-#' 
+#' @name write_xgmml
+#' @rdname write_xgmml
+#' @aliases write_xgmml,BN
+#' @importFrom grDevices col2rgb rgb
+# 
 #' @param x the \code{\link{BN}} object.
-#' @param filename file name (with relative or absolute path) to be written.
+#' @param path file name with relative or absolute path to be written.
 #' @param write.wpdag write the weighted PDAG computed using bootstrap samples or the MMPC 
 #' structure algorithm, instead of the normaldag (default FALSE).
 #' @param node.col vector of colors for each node of the network (in R colornames).
-#' @param frac frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).
+#' @param frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{write.wpdag=TRUE}).
 #' @param max.weight maximum possible weight of an edge (used in case of \code{write.wpdag=TRUE}).
 #' 
-#' @exportMethod write.xgmml
-setGeneric("write.xgmml", function(x, filename="./", write.wpdag=FALSE,
+#' @exportMethod write_xgmml
+setGeneric("write_xgmml", function(x, path="./network", write.wpdag=FALSE,
                                    node.col=rep("white",num.nodes(x)), frac=0.2,
-                                   max.weight=max(wpdag(x))) standardGeneric("write.xgmml"))
+                                   max.weight=max(wpdag(x))) 
+   standardGeneric("write_xgmml"))
 
 
 #' Read the scoring function used to learn the structure of a network.
@@ -763,6 +831,7 @@ setGeneric("complete", function(x, complete.vars=seq_len(num.variables(x))) stan
 #' @param na.string.symbol character that denotes \code{NA} in the dataset.
 #' @param sep.symbol separator among values in the dataset.
 #' @param starts.from starting value for entries in the dataset (observed values, default is 1).
+#' @param num.time.steps number of instants composing the observations (1, unless it is a dynamic system).
 #' 
 #' @seealso BNDataset
 #' 
@@ -774,7 +843,8 @@ setGeneric("complete", function(x, complete.vars=seq_len(num.variables(x))) stan
 #' 
 #' @exportMethod read.dataset
 setGeneric("read.dataset", function(object, data.file, header.file, data.with.header = FALSE,
-                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1)
+                                    na.string.symbol = '?', sep.symbol = '', starts.from = 1,
+                                    num.time.steps = 1)
                             standardGeneric("read.dataset"))
 
 
@@ -1306,6 +1376,21 @@ setGeneric("imp.boots", function(x) standardGeneric("imp.boots"))
 setGeneric("num.boots", function(x) standardGeneric("num.boots"))
 
 
+#' get number of time steps observed in a \code{\link{BN}} or a \code{\link{BNDataset}}.
+#' 
+#' Return the number of time steps observed in a dataset.
+#' 
+#' @name num.time.steps
+#' @rdname num.time.steps
+#' 
+#' @param x a \code{\link{BN}} or a \code{\link{BNDataset}} object.
+#' 
+#' @return the number of time steps.
+#' 
+#' @exportMethod num.time.steps
+setGeneric("num.time.steps", function(x) standardGeneric("num.time.steps"))
+
+
 #' get the junction tree of an \code{\link{InferenceEngine}}.
 #' 
 #' Return the adjacency matrix representing the junction tree computed for a network.
@@ -1628,6 +1713,20 @@ setGeneric("boots<-", function(x, value) standardGeneric("boots<-"))
 #' 
 #' @exportMethod num.boots<-
 setGeneric("num.boots<-", function(x, value) standardGeneric("num.boots<-"))
+
+
+#' set number of time steps of a \code{\link{BN}} or a \code{\link{BNDataset}}.
+#' 
+#' Set the number of time steps of a dataset.
+#' 
+#' @name num.time.steps<-
+#' @rdname num.time.steps-set
+#' 
+#' @param x a \code{\link{BN}} or a \code{\link{BNDataset}} object.
+#' @param value the number of time steps.
+#' 
+#' @exportMethod num.time.steps<-
+setGeneric("num.time.steps<-", function(x, value) standardGeneric("num.time.steps<-"))
 
 
 #' set list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.

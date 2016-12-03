@@ -82,6 +82,16 @@ An header file has to be composed by three rows of tab-delimited values:
 In case of need of more advanced options when reading a dataset from files, please refer to the
 documentation of the \code{\link{read.dataset}} method. Imputation and bootstrap are also available
 as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respectively).
+
+In case of an evolving system to be modeled as a Dynamic Bayesian Network, it is possible to specify 
+only the description of the variables of a single instant; the information will be replicated for all
+the \code{num.time.steps} instants that compose the dataset, where \code{num.time.steps} needs to be
+set as parameter. In this case, it is assumed that the N variables v1, v2, ..., vN of a single instant 
+appear in the dataset as v1_t1, v2_t1, ..., vN_t1, v1_t2, v2_t2, ..., in this exact order.
+The user can however provide information for all the variables in all the instants; if it is not the case,
+the name of the variables will be edited to include the instant. In case of an evolving system, the
+\code{num.variables} slots refers anyway to the total number of variables observed in all the instants
+(the number of columns in the dataset), and not to a single instant.
 }
 \section{Slots}{
 
@@ -103,6 +113,7 @@ as separate routines (\code{\link{impute}} and \code{\link{bootstrap}}, respecti
   \item{\code{has.imputed.boots}:}{dataset has imputed bootstrap samples}
   \item{\code{imp.boots}:}{list of imputed bootstrap samples}
   \item{\code{num.boots}:}{number of bootstrap samples}
+  \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a dynamic system)}
 }
 }
 \examples{

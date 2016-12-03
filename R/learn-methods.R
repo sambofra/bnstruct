@@ -13,12 +13,20 @@ setMethod("learn.network",
             
             bn <- x
             dataset <- y
-            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                  bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            if (num.time.steps(dataset) > 1) {
+              bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
+                                          initial.network, alpha, ess,
+                                          bootstrap, layering, max.fanin.layers, max.fanin,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            } else {
+              bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                    bootstrap, layering, max.fanin.layers, max.fanin,
+                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+              
+              if (!bootstrap && algo != "mmpc")
+                bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            }
             
-            if (!bootstrap)
-              bn <- learn.params(bn, dataset, ess, use.imputed.data)
             return(bn)
           })
 #' @rdname learn.network
@@ -32,12 +40,172 @@ setMethod("learn.network",
           {
             dataset <- x
             bn <- BN(dataset)
+            if (num.time.steps(dataset) > 1) {
+              bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
+                                          initial.network, alpha, ess,
+                                          bootstrap, layering, max.fanin.layers, max.fanin,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            } else {
+              bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                    bootstrap, layering, max.fanin.layers, max.fanin,
+                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+              
+              if (!bootstrap && algo != "mmpc")
+                bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            }
+            
+            return(bn)
+          })
+
+#' @rdname learn.dynamic.network
+#' @aliases learn.dynamic.network,BN
+setMethod("learn.dynamic.network",
+          c("BN"),
+          function(x, y = NULL, num.time.steps = num.time.steps(y), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
+                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(y),
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+          {
+            if (is.null(y) || class(y) != "BNDataset")
+              stop("A BNDataset must be provided in order to learn a network from it. ",
+                   "Please take a look at the documentation of the method: > ?learn.dynamic.network")
+            
+            bn <- x
+            dataset <- y
+            
+            if (num.variables(dataset) %% num.time.steps != 0) {
+              stop("There should be the same number of variables in each time step.")
+            }
+            
+            nv <- num.variables(dataset) / num.time.steps
+            
+            nl <- layering
+            mfl <- max.fanin.layers
+            ls <- layer.struct
+            
+            if (is.null(layering)) {
+              nl <- rep(1,nv)
+            } else {
+              if (length(layering) != nv && length(layering) != num.variables(x)) {
+                stop("If a layering is provided, it should be either as long as the number of variables in each time step, or as the total number of variables in all the time steps.")
+              }
+            }
+            
+            num.layers <- length(unique(nl))
+            
+            copynl <- nl
+            while (length(nl) < num.variables(x)) {
+              nl <- c(nl, copynl+max(nl))
+            }
+            
+            layering <- nl
+            
+            if (is.null(layer.struct)) {
+              ls <- matrix(0, num.layers * num.time.steps, num.layers * num.time.steps)
+              ls[upper.tri(ls, diag=TRUE)] <- 1
+              layer.struct <- ls
+            } else {
+              tmp.ls <- NULL
+              for (i in 1:num.time.steps) {
+                if (i == 1)
+                  nr <- ls
+                else
+                  nr <- matrix(0, num.layers, num.layers)
+                for (j in 2:num.time.steps) {
+                  if (j < i) {
+                    nr <- cbind(nr, matrix(0, num.layers, num.layers))
+                  } else if (i == j) {
+                    nr <- cbind(nr, ls)
+                  } else {
+                    nr <- cbind(nr, matrix(1, num.layers, num.layers))
+                  }
+                }
+                tmp.ls <- rbind(tmp.ls, nr)
+              }
+              layer.struct <- tmp.ls
+            }
+            
+            
             bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
                                   bootstrap, layering, max.fanin.layers, max.fanin,
                                   layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
             
             if (!bootstrap && algo != "mmpc")
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
+
+            return(bn)
+          })
+#' @rdname learn.dynamic.network
+#' @aliases learn.dynamic.network,BNDataset
+setMethod("learn.dynamic.network",
+          c("BNDataset"),
+          function(x, num.time.steps = num.time.steps(x), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
+                   alpha = 0.05, ess = 1, bootstrap = FALSE,
+                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(x),
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...) {
+            
+            dataset <- x
+            bn <- BN(dataset)
+            
+            if (num.variables(x) %% num.time.steps != 0) {
+              stop("There should be the same number of variables in each time step.")
+            }
+            
+            nv <- num.variables(x) / num.time.steps
+            
+            nl <- layering
+            mfl <- max.fanin.layers
+            ls <- layer.struct
+            
+            if (is.null(layering)) {
+              nl <- rep(1,nv)
+            } else {
+              if (length(layering) != nv && length(layering) != num.variables(x)) {
+                stop("If a layering is provided, it should be either as long as the number of variables in each time step, or as the total number of variables in all the time steps.")
+              }
+            }
+            
+            num.layers <- length(unique(nl))
+            
+            copynl <- nl
+            while (length(nl) < num.variables(x)) {
+              nl <- c(nl, copynl+max(nl))
+            }
+            
+            layering <- nl
+            
+            if (is.null(layer.struct)) {
+              ls <- matrix(0, num.layers * num.time.steps, num.layers * num.time.steps)
+              ls[upper.tri(ls, diag=TRUE)] <- 1
+              layer.struct <- ls
+            } else {
+              tmp.ls <- NULL
+              for (i in 1:num.time.steps) {
+                if (i == 1)
+                  nr <- ls
+                else
+                  nr <- matrix(0, num.layers, num.layers)
+                for (j in 2:num.time.steps) {
+                  if (j < i) {
+                    nr <- cbind(nr, matrix(0, num.layers, num.layers))
+                  } else if (i == j) {
+                    nr <- cbind(nr, ls)
+                  } else {
+                    nr <- cbind(nr, matrix(1, num.layers, num.layers))
+                  }
+                }
+                tmp.ls <- rbind(tmp.ls, nr)
+              }
+              layer.struct <- tmp.ls
+            }
+            
+            bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
+                                  bootstrap, layering, max.fanin.layers, max.fanin,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+            
+            if (!bootstrap && algo != "mmpc")
+              bn <- learn.params(bn, dataset, ess, use.imputed.data)
+            
             return(bn)
           })
 

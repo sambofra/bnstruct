@@ -8,6 +8,7 @@
 ^.*\.log
 ^.*\.aux
 ^.*\.blg
+^.*\.xgmml
 networks
 vignettes/bnstruct.dvi
 vignettes/bnstruct_cache

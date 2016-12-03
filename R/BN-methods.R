@@ -15,13 +15,14 @@ setMethod("initialize",
             
             if (!is.null(dataset))
             {
-              name(x)         <- name(dataset)
-              num.nodes(x)    <- num.variables(dataset)
-              variables(x)    <- variables(dataset)
-              node.sizes(x)   <- node.sizes(dataset)
-              discreteness(x) <- discreteness(dataset)
-              dag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
-              wpdag(x)        <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              name(x)           <- name(dataset)
+              num.nodes(x)      <- num.variables(dataset)
+              variables(x)      <- variables(dataset)
+              node.sizes(x)     <- node.sizes(dataset)
+              discreteness(x)   <- discreteness(dataset)
+              dag(x)            <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              wpdag(x)          <- matrix(rep(0, num.nodes(x)*num.nodes(x)), nrow=num.nodes(x), ncol=num.nodes(x))
+              num.time.steps(x) <- num.time.steps(dataset)
 #               validObject(x)
 # 
 #               x <- learn.structure(x, dataset, algo = algo, scoring.func = scoring.func, alpha = alpha, ess = ess, bootstrap = bootstrap,
@@ -121,6 +122,9 @@ setValidity("BN",
               {
                 retval <- c(retval, "incoherent number of variable statuses")
               }
+              if (num.time.steps(object) < 1) {
+                retval <- c(retval, "impossible number of time slots in the network")
+              }
               
               if (is.null(retval)) return (TRUE)
               return(retval)
@@ -173,6 +177,10 @@ setMethod("scoring.func", "BN", function(x) { return(slot(x, "scoring.func")) } 
 #' @aliases struct.algo,BN
 #' @rdname struct.algo
 setMethod("struct.algo", "BN", function(x) { return(slot(x, "struct.algo") ) } )
+
+#' @aliases num.time.steps,BN
+#' @rdname num.time.steps
+setMethod("num.time.steps", "BN", function(x) { return(slot(x, "num.time.steps") ) } )
 
 #' @aliases wpdag.from.dag,BN
 #' @rdname wpdag.from.dag
@@ -328,6 +336,18 @@ setReplaceMethod("struct.algo",
                    return(x)
                  })
 
+#' @name num.time.steps<-
+#' @aliases num.time.steps<-,BN-method
+#' @docType methods
+#' @rdname num.time.steps-set
+setReplaceMethod("num.time.steps",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "num.time.steps") <- value
+                   return(x)
+                 })
+
 
 #' @aliases layering,BN
 #' @rdname layering
@@ -458,6 +478,11 @@ setMethod("print",
             str <- "\nnode.sizes\n"
             cat(str)
             cat(node.sizes(x))
+            if (num.time.steps(x) > 1) {
+              str <- "\ntime steps\n"
+              cat(str)
+              cat(num.time.steps(x))
+            }
             
             if (num.nodes(x) > 0 && (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0))
             {
