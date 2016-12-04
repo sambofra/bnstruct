@@ -120,10 +120,10 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' This method is a wrapper for \code{\link{learn.network}} to simplify the learning of a dynamic network.
 #' It provides an automated generation of the \code{layering} required to represent the set of time constraints
 #' encoded in a dynamic network. In this function, it is assumed that the dataset contains the observations for each variable
-#' in all the time slots:
+#' in all the time steps:
 #' \code{V_1^{t_1}, V_2^{t_1}, V_n^{t_1}, V_1^{t_2}, ... , V_n^{t_k}}.
-#' Variables in time slot \code{j} can be parents for any variable in time slots \code{k>j}, but not for variables \code{i<j}.
-#' If a layering is provided for a time slot, it is valid in each time slot, and not throughout the whole dynamic network;
+#' Variables in time step \code{j} can be parents for any variable in time steps \code{k>=j}, but not for variables \code{i<j}.
+#' If a layering is provided for a time step, it is valid in each time step, and not throughout the whole dynamic network;
 #' a global layering can however be provided.
 #' 
 #' The other parameters available are the ones of \code{\link{learn.network}}, refer to the documentation of that function 

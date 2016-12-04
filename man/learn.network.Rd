@@ -115,6 +115,9 @@ are employed. In these cases, given the possible presence of loops, the \code{wp
 In case of missing data, the default behaviour (with no other indication from the user)
 is to learn the structure using \code{mmhc} starting from the raw dataset, using only the
 available cases with no imputation.
+
+In case of learning from a dataset containing observations of a dynamic system, \code{\link{learn.dynamic.network}}
+will be employed.
  
 Then, the parameters of the network are learnt using MAP (Maximum A Posteriori) estimation (when not using bootstrap or \code{mmpc}).
 
@@ -134,6 +137,6 @@ net <- learn.network(mydataset)
 
 }
 \seealso{
-learn.structure learn.params
+learn.structure learn.params learn.dynamic.network
 }
 

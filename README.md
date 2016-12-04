@@ -51,7 +51,7 @@ install_github("sambofra/bnstruct")
 ```
 
 For Windows platforms, a binary executable of the latest stable version is available
-[on CRAN](https://cran.r-project.org/web/packages/bnstruct/index.html).
+[on CRAN](https://CRAN.R-project.org/package=bnstruct).
 
 `bnstruct` requires R `>= 2.10`, and depends on
 `bitops`, `igraph`, `Matrix`, `graph` and

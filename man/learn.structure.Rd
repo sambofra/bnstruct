@@ -127,6 +127,6 @@ bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
 
 }
 \seealso{
-learn.network
+learn.network learn.dynamic.network
 }
 

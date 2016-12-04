@@ -123,7 +123,7 @@ setValidity("BN",
                 retval <- c(retval, "incoherent number of variable statuses")
               }
               if (num.time.steps(object) < 1) {
-                retval <- c(retval, "impossible number of time slots in the network")
+                retval <- c(retval, "impossible number of time steps in the network")
               }
               
               if (is.null(retval)) return (TRUE)

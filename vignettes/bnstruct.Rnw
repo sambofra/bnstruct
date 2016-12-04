@@ -567,7 +567,8 @@ It is also possible to learn a WPDAG starting from a network with a DAG, using t
 \subsubsection{Learning Dynamic Bayesian Networks}\label{sec:dbns}
 Dynamic Bayesian Networks (DBNs) are Bayesian Networks that represent the evolution in time of a system.
 The set of variables $v_1, v_2, \dots v_N$ of a DBN is repeated over a certain number $T$ of time steps,
-and variables in time slot $j$ can have descendents in successive time steps $k>j$ but not in the previous time
+and variables in time slot $j$ can have descendents in the current or subsequent time steps $k\geq j$ but
+not in the previous time
 steps $i<j$. From a structure learning point of view we can therefore consider the task of learning a DBN
 as learning a layered larger BN.
 
@@ -583,22 +584,14 @@ variable in the previous layers.
 It is possible to provide a layering for the whole DBN using the \Rfunarg{layering} parameter as explained
 in the structure learning section, assigning each one of the $N \times T$ variables to a layer.
 
-It is also possible to exploit knowledge about the layering in each time slot
-by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time steps.
-However, in this case, any variable $v_x$ in time slot $i$ will still be considered a potential parent for variable
-$v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i$.
-The same applies for \Rfunarg{layer.struct}.
-
-<<dbn,eval=F>>=
+<<dbn1,eval=F>>=
 # Assume a system with 8 nodes is observed over 4 consecutive
 # time steps, of which we know the layering in each time slot.
 # The dataset contains therefore 32 variables observed.
-# We provide a layering for the single time slot, that will be
-# expanded throughout the whole DBN.
-layers <- c(1,2,2,3,3,3,3,3)
-dbn <- learn.dynamic.network(dataset,
-                             num.time.steps = 4,
-                             layering = layers)
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps = 4)
+dbn <- learn.dynamic.network(dataset, num.time.steps = 4)
 @
 
 If the \texttt{BNDataset} already contains the information about the number of time steps,
@@ -609,12 +602,26 @@ and treat the network as a dynamic one.
 # Assume a system with 8 nodes is observed over 4 consecutive
 # time steps, of which we know the layering in each time slot.
 # The dataset contains therefore 32 variables observed.
-# We provide a layering for the single time slot, that will be
-# expanded throughout the whole DBN.
 dataset <- BNDataset("evolving_system.data",
                      "evolving_system.header",
-                     num.time.steps = 2)
+                     num.time.steps = 4)
 dbn <- learn.network(dataset)
+@
+
+It is also possible to exploit knowledge about the layering in each time slot
+by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time steps.
+However, in this case, any variable $v_x$ in time slot $i$ will still be considered a potential parent for variable
+$v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i$.
+The same applies for \Rfunarg{layer.struct}.
+
+<<dbn3,eval=F>>=
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps = 4)
+layers <- c(1,2,2,3,3,3,3,3)
+dbn <- learn.dynamic.network(dataset,
+                             num.time.steps = 4,
+                             layering = layers)
 @
 
 
@@ -636,11 +643,23 @@ dbn <- learn.network(dataset)
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network {\color{red}(123 edges in the original network)}.}\label{fig:hepar2crosses}
 \end{figure}
 
+\begin{figure}[!tpb]%figure3
+\centerline{\includegraphics[width=0.75\textwidth]{andes_crosses.eps}}
+\caption{SHD vs. running time of MMHC on complete datasets of i) 100 observations, ii) 1000 observations and iii) 10000 observations sampled from the 223-nodes Andes network (338 edges in the original network).}\label{fig:andescrosses}
+\end{figure}
+
 In this Section we show the results obtained by MMHC on available cases, MMHC on imputed data and SEM, with the BDeu and BIC scoring functions. Our testbed is composed by three networks available in the literature, Child (20 nodes), Alarm (37 nodes) and Hepar2 (70 nodes). For each network we consider 20 datasets of 1000 observations each, with 20\% missingness. The results for the three networks are reported, respectively, in Figures \ref{fig:childcrosses}, \ref{fig:alarmcrosses} and \ref{fig:hepar2crosses}. The datasets have been generated using our package. All the numerical parameters are set at their default value, and no prior knowledge of the network is assumed (e.g. layering).
 
 Each plot shows the distributions of both the Structural Hamming Distance (SHD, the distance in terms of edges, on the vertical axis) from the original network, and the time needed to obtain to learn the network (in seconds, on the horizontal axis).
 
 For all the three networks the overall best results are obtained using MMHC with BDeu after dataset imputation. MMHC converges in few seconds even for the large Hepar2 network; conversely, SEM takes from few minutes up to few hours, often with worse results. SEM paired with BIC failed to converge in 24 hours for all the 20 datasets.
+
+{\color{red}We report also the results obtained by the MMHC algorithm over a larger network, Andes (223 nodes), using BDeu and BIC and three sets of datasets with 100, 1000 and 10000 observations each. In Figure \ref{fig:andescrosses} we show the results in terms of SHD with respect to the original network, and in terms of convergence time. In this case there is no significant difference in terms of time between the two scoring functions.
+The trend observed, with the learning from the datasets with 1000 observations being the slowest one, is a bit surprising, and can be explained with the fact that with fewer data, the statistical pruning is less effective but the computation of the score for each possible parent set is faster, while for larger datasets computing the score for one candidate parent set is more expensive, but there are less candidates to evaluate, as MMPC is more effective; with 1000 observations, in this case we observe an unlucky combination of relatively high computing time over a larger set of candidates.
+
+In terms of solution quality, the results clearly improve as the size of the dataset grows. For 10000 observations BDeu finds slightly better networks, in terms of similarity with the original one, than BIC, while for smaller datasets BIC is significantly more robust. The main difference, however, is given by the number of observations available: with 100 observations, effectively a $p>n$ case, the quality of the discovered networks is very poor, and it improves as the size of the datasets grows, having up to the 75\% of correctness with 10000 observations.
+
+}
 
 
 \subsubsection{Parameter learning}
