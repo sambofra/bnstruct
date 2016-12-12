@@ -41,8 +41,8 @@ have the network, but only a set of observations, and wants to reconstruct the
 network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
 learning the structure and parameters of the network in various situations, such as
 in presence of missing data, for which it is possible to perform \textit{imputation}
-(guessing the missing values, by looking at the data){\color{red}, or the modeling of
-evolving systems using Dynamic Bayesian Networks.}. The package also contains methods
+(guessing the missing values, by looking at the data), or the modeling of
+evolving systems using Dynamic Bayesian Networks. The package also contains methods
 for learning using the Bootstrap technique.
 Finally, \Rpackage{bnstruct}, has a set of additional tools to use Bayesian Networks, such as methods to perform
 belief propagation.
@@ -238,7 +238,7 @@ asia  <- asia()
 child <- child()
 @
 
-{\color{red} If the dataset contains observations a system in consecutive instants,
+If the dataset contains observations a system in consecutive instants,
 it is possible to specify the number of instants that compose the dataset,
 using the \texttt{num.time.steps} parameter to \texttt{BNDataset()} or \texttt{read.dataset}.
 The user can choose whether to provide a description for all the variables observed in the 
@@ -255,7 +255,6 @@ dataset <- BNDataset("evolving_system.data",
                      "evolving_system.header",
                      num.time.steps=2)
 @
-}
 
 
 % \subsection{Importing a dataset}
@@ -528,8 +527,8 @@ net.2   <- learn.network(dataset,
 Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
 Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
 Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
-where each time frame can be associated to a layer. {\color{red}How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
-while a}n example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
+where each time frame can be associated to a layer. How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
+while an example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
 
 In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
 <<layering,eval=F>>=
@@ -563,7 +562,6 @@ first parameter an already initialized network for the dataset. More details can
 
 It is also possible to learn a WPDAG starting from a network with a DAG, using the \Rmethod{wpdag.from.dag} method.
 
-{\color{red}
 \subsubsection{Learning Dynamic Bayesian Networks}\label{sec:dbns}
 Dynamic Bayesian Networks (DBNs) are Bayesian Networks that represent the evolution in time of a system.
 The set of variables $v_1, v_2, \dots v_N$ of a DBN is repeated over a certain number $T$ of time steps,
@@ -625,22 +623,22 @@ dbn <- learn.dynamic.network(dataset,
 @
 
 
-}
+
 
 \subsubsection{Empirical evaluation of structure learning algorithms}
 \begin{figure}[!tpb]%figure1
 \centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network {\color{red}(25 edges in the original network)}.}\label{fig:childcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network (25 edges in the original network).}\label{fig:childcrosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure2
 \centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network {\color{red}(46 edges in the original network)}.}\label{fig:alarmcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network (46 edges in the original network).}\label{fig:alarmcrosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
 \centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network {\color{red}(123 edges in the original network)}.}\label{fig:hepar2crosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network (123 edges in the original network).}\label{fig:hepar2crosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
@@ -654,12 +652,10 @@ Each plot shows the distributions of both the Structural Hamming Distance (SHD, 
 
 For all the three networks the overall best results are obtained using MMHC with BDeu after dataset imputation. MMHC converges in few seconds even for the large Hepar2 network; conversely, SEM takes from few minutes up to few hours, often with worse results. SEM paired with BIC failed to converge in 24 hours for all the 20 datasets.
 
-{\color{red}We report also the results obtained by the MMHC algorithm over a larger network, Andes (223 nodes), using BDeu and BIC and three sets of datasets with 100, 1000 and 10000 observations each. In Figure \ref{fig:andescrosses} we show the results in terms of SHD with respect to the original network, and in terms of convergence time. In this case there is no significant difference in terms of time between the two scoring functions.
+We report also the results obtained by the MMHC algorithm over a larger network, Andes (223 nodes), using BDeu and BIC and three sets of datasets with 100, 1000 and 10000 observations each. In Figure \ref{fig:andescrosses} we show the results in terms of SHD with respect to the original network, and in terms of convergence time. In this case there is no significant difference in terms of time between the two scoring functions.
 The trend observed, with the learning from the datasets with 1000 observations being the slowest one, is a bit surprising, and can be explained with the fact that with fewer data, the statistical pruning is less effective but the computation of the score for each possible parent set is faster, while for larger datasets computing the score for one candidate parent set is more expensive, but there are less candidates to evaluate, as MMPC is more effective; with 1000 observations, in this case we observe an unlucky combination of relatively high computing time over a larger set of candidates.
 
 In terms of solution quality, the results clearly improve as the size of the dataset grows. For 10000 observations BDeu finds slightly better networks, in terms of similarity with the original one, than BIC, while for smaller datasets BIC is significantly more robust. The main difference, however, is given by the number of observations available: with 100 observations, effectively a $p>n$ case, the quality of the discovered networks is very poor, and it improves as the size of the datasets grows, having up to the 75\% of correctness with 10000 observations.
-
-}
 
 
 \subsubsection{Parameter learning}
