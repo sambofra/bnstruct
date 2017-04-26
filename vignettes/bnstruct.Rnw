@@ -30,6 +30,8 @@ comment=""
 \author{Francesco Sambo, Alberto Franzin}
 \maketitle
 
+\tableofcontents
+
 <<echo=FALSE,include=FALSE>>=
 library(bnstruct)
 @
@@ -55,6 +57,15 @@ This document is intended to show some examples of how \Rpackage{bnstruct} can b
 to learn and use Bayesian Networks. First we describe how to manage data sets,
 how to use them to discover a Bayesian Network, and finally how to perform some
 operations on a network. Complete reference for classes and methods can be found in the package documentation.
+
+If you use \Rpackage{bnstruct} in your work, please cite it as:
+\begin{quote}
+Alberto Franzin, Francesco Sambo, Barbara di Camillo. "bnstruct: an R package for Bayesian Network structure learning in the presence of missing data." Bioinformatics, 2017; 33 (8): 1250-1252; Oxford University Press.
+\end{quote}
+These information and a BibTeX entry can be found with
+<<citation2,eval=FALSE>>=
+citation("bnstruct")
+@
 
 \subsection{Overview}
 We provide here some general informations about the context for understanding
@@ -529,12 +540,19 @@ Variables can be grouped in (numbered) layers, and a variable can only have pare
 Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
 where each time frame can be associated to a layer. How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
 while an example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
-
-In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
 <<layering,eval=F>>=
 layers <- c(1,2,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5)
 net.layer <- learn.network(dataset, layering = layers)
 @
+
+In case of more sophisticated layering requirements, some other optional arguments can be provided.
+For \Rfunarg{sm}, the available options to limit the number of incoming arcs are \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin}.
+For \Rfunarg{mmhc}, \Rfunarg{hc} and \Rfunarg{mmpc}, \Rfunarg{layer.struct} is used to allow or forbid edges between the layers defined using the \Rfunarg{layering} argument;
+\Rfunarg{max.fanin} instead sets the maximum number of incoming arcs (for \Rfunarg{hc}) or the maximum number of neighbouring nodes (for \Rfunarg{mmpc} and \Rfunarg{mmhc}).
+
+When using \Rfunarg{hc}, it is possible to provide also a predetermined \textit{skeleton}, that is, the undirected network whose edges will be the only ones
+considered by the algorithm, using the \Rfunarg{init.cpc} optional parameter.
+See also the method documentation for more information.
 
 
 The structure learning task by default computes the structure as a DAG. We can however use

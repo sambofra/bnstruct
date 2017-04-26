@@ -388,6 +388,18 @@ setMethod("learn.structure",
               set.seed(as.numeric(other.args$seed))
             else
               set.seed(0)
+            if ("wm.max" %in% names(other.args))
+              wm.max <- as.numeric(other.args$wm.max)
+            else
+              wm.max <- 15
+            if ("min.counts" %in% names(other.args))
+              min.counts <- as.numeric(other.args$min.counts)
+            else
+              min.counts <- 5
+            if ("initial.cpc" %in% names(other.args))
+              initial.cpc <- as.numeric(other.args$initial.cpc)
+            else
+              initial.cpc <- NULL
             
             #if ("struct.threshold" %in% names(other.args))
               #struct.threshold <- as.numeric(other.args$struct.threshold)
@@ -456,14 +468,14 @@ setMethod("learn.structure",
                 for( i in seq_len(num.boots(dataset)) )
                 {
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct, min.counts=min.counts, max.fanin=max.fanin )
                   finalPDAG <- finalPDAG + cpc
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
-                cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct, min.counts=min.counts, max.fanin=max.fanin )
                 wpdag(bn) <- cpc
               }
               bnstruct.end.log("learning using MMPC completed.")
@@ -488,16 +500,22 @@ setMethod("learn.structure",
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                             tabu.tenure = tabu.tenure, init.net = in.dag)
+                             tabu.tenure = tabu.tenure, init.net = in.dag, wm.max=wm.max,
+                             layering=layering, layer.struct=layer.struct)
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
-                cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                if (is.null(initial.cpc)) {
+                    cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                } else {
+                    cpc <- initial.cpc
+                }
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, init.net = in.dag )
+                               tabu.tenure = tabu.tenure, init.net = in.dag, wm.max=wm.max,
+                               layering=layering, layer.struct=layer.struct )
               }
               bnstruct.end.log("learning using HC completed.")
             } # end if algo == hc
@@ -519,14 +537,15 @@ setMethod("learn.structure",
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   
                   if (use.cpc){
-                    cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                    cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct, min.counts=min.counts, max.fanin=max.fanin )
                   }
                   else
                   {
                     cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                   }
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                             tabu.tenure = tabu.tenure, init.net = in.dag)
+                             tabu.tenure = tabu.tenure, init.net = in.dag, wm.max=wm.max,
+                             layering=layering, layer.struct=layer.struct)
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
                 wpdag(bn) <- finalPDAG
@@ -534,11 +553,12 @@ setMethod("learn.structure",
               else
               {
                 if (use.cpc)
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct, min.counts=min.counts, max.fanin=max.fanin )
                 else
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, init.net = in.dag )
+                               tabu.tenure = tabu.tenure, init.net = in.dag, wm.max=wm.max,
+                               layering=layering, layer.struct=layer.struct)
               }
               bnstruct.end.log("learning using MMHC completed.")
             } # end if algo == mmhc

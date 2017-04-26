@@ -1,5 +1,5 @@
 hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100, 
-                init.net = NULL )
+                init.net = NULL, wm.max=15, layering=NULL, layer.struct=NULL )
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
@@ -26,6 +26,32 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   }
   else
     curr.g <- matrix(0L,n.nodes,n.nodes) # integers!  
+
+
+  # apply layering
+  if (!is.null(layer.struct) && is.null(layering)) {
+      stop("layer.struct provided without layering.\n")
+  }
+  if ( !is.null(layering) && length(unique(layering)) > 1 ) {
+      n.layers <- length(unique(layering))
+
+      if (is.null(layer.struct)) {
+          layer.struct <- matrix(1L, n.layers, n.layers)
+          layer.struct[lower.tri(layer.struct)] <- 0
+          layer.struct[1,1] <- 0
+      }
+
+      layers <- matrix(1L, n.nodes, n.nodes)
+      for (i in 1:n.layers) {
+          for (j in 1:n.layers) {
+              layers[which(layering == i), which(layering == j)] <- layer.struct[i, j]
+          }
+      }
+      diag(layers) <- 0
+
+      # keep only edges allowed by both the CPC / initial network and the layering
+      cpc <- cpc & layers
+  }
   
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
@@ -42,8 +68,8 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   
   # worsening moves
   wm.count <- 0
-  wm.max <- 15
-  while( wm.count < 15 )
+  #wm.max <- 15
+  while( wm.count < wm.max )
   {
     next.score.diff <- rep(-Inf,n.nodes)
     next.pert <- rep(-1L,n.nodes)
@@ -147,7 +173,8 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
 
 
 mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
-						layering = NULL, layer.struct = NULL)
+		  layering = NULL, layer.struct = NULL, 
+                  max.cpc.size=length(node.sizes), min.counts=5, max.fanin=length(node.sizes)-1)
 						
 {
   n.nodes <- ncol(data)
@@ -201,7 +228,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # forward addition of nodes
   for( i in 1:n.nodes )
   {
-    cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
+    cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th, min.counts, max.fanin )
     # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     allowed[,i] <- allowed[,i] & t(cpc.mat[i,])
   }
@@ -211,7 +238,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # backwards removal of nodes
   for( i in 1:n.nodes )
   {
-    cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th )
+    cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th, min.counts, max.fanin )
     # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     cpc.mat[,i] <- cpc.mat[,i] & t(cpc.mat[i,])
   }
@@ -229,7 +256,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   return( cpc.mat )
 }
 
-mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
+mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th, min.counts, max.fanin )
 {
   # cat("\n",x,":\n");
   n.nodes <- ncol(data)
@@ -240,7 +267,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   minAssoc <- rep(0,n.nodes)
   for( y in 1:n.nodes )
     if( allowed[x,y] )
-      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th )
+      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th, min.counts )
   allowed[x,minAssoc==0] <- 0 # remove already independent nodes
   
   m <- max( minAssoc )
@@ -258,22 +285,22 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
     # try to add one node to the cpc
     for( y in 1:n.nodes )
     {
-      if( allowed[x,y] )
+      if( allowed[x,y] && length(cpc) > 0 )
       {
         # condition on all possible combinations of cpc elements, 
         # from smaller to larger
         n <- as.integer( length(cpc) )
         s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-        for( zsize in seq_len( n ) )
+        for( zsize in seq_len( min(c(n, max.fanin)) ) )
         {
           # test for possible early stopping, no indep test can be performed
-          if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / 5 )
+          if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts )
             break
           
-			    comb <- as.integer(1:zsize)
-			    while( comb[1]!=0 ) # check for the end of combinations
-			    {
-            assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb] )
+	  comb <- as.integer(1:zsize)
+	  while( comb[1]!=0 ) # check for the end of combinations
+	  {
+            assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb], min.counts )
             if( assoc < minAssoc[y] )
               minAssoc[y] <- assoc
             if( assoc == 0 ) # do not try with y anymore
@@ -281,7 +308,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
               allowed[x,y] = 0
               break
             }
-				    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
+	    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
           }
           if( allowed[x,y] == 0 ) # came out from the break
             break
@@ -305,7 +332,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   return(cpc.vec)
 }
 
-mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
+mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th, min.counts, max.fanin )
 {
 #  cat("\n",x,":\n");
 #  cat(which(cpc.vec!=0),"\n");
@@ -325,16 +352,16 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
       cpc <- setdiff( which( cpc.vec > 0 ), y )
 		  n <- as.integer( length(cpc) )
       s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-      for( zsize in seq_len( n )  )
+      for( zsize in seq_len( min(c(n, max.fanin)) )  )
       {
         # test for possible early stopping, no indep test can be performed
-        if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / 5)
+        if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts)
           break
         
         comb <- as.integer(1:zsize)
         while( comb[1]!=0 ) # check for the end of combinations
         {  
-          assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb] )
+          assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb], min.counts )
           if( assoc == 0 ) # do not try with y anymore
           {
             cpc.vec[y] = 0
@@ -352,10 +379,10 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
   return( cpc.vec )
 }
   
-g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c() )
+g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c(), min.counts = 5)
 {
-  # if less than 5 counts per cell on average, cannot exclude dependence
-  if( dim(data)[1]/prod(sizes[c(x,y,z)]) < 5 )
+  # if less than min.counts (default 5) counts per cell on average, cannot exclude dependence
+  if( dim(data)[1]/prod(sizes[c(x,y,z)]) < min.counts )
     return( chi.th )
 
   # tab <- compute.counts( data[,c(x,y,z)], sizes[c(x,y,z)] )
