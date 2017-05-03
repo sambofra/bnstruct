@@ -267,7 +267,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th, min.counts, max.fani
   minAssoc <- rep(0,n.nodes)
   for( y in 1:n.nodes )
     if( allowed[x,y] )
-      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th, min.counts )
+      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th, min.counts=min.counts )
   allowed[x,minAssoc==0] <- 0 # remove already independent nodes
   
   m <- max( minAssoc )
@@ -350,7 +350,7 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th, min.counts, max.fani
       # condition on all possible combinations of cpc elements, 
       # from smaller to larger
       cpc <- setdiff( which( cpc.vec > 0 ), y )
-		  n <- as.integer( length(cpc) )
+      n <- as.integer( length(cpc) )
       s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
       for( zsize in seq_len( min(c(n, max.fanin)) )  )
       {
