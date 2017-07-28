@@ -80,13 +80,17 @@
 #' @param layering vector containing the layers each node belongs to.
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
 #'        for nodes in a layer (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
-#' (if available, a check is performed). Default is to use raw dataset
+#'        (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
-#' starting the Hill Climbing from an empty graph.
+#'        starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for methods.
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
@@ -151,6 +155,7 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' @param layering vector containing the layers each node belongs to.
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
 #'        for nodes in a layer (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
@@ -158,6 +163,9 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 #' starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for methods.
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
@@ -276,12 +284,16 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
 #' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
 #' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 #' starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for method.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
@@ -308,7 +320,8 @@ setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="B
                                        alpha=0.05, ess=1, bootstrap=FALSE,
                                        layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
                                        layer.struct = NULL,
-                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.structure"))
+                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE,
+                                       mandatory.edges = NULL, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.

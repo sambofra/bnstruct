@@ -1,10 +1,11 @@
 hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100, 
-                init.net = NULL, wm.max=15, layering=NULL, layer.struct=NULL )
+                max.parents = length(node.sizes)-1,
+                init.net = NULL, wm.max=15, layering=NULL, layer.struct=NULL,
+                mandatory.edges = NULL )
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
-  
-  
+
   # just to be sure
   storage.mode( node.sizes ) <- "integer"
   
@@ -14,6 +15,13 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   
   # data <- quantize.with.na.matrix( data, levels )
   data <- quantize.matrix( data, levels )
+
+  # apply mandatory edges (if present)
+  m.edges <- matrix(0L, n.nodes, n.nodes)
+  if (!is.null(mandatory.edges)) {
+    m.edges <- m.edges | mandatory.edges
+  }
+  storage.mode(m.edges) <- "integer"
   
   # start with init.net if not NULL, otherwise with empty matrix
   if( !is.null(init.net) )
@@ -26,7 +34,7 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   }
   else
     curr.g <- matrix(0L,n.nodes,n.nodes) # integers!  
-
+  curr.g <- curr.g | m.edges
 
   # apply layering
   if (!is.null(layer.struct) && is.null(layering)) {
@@ -51,12 +59,17 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
 
       # keep only edges allowed by both the CPC / initial network and the layering
       cpc <- cpc & layers
+      
+      if (sum(m.edges | t(m.edges)) > 0L && sum(curr.g & layers) == 0L) {
+        stop("the mandatory edges provided are inconsistent with the given layering.\n")
+      }
   }
+  # end apply layering
   
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
-    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, scoring.func,
-                                  ess, PACKAGE = "bnstruct" )
+    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L,
+                                  scoring.func, ess, PACKAGE = "bnstruct" )
 
   # global best solution
   global.best.g <- curr.g
@@ -79,7 +92,7 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
     {
       for( par in 1L:n.nodes )
       {
-        if( cpc[par,node] == 1L )
+        if( cpc[par,node] == 1L && (m.edges[par,node] == 0 && m.edges[node,par] == 0))
         {
           next.g <- curr.g;
           s.diff <- -Inf
@@ -94,7 +107,9 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
-          else if( curr.g[node,par] == 0L ) # edge addition
+          # edge addition
+          # check also if there is room for one more parent
+          else if( curr.g[node,par] == 0L && sum(curr.g[,node]) < max.parents ) 
           {
             next.g[par,node] = 1L;
             # print(c(node,par,.Call("is_acyclic", next.g, PACKAGE = "bnstruct"),!.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct")))
@@ -107,7 +122,9 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
-          else # edge reversal
+          # edge reversal
+          # check also if there is room for one more parent
+          else if ( sum(curr.g[,node]) < max.parents )
           {
             next.g[par,node] = 1L;
             next.g[node,par] = 0L;
@@ -174,12 +191,17 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
 
 mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
 		  layering = NULL, layer.struct = NULL, 
-                  max.cpc.size=length(node.sizes), min.counts=5, max.fanin=length(node.sizes)-1)
+                  max.fanin=length(node.sizes)-1, mandatory.edges = NULL )
 						
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
-  
+  min.counts <- 5
+
+  if (length(max.fanin) == 1) {
+    max.fanin <- rep(max.fanin, n.nodes)
+  }
+
   # just to be sure
   storage.mode( node.sizes ) <- "integer"
   
@@ -220,6 +242,13 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   
   cpc.mat <- layer.mat | t(layer.mat) # constrain the cpc search
   allowed <- cpc.mat
+
+  # mandatory edges
+  if ( is.null(mandatory.edges) ) {
+    medges <- matrix(0, n.nodes, n.nodes)
+  } else {
+    medges <- mandatory.edges | t(mandatory.edges)
+  }
   
   # print(cpc.mat)
   
@@ -246,12 +275,14 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # print(cpc.mat)
   
   # symmetry enformcement
-  cpc.mat = cpc.mat * t(cpc.mat)
+  cpc.mat <- cpc.mat * t(cpc.mat)
   
   # further filter with layering
-  cpc.mat = cpc.mat * layer.mat
+  cpc.mat <- cpc.mat * layer.mat
   
-  # print(cpc.mat)
+  # force mandatory edges
+  cpc.mat <- cpc.mat | medges
+  storage.mode(cpc.mat) <- "integer"
   
   return( cpc.mat )
 }
@@ -291,7 +322,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th, min.counts, max.fani
         # from smaller to larger
         n <- as.integer( length(cpc) )
         s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-        for( zsize in seq_len( min(c(n, max.fanin)) ) )
+        for( zsize in seq_len( min(c(n, max.fanin[y])) ) )
         {
           # test for possible early stopping, no indep test can be performed
           if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts )
@@ -352,7 +383,7 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th, min.counts, max.fani
       cpc <- setdiff( which( cpc.vec > 0 ), y )
       n <- as.integer( length(cpc) )
       s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-      for( zsize in seq_len( min(c(n, max.fanin)) )  )
+      for( zsize in seq_len( min(c(n, max.fanin[y])) )  )
       {
         # test for possible early stopping, no indep test can be performed
         if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts)

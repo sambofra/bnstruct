@@ -15,15 +15,17 @@ learn.dynamic.network(x, ...)
   num.time.steps = num.time.steps(y), algo = "mmhc",
   scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
   bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(y), layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  max.fanin = num.variables(y) - 1, max.parents = num.variables(y) - 1,
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, mandatory.edges = NULL, ...)
 
 \S4method{learn.dynamic.network}{BNDataset}(x,
   num.time.steps = num.time.steps(x), algo = "mmhc",
   scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
   bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(x), layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  max.fanin = num.variables(x) - 1, max.parents = num.variables(x) - 1,
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, mandatory.edges = NULL, ...)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
@@ -59,6 +61,8 @@ or the string \code{random.chain} to sample a random chain as starting point.}
 
 \item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
 
+\item{max.parents}{maximum number of parents for each node (for \code{mmhc}, \code{hc}).}
+
 \item{layer.struct}{\code{0/1} matrix for indicating which layers can contain parent nodes
 for nodes in a layer (only for \code{mmhc}).}
 
@@ -69,6 +73,10 @@ for nodes in a layer (only for \code{mmhc}).}
 
 \item{use.cpc}{(when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 starting the Hill Climbing from an empty graph.}
+
+\item{mandatory.edges}{binary matrix, where a \code{1} in cell \code{[i,j]}
+indicates that an edge from node \code{i} to node \code{j} must be present
+in the final network.}
 }
 \value{
 new \code{\link{BN}} object with structure (DAG) and conditional probabilities

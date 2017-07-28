@@ -11,13 +11,16 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
   initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
   layering = c(), max.fanin.layers = NULL,
   max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+  mandatory.edges = NULL, ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
   scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
   bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(dataset), layer.struct = NULL,
-  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  max.fanin = num.variables(dataset) - 1,
+  max.parents = num.variables(dataset) - 1, layer.struct = NULL,
+  cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+  mandatory.edges = NULL, ...)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -57,7 +60,13 @@ or the string \code{random.chain} to sample a random chain as starting point.}
 \item{use.cpc}{(when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 starting the Hill Climbing from an empty graph.}
 
+\item{mandatory.edges}{binary matrix, where a \code{1} in cell \code{[i,j]}
+indicates that an edge from node \code{i} to node \code{j} must be present
+in the final network.}
+
 \item{...}{potential further arguments for method.}
+
+\item{max.parents}{maximum number of parents for each node (for \code{mmhc}, \code{hc}).}
 }
 \value{
 new \code{\link{BN}} object with DAG.
