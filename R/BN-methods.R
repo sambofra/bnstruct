@@ -522,6 +522,7 @@ setMethod("print",
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' @param frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{plot.wpdag=TRUE}).
 #' @param max.weight maximum possible weight of an edge (used in case of \code{plot.wpdag=TRUE}).
+#' @param node.size.lab size of the labels for the nodes.
 #' 
 #' @importFrom graphics plot
 #' @importFrom grDevices colors dev.off postscript
@@ -531,9 +532,9 @@ setMethod("print",
 #' @rdname plot
 #' @export
 plot.BN <- 
-  function( x, ..., use.node.names = TRUE, frac = 0.2, 
-                    max.weight = max(dag(x)), node.col = rep('white',num.nodes(x)),
-                    plot.wpdag = FALSE)
+  function( x, ..., use.node.names = TRUE, frac = 0.2, max.weight = max(dag(x)),
+                    node.size.lab=14, node.col = rep('white',num.nodes(x)),
+                    plot.wpdag = FALSE) #, adapt.node.size=TRUE)
           {
             
             # check for Rgraphviz
@@ -574,10 +575,44 @@ plot.BN <-
             # build graph
             rownames(mat.th) <- node.names
             colnames(mat.th) <- node.names
+
+            # node colors
+            node.fill <- as.list(node.col)
+            names(node.fill) <- node.names
+
             g <- new("graphAM", adjMat=mat.th, edgemode="directed")
+
+            #if (adapt.node.size) {
+                #gtmp <- new("graphAM", adjMat=mat.th, edgemode="directed")
+                #attrs <- Rgraphviz::getDefaultAttrs(curAttrs = list())
+                #attrs$node <- list(fixedsize=FALSE)
+                #gtmp <- Rgraphviz::layoutGraph(gtmp, attrs=attrs)
+
+                #node.sizes <- rep(ceiling(max(graph::nodeRenderInfo(gtmp)$height) * node.size.lab / 28) * 2, num.nodes)
+                #node.lwidth <- node.rwidth <- node.sizes / 2
+                #names(node.sizes) <- names(node.lwidth) <- names(node.rwidth) <- node.names
+
+                #nri <- graph::nodeRenderInfo(gtmp)
+                #nri$fill <- node.fill
+                #nri$fontsize <- node.size.lab
+                #nri$height <- node.sizes
+                #nri$rWidth <- node.rwidth
+                #nri$lWidth <- node.lwidth
+
+                #graph::nodeRenderInfo(g) <- nri #list(fill=node.fill, fontsize=node.size.lab,
+                                                # height=node.sizes, rWidth=node.rwidth, lWidth=node.lwidth)
+                #print(graph::nodeRenderInfo(g))
+            #}
+
             en <- Rgraphviz::edgeNames(g,recipEdges="distinct")
+            #g <- Rgraphviz::layoutGraph(g, layoutType = "dot", attrs=list(graph=list(nodesep=5), node=list(height=node.sizes, rWidth=node.rwidth, lWidth=node.lwidth, fill=node.fill, fontsize=node.size.lab)))#, attrs=attrs)
+            #graph::nodeRenderInfo(g) <- list(fill=node.fill, fontsize=node.size.lab,
+            #                                fixedsize=F,
+            #                                height=node.sizes, rWidth=node.rwidth, lWidth=node.lwidth)
+            #graph::graphRenderInfo(g)  <- list(scale=5)
+            #print(graph::graphRenderInfo(g))
             g <- Rgraphviz::layoutGraph(g)
-            
+
             # set edge darkness proportional to confidence
             conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
             col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
@@ -590,10 +625,22 @@ plot.BN <-
             ahs[dirs=="both"] <- ats[dirs=="both"] <- "none"
             graph::edgeRenderInfo(g) <- list(col=col,lwd=2,arrowhead=ahs,arrowtail=ats)
             
-            # node colors
-            node.fill <- as.list(node.col)
-            names(node.fill) <- node.names
-            graph::nodeRenderInfo(g) <- list(fill=node.fill)
+            #if (adapt.node.size) {
+                #node.sizes  <- as.list(node.sizes)
+                #node.lwidth <- as.list(node.lwidth)
+                #node.rwidth <- as.list(node.rwidth)
+                #names(node.sizes) <- names(node.lwidth) <- names(node.rwidth) <- node.names
+                #graph::nodeRenderInfo(g) <- list(fill=node.fill, #fontsize=node.size.lab, 
+                #                                 height=node.sizes,
+                #                                 rWidth=node.rwidth, lWidth=node.lwidth)
+            #print(node.sizes)
+            #print(node.fill)
+            #} else {
+            graph::nodeRenderInfo(g) <- list(fill=node.fill, fontsize=node.size.lab)
+            #}
+
+            #print(graph::nodeRenderInfo(g))
+            #print(adapt.node.size)
             
             Rgraphviz::renderGraph(g)
           }
@@ -729,6 +776,77 @@ dag.to.cpdag <- function(dag.adj.matrix, layering = NULL)
     stop("The adjacency matrix must have at least one non-null value.")
   return(abs(label.edges(dag.adj.matrix, layering)))
 }
+
+
+#' counts the edges in a WPDAG with their directionality
+#'
+#' Given a \code{BN} with a \code{WPDAG}, it counts the edges, with
+#' their directionality.
+#'
+#' @param x the \code{BN}
+#' @param use.node.names use node names rather than number (\code{TRUE} by default).
+#'
+#' @return a matrix containing the node pairs with the count of the edges
+#'         between them in the \code{WPDAG}.
+#'
+#' @name edge.dir.wpdag
+#' @rdname edge.dir.wpdag
+#'
+#' @export
+edge.dir.wpdag <- function (x, use.node.names = TRUE)
+{
+  if (!is.element(1, dag(x)) && length(which(wpdag(x) != 0)) > 0)
+    mat <- wpdag(x)
+  else
+    mat <- dag(x)
+
+  num.nodes <- num.nodes(x)
+  variables <- variables(x)
+
+    if (use.node.names && length(variables) > 0)
+    node.names <- variables
+  else node.names <- as.character(1:num.nodes)
+
+  rownames(mat) <- node.names
+  colnames(mat) <- node.names
+
+  # Indexes of element inside WPDAG lower triangular matrix
+  ltel <- which(lower.tri(mat, diag = FALSE), arr.ind=T)
+  # Respective elements inside WPDAG upper triangular matrix
+  utel <- cbind(ltel[,2], ltel[,1])
+
+  # Find pairs of nodes [i,j] with an edge directed from i to j
+  nodes.dir.l <- ltel[which(mat[ltel]>mat[utel]), ]
+  nodes.dir.u <- utel[which(mat[utel]>mat[ltel]), ]
+
+  ### Find number of occurrences of directed edges ###
+  # Count edges occurence for each pair of nodes
+  edge.occurr.l <- mat[nodes.dir.l]
+  edge.occurr.u <- mat[nodes.dir.u]
+  edge.occurr <- c(edge.occurr.l, edge.occurr.u)
+  # Once pairs of nodes with directed edge have been found, count the occurences of that edge in the opposite direction
+  nodes.rev.l <- cbind(nodes.dir.l[,2], nodes.dir.l[,1])
+  nodes.rev.u <- cbind(nodes.dir.u[,2], nodes.dir.u[,1])
+  edge.rev.occurr.l <- mat[nodes.rev.l]
+  edge.rev.occurr.u <- mat[nodes.rev.u]
+  edge.rev.occurr <- c(edge.rev.occurr.l, edge.rev.occurr.u)
+
+  # Name of nodes with directed edges
+  nodes.start.l <- rownames(mat)[nodes.dir.l[,1]]
+  nodes.stop.l <- rownames(mat)[nodes.dir.l[,2]]
+
+  nodes.start.u <- rownames(mat)[nodes.dir.u[,1]]
+  nodes.stop.u <- rownames(mat)[nodes.dir.u[,2]]
+  # Combine together pairs of nodes (edges from nodes.start to nodes.stop)
+  nodes.start <- c(nodes.start.l, nodes.start.u)
+  nodes.stop <- c(nodes.stop.l, nodes.stop.u)
+  nodes.dir <- cbind(nodes.start, nodes.stop)
+  # Combine pairs of nodes (names) with info about edges occurrence 
+  edge.directed.wpdag <- cbind(nodes.dir, edge.occurr, edge.rev.occurr)
+
+  return(edge.directed.wpdag)
+}
+
 
 
 label.edges <- function(dgraph, layering = NULL)

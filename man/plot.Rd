@@ -8,8 +8,8 @@
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
 \method{plot}{BN}(x, ..., use.node.names = TRUE, frac = 0.2,
-  max.weight = max(dag(x)), node.col = rep("white", num.nodes(x)),
-  plot.wpdag = FALSE)
+  max.weight = max(dag(x)), node.size.lab = 14, node.col = rep("white",
+  num.nodes(x)), plot.wpdag = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object.}
@@ -21,6 +21,8 @@
 \item{frac}{minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{plot.wpdag=TRUE}).}
 
 \item{max.weight}{maximum possible weight of an edge (used in case of \code{plot.wpdag=TRUE}).}
+
+\item{node.size.lab}{size of the labels for the nodes.}
 
 \item{node.col}{list of (\code{R}) colors for the nodes.}
 
