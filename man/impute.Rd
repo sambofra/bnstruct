@@ -3,8 +3,8 @@
 \docType{methods}
 \name{impute}
 \alias{impute}
-\alias{impute,BNDataset}
 \alias{impute,BNDataset-method}
+\alias{impute,BNDataset}
 \title{Impute a \code{\link{BNDataset}} raw data with missing values.}
 \usage{
 impute(object, k.impute = 10)
@@ -27,4 +27,3 @@ dataset <- impute(dataset)
 }
 
 }
-

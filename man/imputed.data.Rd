@@ -3,8 +3,8 @@
 \docType{methods}
 \name{imputed.data}
 \alias{imputed.data}
-\alias{imputed.data,BNDataset}
 \alias{imputed.data,BNDataset-method}
+\alias{imputed.data,BNDataset}
 \title{get imputed data of a BNDataset.}
 \usage{
 imputed.data(x)
@@ -20,4 +20,3 @@ Return imputed data contained in a \code{\link{BNDataset}} object, if any.
 \seealso{
 \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}, \code{\link{raw.data}}
 }
-

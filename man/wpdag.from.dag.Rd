@@ -3,8 +3,8 @@
 \docType{methods}
 \name{wpdag.from.dag}
 \alias{wpdag.from.dag}
-\alias{wpdag.from.dag,BN}
 \alias{wpdag.from.dag,BN-method}
+\alias{wpdag.from.dag,BN}
 \title{Initialize a WPDAG from a DAG.}
 \usage{
 wpdag.from.dag(x, layering = NULL)
@@ -33,4 +33,3 @@ wp.net <- wpdag.from.dag(net, layering)
 \seealso{
 \code{\link{dag.to.cpdag}}
 }
-

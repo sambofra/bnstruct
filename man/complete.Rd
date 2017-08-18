@@ -3,8 +3,8 @@
 \docType{methods}
 \name{complete}
 \alias{complete}
-\alias{complete,BNDataset}
 \alias{complete,BNDataset-method}
+\alias{complete,BNDataset}
 \title{Subset a \code{\link{BNDataset}} to get only complete cases.}
 \usage{
 complete(x, complete.vars = seq_len(num.variables(x)))
@@ -33,4 +33,3 @@ or \code{\link{bootstrap}}, there may likely be a loss of correspondence between
 the subsetted \code{raw.data} and the previously generated \code{imputed.data}
 and \code{bootstrap} samples.
 }
-

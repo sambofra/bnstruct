@@ -3,6 +3,7 @@
 \docType{methods}
 \name{imp.boots<-}
 \alias{imp.boots<-}
+\alias{imp.boots<-}
 \alias{imp.boots<-,BNDataset-method}
 \title{set list of bootstrap samples from imputed data of a \code{\link{BNDataset}}.}
 \usage{
@@ -18,4 +19,3 @@ imp.boots(x) <- value
 \description{
 Add to a dataset a list of samples from imputed data computed using bootstrap.
 }
-

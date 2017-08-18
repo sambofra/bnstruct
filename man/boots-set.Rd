@@ -3,6 +3,7 @@
 \docType{methods}
 \name{boots<-}
 \alias{boots<-}
+\alias{boots<-}
 \alias{boots<-,BNDataset-method}
 \title{set list of bootstrap samples of a \code{\link{BNDataset}}.}
 \usage{
@@ -18,4 +19,3 @@ boots(x) <- value
 \description{
 Add to a dataset a list of samples from raw data computed using bootstrap.
 }
-

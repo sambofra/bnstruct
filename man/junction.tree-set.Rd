@@ -3,6 +3,7 @@
 \docType{methods}
 \name{junction.tree<-}
 \alias{junction.tree<-}
+\alias{junction.tree<-}
 \alias{junction.tree<-,InferenceEngine-method}
 \title{set the junction tree of an \code{\link{InferenceEngine}}.}
 \usage{
@@ -18,4 +19,3 @@ junction.tree(x) <- value
 \description{
 Set the adjacency matrix of the junction tree computed for a network.
 }
-

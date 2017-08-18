@@ -3,8 +3,8 @@
 \docType{methods}
 \name{learn.structure}
 \alias{learn.structure}
-\alias{learn.structure,BN,BNDataset}
 \alias{learn.structure,BN,BNDataset-method}
+\alias{learn.structure,BN,BNDataset}
 \title{learn the structure of a network.}
 \usage{
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
@@ -138,4 +138,3 @@ bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
 \seealso{
 learn.network learn.dynamic.network
 }
-

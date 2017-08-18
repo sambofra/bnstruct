@@ -30,4 +30,3 @@ imputed data frame.
 Perform imputation of missing data in a data frame using the k-Nearest Neighbour algorithm.
 For discrete variables we use the mode, for continuous variables the median value is instead taken.
 }
-

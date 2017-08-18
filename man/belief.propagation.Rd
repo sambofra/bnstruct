@@ -3,8 +3,8 @@
 \docType{methods}
 \name{belief.propagation}
 \alias{belief.propagation}
-\alias{belief.propagation,InferenceEngine}
 \alias{belief.propagation,InferenceEngine-method}
+\alias{belief.propagation,InferenceEngine}
 \title{perform belief propagation.}
 \usage{
 belief.propagation(ie, observations = NULL, return.potentials = FALSE)
@@ -40,4 +40,3 @@ belief.propagation(ie)
 }
 
 }
-

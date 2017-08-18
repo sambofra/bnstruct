@@ -3,8 +3,8 @@
 \docType{methods}
 \name{dag}
 \alias{dag}
-\alias{dag,BN}
 \alias{dag,BN-method}
+\alias{dag,BN}
 \title{get adjacency matrix of a network.}
 \usage{
 dag(x)
@@ -21,4 +21,3 @@ matrix containing the adjacency matrix of the directed acyclic graph representin
 \description{
 Return the adjacency matrix of the directed acyclic graph representing the structure of a network.
 }
-

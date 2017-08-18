@@ -3,8 +3,8 @@
 \docType{methods}
 \name{read.net}
 \alias{read.net}
-\alias{read.net,character}
 \alias{read.net,character-method}
+\alias{read.net,character}
 \title{Read a network from a \code{.net} file.}
 \usage{
 read.net(x)
@@ -24,4 +24,3 @@ build a \code{\link{BN}} object.
 \details{
 The method relies on a coherent ordering of variable values and parameters in the file.
 }
-

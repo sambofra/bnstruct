@@ -3,8 +3,8 @@
 \docType{methods}
 \name{em}
 \alias{em}
-\alias{em,InferenceEngine,BNDataset}
 \alias{em,InferenceEngine,BNDataset-method}
+\alias{em,InferenceEngine,BNDataset}
 \title{expectation-maximization algorithm.}
 \usage{
 em(x, dataset, threshold = 0.001, max.em.iterations = 10, ess = 1)
@@ -36,4 +36,3 @@ em(x, dataset)
 }
 
 }
-

@@ -3,6 +3,7 @@
 \docType{methods}
 \name{num.items<-}
 \alias{num.items<-}
+\alias{num.items<-}
 \alias{num.items<-,BNDataset-method}
 \title{set number of items of a \code{\link{BNDataset}}.}
 \usage{
@@ -18,4 +19,3 @@ num.items(x) <- value
 \description{
 Set the number of observed items (rows) in a dataset.
 }
-

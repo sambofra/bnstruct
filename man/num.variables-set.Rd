@@ -3,6 +3,7 @@
 \docType{methods}
 \name{num.variables<-}
 \alias{num.variables<-}
+\alias{num.variables<-}
 \alias{num.variables<-,BNDataset-method}
 \title{set number of variables of a \code{\link{BNDataset}}.}
 \usage{
@@ -18,4 +19,3 @@ num.variables(x) <- value
 \description{
 Set the number of variables observed in a dataset.
 }
-

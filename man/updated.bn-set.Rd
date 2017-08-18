@@ -3,6 +3,7 @@
 \docType{methods}
 \name{updated.bn<-}
 \alias{updated.bn<-}
+\alias{updated.bn<-}
 \alias{updated.bn<-,InferenceEngine-method}
 \title{set the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
@@ -18,4 +19,3 @@ updated.bn(x) <- value
 \description{
 Add an updated network to an InferenceEngine.
 }
-

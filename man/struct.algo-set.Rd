@@ -3,6 +3,7 @@
 \docType{methods}
 \name{struct.algo<-}
 \alias{struct.algo<-}
+\alias{struct.algo<-}
 \alias{struct.algo<-,BN-method}
 \title{Set the algorithm used to learn the structure of a network.}
 \usage{
@@ -21,4 +22,3 @@ updated BN.
 \description{
 Set the algorithm used in the \code{\link{learn.structure}} method.
 }
-

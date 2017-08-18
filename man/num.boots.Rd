@@ -3,8 +3,8 @@
 \docType{methods}
 \name{num.boots}
 \alias{num.boots}
-\alias{num.boots,BNDataset}
 \alias{num.boots,BNDataset-method}
+\alias{num.boots,BNDataset}
 \title{get number of bootstrap samples of a \code{\link{BNDataset}}.}
 \usage{
 num.boots(x)
@@ -20,4 +20,3 @@ the number of bootstrap samples.
 \description{
 Return the number of bootstrap samples computed from a dataset.
 }
-

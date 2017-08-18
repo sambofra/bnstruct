@@ -3,18 +3,20 @@
 \docType{methods}
 \name{save.to.eps}
 \alias{save.to.eps}
-\alias{save.to.eps,BN,character}
 \alias{save.to.eps,BN,character-method}
+\alias{save.to.eps,BN,character}
 \title{save a \code{\link{BN}} picture as \code{.eps} file.}
 \usage{
-save.to.eps(x, filename)
+save.to.eps(x, filename, ...)
 
-\S4method{save.to.eps}{BN,character}(x, filename)
+\S4method{save.to.eps}{BN,character}(x, filename, ...)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object}
 
 \item{filename}{name (with path, if needed) of the file to be created}
+
+\item{...}{parameters for the \code{\link{plot}} method.}
 }
 \description{
 Save an image of a Bayesian Network as an \code{.eps} file.
@@ -28,4 +30,3 @@ save.to.eps(x, "out.eps")
 \seealso{
 \code{\link{plot}}
 }
-

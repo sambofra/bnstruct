@@ -3,6 +3,7 @@
 \docType{methods}
 \name{jpts<-}
 \alias{jpts<-}
+\alias{jpts<-}
 \alias{jpts<-,InferenceEngine-method}
 \title{set the list of joint probability tables compiled by an \code{\link{InferenceEngine}}.}
 \usage{
@@ -22,4 +23,3 @@ Add a list of joint probability tables for the cliques of the junction tree.
 Each joint probability table is represented as a multidimensional array. 
 To retrieve single dimensions (e.g. to compute marginals), users should provide dimension names.
 }
-

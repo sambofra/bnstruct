@@ -3,6 +3,7 @@
 \docType{methods}
 \name{header.file<-}
 \alias{header.file<-}
+\alias{header.file<-}
 \alias{header.file<-,BNDataset-method}
 \title{set header file of a \code{\link{BNDataset}}.}
 \usage{
@@ -28,4 +29,3 @@ Further rows are ignored.
 \seealso{
 \code{\link{data.file<-}}
 }
-
