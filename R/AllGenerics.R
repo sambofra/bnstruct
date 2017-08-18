@@ -451,6 +451,7 @@ setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 #' 
 #' @param x a \code{\link{BN}} object
 #' @param filename name (with path, if needed) of the file to be created
+#' @param ... parameters for the \code{\link{plot}} method.
 #' 
 #' @examples
 #' \dontrun{
@@ -460,7 +461,7 @@ setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 #' @seealso \code{\link{plot}}
 #' 
 #' @exportMethod save.to.eps
-setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
+setGeneric("save.to.eps", function(x, filename, ...) standardGeneric("save.to.eps"))
 
 
 #' Read a network from a \code{.dsc} file.

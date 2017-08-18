@@ -162,7 +162,8 @@ make install
 
 \Rpackage{bnstruct} requires R $\geq 2.10$,
 and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
-Package \Rpackage{Rgraphviz} is requested in order to plot graphs, but is not mandatory.
+Packages \Rpackage{Rgraphviz} or \Rpackage{qgraph} are requested in order to plot graphs,
+but are not mandatory.
 
 
 \section{Data sets}
@@ -729,6 +730,20 @@ in the inline documentation of the method.
 plot(net) # regular DAG
 plot(net, plot.wpdag=T) # wpdag
 @
+
+The \Rmethod{plot()} method by default uses the \Rpackage{Rgraphviz}, and it corresponds to
+\Rmethod{plot(net, method="default")}. More advanced plotting functionalities are available
+using the Rpackage{qgraph} package, via \Rmethod{plot(net, method="qgraph")}. With
+\Rfunarg{method="qgraph"} it is possible to specify the optional arguments available for the
+\Rmethod{qgraph::qgraph()} method; for the full list of parameters and their effect, please
+refer to the documentation of the \Rpackage{qgraph} package \cite{epskampqgraph}.
+<<plotqgraph,eval=FALSE>>=
+plot(net, method="qgraph",
+          label.scale.equal=T,
+          node.width = 1.6,
+          plot.wpdag=T)
+@
+
 
 As it is for \Robject{BNDataset}s, we have several equivalent options to print a network.
 <<show,eval=FALSE>>=
