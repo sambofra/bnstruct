@@ -520,6 +520,7 @@ setMethod("print",
 #'        the \code{Rgraphviz} package, while \code{qgraph} requires the \code{qgraph} package
 #'        and allows for a greater customization.
 #' @param use.node.names \code{TRUE} if node names have to be printed. If \code{FALSE}, numbers are used instead.
+#' @param node.size.lab font size for the node labels in the default mode.
 #' @param node.col list of (\code{R}) colors for the nodes.
 #' @param plot.wpdag if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.
 #' @param frac minimum fraction [0,1] of presence of an edge to be plotted (used in case of \code{plot.wpdag=TRUE}).
@@ -573,7 +574,7 @@ plot.BN <-
             variables <- variables(x)
 
             if (method == "default") {
-                bngzplot(mat, num.nodes, variables, use.node.names,
+                bngzplot(x, mat, num.nodes, variables, use.node.names,
                             frac, max.weight, node.size.lab, node.col)
             } else {
                 plist <- list(...)
@@ -582,15 +583,12 @@ plot.BN <-
             }
 }            
 
-bngzplot <- function(mat, num.nodes, variables, use.node.names, frac, max.weight,
+bngzplot <- function(x, mat, num.nodes, variables, use.node.names, frac, max.weight,
                       node.size.lab, node.col) {
 
             mat.th <- mat
-            if (is.element(1,dag(x)) || length(which(wpdag(x) != 0)) > 0)
-            {
-              mat.th[mat <  frac*max.weight] <- 0
-              mat.th[mat >= frac*max.weight] <- 1
-            }
+            mat.th[mat <  frac*max.weight] <- 0
+            mat.th[mat >= frac*max.weight] <- 1
             
             # node names
             if (use.node.names && length(variables) > 0)

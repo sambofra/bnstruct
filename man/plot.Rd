@@ -24,6 +24,8 @@ and allows for a greater customization.}
 
 \item{max.weight}{maximum possible weight of an edge (used in case of \code{plot.wpdag=TRUE}).}
 
+\item{node.size.lab}{font size for the node labels in the default mode.}
+
 \item{node.col}{list of (\code{R}) colors for the nodes.}
 
 \item{plot.wpdag}{if \code{TRUE} plot the network according to the WPDAG computed using bootstrap instead of the DAG.}
