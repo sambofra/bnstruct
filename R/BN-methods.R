@@ -629,9 +629,7 @@ bnqgplot <- function(mat, num.nodes, variables, use.node.names,
 
             # parse ... parameters
             plist <- unlist(list(...), recursive=F)
-print(plist)
             parnames <- names(plist)
-print(parnames)
 
             if (use.node.names && length(variables) > 0)
               node.names <- variables
@@ -661,7 +659,6 @@ print(parnames)
                 plist[["labels"]] <- node.names
             }
 
-print(plist)
             do.call(qgraph::qgraph, plist)
 }
 

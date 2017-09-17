@@ -96,6 +96,7 @@ called \emph{imputation}. In this case, the dataset with the ``holes filled''
 is called the \emph{imputed dataset}, while the original dataset with missing values is
 referred to as the \emph{raw dataset}.
 In section \ref{sec:imputation} we show how to perform imputation in \Rpackage{bnstruct}.
+The case of missing variables is not considered by \Rpackage{bnstruct}.
 
 Another common operation on data is the employment of resampling techniques in order
 to estimate properties of a distribution from an approximate one. This usually allows
@@ -547,14 +548,19 @@ net.layer <- learn.network(dataset, layering = layers)
 @
 
 In case of more sophisticated layering requirements, some other optional arguments can be provided.
-For \Rfunarg{sm}, the available options to limit the number of incoming arcs are \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin}.
-For \Rfunarg{mmhc}, \Rfunarg{hc} and \Rfunarg{mmpc}, \Rfunarg{layer.struct} is used to allow or forbid edges between the layers defined using the \Rfunarg{layering} argument;
-\Rfunarg{max.fanin} instead sets the maximum number of incoming arcs (for \Rfunarg{hc}) or the maximum number of neighbouring nodes (for \Rfunarg{mmpc} and \Rfunarg{mmhc}).
+For \Rfunarg{sm}, the available options to limit the number of incoming arcs are \Rfunarg{max.parents.layers} and \Rfunarg{max.parents}.
+For \Rfunarg{hc}, the corresponding options are \Rfunarg{layer.struct} and \Rfunarg{max.parents}.
+\Rfunarg{mmpc}, not considering directed edges, takes instead \Rfunarg{layer.struct} and \Rfunarg{max.fanin}.
+Finally, for \Rfunarg{mmhc}, \Rfunarg{layer.struct}, \Rfunarg{max.fanin}, and \Rfunarg{max.parents} are available.
+\Rfunarg{layer.struct} and \Rfunarg{max.parents.layers} are used to allow or forbid edges between the layers defined using the \Rfunarg{layering} argument; \Rfunarg{max.parents} bounds the number of incoming directed edges in a node, while \Rfunarg{max.fanin} serves the same purpose for non-directed edges.
 
 When using \Rfunarg{hc}, it is possible to provide also a predetermined \textit{skeleton}, that is, the undirected network whose edges will be the only ones
 considered by the algorithm, using the \Rfunarg{init.cpc} optional parameter.
 See also the method documentation for more information.
 
+It is also possible to enforce the presence of some edges, using the \Rfunarg{mandatory.edges} argument,
+that takes a binary matrix that takes \texttt{1} in position \texttt{i,j} if there must be an edge
+from node \texttt{i} to node \texttt{j}.
 
 The structure learning task by default computes the structure as a DAG. We can however use
 bootstrap samples to learn what we call a \textit{weighted partially DAG}, in order to get a weighted confidence on the presence or
@@ -658,9 +664,9 @@ dbn <- learn.dynamic.network(dataset,
 \begin{figure}[!tpb]%figure3
 \centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network (123 edges in the original network).}\label{fig:hepar2crosses}
-\end{figure}
+%\end{figure}
 
-\begin{figure}[!tpb]%figure3
+%\begin{figure}[!tpb]%figure3
 \centerline{\includegraphics[width=0.75\textwidth]{andes_crosses.eps}}
 \caption{SHD vs. running time of MMHC on complete datasets of i) 100 observations, ii) 1000 observations and iii) 10000 observations sampled from the 223-nodes Andes network (338 edges in the original network).}\label{fig:andescrosses}
 \end{figure}

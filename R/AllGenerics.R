@@ -78,11 +78,13 @@
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to.
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
-#'        for nodes in a layer (only for \code{mmhc}).
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #'        (if available, a check is performed). Default is to use raw dataset
@@ -153,11 +155,13 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to.
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
-#'        for nodes in a layer (only for \code{mmhc}).
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
@@ -282,10 +286,13 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param max.parents maximum number of parents for each node (for \code{mmhc}, \code{hc}).
-#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
@@ -317,9 +324,9 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' 
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", initial.network=NULL,
-                                       alpha=0.05, ess=1, bootstrap=FALSE,
-                                       layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
-                                       layer.struct = NULL,
+                                       alpha=0.05, ess=1, bootstrap=FALSE, layering=c(), max.fanin = num.variables(dataset),
+                                       max.fanin.layers=NULL, max.parents=num.variables(dataset),
+                                       max.parents.layers = NULL, layer.struct = NULL,
                                        cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE,
                                        mandatory.edges = NULL, ...) standardGeneric("learn.structure"))
 
