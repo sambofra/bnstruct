@@ -3,8 +3,8 @@
 \docType{methods}
 \name{marginals}
 \alias{marginals}
-\alias{marginals,InferenceEngine}
 \alias{marginals,InferenceEngine-method}
+\alias{marginals,InferenceEngine}
 \title{compute the list of inferred marginals of a BN.}
 \usage{
 marginals(x, ...)
@@ -30,4 +30,3 @@ marginals(eng)
 }
 
 }
-

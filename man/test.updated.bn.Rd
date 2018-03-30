@@ -3,8 +3,8 @@
 \docType{methods}
 \name{test.updated.bn}
 \alias{test.updated.bn}
-\alias{test.updated.bn,InferenceEngine}
 \alias{test.updated.bn,InferenceEngine-method}
+\alias{test.updated.bn,InferenceEngine}
 \title{check if an updated \code{\link{BN}} is present in an \code{\link{InferenceEngine}}.}
 \usage{
 test.updated.bn(x)
@@ -34,4 +34,3 @@ test.updated.bn(ie) # TRUE
 }
 
 }
-

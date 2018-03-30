@@ -78,15 +78,21 @@
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to.
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
-#'        for nodes in a layer (only for \code{mmhc}).
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
-#' (if available, a check is performed). Default is to use raw dataset
+#'        (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
-#' starting the Hill Climbing from an empty graph.
+#'        starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for methods.
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
@@ -120,10 +126,10 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' This method is a wrapper for \code{\link{learn.network}} to simplify the learning of a dynamic network.
 #' It provides an automated generation of the \code{layering} required to represent the set of time constraints
 #' encoded in a dynamic network. In this function, it is assumed that the dataset contains the observations for each variable
-#' in all the time slots:
+#' in all the time steps:
 #' \code{V_1^{t_1}, V_2^{t_1}, V_n^{t_1}, V_1^{t_2}, ... , V_n^{t_k}}.
-#' Variables in time slot \code{j} can be parents for any variable in time slots \code{k>j}, but not for variables \code{i<j}.
-#' If a layering is provided for a time slot, it is valid in each time slot, and not throughout the whole dynamic network;
+#' Variables in time step \code{j} can be parents for any variable in time steps \code{k>=j}, but not for variables \code{i<j}.
+#' If a layering is provided for a time step, it is valid in each time step, and not throughout the whole dynamic network;
 #' a global layering can however be provided.
 #' 
 #' The other parameters available are the ones of \code{\link{learn.network}}, refer to the documentation of that function 
@@ -149,15 +155,21 @@ setGeneric("learn.network", function(x, ...)#dataset, algo="mmhc", scoring.func=
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to.
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
 #' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
-#'        for nodes in a layer (only for \code{mmhc}).
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 #' starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for methods.
 #' 
 #' @return new \code{\link{BN}} object with structure (DAG) and conditional probabilities
@@ -274,14 +286,21 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' @param ess Equivalent Sample Size value.
 #' @param bootstrap \code{TRUE} to use bootstrap samples. 
 #' @param layering vector containing the layers each node belongs to (only for \code{sm}).
-#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm}).
-#' @param max.fanin maximum number of parents for each node (only for \code{sm}).
-#' @param layer.struct prior knowledge for layering structure (only for \code{mmhc}).
+#' @param max.fanin.layers matrix of available parents in each layer (only for \code{sm} --
+#'        DEPRECATED, use \code{max.parents.layers} instead).
+#' @param max.fanin maximum number of parents for each node (only for \code{hc}, \code{mmhc}).
+#' @param max.parents maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).
+#' @param max.parents.layers matrix of available parents in each layer (only for \code{sm}).
+#' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' @param cont.nodes vector containing the index of continuous variables.
 #' @param use.imputed.data \code{TRUE} to learn the structure from the imputed dataset
 #' (if available, a check is performed). Default is to use raw dataset
 #' @param use.cpc (when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 #' starting the Hill Climbing from an empty graph.
+#' @param mandatory.edges binary matrix, where a \code{1} in cell \code{[i,j]}
+#'        indicates that an edge from node \code{i} to node \code{j} must be present
+#'        in the final network.
 #' @param ... potential further arguments for method.
 #' 
 #' @return new \code{\link{BN}} object with DAG.
@@ -305,10 +324,11 @@ setGeneric("learn.params", function(bn, dataset, ess=1, use.imputed.data=F) stan
 #' 
 #' @exportMethod learn.structure
 setGeneric("learn.structure", function(bn, dataset, algo="mmhc", scoring.func="BDeu", initial.network=NULL,
-                                       alpha=0.05, ess=1, bootstrap=FALSE,
-                                       layering=c(), max.fanin.layers=NULL, max.fanin=num.variables(dataset),
-                                       layer.struct = NULL,
-                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE, ...) standardGeneric("learn.structure"))
+                                       alpha=0.05, ess=1, bootstrap=FALSE, layering=c(), max.fanin = num.variables(dataset),
+                                       max.fanin.layers=NULL, max.parents=num.variables(dataset),
+                                       max.parents.layers = NULL, layer.struct = NULL,
+                                       cont.nodes=c(), use.imputed.data=FALSE, use.cpc=TRUE,
+                                       mandatory.edges = NULL, ...) standardGeneric("learn.structure"))
 
 
 #' return the layering of the nodes.
@@ -438,6 +458,7 @@ setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 #' 
 #' @param x a \code{\link{BN}} object
 #' @param filename name (with path, if needed) of the file to be created
+#' @param ... parameters for the \code{\link{plot}} method.
 #' 
 #' @examples
 #' \dontrun{
@@ -447,7 +468,7 @@ setGeneric("marginals", function(x, ...) standardGeneric("marginals"))
 #' @seealso \code{\link{plot}}
 #' 
 #' @exportMethod save.to.eps
-setGeneric("save.to.eps", function(x, filename) standardGeneric("save.to.eps"))
+setGeneric("save.to.eps", function(x, filename, ...) standardGeneric("save.to.eps"))
 
 
 #' Read a network from a \code{.dsc} file.

@@ -3,8 +3,8 @@
 \docType{methods}
 \name{observations}
 \alias{observations}
-\alias{observations,InferenceEngine}
 \alias{observations,InferenceEngine-method}
+\alias{observations,InferenceEngine}
 \title{get the list of observations of an \code{\link{InferenceEngine}}.}
 \usage{
 observations(x)
@@ -27,4 +27,3 @@ Output is a list in the following format:
 \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 }
 }
-

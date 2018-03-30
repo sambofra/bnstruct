@@ -3,9 +3,11 @@
 setMethod("learn.network",
           c("BN"),
           function(x, y = NULL, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+                   max.fanin = num.variables(y) -1, max.fanin.layers = NULL,
+                   max.parents = num.variables(y) -1, max.parents.layers = NULL,
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, 
+                   mandatory.edges = NULL, ...)
           {
             if (is.null(y) || class(y) != "BNDataset")
               stop("A BNDataset must be provided in order to learn a network from it. ",
@@ -15,13 +17,15 @@ setMethod("learn.network",
             dataset <- y
             if (num.time.steps(dataset) > 1) {
               bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
-                                          initial.network, alpha, ess,
-                                          bootstrap, layering, max.fanin.layers, max.fanin,
-                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                          initial.network, alpha, ess, bootstrap, layering,
+                                          max.fanin, max.fanin.layers, max.parents, max.parents.layers,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, 
+                                          mandatory.edges, ...)
             } else {
               bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                    bootstrap, layering, max.fanin.layers, max.fanin,
-                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                    bootstrap, layering, max.fanin, max.fanin.layers, max.parents,
+                                    max.parents.layers, layer.struct, cont.nodes, use.imputed.data, use.cpc,
+                                    mandatory.edges, ...)
               
               if (!bootstrap && algo != "mmpc")
                 bn <- learn.params(bn, dataset, ess, use.imputed.data)
@@ -34,21 +38,25 @@ setMethod("learn.network",
 setMethod("learn.network",
           c("BNDataset"),
           function(x, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+                   max.fanin = num.variables(x) - 1, max.fanin.layers = NULL,
+                   max.parents = num.variables(x) - 1, max.parents.layers = NULL,
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+                   mandatory.edges = NULL, ...)
           {
             dataset <- x
             bn <- BN(dataset)
             if (num.time.steps(dataset) > 1) {
               bn <- learn.dynamic.network(bn, dataset, num.time.steps(dataset), algo, scoring.func,
-                                          initial.network, alpha, ess,
-                                          bootstrap, layering, max.fanin.layers, max.fanin,
-                                          layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                          initial.network, alpha, ess, bootstrap, layering,
+                                          max.fanin, max.fanin.layers, max.parents, max.parents.layers,
+                                          layer.struct, cont.nodes, use.imputed.data, use.cpc,
+                                          mandatory.edges, ...)
             } else {
               bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                    bootstrap, layering, max.fanin.layers, max.fanin,
-                                    layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                    bootstrap, layering, max.fanin, max.fanin.layers, max.parents,
+                                    max.parents.layers, layer.struct, cont.nodes, use.imputed.data,
+                                    use.cpc, mandatory.edges, ...)
               
               if (!bootstrap && algo != "mmpc")
                 bn <- learn.params(bn, dataset, ess, use.imputed.data)
@@ -62,9 +70,11 @@ setMethod("learn.network",
 setMethod("learn.dynamic.network",
           c("BN"),
           function(x, y = NULL, num.time.steps = num.time.steps(y), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL, 
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(y),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+                   max.fanin = num.variables(y) - 1, max.fanin.layers = NULL,
+                   max.parents = num.variables(y) - 1, max.parents.layers = NULL,
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+                   mandatory.edges = NULL, ...)
           {
             if (is.null(y) || class(y) != "BNDataset")
               stop("A BNDataset must be provided in order to learn a network from it. ",
@@ -80,7 +90,6 @@ setMethod("learn.dynamic.network",
             nv <- num.variables(dataset) / num.time.steps
             
             nl <- layering
-            mfl <- max.fanin.layers
             ls <- layer.struct
             
             if (is.null(layering)) {
@@ -127,8 +136,8 @@ setMethod("learn.dynamic.network",
             
             
             bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                  bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                  bootstrap, layering, max.fanin, max.fanin.layers, max.parents, max.parents.layers,
+                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, mandatory.edges, ...)
             
             if (!bootstrap && algo != "mmpc")
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
@@ -140,9 +149,11 @@ setMethod("learn.dynamic.network",
 setMethod("learn.dynamic.network",
           c("BNDataset"),
           function(x, num.time.steps = num.time.steps(x), algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(x),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...) {
+                   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+                   max.fanin = num.variables(x) - 1, max.fanin.layers = NULL,
+                   max.parents = num.variables(x) - 1, max.parents.layers = NULL,
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+                   mandatory.edges = NULL, ...) {
             
             dataset <- x
             bn <- BN(dataset)
@@ -154,7 +165,6 @@ setMethod("learn.dynamic.network",
             nv <- num.variables(x) / num.time.steps
             
             nl <- layering
-            mfl <- max.fanin.layers
             ls <- layer.struct
             
             if (is.null(layering)) {
@@ -200,8 +210,9 @@ setMethod("learn.dynamic.network",
             }
             
             bn <- learn.structure(bn, dataset, algo, scoring.func, initial.network, alpha, ess,
-                                  bootstrap, layering, max.fanin.layers, max.fanin,
-                                  layer.struct, cont.nodes, use.imputed.data, use.cpc, ...)
+                                  bootstrap, layering, max.fanin, max.fanin.layers, max.parents,
+                                  max.parents.layers, layer.struct, cont.nodes, use.imputed.data,
+                                  use.cpc, mandatory.edges, ...)
             
             if (!bootstrap && algo != "mmpc")
               bn <- learn.params(bn, dataset, ess, use.imputed.data)
@@ -293,9 +304,11 @@ setMethod("learn.params",
 setMethod("learn.structure",
           c("BN", "BNDataset"),
           function(bn, dataset, algo = "mmhc", scoring.func = "BDeu", initial.network = NULL,
-                   alpha = 0.05, ess = 1, bootstrap = FALSE,
-                   layering = c(), max.fanin.layers = NULL, max.fanin = num.variables(dataset),
-                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, ...)
+                   alpha = 0.05, ess = 1, bootstrap = FALSE, layering = c(),
+                   max.fanin = num.variables(dataset) - 1, max.fanin.layers = NULL,
+                   max.parents = num.variables(dataset) - 1, max.parents.layers = NULL,
+                   layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
+                   mandatory.edges = NULL, ...)
           {
             
             # setup
@@ -376,6 +389,12 @@ setMethod("learn.structure",
             }
             else
               init.net <- NULL
+
+            # check consistency between max.parents and max.fanin
+            #if (max.fanin < max.parents) {
+            #  # bnstruct.log ("bounding max.parents to max.fanin")
+            #  max.parents <- max.fanin
+            #}
             
             # other params
             other.args <- list(...)
@@ -388,6 +407,14 @@ setMethod("learn.structure",
               set.seed(as.numeric(other.args$seed))
             else
               set.seed(0)
+            if ("wm.max" %in% names(other.args))
+              wm.max <- as.numeric(other.args$wm.max)
+            else
+              wm.max <- 15
+            if ("initial.cpc" %in% names(other.args))
+              initial.cpc <- as.numeric(other.args$initial.cpc)
+            else
+              initial.cpc <- NULL
             
             #if ("struct.threshold" %in% names(other.args))
               #struct.threshold <- as.numeric(other.args$struct.threshold)
@@ -397,6 +424,15 @@ setMethod("learn.structure",
             # switch on algorithm
             if (algo == "sm")
             {
+              # check consistency between max.parents and max.fanin
+              if ( max.fanin < max.parents                                   ||
+                  (is.null(max.parents.layers) && !is.null(max.fanin.layers))  ) {
+                bnstruct.log ("SM uses 'max.parents' and 'max.parents.layers' parameters, ",
+                              "but apparently you set 'max.fanin' and 'max.fanin.layers', ",
+                              "changing accordingly.")
+                max.parents <- max.fanin
+                max.parents.layers <- max.fanin.layers
+              }
               bnstruct.start.log("learning the structure using SM ...")
               if (bootstrap)
               {
@@ -406,7 +442,7 @@ setMethod("learn.structure",
                   data <- boot(dataset, i, use.imputed.data = use.imputed.data)
                   
                   dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering,
-                            max.fanin.layers, ess)
+                            max.fanin.layers, ess, initial.cpc, mandatory.edges)
                   
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
@@ -415,7 +451,8 @@ setMethod("learn.structure",
               else
               {     
                 dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes,
-                               max.fanin, layering, max.fanin.layers, ess)
+                               max.fanin, layering, max.fanin.layers, ess,
+                               initial.cpc, mandatory.edges)
               }
               bnstruct.end.log("learning using SM completed.")
             } # end if algo == sm
@@ -429,9 +466,10 @@ setMethod("learn.structure",
                         initial.network = init.net,
                         alpha = alpha, ess = ess, bootstrap = bootstrap,
                         layering = layering, max.fanin.layers = max.fanin.layers,
-                        max.fanin = max.fanin, cont.nodes = cont.nodes,
+                        max.fanin = max.fanin,
+                        max.parents = max.parents, cont.nodes = cont.nodes,
                         use.imputed.data = use.imputed.data,
-                        use.cpc = use.cpc, ...)
+                        use.cpc = use.cpc, mandatory.edges = mandatory.edges, ...)
               
               bnstruct.end.log("learning using SEM completed.")
             } # end if (algo == sem)
@@ -448,6 +486,13 @@ setMethod("learn.structure",
             # Shall we assume the users know what they're doing?
             if (algo == "mmpc")
             {
+                if ( max.parents < max.fanin) {
+                bnstruct.log ("MMPC uses 'max.fanin', ",
+                              "but apparently you set 'max.parents', ",
+                              "changing accordingly.")
+                max.parents <- max.fanin
+                max.parents.layers <- max.fanin.layers
+              }
               bnstruct.start.log("learning the structure using MMPC ...")
               
               if (bootstrap)
@@ -456,14 +501,16 @@ setMethod("learn.structure",
                 for( i in seq_len(num.boots(dataset)) )
                 {
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
+                               layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
                   finalPDAG <- finalPDAG + cpc
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
-                cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
+                             layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
                 wpdag(bn) <- cpc
               }
               bnstruct.end.log("learning using MMPC completed.")
@@ -473,6 +520,14 @@ setMethod("learn.structure",
             # use.cpc = FALSE
             if (algo == "hc")
             {
+              if ( max.parents < max.fanin                                   ||
+                  (is.null(layer.struct) && !is.null(max.parents.layers))  ) {
+                bnstruct.log ("HC uses 'max.fanin' and 'layer.struct' parameters, ",
+                              "but apparently you set 'max.parents' and 'max.parents.layers', ",
+                              "changing accordingly.")
+                max.parents <- max.fanin
+                max.parents.layers <- max.fanin.layers
+              }
               bnstruct.start.log("learning the structure using HC ...")
               
               if (!is.null(init.net))
@@ -488,22 +543,37 @@ setMethod("learn.structure",
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                             tabu.tenure = tabu.tenure, init.net = in.dag)
+                             tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                             wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                             mandatory.edges = mandatory.edges)
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
                 wpdag(bn) <- finalPDAG
               }
               else
               {
-                cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                if (is.null(initial.cpc)) {
+                    cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
+                } else {
+                    cpc <- initial.cpc
+                }
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, init.net = in.dag )
+                               tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                               wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                               mandatory.edges = mandatory.edges)
               }
               bnstruct.end.log("learning using HC completed.")
             } # end if algo == hc
             
             if (algo == "mmhc") # default
             {
+              if ( max.fanin < max.parents) {
+                bnstruct.log ("MMHC uses 'max.fanin', ",
+                              "but apparently you set 'max.parents', ",
+                              "changing accordingly.")
+                max.parents <- max.fanin
+                max.parents.layers <- max.fanin.layers
+              }
               bnstruct.start.log("learning the structure using MMHC ...")
               
               if (!is.null(init.net))
@@ -519,14 +589,21 @@ setMethod("learn.structure",
                   data <- boot(dataset, i, use.imputed.data=use.imputed.data)
                   
                   if (use.cpc){
-                    cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                    if (!is.null(initial.cpc)) {
+                      cpc <- initial.cpc
+                    } else {
+                      cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
+                                   layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
+                    }
                   }
                   else
                   {
                     cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                   }
                   dag <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                             tabu.tenure = tabu.tenure, init.net = in.dag)
+                             tabu.tenure = tabu.tenure, max.parents = max.parents,
+                             init.net = in.dag, wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                             mandatory.edges = mandatory.edges )
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
                 wpdag(bn) <- finalPDAG
@@ -534,11 +611,18 @@ setMethod("learn.structure",
               else
               {
                 if (use.cpc)
-                  cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering, layer.struct )
+                    if (!is.null(initial.cpc)) {
+                      cpc <- initial.cpc
+                    } else {
+                      cpc <- mmpc( data, node.sizes, cont.nodes, alpha, layering,
+                                   layer.struct, max.fanin=max.fanin, mandatory.edges = mandatory.edges )
+                    }
                 else
                   cpc <- matrix(rep(1, num.nodes*num.nodes), nrow = num.nodes, ncol = num.nodes)
                 dag(bn) <- hc( data, node.sizes, scoring.func, cpc, cont.nodes, ess = ess,
-                               tabu.tenure = tabu.tenure, init.net = in.dag )
+                               tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
+                               wm.max=wm.max, layering=layering, layer.struct=layer.struct,
+                               mandatory.edges = mandatory.edges )
               }
               bnstruct.end.log("learning using MMHC completed.")
             } # end if algo == mmhc

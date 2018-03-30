@@ -1,0 +1,21 @@
+citHeader("To cite the bnstruct package in publications, use:")
+
+citEntry(
+  entry = "Article", 
+  title = "bnstruct: an R package for Bayesian Network structure learning in the presence of missing data", 
+  author = personList(c(as.person("Alberto Franzin"),
+                        as.person("Francesco Sambo"),
+                        as.person("Barbara di Camillo"))),
+  journal = "Bioinformatics", 
+  year = 2017, 
+  volume = 33,
+  number = 8, 
+  pages = "1250--1252", 
+  doi = "10.1093/bioinformatics/btw807",
+  publisher = "Oxford University Press", 
+  textVersion = paste(
+    "Alberto Franzin, Francesco Sambo, Barbara di Camillo.",
+    "bnstruct: an R package for Bayesian Network structure learning in the presence of missing data.",
+    "Bioinformatics, 2017; 33 (8): 1250-1252, Oxford University Press"
+  )
+)

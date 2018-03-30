@@ -3,8 +3,8 @@
 \docType{methods}
 \name{read.bif}
 \alias{read.bif}
-\alias{read.bif,character}
 \alias{read.bif,character-method}
+\alias{read.bif,character}
 \title{Read a network from a \code{.bif} file.}
 \usage{
 read.bif(x)
@@ -24,4 +24,3 @@ build a \code{\link{BN}} object.
 \details{
 The method relies on a coherent ordering of variable values and parameters in the file.
 }
-

@@ -2,10 +2,11 @@
 % Please edit documentation in R/AllClasses.R, R/InferenceEngine-methods.R
 \docType{class}
 \name{InferenceEngine-class}
-\alias{InferenceEngine}
-\alias{InferenceEngine,InferenceEngine-class}
 \alias{InferenceEngine-class}
+\alias{InferenceEngine,InferenceEngine-class}
+\alias{InferenceEngine}
 \alias{initialize,InferenceEngine-method}
+\alias{InferenceEngine}
 \title{InferenceEngine class.}
 \usage{
 \S4method{initialize}{InferenceEngine}(.Object, ...)
@@ -53,6 +54,7 @@ constructor for \code{\link{InferenceEngine}} object
   \item{\code{observed.vals}:}{list of observed values for the corresponding variables in \code{observed.vars}.}
 }
 }
+
 \examples{
 \dontrun{
 dataset <- BNDataset()
@@ -65,4 +67,3 @@ eng.2 <- InferenceEngine(bn, obs)
 }
 
 }
-

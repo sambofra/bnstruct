@@ -1,10 +1,11 @@
 hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess = 1, tabu.tenure = 100, 
-                init.net = NULL )
+                max.parents = length(node.sizes)-1,
+                init.net = NULL, wm.max=15, layering=NULL, layer.struct=NULL,
+                mandatory.edges = NULL )
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
-  
-  
+
   # just to be sure
   storage.mode( node.sizes ) <- "integer"
   
@@ -14,6 +15,13 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   
   # data <- quantize.with.na.matrix( data, levels )
   data <- quantize.matrix( data, levels )
+
+  # apply mandatory edges (if present)
+  m.edges <- matrix(0L, n.nodes, n.nodes)
+  if (!is.null(mandatory.edges)) {
+    m.edges <- m.edges | mandatory.edges
+  }
+  storage.mode(m.edges) <- "integer"
   
   # start with init.net if not NULL, otherwise with empty matrix
   if( !is.null(init.net) )
@@ -26,11 +34,42 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   }
   else
     curr.g <- matrix(0L,n.nodes,n.nodes) # integers!  
+  curr.g <- curr.g | m.edges
+
+  # apply layering
+  if (!is.null(layer.struct) && is.null(layering)) {
+      stop("layer.struct provided without layering.\n")
+  }
+  if ( !is.null(layering) && length(unique(layering)) > 1 ) {
+      n.layers <- length(unique(layering))
+
+      if (is.null(layer.struct)) {
+          layer.struct <- matrix(1L, n.layers, n.layers)
+          layer.struct[lower.tri(layer.struct)] <- 0
+          layer.struct[1,1] <- 0
+      }
+
+      layers <- matrix(1L, n.nodes, n.nodes)
+      for (i in 1:n.layers) {
+          for (j in 1:n.layers) {
+              layers[which(layering == i), which(layering == j)] <- layer.struct[i, j]
+          }
+      }
+      diag(layers) <- 0
+
+      # keep only edges allowed by both the CPC / initial network and the layering
+      cpc <- cpc & layers
+      
+      if (sum(m.edges | t(m.edges)) > 0L && sum(curr.g & layers) == 0L) {
+        stop("the mandatory edges provided are inconsistent with the given layering.\n")
+      }
+  }
+  # end apply layering
   
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
-    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L, scoring.func,
-                                  ess, PACKAGE = "bnstruct" )
+    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L,
+                                  scoring.func, ess, PACKAGE = "bnstruct" )
 
   # global best solution
   global.best.g <- curr.g
@@ -42,8 +81,8 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   
   # worsening moves
   wm.count <- 0
-  wm.max <- 15
-  while( wm.count < 15 )
+  #wm.max <- 15
+  while( wm.count < wm.max )
   {
     next.score.diff <- rep(-Inf,n.nodes)
     next.pert <- rep(-1L,n.nodes)
@@ -53,7 +92,7 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
     {
       for( par in 1L:n.nodes )
       {
-        if( cpc[par,node] == 1L )
+        if( cpc[par,node] == 1L && (m.edges[par,node] == 0 && m.edges[node,par] == 0))
         {
           next.g <- curr.g;
           s.diff <- -Inf
@@ -68,7 +107,9 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
-          else if( curr.g[node,par] == 0L ) # edge addition
+          # edge addition
+          # check also if there is room for one more parent
+          else if( curr.g[node,par] == 0L && sum(curr.g[,node]) < max.parents ) 
           {
             next.g[par,node] = 1L;
             # print(c(node,par,.Call("is_acyclic", next.g, PACKAGE = "bnstruct"),!.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct")))
@@ -81,7 +122,9 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
-          else # edge reversal
+          # edge reversal
+          # check also if there is room for one more parent
+          else if ( sum(curr.g[,node]) < max.parents )
           {
             next.g[par,node] = 1L;
             next.g[node,par] = 0L;
@@ -147,12 +190,18 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
 
 
 mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
-						layering = NULL, layer.struct = NULL)
+		  layering = NULL, layer.struct = NULL, 
+                  max.fanin=length(node.sizes)-1, mandatory.edges = NULL )
 						
 {
   n.nodes <- ncol(data)
   n.cases <- nrow(data)
-  
+  min.counts <- 5
+
+  if (length(max.fanin) == 1) {
+    max.fanin <- rep(max.fanin, n.nodes)
+  }
+
   # just to be sure
   storage.mode( node.sizes ) <- "integer"
   
@@ -193,6 +242,13 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   
   cpc.mat <- layer.mat | t(layer.mat) # constrain the cpc search
   allowed <- cpc.mat
+
+  # mandatory edges
+  if ( is.null(mandatory.edges) ) {
+    medges <- matrix(0, n.nodes, n.nodes)
+  } else {
+    medges <- mandatory.edges | t(mandatory.edges)
+  }
   
   # print(cpc.mat)
   
@@ -201,7 +257,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # forward addition of nodes
   for( i in 1:n.nodes )
   {
-    cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th )
+    cpc.mat[i,] <- mmpc.fwd( data, node.sizes, allowed, i, chi.th, min.counts, max.fanin )
     # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     allowed[,i] <- allowed[,i] & t(cpc.mat[i,])
   }
@@ -211,7 +267,7 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # backwards removal of nodes
   for( i in 1:n.nodes )
   {
-    cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th )
+    cpc.mat[i,] <- mmpc.bwd( data, node.sizes, cpc.mat[i,], i, chi.th, min.counts, max.fanin )
     # cat("cpcMat ",i,": ",cpc.mat[i,],"\n")
     cpc.mat[,i] <- cpc.mat[,i] & t(cpc.mat[i,])
   }
@@ -219,17 +275,19 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   # print(cpc.mat)
   
   # symmetry enformcement
-  cpc.mat = cpc.mat * t(cpc.mat)
+  cpc.mat <- cpc.mat * t(cpc.mat)
   
   # further filter with layering
-  cpc.mat = cpc.mat * layer.mat
+  cpc.mat <- cpc.mat * layer.mat
   
-  # print(cpc.mat)
+  # force mandatory edges
+  cpc.mat <- cpc.mat | medges
+  storage.mode(cpc.mat) <- "integer"
   
   return( cpc.mat )
 }
 
-mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
+mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th, min.counts, max.fanin )
 {
   # cat("\n",x,":\n");
   n.nodes <- ncol(data)
@@ -240,7 +298,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   minAssoc <- rep(0,n.nodes)
   for( y in 1:n.nodes )
     if( allowed[x,y] )
-      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th )
+      minAssoc[y] <- g2( data, node.sizes, x, y, chi.th, min.counts=min.counts )
   allowed[x,minAssoc==0] <- 0 # remove already independent nodes
   
   m <- max( minAssoc )
@@ -258,22 +316,22 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
     # try to add one node to the cpc
     for( y in 1:n.nodes )
     {
-      if( allowed[x,y] )
+      if( allowed[x,y] && length(cpc) > 0 )
       {
         # condition on all possible combinations of cpc elements, 
         # from smaller to larger
         n <- as.integer( length(cpc) )
         s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-        for( zsize in seq_len( n ) )
+        for( zsize in seq_len( min(c(n, max.fanin[y])) ) )
         {
           # test for possible early stopping, no indep test can be performed
-          if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / 5 )
+          if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts )
             break
           
-			    comb <- as.integer(1:zsize)
-			    while( comb[1]!=0 ) # check for the end of combinations
-			    {
-            assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb] )
+	  comb <- as.integer(1:zsize)
+	  while( comb[1]!=0 ) # check for the end of combinations
+	  {
+            assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb], min.counts )
             if( assoc < minAssoc[y] )
               minAssoc[y] <- assoc
             if( assoc == 0 ) # do not try with y anymore
@@ -281,7 +339,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
               allowed[x,y] = 0
               break
             }
-				    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
+	    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
           }
           if( allowed[x,y] == 0 ) # came out from the break
             break
@@ -305,7 +363,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th )
   return(cpc.vec)
 }
 
-mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
+mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th, min.counts, max.fanin )
 {
 #  cat("\n",x,":\n");
 #  cat(which(cpc.vec!=0),"\n");
@@ -323,18 +381,18 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
       # condition on all possible combinations of cpc elements, 
       # from smaller to larger
       cpc <- setdiff( which( cpc.vec > 0 ), y )
-		  n <- as.integer( length(cpc) )
+      n <- as.integer( length(cpc) )
       s <- sort( node.sizes[cpc], index.return=T )$ix # useful for early stopping
-      for( zsize in seq_len( n )  )
+      for( zsize in seq_len( min(c(n, max.fanin[y])) )  )
       {
         # test for possible early stopping, no indep test can be performed
-        if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / 5)
+        if( prod(node.sizes[c(x,y,cpc[s[1:zsize]])]) > n.cases / min.counts)
           break
         
         comb <- as.integer(1:zsize)
         while( comb[1]!=0 ) # check for the end of combinations
         {  
-          assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb] )
+          assoc = g2( data, node.sizes, x, y, chi.th, cpc[comb], min.counts )
           if( assoc == 0 ) # do not try with y anymore
           {
             cpc.vec[y] = 0
@@ -352,10 +410,10 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th )
   return( cpc.vec )
 }
   
-g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c() )
+g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c(), min.counts = 5)
 {
-  # if less than 5 counts per cell on average, cannot exclude dependence
-  if( dim(data)[1]/prod(sizes[c(x,y,z)]) < 5 )
+  # if less than min.counts (default 5) counts per cell on average, cannot exclude dependence
+  if( dim(data)[1]/prod(sizes[c(x,y,z)]) < min.counts )
     return( chi.th )
 
   # tab <- compute.counts( data[,c(x,y,z)], sizes[c(x,y,z)] )

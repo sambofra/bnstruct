@@ -3,8 +3,8 @@
 \docType{methods}
 \name{wpdag}
 \alias{wpdag}
-\alias{wpdag,BN}
 \alias{wpdag,BN-method}
+\alias{wpdag,BN}
 \title{get the WPDAG of an object.}
 \usage{
 wpdag(x)
@@ -20,4 +20,3 @@ matrix contaning the WPDAG of the object.
 \description{
 Return the weighted partially directed acyclic graph of a network, when available (e.g. when bootstrap on dataset is performed).
 }
-

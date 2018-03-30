@@ -27,7 +27,7 @@ this void.
 
 Installation
 -----------
-The latest stable version of `bnstruct` is available 
+The latest stable version of `bnstruct` is available
 [on CRAN](https://CRAN.R-project.org/package=bnstruct)
 and can be installed with
 ```{r eval=FALSE}
@@ -58,3 +58,13 @@ For Windows platforms, a binary executable of the latest stable version is avail
 `methods`. Package `Rgraphviz` is requested in
 order to plot graphs, but is not mandatory.
 
+Reference
+---------
+If you `bnstruct` in your work, please cite it as:
+```
+Alberto Franzin, Francesco Sambo, Barbara di Camillo. "bnstruct: an R package for Bayesian Network structure learning in the presence of missing data." Bioinformatics, 2017; 33 (8): 1250-1252; Oxford University Press.
+```
+These information and a BibTeX entry can be found with
+```{r eval=FALSE}
+citation("bnstruct")
+```

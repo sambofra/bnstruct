@@ -3,10 +3,10 @@
 \docType{methods}
 \name{learn.dynamic.network}
 \alias{learn.dynamic.network}
-\alias{learn.dynamic.network,BN}
 \alias{learn.dynamic.network,BN-method}
-\alias{learn.dynamic.network,BNDataset}
+\alias{learn.dynamic.network,BN}
 \alias{learn.dynamic.network,BNDataset-method}
+\alias{learn.dynamic.network,BNDataset}
 \title{learn a dynamic network (structure and parameters) of a \link{BN} from a \link{BNDataset}.}
 \usage{
 learn.dynamic.network(x, ...)
@@ -14,16 +14,18 @@ learn.dynamic.network(x, ...)
 \S4method{learn.dynamic.network}{BN}(x, y = NULL,
   num.time.steps = num.time.steps(y), algo = "mmhc",
   scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(y), layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  bootstrap = FALSE, layering = c(), max.fanin = num.variables(y) - 1,
+  max.fanin.layers = NULL, max.parents = num.variables(y) - 1,
+  max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
+  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
 
 \S4method{learn.dynamic.network}{BNDataset}(x,
   num.time.steps = num.time.steps(x), algo = "mmhc",
   scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin.layers = NULL,
-  max.fanin = num.variables(x), layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, ...)
+  bootstrap = FALSE, layering = c(), max.fanin = num.variables(x) - 1,
+  max.fanin.layers = NULL, max.parents = num.variables(x) - 1,
+  max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
+  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
@@ -55,12 +57,17 @@ or the string \code{random.chain} to sample a random chain as starting point.}
 
 \item{layering}{vector containing the layers each node belongs to.}
 
-\item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm}).}
+\item{max.fanin}{maximum number of parents for each node (only for \code{hc}, \code{mmhc}).}
 
-\item{max.fanin}{maximum number of parents for each node (only for \code{sm}).}
+\item{max.fanin.layers}{matrix of available parents in each layer (only for \code{sm} --
+DEPRECATED, use \code{max.parents.layers} instead).}
+
+\item{max.parents}{maximum number of parents for each node (for \code{sm}, \code{hc}, \code{mmhc}).}
+
+\item{max.parents.layers}{matrix of available parents in each layer (only for \code{sm}).}
 
 \item{layer.struct}{\code{0/1} matrix for indicating which layers can contain parent nodes
-for nodes in a layer (only for \code{mmhc}).}
+for nodes in a layer (only for \code{mmhc}, \code{mmpc}).}
 
 \item{cont.nodes}{vector containing the index of continuous variables.}
 
@@ -69,6 +76,10 @@ for nodes in a layer (only for \code{mmhc}).}
 
 \item{use.cpc}{(when using \code{mmhc}) compute Candidate Parent-and-Children sets instead of 
 starting the Hill Climbing from an empty graph.}
+
+\item{mandatory.edges}{binary matrix, where a \code{1} in cell \code{[i,j]}
+indicates that an edge from node \code{i} to node \code{j} must be present
+in the final network.}
 }
 \value{
 new \code{\link{BN}} object with structure (DAG) and conditional probabilities
@@ -79,10 +90,10 @@ Learn a dynamic network (structure and parameters) of a \link{BN} from a \link{B
 This method is a wrapper for \code{\link{learn.network}} to simplify the learning of a dynamic network.
 It provides an automated generation of the \code{layering} required to represent the set of time constraints
 encoded in a dynamic network. In this function, it is assumed that the dataset contains the observations for each variable
-in all the time slots:
+in all the time steps:
 \code{V_1^{t_1}, V_2^{t_1}, V_n^{t_1}, V_1^{t_2}, ... , V_n^{t_k}}.
-Variables in time slot \code{j} can be parents for any variable in time slots \code{k>j}, but not for variables \code{i<j}.
-If a layering is provided for a time slot, it is valid in each time slot, and not throughout the whole dynamic network;
+Variables in time step \code{j} can be parents for any variable in time steps \code{k>=j}, but not for variables \code{i<j}.
+If a layering is provided for a time step, it is valid in each time step, and not throughout the whole dynamic network;
 a global layering can however be provided.
 }
 \details{
@@ -100,4 +111,3 @@ net <- learn.dynamic.network(mydataset, num.time.steps=2)
 \seealso{
 learn.network learn.structure learn.params
 }
-

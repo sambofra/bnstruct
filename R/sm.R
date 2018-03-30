@@ -10,7 +10,8 @@
 
 # Silander and Myllymaki complete search, BDeu score, high memory occupation.
 sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = NULL, 
-	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL ) 
+	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL,
+        mandatory.edges = NULL ) 
 {
 	n.cases <- nrow(x)
 	n.nodes <- ncol(x)
@@ -71,9 +72,32 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
   
   # remove parents not in cpc, if cpc.matrix is given
 	if( !is.null(cpc.mat) )
-    for( i in 1:n.nodes )
-      ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
-                     PACKAGE = "bnstruct") > 0) ] <- FALSE
+            for( i in 1:n.nodes )
+                ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
+                         PACKAGE = "bnstruct") > 0) ] <- FALSE
+
+        # remove candidate parents not consistent with mandatory edges.
+        # The idea is to transform this matrix in something similar to
+        # the CPC matrix: the idea is to leave only candidate parent sets
+        # that contain the mandatory edge(s).
+        if ( !is.null(mandatory.edges) ) {
+            for ( i in 1:n.nodes ) {
+                if ( sum(mandatory.edges[i,]) > 0 || sum(mandatory.edges[,i] > 0)) {
+                    ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(mandatory.edges[i,]==1),
+                             PACKAGE = "bnstruct") > 0) ] <- FALSE
+                    backup.ifm <- ifm[i,]
+                    for ( j in 1:n.nodes ) {
+                        if (mandatory.edges[j,i] == 1 && i != j) {
+                            ifm2 <- rep(TRUE, length(backup.ifm))
+                            ifm2[ (.Call("fumt_mask", n_elements = n.nodes, pattern = j,
+                                  PACKAGE = "bnstruct") > 0) ] <- FALSE
+                            backup.ifm <- backup.ifm & !ifm2
+                        }
+                    }
+                    ifm[i, ] <- backup.ifm
+                }
+            }
+        }
   
   # aflml <- all.families.log.marginal.likelihood( data, node.sizes, ifm, ess )
 	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, ess, scoring.func, PACKAGE = "bnstruct" )

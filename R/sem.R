@@ -6,12 +6,19 @@ setMethod("sem",
                    max.sem.iterations = 25, max.em.iterations = 10, scoring.func = "BDeu",
                    initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
                    layering = c(), max.fanin.layers = NULL,
-                   max.fanin = num.variables(dataset), cont.nodes = c(), use.imputed.data = FALSE,
-                   use.cpc = TRUE, ...)
+                   max.fanin = num.variables(dataset) - 1,
+                   max.parents = num.variables(dataset) - 1,
+                   cont.nodes = c(), use.imputed.data = FALSE,
+                   use.cpc = TRUE, mandatory.edges = NULL, ...)
           {
             net <- x
             
             num.nodes <- num.nodes(net)
+
+            # overwrite max.fanin, in case max.parents is provided
+            if (!is.null(max.parents)) {
+              max.fanin <- max.parents
+            }
 
             if (is.character(scoring.func))
               scoring.func <- match(tolower(scoring.func), c("bdeu", "aic", "bic"))
@@ -59,8 +66,9 @@ setMethod("sem",
                                        initial.network = w.net, # NULL,
                                        alpha = alpha, ess = ess, bootstrap = bootstrap,
                                        layering = layering, max.fanin.layers = max.fanin.layers,
-                                       max.fanin = max.fanin, cont.nodes = cont.nodes,
-                                       use.imputed.data = T, use.cpc = use.cpc, ...)
+                                       max.fanin = max.fanin, max.parents = max.parents,
+                                       cont.nodes = cont.nodes, use.imputed.data = T, use.cpc = use.cpc,
+                                       mandatory.edges = mandatory.edges, ...)
               
               difference <- shd(dag(w.net), dag(new.net))
               

@@ -3,6 +3,7 @@
 \docType{methods}
 \name{imputed.data<-}
 \alias{imputed.data<-}
+\alias{imputed.data<-}
 \alias{imputed.data<-,BNDataset-method}
 \title{add imputed data.}
 \usage{
@@ -21,4 +22,3 @@ Insert imputed data in a \code{\link{BNDataset}} object.
 \seealso{
 \code{\link{has.imputed.data}}, \code{\link{imputed.data}}, \code{\link{read.dataset}}
 }
-

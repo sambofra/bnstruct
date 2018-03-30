@@ -30,6 +30,8 @@ comment=""
 \author{Francesco Sambo, Alberto Franzin}
 \maketitle
 
+\tableofcontents
+
 <<echo=FALSE,include=FALSE>>=
 library(bnstruct)
 @
@@ -41,8 +43,8 @@ have the network, but only a set of observations, and wants to reconstruct the
 network that generated the data. The \Rpackage{bnstruct} package provides objects and methods for
 learning the structure and parameters of the network in various situations, such as
 in presence of missing data, for which it is possible to perform \textit{imputation}
-(guessing the missing values, by looking at the data){\color{red}, or the modeling of
-evolving systems using Dynamic Bayesian Networks.}. The package also contains methods
+(guessing the missing values, by looking at the data), or the modeling of
+evolving systems using Dynamic Bayesian Networks. The package also contains methods
 for learning using the Bootstrap technique.
 Finally, \Rpackage{bnstruct}, has a set of additional tools to use Bayesian Networks, such as methods to perform
 belief propagation.
@@ -55,6 +57,15 @@ This document is intended to show some examples of how \Rpackage{bnstruct} can b
 to learn and use Bayesian Networks. First we describe how to manage data sets,
 how to use them to discover a Bayesian Network, and finally how to perform some
 operations on a network. Complete reference for classes and methods can be found in the package documentation.
+
+If you use \Rpackage{bnstruct} in your work, please cite it as:
+\begin{quote}
+Alberto Franzin, Francesco Sambo, Barbara di Camillo. "bnstruct: an R package for Bayesian Network structure learning in the presence of missing data." Bioinformatics, 2017; 33 (8): 1250-1252; Oxford University Press.
+\end{quote}
+These information and a BibTeX entry can be found with
+<<citation2,eval=FALSE>>=
+citation("bnstruct")
+@
 
 \subsection{Overview}
 We provide here some general informations about the context for understanding
@@ -85,6 +96,7 @@ called \emph{imputation}. In this case, the dataset with the ``holes filled''
 is called the \emph{imputed dataset}, while the original dataset with missing values is
 referred to as the \emph{raw dataset}.
 In section \ref{sec:imputation} we show how to perform imputation in \Rpackage{bnstruct}.
+The case of missing variables is not considered by \Rpackage{bnstruct}.
 
 Another common operation on data is the employment of resampling techniques in order
 to estimate properties of a distribution from an approximate one. This usually allows
@@ -151,7 +163,8 @@ make install
 
 \Rpackage{bnstruct} requires R $\geq 2.10$,
 and depends on \Rpackage{bitops}, \Rpackage{igraph}, \Rpackage{Matrix} and \Rpackage{methods}.
-Package \Rpackage{Rgraphviz} is requested in order to plot graphs, but is not mandatory.
+Packages \Rpackage{Rgraphviz} or \Rpackage{qgraph} are requested in order to plot graphs,
+but are not mandatory.
 
 
 \section{Data sets}
@@ -238,7 +251,7 @@ asia  <- asia()
 child <- child()
 @
 
-{\color{red} If the dataset contains observations a system in consecutive instants,
+If the dataset contains observations a system in consecutive instants,
 it is possible to specify the number of instants that compose the dataset,
 using the \texttt{num.time.steps} parameter to \texttt{BNDataset()} or \texttt{read.dataset}.
 The user can choose whether to provide a description for all the variables observed in the 
@@ -255,7 +268,6 @@ dataset <- BNDataset("evolving_system.data",
                      "evolving_system.header",
                      num.time.steps=2)
 @
-}
 
 
 % \subsection{Importing a dataset}
@@ -528,15 +540,27 @@ net.2   <- learn.network(dataset,
 Prior knowledge can be given to the learning algorithm, by providing a \textit{layering} of the variables.
 Variables can be grouped in (numbered) layers, and a variable can only have parents in upper (lower-numbered) layers. In order to specify this in the learning step, one supplementary argument has to be provided: \texttt{layering}, a vector containing the indices of the layers of each variable. By default, the first layer contains variables with no parents, and variables in layer $j$ can have parents only in layers $i \leq j$.
 Layering is useful also in case of a Naive Bayes network, or when learning a Dynamic Bayesian Network,
-where each time frame can be associated to a layer. {\color{red}How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
-while a}n example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
-
-In case of more sophisticated requirements, some other optional arguments can be provided: \Rfunarg{max.fanin.layers} and \Rfunarg{max.fanin} for \Rfunarg{sm}, \Rfunarg{layer.struct} for \Rfunarg{mmhc} (see method documentation).
+where each time frame can be associated to a layer. How to learn a Dynamic Bayesian Network is explained in Section \ref{sec:dbns},
+while an example of learning a Naive Bayes network is given in Section \ref{sec:naivebayes}.
 <<layering,eval=F>>=
 layers <- c(1,2,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5)
 net.layer <- learn.network(dataset, layering = layers)
 @
 
+In case of more sophisticated layering requirements, some other optional arguments can be provided.
+For \Rfunarg{sm}, the available options to limit the number of incoming arcs are \Rfunarg{max.parents.layers} and \Rfunarg{max.parents}.
+For \Rfunarg{hc}, the corresponding options are \Rfunarg{layer.struct} and \Rfunarg{max.parents}.
+\Rfunarg{mmpc}, not considering directed edges, takes instead \Rfunarg{layer.struct} and \Rfunarg{max.fanin}.
+Finally, for \Rfunarg{mmhc}, \Rfunarg{layer.struct}, \Rfunarg{max.fanin}, and \Rfunarg{max.parents} are available.
+\Rfunarg{layer.struct} and \Rfunarg{max.parents.layers} are used to allow or forbid edges between the layers defined using the \Rfunarg{layering} argument; \Rfunarg{max.parents} bounds the number of incoming directed edges in a node, while \Rfunarg{max.fanin} serves the same purpose for non-directed edges.
+
+When using \Rfunarg{hc}, it is possible to provide also a predetermined \textit{skeleton}, that is, the undirected network whose edges will be the only ones
+considered by the algorithm, using the \Rfunarg{init.cpc} optional parameter.
+See also the method documentation for more information.
+
+It is also possible to enforce the presence of some edges, using the \Rfunarg{mandatory.edges} argument,
+that takes a binary matrix that takes \texttt{1} in position \texttt{i,j} if there must be an edge
+from node \texttt{i} to node \texttt{j}.
 
 The structure learning task by default computes the structure as a DAG. We can however use
 bootstrap samples to learn what we call a \textit{weighted partially DAG}, in order to get a weighted confidence on the presence or
@@ -563,11 +587,11 @@ first parameter an already initialized network for the dataset. More details can
 
 It is also possible to learn a WPDAG starting from a network with a DAG, using the \Rmethod{wpdag.from.dag} method.
 
-{\color{red}
 \subsubsection{Learning Dynamic Bayesian Networks}\label{sec:dbns}
 Dynamic Bayesian Networks (DBNs) are Bayesian Networks that represent the evolution in time of a system.
 The set of variables $v_1, v_2, \dots v_N$ of a DBN is repeated over a certain number $T$ of time steps,
-and variables in time slot $j$ can have descendents in successive time steps $k>j$ but not in the previous time
+and variables in time slot $j$ can have descendents in the current or subsequent time steps $k\geq j$ but
+not in the previous time
 steps $i<j$. From a structure learning point of view we can therefore consider the task of learning a DBN
 as learning a layered larger BN.
 
@@ -583,22 +607,14 @@ variable in the previous layers.
 It is possible to provide a layering for the whole DBN using the \Rfunarg{layering} parameter as explained
 in the structure learning section, assigning each one of the $N \times T$ variables to a layer.
 
-It is also possible to exploit knowledge about the layering in each time slot
-by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time steps.
-However, in this case, any variable $v_x$ in time slot $i$ will still be considered a potential parent for variable
-$v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i$.
-The same applies for \Rfunarg{layer.struct}.
-
-<<dbn,eval=F>>=
+<<dbn1,eval=F>>=
 # Assume a system with 8 nodes is observed over 4 consecutive
 # time steps, of which we know the layering in each time slot.
 # The dataset contains therefore 32 variables observed.
-# We provide a layering for the single time slot, that will be
-# expanded throughout the whole DBN.
-layers <- c(1,2,2,3,3,3,3,3)
-dbn <- learn.dynamic.network(dataset,
-                             num.time.steps = 4,
-                             layering = layers)
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps = 4)
+dbn <- learn.dynamic.network(dataset, num.time.steps = 4)
 @
 
 If the \texttt{BNDataset} already contains the information about the number of time steps,
@@ -609,31 +625,50 @@ and treat the network as a dynamic one.
 # Assume a system with 8 nodes is observed over 4 consecutive
 # time steps, of which we know the layering in each time slot.
 # The dataset contains therefore 32 variables observed.
-# We provide a layering for the single time slot, that will be
-# expanded throughout the whole DBN.
 dataset <- BNDataset("evolving_system.data",
                      "evolving_system.header",
-                     num.time.steps = 2)
+                     num.time.steps = 4)
 dbn <- learn.network(dataset)
 @
 
+It is also possible to exploit knowledge about the layering in each time slot
+by specifying the layering for just $N$ variables; such layering will be unfolded over the $T$ time steps.
+However, in this case, any variable $v_x$ in time slot $i$ will still be considered a potential parent for variable
+$v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i$.
+The same applies for \Rfunarg{layer.struct}.
 
-}
+<<dbn3,eval=F>>=
+dataset <- BNDataset("evolving_system.data",
+                     "evolving_system.header",
+                     num.time.steps = 4)
+layers <- c(1,2,2,3,3,3,3,3)
+dbn <- learn.dynamic.network(dataset,
+                             num.time.steps = 4,
+                             layering = layers)
+@
+
+
+
 
 \subsubsection{Empirical evaluation of structure learning algorithms}
 \begin{figure}[!tpb]%figure1
 \centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network {\color{red}(25 edges in the original network)}.}\label{fig:childcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network (25 edges in the original network).}\label{fig:childcrosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure2
 \centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network {\color{red}(46 edges in the original network)}.}\label{fig:alarmcrosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network (46 edges in the original network).}\label{fig:alarmcrosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
 \centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
-\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network {\color{red}(123 edges in the original network)}.}\label{fig:hepar2crosses}
+\caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network (123 edges in the original network).}\label{fig:hepar2crosses}
+%\end{figure}
+
+%\begin{figure}[!tpb]%figure3
+\centerline{\includegraphics[width=0.75\textwidth]{andes_crosses.eps}}
+\caption{SHD vs. running time of MMHC on complete datasets of i) 100 observations, ii) 1000 observations and iii) 10000 observations sampled from the 223-nodes Andes network (338 edges in the original network).}\label{fig:andescrosses}
 \end{figure}
 
 In this Section we show the results obtained by MMHC on available cases, MMHC on imputed data and SEM, with the BDeu and BIC scoring functions. Our testbed is composed by three networks available in the literature, Child (20 nodes), Alarm (37 nodes) and Hepar2 (70 nodes). For each network we consider 20 datasets of 1000 observations each, with 20\% missingness. The results for the three networks are reported, respectively, in Figures \ref{fig:childcrosses}, \ref{fig:alarmcrosses} and \ref{fig:hepar2crosses}. The datasets have been generated using our package. All the numerical parameters are set at their default value, and no prior knowledge of the network is assumed (e.g. layering).
@@ -641,6 +676,11 @@ In this Section we show the results obtained by MMHC on available cases, MMHC on
 Each plot shows the distributions of both the Structural Hamming Distance (SHD, the distance in terms of edges, on the vertical axis) from the original network, and the time needed to obtain to learn the network (in seconds, on the horizontal axis).
 
 For all the three networks the overall best results are obtained using MMHC with BDeu after dataset imputation. MMHC converges in few seconds even for the large Hepar2 network; conversely, SEM takes from few minutes up to few hours, often with worse results. SEM paired with BIC failed to converge in 24 hours for all the 20 datasets.
+
+We report also the results obtained by the MMHC algorithm over a larger network, Andes (223 nodes), using BDeu and BIC and three sets of datasets with 100, 1000 and 10000 observations each. In Figure \ref{fig:andescrosses} we show the results in terms of SHD with respect to the original network, and in terms of convergence time. In this case there is no significant difference in terms of time between the two scoring functions.
+The trend observed, with the learning from the datasets with 1000 observations being the slowest one, is a bit surprising, and can be explained with the fact that with fewer data, the statistical pruning is less effective but the computation of the score for each possible parent set is faster, while for larger datasets computing the score for one candidate parent set is more expensive, but there are less candidates to evaluate, as MMPC is more effective; with 1000 observations, in this case we observe an unlucky combination of relatively high computing time over a larger set of candidates.
+
+In terms of solution quality, the results clearly improve as the size of the dataset grows. For 10000 observations BDeu finds slightly better networks, in terms of similarity with the original one, than BIC, while for smaller datasets BIC is significantly more robust. The main difference, however, is given by the number of observations available: with 100 observations, effectively a $p>n$ case, the quality of the discovered networks is very poor, and it improves as the size of the datasets grows, having up to the 75\% of correctness with 10000 observations.
 
 
 \subsubsection{Parameter learning}
@@ -696,6 +736,20 @@ in the inline documentation of the method.
 plot(net) # regular DAG
 plot(net, plot.wpdag=T) # wpdag
 @
+
+The \Rmethod{plot()} method by default uses the \Rpackage{Rgraphviz}, and it corresponds to
+\Rmethod{plot(net, method="default")}. More advanced plotting functionalities are available
+using the Rpackage{qgraph} package, via \Rmethod{plot(net, method="qgraph")}. With
+\Rfunarg{method="qgraph"} it is possible to specify the optional arguments available for the
+\Rmethod{qgraph::qgraph()} method; for the full list of parameters and their effect, please
+refer to the documentation of the \Rpackage{qgraph} package \cite{epskampqgraph}.
+<<plotqgraph,eval=FALSE>>=
+plot(net, method="qgraph",
+          label.scale.equal=T,
+          node.width = 1.6,
+          plot.wpdag=T)
+@
+
 
 As it is for \Robject{BNDataset}s, we have several equivalent options to print a network.
 <<show,eval=FALSE>>=

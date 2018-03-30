@@ -3,8 +3,8 @@
 \docType{methods}
 \name{bn}
 \alias{bn}
-\alias{bn,InferenceEngine}
 \alias{bn,InferenceEngine-method}
+\alias{bn,InferenceEngine}
 \title{get the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
 bn(x)
@@ -20,4 +20,3 @@ the \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.
 \description{
 Return a network contained in an InferenceEngine.
 }
-

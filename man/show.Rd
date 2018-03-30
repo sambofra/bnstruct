@@ -18,4 +18,3 @@ show(object)
 The \code{show} method allows to provide a custom aspect for the output that is generated
 when the name of an instance is gives as command in an R session.
 }
-

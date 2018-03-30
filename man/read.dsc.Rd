@@ -3,8 +3,8 @@
 \docType{methods}
 \name{read.dsc}
 \alias{read.dsc}
-\alias{read.dsc,character}
 \alias{read.dsc,character-method}
+\alias{read.dsc,character}
 \title{Read a network from a \code{.dsc} file.}
 \usage{
 read.dsc(x)
@@ -24,4 +24,3 @@ build a \code{\link{BN}} object.
 \details{
 The method relies on a coherent ordering of variable values and parameters in the file.
 }
-

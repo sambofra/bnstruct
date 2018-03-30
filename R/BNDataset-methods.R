@@ -56,7 +56,7 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
   if(length(variables) > 1)
   {
     vars <- variables
-    if (length(vars) == ncol(a)) {
+    if (length(vars) == ncol(as.matrix(data))) {
       variables(dataset) <- vars
     } else if (num.time.steps > 1 && length(vars) * num.time.steps == ncol(as.matrix(data))) {
       copyvars <- c()
@@ -205,7 +205,7 @@ setValidity("BNDataset",
               }
               
               if (object@num.time.steps < 1) {
-                retval <- c(retval, "impossible number of time slots in the dataset")
+                retval <- c(retval, "impossible number of time steps in the dataset")
               }
               
               if (is.null(retval)) return (TRUE)

@@ -3,8 +3,8 @@
 \docType{methods}
 \name{layering}
 \alias{layering}
-\alias{layering,BN}
 \alias{layering,BN-method}
+\alias{layering,BN}
 \title{return the layering of the nodes.}
 \usage{
 layering(x)
@@ -29,4 +29,3 @@ layering(x)
 }
 
 }
-
