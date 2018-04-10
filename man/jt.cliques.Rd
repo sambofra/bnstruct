@@ -3,8 +3,8 @@
 \docType{methods}
 \name{jt.cliques}
 \alias{jt.cliques}
-\alias{jt.cliques,InferenceEngine-method}
 \alias{jt.cliques,InferenceEngine}
+\alias{jt.cliques,InferenceEngine-method}
 \title{get the list of cliques of the junction tree of an \code{\link{InferenceEngine}}.}
 \usage{
 jt.cliques(x)
@@ -20,3 +20,4 @@ the list of cliques of the junction tree contained in the \code{\link{InferenceE
 \description{
 Return the list of cliques containing the variables associated to each node of a junction tree.
 }
+

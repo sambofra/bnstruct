@@ -3,8 +3,8 @@
 \docType{methods}
 \name{cpts}
 \alias{cpts}
-\alias{cpts,BN-method}
 \alias{cpts,BN}
+\alias{cpts,BN-method}
 \title{get the list of conditional probability tables of a \code{\link{BN}}.}
 \usage{
 cpts(x)
@@ -29,3 +29,4 @@ E.g. dimensions for conditional probability \code{P(C|A,B)} can be either \code{
 if some operations have been performed, or how the probability table has been computed.
 Users should not rely on dimension numbers, but should instead select the dimensions using their names.
 }
+

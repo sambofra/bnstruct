@@ -270,8 +270,9 @@ setMethod("learn.params",
             # esimate a cpt for each family from data
             for ( i in 1:n.nodes )
             {
+              cat("node " ,i, "\n")
               family <- c( which(dag[,i]!=0), i )
-              counts <- .Call( "compute_counts_nas", data[,family], node.sizes[family], 
+              counts <- .Call( "bnstruct_compute_counts_nas", data[,family], node.sizes[family], 
                                PACKAGE = "bnstruct" )
               counts <- array(c(counts), c(node.sizes[family]))
               cpts[[i]] <- counts.to.probs( counts + ess / prod(dim(counts)) )

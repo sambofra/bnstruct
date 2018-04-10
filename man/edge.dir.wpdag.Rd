@@ -19,3 +19,4 @@ a matrix containing the node pairs with the count of the edges
 Given a \code{BN} with a \code{WPDAG}, it counts the edges, with
 their directionality.
 }
+

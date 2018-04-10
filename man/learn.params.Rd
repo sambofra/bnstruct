@@ -3,8 +3,8 @@
 \docType{methods}
 \name{learn.params}
 \alias{learn.params}
-\alias{learn.params,BN,BNDataset-method}
 \alias{learn.params,BN,BNDataset}
+\alias{learn.params,BN,BNDataset-method}
 \title{learn the parameters of a \link{BN}.}
 \usage{
 learn.params(bn, dataset, ess = 1, use.imputed.data = F)
@@ -45,3 +45,4 @@ bn <- learn.params(bn, dataset, ess=1)
 \seealso{
 learn.network
 }
+

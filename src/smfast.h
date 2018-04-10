@@ -7,16 +7,16 @@
 #include "util.h"
 
 /* find best parents */
-SEXP fbp( SEXP aflml );
+SEXP bnstruct_fbp( SEXP aflml );
 
 /* find best sinks */
-SEXP fbs( SEXP bps, SEXP aflml );
+SEXP bnstruct_fbs( SEXP bps, SEXP aflml );
 
 /* fast upwards moebius transform */
-SEXP fumt_mask( SEXP n_elements, SEXP pattern );
+SEXP bnstruct_fumt_mask( SEXP n_elements, SEXP pattern );
 
 /* computes log marginal likelihood for all possible families */
-SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss, SEXP func );
+SEXP bnstruct_all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss, SEXP func );
 
 /* 
 	very internal function

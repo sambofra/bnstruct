@@ -2,9 +2,9 @@
 % Please edit documentation in R/AllClasses.R, R/BNDataset-methods.R
 \docType{class}
 \name{BNDataset-class}
-\alias{BNDataset-class}
-\alias{BNDataset,BNDataset-class}
 \alias{BNDataset}
+\alias{BNDataset,BNDataset-class}
+\alias{BNDataset-class}
 \alias{initialize,BNDataset-method}
 \title{BNDataset class.}
 \usage{
@@ -116,7 +116,6 @@ the name of the variables will be edited to include the instant. In case of an e
   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a dynamic system)}
 }
 }
-
 \examples{
 \dontrun{
 # create from files
@@ -134,3 +133,4 @@ dataset <- BNDataset(data = data,
 \seealso{
 read.dataset, impute, bootstrap
 }
+

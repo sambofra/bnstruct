@@ -3,7 +3,6 @@
 \docType{methods}
 \name{num.boots<-}
 \alias{num.boots<-}
-\alias{num.boots<-}
 \alias{num.boots<-,BNDataset-method}
 \title{set number of bootstrap samples of a \code{\link{BNDataset}}.}
 \usage{
@@ -19,3 +18,4 @@ num.boots(x) <- value
 \description{
 Set the length of the list of samples of a dataset computed using bootstrap.
 }
+

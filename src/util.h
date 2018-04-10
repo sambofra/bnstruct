@@ -8,21 +8,21 @@
 /* compute the BDEu score of node _ni_, with parents _pars_, from dataset
    _data_ and with equivalent sample size _ess_
 */
-SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess );
+SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess );
 
 // compute score for a node as above, but called from c, not from R
 double score_node_1( int* data, int ncols_data, int nrows_data, int* node_sizes, unsigned int ni, int* pars, int length_pars, int func, double ess );
 
 /* test wether the graph _g_ is acyclic
 */
-SEXP is_acyclic( SEXP g );
+SEXP bnstruct_is_acyclic( SEXP g );
 
 /* computes contingency table, excluding NAs: 
 */
-SEXP compute_counts_nas( SEXP data, SEXP node_sizes );
+SEXP bnstruct_compute_counts_nas( SEXP data, SEXP node_sizes );
 
 /* computes contingency table, no NAs assumed */
-SEXP compute_counts( SEXP data, SEXP node_sizes );
+SEXP bnstruct_compute_counts( SEXP data, SEXP node_sizes );
 
 /* computes log likelihood for the family (ni,pa), accounting for NAs
 */

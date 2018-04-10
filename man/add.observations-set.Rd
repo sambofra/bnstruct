@@ -3,7 +3,6 @@
 \docType{methods}
 \name{add.observations<-}
 \alias{add.observations<-}
-\alias{add.observations<-}
 \alias{add.observations<-,InferenceEngine-method}
 \title{add further evidence to an existing list of observations of an \code{\link{InferenceEngine}}.}
 \usage{
@@ -30,3 +29,4 @@ In case of multiple observations of the same variable, the last observation is t
 \seealso{
 \code{\link{observations<-}}
 }
+

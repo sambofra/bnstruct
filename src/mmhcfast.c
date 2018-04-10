@@ -1,6 +1,6 @@
 #include "mmhcfast.h"
 
-SEXP next_comb( SEXP sexp_comb, SEXP sexp_n )
+SEXP bnstruct_next_comb( SEXP sexp_comb, SEXP sexp_n )
 {
 	R_len_t m, i, j, finished;
 	m = length(sexp_comb);
@@ -36,7 +36,7 @@ SEXP next_comb( SEXP sexp_comb, SEXP sexp_n )
 	return( result );
 }
 
-SEXP g2_stat( SEXP data, SEXP node_sizes )
+SEXP bnstruct_g2_stat( SEXP data, SEXP node_sizes )
 {
 	int i,j,k,index,sx,sy,sz,sxy,val,zx,zy,zz,zc,df,elmt;
 	double stat = 0;
@@ -137,7 +137,7 @@ SEXP g2_stat( SEXP data, SEXP node_sizes )
 	return result;
 }
 
-SEXP in_tabu( SEXP mat, SEXP tabu )
+SEXP bnstruct_in_tabu( SEXP mat, SEXP tabu )
 {
   int n_nodes = ncols(mat);
   int t_tenure = INTEGER(getAttrib(tabu, R_DimSymbol))[2]; // dim[3]

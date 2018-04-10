@@ -1,6 +1,6 @@
 #include "util.h"
 
-SEXP score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess )
+SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess )
 {
   SEXP score;
   PROTECT( score = allocVector(REALSXP, 1) );
@@ -52,7 +52,7 @@ double score_node_1( int* data, int ncols_data, int nrows_data, int* node_sizes,
 }
 
 
-SEXP is_acyclic( SEXP graph )
+SEXP bnstruct_is_acyclic( SEXP graph )
 {
   int n_nodes = nrows(graph);
   int * g = INTEGER(graph);
@@ -195,9 +195,9 @@ double bdeu_score( unsigned int * d, unsigned int n_nodes, unsigned int n_cases,
 	return ll;
 }
 
-SEXP compute_counts_nas( SEXP data, SEXP node_sizes )
+SEXP bnstruct_compute_counts_nas( SEXP data, SEXP node_sizes )
 {
-	int i,j,index,elmt,stride;
+	long int i,j,index,elmt,stride;
 	// inputs
 	int * d = INTEGER(data);
 	int n_nodes = ncols(data);
@@ -205,19 +205,22 @@ SEXP compute_counts_nas( SEXP data, SEXP node_sizes )
 	int * ns = INTEGER(node_sizes);
 	
 	// internal structure
-	int cum_prod_sizes[n_nodes+1]; 
+	long int cum_prod_sizes[n_nodes+1]; 
 	cum_prod_sizes[0] = 1;
 	for( i = 1; i < n_nodes + 1; i++ )
 		cum_prod_sizes[i] = cum_prod_sizes[i-1] * ns[i-1];
 	
 	// precomputed here for speed
-	int strides[n_nodes];
+	long int strides[n_nodes];
 	for( i = 0; i < n_nodes; i++ ){
 		strides[i] = i * n_cases;
 	}
 	
 	// allocate output
 	SEXP result;
+        for (i = 0 ; i <= n_nodes ; i++) {
+          printf("%d %ld\n", i, cum_prod_sizes[i]);
+        }
 	PROTECT( result = allocVector(REALSXP, cum_prod_sizes[n_nodes]) );
 	double * counts = REAL(result);
 	memset( counts, 0, sizeof(double) * cum_prod_sizes[n_nodes] );
@@ -245,7 +248,7 @@ SEXP compute_counts_nas( SEXP data, SEXP node_sizes )
 	return result;
 }
 
-SEXP compute_counts( SEXP data, SEXP node_sizes )
+SEXP bnstruct_compute_counts( SEXP data, SEXP node_sizes )
 {
   int i,j,index,elmt;
 	// inputs

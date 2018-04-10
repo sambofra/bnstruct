@@ -1,4 +1,6 @@
-#' @useDynLib bnstruct
+#' @useDynLib bnstruct, .registration = TRUE
+NULL
+
 .onLoad = function(lib, pkg) 
 {
   # library.dynam("bnstruct", package = pkg, lib.loc = lib)
@@ -8,7 +10,7 @@
 		MAX_NODES <- 32
 
   assign(".bnstruct.env", new.env(), envir=parent.env(environment()))
-	assign("bnstruct.log.indent.tracker", 0, envir = .bnstruct.env)
+  assign("bnstruct.log.indent.tracker", 0, envir = .bnstruct.env)
 }#.ONLOAD
 
 .onUnload = function(lib) 

@@ -3,7 +3,6 @@
 \docType{methods}
 \name{dag<-}
 \alias{dag<-}
-\alias{dag<-}
 \alias{dag<-,BN-method}
 \title{set adjacency matrix of an object.}
 \usage{
@@ -20,3 +19,4 @@ the structure of the object.}
 \description{
 Set the adjacency matrix of the directed acyclic graph representing the structure of a network.
 }
+

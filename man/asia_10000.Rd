@@ -19,3 +19,4 @@ S. Lauritzen, D. Spiegelhalter. Local Computation with Probabilities on Graphica
 \seealso{
 \code{\link{asia}}
 }
+

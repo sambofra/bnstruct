@@ -29,3 +29,4 @@ wpdag(net) <- pdag
 \seealso{
 \code{\link{wpdag.from.dag}}
 }
+

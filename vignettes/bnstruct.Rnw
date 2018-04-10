@@ -652,22 +652,22 @@ dbn <- learn.dynamic.network(dataset,
 
 \subsubsection{Empirical evaluation of structure learning algorithms}
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{child_crosses_1000.pdf}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 20-nodes Child network (25 edges in the original network).}\label{fig:childcrosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure2
-\centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{alarm_crosses_1000.pdf}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 37-nodes Alarm network (46 edges in the original network).}\label{fig:alarmcrosses}
 \end{figure}
 
 \begin{figure}[!tpb]%figure3
-\centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{hepar2_crosses_1000.pdf}}
 \caption{SHD vs. running time of i) available case analysis with MMHC, ii) kNN imputation followed by MMHC and iii) SEM, with both the BDeu and the BIC scoring functions, on 20 datasets with 1000 observations and $20\%$ missingness sampled from the 70-nodes Hepar2 network (123 edges in the original network).}\label{fig:hepar2crosses}
 %\end{figure}
 
 %\begin{figure}[!tpb]%figure3
-\centerline{\includegraphics[width=0.75\textwidth]{andes_crosses.eps}}
+\centerline{\includegraphics[width=0.75\textwidth]{andes_crosses.pdf}}
 \caption{SHD vs. running time of MMHC on complete datasets of i) 100 observations, ii) 1000 observations and iii) 10000 observations sampled from the 223-nodes Andes network (338 edges in the original network).}\label{fig:andescrosses}
 \end{figure}
 

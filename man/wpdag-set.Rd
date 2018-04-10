@@ -3,7 +3,6 @@
 \docType{methods}
 \name{wpdag<-}
 \alias{wpdag<-}
-\alias{wpdag<-}
 \alias{wpdag<-,BN-method}
 \title{set WPDAG of the object.}
 \usage{
@@ -19,3 +18,4 @@ wpdag(x) <- value
 \description{
 Set the weighted partially directed acyclic graph of a network (e.g. in case bootstrap on dataset is performed).
 }
+

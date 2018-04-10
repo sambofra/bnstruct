@@ -3,8 +3,8 @@
 \docType{methods}
 \name{updated.bn}
 \alias{updated.bn}
-\alias{updated.bn,InferenceEngine-method}
 \alias{updated.bn,InferenceEngine}
+\alias{updated.bn,InferenceEngine-method}
 \title{get the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
 updated.bn(x)
@@ -20,3 +20,4 @@ the updated \code{\link{BN}} object contained in an \code{\link{InferenceEngine}
 \description{
 Return an updated network contained in an InferenceEngine.
 }
+

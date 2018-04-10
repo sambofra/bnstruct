@@ -455,11 +455,19 @@ setMethod("get.most.probable.values",
 
 
 # redefition of print() for BN objects
+#' print a \code{\link{BN}}, \code{\link{BNDataset}} or \code{\link{InferenceEngine}} to \code{stdout}.
+#' 
+#' @name print
+#' 
+#' @param x a \code{\link{BN}}, \code{\link{BNDataset}} or \code{\link{InferenceEngine}}.
+# ' @param ... potential other arguments.
+#'
 #' @rdname print
-#' @aliases print,BN
-setMethod("print",
-          "BN",
-          function(x, ...)
+#' @aliases print,BN print.BN,BN
+#' @export
+#setMethod("print.BN",
+#          "BN",
+print.BN <- function(x, ...)
           {
             str <- "\nBayesian Network: "
             str <- paste(str, name(x), sep = '')
@@ -510,7 +518,7 @@ setMethod("print",
             
             cat("\n")
             
-          })
+          }#)
 
 
 #' plot a \code{\link{BN}} as a picture.
