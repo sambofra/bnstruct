@@ -264,8 +264,8 @@ It is assumed that the variables in the dataset are reported in the following or
 $V_1\_t1, V_2\_t1, \dots, V_N\_tk, V_1\_t2, V_2\_t2, \dots, V_N\_tk$.
 
 <<evolvingdataset,eval=FALSE>>=
-dataset <- BNDataset("evolving_system.data",
-                     "evolving_system.header",
+dataset <- BNDataset("asia_2_layers.data",
+                     "asia_2_layers.header",
                      num.time.steps=2)
 @
 
@@ -608,13 +608,16 @@ It is possible to provide a layering for the whole DBN using the \Rfunarg{layeri
 in the structure learning section, assigning each one of the $N \times T$ variables to a layer.
 
 <<dbn1,eval=F>>=
-# Assume a system with 8 nodes is observed over 4 consecutive
+# asia_2_layers is a toy example constructed purely for testing
+# purposes. It does not represent a real set of observations.
+#
+# It simulates a system with 8 nodes observed over 2 consecutive
 # time steps, of which we know the layering in each time slot.
-# The dataset contains therefore 32 variables observed.
-dataset <- BNDataset("evolving_system.data",
-                     "evolving_system.header",
-                     num.time.steps = 4)
-dbn <- learn.dynamic.network(dataset, num.time.steps = 4)
+# The dataset contains therefore 16 variables observed.
+dataset <- BNDataset("asia_2_layers.data",
+                     "asia_2_layers.header",
+                     num.time.steps = 2)
+dbn <- learn.dynamic.network(dataset, num.time.steps = 2)
 @
 
 If the \texttt{BNDataset} already contains the information about the number of time steps,
@@ -622,12 +625,15 @@ it is also possible to use \texttt{learn.network}, which will recognize the evol
 and treat the network as a dynamic one.
 
 <<dbn2,eval=F>>=
-# Assume a system with 8 nodes is observed over 4 consecutive
+# asia_2_layers is a toy example constructed purely for testing
+# purposes. It does not represent a real set of observations.
+#
+# It simulates a system with 8 nodes observed over 2 consecutive
 # time steps, of which we know the layering in each time slot.
-# The dataset contains therefore 32 variables observed.
-dataset <- BNDataset("evolving_system.data",
-                     "evolving_system.header",
-                     num.time.steps = 4)
+# The dataset contains therefore 16 variables observed.
+dataset <- BNDataset("asia_2_layers.data",
+                     "asia_2_layers.header",
+                     num.time.steps = 2)
 dbn <- learn.network(dataset)
 @
 
@@ -638,12 +644,18 @@ $v_y$ in time slot $j>i$, even if such relationship is forbidden in time slot $i
 The same applies for \Rfunarg{layer.struct}.
 
 <<dbn3,eval=F>>=
-dataset <- BNDataset("evolving_system.data",
-                     "evolving_system.header",
-                     num.time.steps = 4)
+# asia_2_layers is a toy example constructed purely for testing
+# purposes. It does not represent a real set of observations.
+#
+# It simulates a system with 8 nodes observed over 2 consecutive
+# time steps, of which we know the layering in each time slot.
+# The dataset contains therefore 16 variables observed.
+dataset <- BNDataset("asia_2_layers.data",
+                     "asia_2_layers.header",
+                     num.time.steps = 2)
 layers <- c(1,2,2,3,3,3,3,3)
 dbn <- learn.dynamic.network(dataset,
-                             num.time.steps = 4,
+                             num.time.steps = 2,
                              layering = layers)
 @
 
