@@ -218,9 +218,9 @@ SEXP bnstruct_compute_counts_nas( SEXP data, SEXP node_sizes )
 	
 	// allocate output
 	SEXP result;
-        for (i = 0 ; i <= n_nodes ; i++) {
+        /*for (i = 0 ; i <= n_nodes ; i++) {
           printf("%d %ld\n", i, cum_prod_sizes[i]);
-        }
+        }*/
 	PROTECT( result = allocVector(REALSXP, cum_prod_sizes[n_nodes]) );
 	double * counts = REAL(result);
 	memset( counts, 0, sizeof(double) * cum_prod_sizes[n_nodes] );
