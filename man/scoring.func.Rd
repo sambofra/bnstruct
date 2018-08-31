@@ -3,8 +3,8 @@
 \docType{methods}
 \name{scoring.func}
 \alias{scoring.func}
-\alias{scoring.func,BN-method}
 \alias{scoring.func,BN}
+\alias{scoring.func,BN-method}
 \title{Read the scoring function used to learn the structure of a network.}
 \usage{
 scoring.func(x)
@@ -21,3 +21,4 @@ the scoring function used.
 Read the scoring function used in the \code{\link{learn.structure}} method.
 Outcome is meaningful only if the structure of a network has been learnt.
 }
+

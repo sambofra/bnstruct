@@ -3,7 +3,6 @@
 \docType{methods}
 \name{raw.data<-}
 \alias{raw.data<-}
-\alias{raw.data<-}
 \alias{raw.data<-,BNDataset-method}
 \title{add raw data.}
 \usage{
@@ -22,3 +21,4 @@ Insert raw data in a \code{\link{BNDataset}} object.
 \seealso{
 \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{read.dataset}}
 }
+

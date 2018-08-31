@@ -3,7 +3,6 @@
 \docType{methods}
 \name{jt.cliques<-}
 \alias{jt.cliques<-}
-\alias{jt.cliques<-}
 \alias{jt.cliques<-,InferenceEngine-method}
 \title{set the list of cliques of the junction tree of an \code{\link{InferenceEngine}}.}
 \usage{
@@ -19,3 +18,4 @@ jt.cliques(x) <- value
 \description{
 Add to the InferenceEngine a list containing the cliques of variables composing the nodes of the junction tree.
 }
+

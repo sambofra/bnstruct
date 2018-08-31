@@ -3,10 +3,8 @@
 \docType{methods}
 \name{num.variables}
 \alias{num.variables}
-\alias{num.variables,BNDataset-method}
 \alias{num.variables,BNDataset}
 \alias{num.variables,BNDataset-method}
-\alias{num.variables,BNDataset}
 \title{get number of variables of a \code{\link{BNDataset}}.}
 \usage{
 num.variables(x)
@@ -28,3 +26,4 @@ of \code{\link{num.nodes}} of a network built upon the same dataset.
 \seealso{
 \code{\link{num.nodes}}
 }
+

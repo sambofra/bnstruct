@@ -482,11 +482,20 @@ setMethod("marginals",
 
 
 # redefition of print() for InferenceEngine objects
+# ' print a \code{\link{InferenceEngine}} to \code{stdout}.
+#'
+#' @name print
+#' 
+# ' @param x an \code{\link{InferenceEngine}}.
+#' @param engine if \code{x} is an \code{\link{InferenceEngine}}, specify the inference engine to be shown. Currently only \code{engine = 'jt'} is supported.
+#' @param ... potential other arguments.
+#'
 #' @rdname print
-#' @aliases print,InferenceEngine
-setMethod("print",
-          "InferenceEngine",
-          function(x, engine = "jt", ...)
+#' @aliases print,InferenceEngine print.InferenceEngine,InferenceEngine
+#' @export
+#setMethod("print.InferenceEngine",
+#          "InferenceEngine",
+print.InferenceEngine <- function(x, engine = "jt", ...)
           {
             if (engine == 'jt')
             {
@@ -517,7 +526,7 @@ setMethod("print",
               }
             }
             
-          })
+          }#)
 
 # keep last (most recent) observation for each var
 unique.observations <- function(observed.vars, observed.vals)

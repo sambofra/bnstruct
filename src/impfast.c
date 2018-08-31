@@ -1,6 +1,6 @@
 #include "impfast.h"
 
-SEXP heom_dist( SEXP sexp_vec, SEXP sexp_mat, SEXP sexp_num_var, SEXP sexp_num_var_range )
+SEXP bnstruct_heom_dist( SEXP sexp_vec, SEXP sexp_mat, SEXP sexp_num_var, SEXP sexp_num_var_range )
 {
 	// inputs
 	int i,j;

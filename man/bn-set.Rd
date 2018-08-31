@@ -3,7 +3,6 @@
 \docType{methods}
 \name{bn<-}
 \alias{bn<-}
-\alias{bn<-}
 \alias{bn<-,InferenceEngine-method}
 \title{set the original \code{\link{BN}} object contained in an \code{\link{InferenceEngine}}.}
 \usage{
@@ -19,3 +18,4 @@ bn(x) <- value
 \description{
 Add an original network to an InferenceEngine.
 }
+

@@ -2,8 +2,8 @@
 % Please edit documentation in R/BN-methods.R
 \name{plot}
 \alias{plot}
-\alias{plot.BN}
 \alias{plot,BN}
+\alias{plot.BN}
 \alias{plot.BN,BN}
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
@@ -36,3 +36,4 @@ and allows for a greater customization.}
 \description{
 plot a \code{\link{BN}} as a picture.
 }
+

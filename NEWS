@@ -1,0 +1,23 @@
+bnstruct v1.0.3 (Release date: 2017-MM-DD)
+===============
+
+* Added qgraph option for plot()
+* Parameters wm.max, initial.cpc exposed in learn.network
+* Layering added to HC
+* Mandatory edges can be specified to learn.network
+* Modified way of imposing a maximum number of parent nodes for the different algorithms
+
+bnstruct v1.0.2 (Release date: 2016-12-13)
+===============
+
+* Second revision for paper submission
+
+bnstruct v1.0.1 (Release date: 2016-11-10)
+===============
+
+* First revision for paper submission
+
+bnstruct v1.0 (Release date: 2015-07-30)
+===============
+
+* First CRAN submission

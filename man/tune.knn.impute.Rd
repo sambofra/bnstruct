@@ -28,3 +28,4 @@ matrix of error distributions
 \description{
 tune the parameter k of the knn algorithm used in imputation.
 }
+

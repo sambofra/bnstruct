@@ -1,6 +1,6 @@
 #include "smfast.h"
 
-SEXP fbp( SEXP aflml )
+SEXP bnstruct_fbp( SEXP aflml )
 {
 	R_len_t ni, si, bi, pos, pos2; 
 	R_len_t n_nodes = nrows(aflml); 
@@ -47,7 +47,7 @@ SEXP fbp( SEXP aflml )
 	return( res );
 }
 
-SEXP fbs( SEXP bps, SEXP aflml )
+SEXP bnstruct_fbs( SEXP bps, SEXP aflml )
 {
 	R_len_t si, sink, nop, pos;
 	R_len_t n_nodes = nrows(aflml); 
@@ -86,7 +86,7 @@ SEXP fbs( SEXP bps, SEXP aflml )
 	return( res );
 }
 
-SEXP na_rows_int( SEXP mat )
+SEXP bnstruct_na_rows_int( SEXP mat )
 {
 	int i,j,stride, *res;
 	int n_rows = nrows( mat );
@@ -110,7 +110,7 @@ SEXP na_rows_int( SEXP mat )
 	return( result );
 }
 
-SEXP fumt_mask( SEXP n_elements, SEXP pattern )
+SEXP bnstruct_fumt_mask( SEXP n_elements, SEXP pattern )
 {
 	int i, times, ind, stride, start;
 	int bitmask = 1;
@@ -146,7 +146,7 @@ SEXP fumt_mask( SEXP n_elements, SEXP pattern )
 	return(result);
 }
 
-SEXP all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss, SEXP func )
+SEXP bnstruct_all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mask, SEXP iss, SEXP func )
 {
 	unsigned int i,j,n_pa,pos;
 	

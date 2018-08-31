@@ -3,8 +3,8 @@
 \docType{methods}
 \name{has.imputed.data}
 \alias{has.imputed.data}
-\alias{has.imputed.data,BNDataset-method}
 \alias{has.imputed.data,BNDataset}
+\alias{has.imputed.data,BNDataset-method}
 \title{check if a BNDataset contains impited data.}
 \usage{
 has.imputed.data(x)
@@ -33,3 +33,4 @@ has.imputed.data(x) # TRUE
 \seealso{
 \code{\link{has.raw.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
+

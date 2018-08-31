@@ -3,8 +3,8 @@
 \docType{methods}
 \name{has.imputed.boots}
 \alias{has.imputed.boots}
-\alias{has.imputed.boots,BNDataset-method}
 \alias{has.imputed.boots,BNDataset}
+\alias{has.imputed.boots,BNDataset-method}
 \title{check whether a \code{\link{BNDataset}} has bootstrap samples from imputed data or not.}
 \usage{
 has.imputed.boots(x)
@@ -23,3 +23,4 @@ Return \code{TRUE} if the given dataset contains samples for bootstrap from inpu
 \seealso{
 \code{\link{has.boots}}, \code{\link{boots}}, \code{\link{imp.boots}}
 }
+

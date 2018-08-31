@@ -3,10 +3,10 @@
 \docType{methods}
 \name{learn.network}
 \alias{learn.network}
-\alias{learn.network,BN-method}
 \alias{learn.network,BN}
-\alias{learn.network,BNDataset-method}
+\alias{learn.network,BN-method}
 \alias{learn.network,BNDataset}
+\alias{learn.network,BNDataset-method}
 \title{learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.}
 \usage{
 learn.network(x, ...)
@@ -150,3 +150,4 @@ net <- learn.network(mydataset)
 \seealso{
 learn.structure learn.params learn.dynamic.network
 }
+

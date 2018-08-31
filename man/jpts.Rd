@@ -3,8 +3,8 @@
 \docType{methods}
 \name{jpts}
 \alias{jpts}
-\alias{jpts,InferenceEngine-method}
 \alias{jpts,InferenceEngine}
+\alias{jpts,InferenceEngine-method}
 \title{get the list of joint probability tables compiled by an \code{\link{InferenceEngine}}.}
 \usage{
 jpts(x)
@@ -26,3 +26,4 @@ Each joint probability table is represented as a multidimensional array.
 To retrieve single dimensions (e.g. to compute marginals), users should not rely on dimension numbers,
 but should instead select the dimensions using their names.
 }
+

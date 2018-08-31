@@ -3,8 +3,8 @@
 \docType{methods}
 \name{boots}
 \alias{boots}
-\alias{boots,BNDataset-method}
 \alias{boots,BNDataset}
+\alias{boots,BNDataset-method}
 \title{get list of bootstrap samples of a \code{\link{BNDataset}}.}
 \usage{
 boots(x)
@@ -23,3 +23,4 @@ Return the list of samples computed from raw data of a dataset.
 \seealso{
 \code{\link{has.boots}}, \code{\link{has.imputed.boots}}, \code{\link{imp.boots}}
 }
+

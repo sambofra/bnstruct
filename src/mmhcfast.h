@@ -10,15 +10,15 @@
 /* generate the next combinations of length(sexp_comb) indices drawn
    from 1:sexp_n, or 0^m if no next combination 
 */
-SEXP next_comb( SEXP sexp_comb, SEXP sexp_n );
+SEXP bnstruct_next_comb( SEXP sexp_comb, SEXP sexp_n );
 
 /* compute the g2 statistic for conditional independence of
    data[,1] from data[,2] conditioned on data[,3:end]
 */
-SEXP g2_stat( SEXP data, SEXP node_sizes );
+SEXP bnstruct_g2_stat( SEXP data, SEXP node_sizes );
 
 /* check if matrix _mat_ is in tabu list
 */
-SEXP in_tabu( SEXP mat, SEXP tabu );
+SEXP bnstruct_in_tabu( SEXP mat, SEXP tabu );
 
 #endif

@@ -3,8 +3,8 @@
 \docType{methods}
 \name{raw.data}
 \alias{raw.data}
-\alias{raw.data,BNDataset-method}
 \alias{raw.data,BNDataset}
+\alias{raw.data,BNDataset-method}
 \title{get raw data of a BNDataset.}
 \usage{
 raw.data(x)
@@ -20,3 +20,4 @@ Return raw data contained in a \code{\link{BNDataset}} object, if any.
 \seealso{
 \code{\link{has.raw.data}}, \code{\link{has.imputed.data}}
 }
+

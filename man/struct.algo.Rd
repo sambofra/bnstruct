@@ -3,8 +3,8 @@
 \docType{methods}
 \name{struct.algo}
 \alias{struct.algo}
-\alias{struct.algo,BN-method}
 \alias{struct.algo,BN}
+\alias{struct.algo,BN-method}
 \title{Read the algorithm used to learn the structure of a network.}
 \usage{
 struct.algo(x)
@@ -21,3 +21,4 @@ the structure learning algorithm used.
 Read the algorithm used in the \code{\link{learn.structure}} method.
 Outcome is meaningful only if the structure of a network has been learnt.
 }
+

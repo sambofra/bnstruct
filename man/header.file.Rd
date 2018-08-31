@@ -3,8 +3,8 @@
 \docType{methods}
 \name{header.file}
 \alias{header.file}
-\alias{header.file,BNDataset-method}
 \alias{header.file,BNDataset}
+\alias{header.file,BNDataset-method}
 \title{get header file of a \code{\link{BNDataset}}.}
 \usage{
 header.file(x)
@@ -30,3 +30,4 @@ The header file contains three rows:
 \seealso{
 \code{\link{data.file}}
 }
+

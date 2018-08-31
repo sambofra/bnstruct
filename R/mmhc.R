@@ -68,7 +68,7 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   
   curr.score.nodes <- array(0,n.nodes)
   for( i in 1L:n.nodes )
-    curr.score.nodes[i] <- .Call( "score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L,
+    curr.score.nodes[i] <- .Call( "bnstruct_score_node", data, node.sizes, i-1L, which(curr.g[,i]!=0)-1L,
                                   scoring.func, ess, PACKAGE = "bnstruct" )
 
   # global best solution
@@ -100,10 +100,10 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
           if( curr.g[par,node] == 1L ) # edge removal
           {
             next.g[par,node] = 0L;
-            if( .Call("is_acyclic", next.g, PACKAGE = "bnstruct") &!.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
+            if( .Call("bnstruct_is_acyclic", next.g, PACKAGE = "bnstruct") &!.Call("bnstruct_in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
             {
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\n')
-              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L, 
+              s.diff <- .Call( "bnstruct_score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L, 
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
@@ -113,12 +113,12 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
           {
             next.g[par,node] = 1L;
             # print(c(node,par,.Call("is_acyclic", next.g, PACKAGE = "bnstruct"),!.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct")))
-            if( .Call("is_acyclic", next.g, PACKAGE = "bnstruct") & !.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
+            if( .Call("bnstruct_is_acyclic", next.g, PACKAGE = "bnstruct") & !.Call("bnstruct_in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
             {
               # print("here\n");
               
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\n')
-              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
+              s.diff <- .Call( "bnstruct_score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
                                scoring.func, ess, PACKAGE = "bnstruct" ) - curr.score.nodes[node];
             }
           }
@@ -128,12 +128,12 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
           {
             next.g[par,node] = 1L;
             next.g[node,par] = 0L;
-            if( .Call("is_acyclic", next.g, PACKAGE = "bnstruct") & !.Call("in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
+            if( .Call("bnstruct_is_acyclic", next.g, PACKAGE = "bnstruct") & !.Call("bnstruct_in_tabu", next.g, tabu, PACKAGE = "bnstruct"))
             {
 #               cat(node.sizes,'\t',node-1L,'\t',which(next.g[,node]!=0)-1L,'\t',par-1L,'\t',which(next.g[,par]!=0)-1L,'\n')
-              s.diff <- .Call( "score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
+              s.diff <- .Call( "bnstruct_score_node", data, node.sizes, node-1L, which(next.g[,node]!=0)-1L,
                                scoring.func, ess, PACKAGE = "bnstruct" ) + 
-                        .Call( "score_node", data, node.sizes, par-1L, which(next.g[,par]!=0)-1L,
+                        .Call( "bnstruct_score_node", data, node.sizes, par-1L, which(next.g[,par]!=0)-1L,
                                scoring.func, ess, PACKAGE = "bnstruct" ) -
                         ( curr.score.nodes[node] + curr.score.nodes[par] )
             }
@@ -160,9 +160,9 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
     {
       curr.g[best.node,next.pert[best.node]] = 0L;
       # cat(node.sizes,'\t',best.node-1L,'\t',which(curr.g[,best.node]!=0)-1L,'\t',next.pert[best.node]-1L,'\t',which(curr.g[,next.pert[best.node]]!=0)-1L,'\n')
-      curr.score.nodes[best.node] <- .Call( "score_node", data, node.sizes, best.node-1L, 
+      curr.score.nodes[best.node] <- .Call( "bnstruct_score_node", data, node.sizes, best.node-1L, 
                                             which(curr.g[,best.node]!=0)-1L, scoring.func, ess, PACKAGE = "bnstruct" )
-      curr.score.nodes[next.pert[best.node]] <- .Call( "score_node", data, node.sizes, next.pert[best.node]-1L, 
+      curr.score.nodes[next.pert[best.node]] <- .Call( "bnstruct_score_node", data, node.sizes, next.pert[best.node]-1L, 
                                             which(curr.g[,next.pert[best.node]]!=0)-1L, scoring.func, ess, PACKAGE = "bnstruct" )
     }
     else
@@ -339,7 +339,7 @@ mmpc.fwd <- function( data, node.sizes, allowed, x, chi.th, min.counts, max.fani
               allowed[x,y] = 0
               break
             }
-	    comb <- .Call( "next_comb", comb, n, PACKAGE = "bnstruct" )
+	    comb <- .Call( "bnstruct_next_comb", comb, n, PACKAGE = "bnstruct" )
           }
           if( allowed[x,y] == 0 ) # came out from the break
             break
@@ -399,7 +399,7 @@ mmpc.bwd <- function( data, node.sizes, cpc.vec, x, chi.th, min.counts, max.fani
 #            cat(which(cpc.vec!=0),"\n");
             break
           }
-          comb <- .Call("next_comb", comb, n, PACKAGE = "bnstruct" )
+          comb <- .Call("bnstruct_next_comb", comb, n, PACKAGE = "bnstruct" )
         }
         if( cpc.vec[y] == 0 ) # came out from the break
           break
@@ -449,7 +449,7 @@ g2 <- function( data, sizes, x, y, chi.th = 0.05, z=c(), min.counts = 5)
 #   
 #   return( max(pchisq(2*sum(s),df) - 1+chi.th, 0) )
   
-  stat <- .Call("g2_stat", data = data[,c(x,y,z)], node_sizes = sizes[c(x,y,z)], 
+  stat <- .Call("bnstruct_g2_stat", data = data[,c(x,y,z)], node_sizes = sizes[c(x,y,z)], 
                  PACKAGE = "bnstruct")
   
   # print(stat)

@@ -2,11 +2,10 @@
 % Please edit documentation in R/AllClasses.R, R/BN-methods.R
 \docType{class}
 \name{BN-class}
-\alias{BN-class}
+\alias{BN}
 \alias{BN,BN-class}
-\alias{BN}
+\alias{BN-class}
 \alias{initialize,BN-method}
-\alias{BN}
 \title{BN class definition.}
 \usage{
 \S4method{initialize}{BN}(.Object, dataset = NULL, ...)
@@ -50,7 +49,6 @@ This is usually viable only if the user already has knowledge about the network 
   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a Dynamic Bayesian Network)}
 }
 }
-
 \examples{
 \dontrun{
 net.1 <- BN()
@@ -62,3 +60,4 @@ net.2 <- BN(dataset)
 
 
 }
+

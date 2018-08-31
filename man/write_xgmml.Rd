@@ -5,7 +5,6 @@
 \alias{write_xgmml}
 \alias{write_xgmml,BN}
 \alias{write_xgmml,BN-method}
-\alias{write_xgmml,BN}
 \title{Write a network saving it in an \code{XGMML} file.}
 \usage{
 write_xgmml(x, path = "./network", write.wpdag = FALSE,
@@ -34,3 +33,4 @@ structure algorithm, instead of the normaldag (default FALSE).}
 Write a network on disk, saving it in an \code{XGMML} file,
 for importing it in Cytoscape.
 }
+

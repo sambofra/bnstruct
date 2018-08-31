@@ -3,8 +3,8 @@
 \docType{methods}
 \name{num.items}
 \alias{num.items}
-\alias{num.items,BNDataset-method}
 \alias{num.items,BNDataset}
+\alias{num.items,BNDataset-method}
 \title{get number of items of a \code{\link{BNDataset}}.}
 \usage{
 num.items(x)
@@ -20,3 +20,4 @@ number of items of the desired dataset.
 \description{
 Return the number of items in a dataset, that is, the number of rows in its data slot.
 }
+

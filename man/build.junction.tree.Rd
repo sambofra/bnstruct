@@ -3,8 +3,8 @@
 \docType{methods}
 \name{build.junction.tree}
 \alias{build.junction.tree}
-\alias{build.junction.tree,InferenceEngine-method}
 \alias{build.junction.tree,InferenceEngine}
+\alias{build.junction.tree,InferenceEngine-method}
 \title{build a JunctionTree.}
 \usage{
 build.junction.tree(object, ...)
@@ -33,3 +33,4 @@ eng <- build.junction.tree(eng)
 \seealso{
 InferenceEngine
 }
+

@@ -3,8 +3,8 @@
 \docType{methods}
 \name{read.dataset}
 \alias{read.dataset}
-\alias{read.dataset,BNDataset,character,character-method}
 \alias{read.dataset,BNDataset,character,character}
+\alias{read.dataset,BNDataset,character,character-method}
 \title{Read a dataset from file.}
 \usage{
 read.dataset(object, data.file, header.file, data.with.header = FALSE,
@@ -85,3 +85,4 @@ dataset <- read.dataset(dataset, "file.data", "file.header")
 \seealso{
 BNDataset
 }
+

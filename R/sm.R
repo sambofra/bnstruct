@@ -73,7 +73,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
   # remove parents not in cpc, if cpc.matrix is given
 	if( !is.null(cpc.mat) )
             for( i in 1:n.nodes )
-                ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
+                ifm[ i, (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
                          PACKAGE = "bnstruct") > 0) ] <- FALSE
 
         # remove candidate parents not consistent with mandatory edges.
@@ -83,13 +83,13 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
         if ( !is.null(mandatory.edges) ) {
             for ( i in 1:n.nodes ) {
                 if ( sum(mandatory.edges[i,]) > 0 || sum(mandatory.edges[,i] > 0)) {
-                    ifm[ i, (.Call("fumt_mask", n_elements = n.nodes, pattern = which(mandatory.edges[i,]==1),
+                    ifm[ i, (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = which(mandatory.edges[i,]==1),
                              PACKAGE = "bnstruct") > 0) ] <- FALSE
                     backup.ifm <- ifm[i,]
                     for ( j in 1:n.nodes ) {
                         if (mandatory.edges[j,i] == 1 && i != j) {
                             ifm2 <- rep(TRUE, length(backup.ifm))
-                            ifm2[ (.Call("fumt_mask", n_elements = n.nodes, pattern = j,
+                            ifm2[ (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = j,
                                   PACKAGE = "bnstruct") > 0) ] <- FALSE
                             backup.ifm <- backup.ifm & !ifm2
                         }
@@ -100,13 +100,13 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
         }
   
   # aflml <- all.families.log.marginal.likelihood( data, node.sizes, ifm, ess )
-	aflml <- .Call("all_fam_log_marg_lik", data, node.sizes, ifm, ess, scoring.func, PACKAGE = "bnstruct" )
+	aflml <- .Call("bnstruct_all_fam_log_marg_lik", data, node.sizes, ifm, ess, scoring.func, PACKAGE = "bnstruct" )
 	
 	# bps <- find.best.parents( aflml )
-	bps <- .Call("fbp", aflml = aflml, PACKAGE = "bnstruct");
+	bps <- .Call("bnstruct_fbp", aflml = aflml, PACKAGE = "bnstruct");
 	
 	# sinks <- find.best.sinks( bps, aflml )
-	sinks <- .Call("fbs", bps = bps, aflml = aflml, PACKAGE = "bnstruct");
+	sinks <- .Call("bnstruct_fbs", bps = bps, aflml = aflml, PACKAGE = "bnstruct");
 	
 	order <- find.best.ordering( sinks )
 	
@@ -167,7 +167,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 	# base.mask <- rep(0,2^n.nodes)
 	# base.mask[ 2^((1:n.nodes)-1)+1 ] <- 1
 	# base.mask <- fumt(base.mask) > max(diag(max.fanin.layers))
-	base.mask <- (.Call("fumt_mask", n_elements = n.nodes, pattern = seq_len(n.nodes),
+	base.mask <- (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = seq_len(n.nodes),
 		PACKAGE = "bnstruct") > max(diag(max.fanin.layers)) );
 	
 	ifm <- !matrix( rep(base.mask,n.nodes), n.nodes, 2^n.nodes, byrow = TRUE)
@@ -177,7 +177,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 		# mask <- rep(0, 2^n.nodes)
 		# mask[ 2^(i-1)+1 ] <- 1
 		# mask <- fumt(mask) > 0
-		mask <- (.Call("fumt_mask", n_elements = n.nodes, 
+		mask <- (.Call("bnstruct_fumt_mask", n_elements = n.nodes, 
 			pattern = i, PACKAGE = "bnstruct") > 0);
 		
 		ifm[ i, mask ] <- FALSE
@@ -192,7 +192,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 			# mask <- rep(0, 2^n.nodes)
 			# mask[ 2^(invalidParents-1)+1 ] <- 1
 			# mask <- fumt(mask) > 0
-			mask <- (.Call("fumt_mask", n_elements = n.nodes, 
+			mask <- (.Call("bnstruct_fumt_mask", n_elements = n.nodes, 
 				pattern = invalidParents, PACKAGE = "bnstruct") > 0);
 			
 			ifm[ i, mask ] <- FALSE
@@ -215,7 +215,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 				# mask <- rep(0, 2^n.nodes)
 				# mask[ 2^(parents-1)+1 ] <- 1
 				# mask <- fumt(mask) > max.fanin.layers[j, layering[i]];
-				mask <- ( .Call("fumt_mask", n_elements = n.nodes, pattern = parents,
+				mask <- ( .Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = parents,
 					PACKAGE = "bnstruct") > max.fanin.layers[j, layering[i]] );
 				ifm[i, mask] <- FALSE;
 			}
@@ -327,7 +327,7 @@ log.lik <- function( node.sizes, ess, data )
     # counts <- compute.counts( data, node.sizes )
     # prior <- array( ess/prod.sizes, node.sizes ); # faster !
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
-    counts <- .Call("compute_counts", data, node.sizes, PACKAGE = "bnstruct")
+    counts <- .Call("bnstruct_compute_counts", data, node.sizes, PACKAGE = "bnstruct")
     prior <- ess/prod.sizes;
     
     # correct for NAs with maximum a posteriori estimate
@@ -349,7 +349,7 @@ log.lik <- function( node.sizes, ess, data )
     # counts <- compute.counts( data, node.sizes )
     # counts <- .Call("compute_counts_nas", data, node.sizes, na.rows, package = "bnstruct")
     # prior <- rep( ess/node.sizes, node.sizes );
-    counts <- .Call("compute_counts", data, node.sizes, PACKAGE = "bnstruct")
+    counts <- .Call("bnstruct_compute_counts", data, node.sizes, PACKAGE = "bnstruct")
     prior <- ess/node.sizes
     
     # correct for NAs with maximum a posteriori estimate

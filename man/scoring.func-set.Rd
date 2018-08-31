@@ -3,7 +3,6 @@
 \docType{methods}
 \name{scoring.func<-}
 \alias{scoring.func<-}
-\alias{scoring.func<-}
 \alias{scoring.func<-,BN-method}
 \title{Set the scoring function used to learn the structure of a network.}
 \usage{
@@ -22,3 +21,4 @@ updated BN.
 \description{
 Set the scoring function used in the \code{\link{learn.structure}} method.
 }
+

@@ -559,11 +559,21 @@ setMethod("complete",
 
 
 # redefinition of print() for BNDataset objects
+# ' print a \code{\link{BNDataset}} to \code{stdout}.
+#' 
+#' @name print
+#' 
+# ' @param x a \code{\link{BNDataset}}.
+#' @param show.raw.data if \code{x} is a \code{\link{BNDataset}}, print also raw dataset, if available.
+#' @param show.imputed.data if \code{x} is a \code{\link{BNDataset}}, print also imputed dataset, if available.
+# ' @param ... potential other arguments.
+#'
 #' @rdname print
-#' @aliases print,BNDataset
-setMethod("print",
-          "BNDataset",
-          function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
+#' @aliases print,BNDataset print.BNDataset,BNDataset
+#' @export
+#setMethod("print.BNDataset",
+#          "BNDataset",
+print.BNDataset <- function(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
           {
             
             str <- "\nDataset: \n"
@@ -617,7 +627,7 @@ setMethod("print",
             }
             
             cat("\n")
-          })
+          }#)
 
 #' @rdname impute
 #' @aliases impute,BNDataset
