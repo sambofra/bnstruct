@@ -238,10 +238,10 @@ the user can refer to them as an example. The two datasets have been created wit
 <<create.sample.datasets, eval=FALSE>>=
 asia <- BNDataset("asia_10000.data",
                   "asia_10000.header",
-                  starts.from=0)
+                  starts.from = 0)
 child <- BNDataset("Child_data_na_5000.data",
                    "Child_data_na_5000.header",
-                   starts.from=0)
+                   starts.from = 0)
 @
 
 and are also available with
@@ -266,7 +266,8 @@ $V_1\_t1, V_2\_t1, \dots, V_N\_tk, V_1\_t2, V_2\_t2, \dots, V_N\_tk$.
 <<evolvingdataset,eval=FALSE>>=
 dataset <- BNDataset("asia_2_layers.data",
                      "asia_2_layers.header",
-                     num.time.steps=2)
+                     num.time.steps = 2,
+                     starts.from = 0)
 @
 
 
@@ -616,7 +617,8 @@ in the structure learning section, assigning each one of the $N \times T$ variab
 # The dataset contains therefore 16 variables observed.
 dataset <- BNDataset("asia_2_layers.data",
                      "asia_2_layers.header",
-                     num.time.steps = 2)
+                     num.time.steps = 2,
+                     starts_from = 0)
 dbn <- learn.dynamic.network(dataset, num.time.steps = 2)
 @
 
@@ -633,7 +635,8 @@ and treat the network as a dynamic one.
 # The dataset contains therefore 16 variables observed.
 dataset <- BNDataset("asia_2_layers.data",
                      "asia_2_layers.header",
-                     num.time.steps = 2)
+                     num.time.steps = 2,
+                     starts.from = 0)
 dbn <- learn.network(dataset)
 @
 
@@ -652,7 +655,8 @@ The same applies for \Rfunarg{layer.struct}.
 # The dataset contains therefore 16 variables observed.
 dataset <- BNDataset("asia_2_layers.data",
                      "asia_2_layers.header",
-                     num.time.steps = 2)
+                     num.time.steps = 2,
+                     starts.from = 0)
 layers <- c(1,2,2,3,3,3,3,3)
 dbn <- learn.dynamic.network(dataset,
                              num.time.steps = 2,
