@@ -1515,6 +1515,23 @@ setGeneric("updated.bn", function(x) { standardGeneric("updated.bn") } )
 #' @exportMethod observations
 setGeneric("observations", function(x) { standardGeneric("observations") } )
 
+#' get the list of quantiles of an object.
+#' 
+#' Return the list of quantiles of a \code{\link{BN}} or a \code{\link{BNDataset}}. It is set when a discretization needs to be performed.
+#' 
+#' Output is a list of \code{\link{num.nodes}} vectors, one per variable. Each vector is \code{NULL}
+#' if the corresponding variable is discrete in the original dataset, and contains the cut points for the quantiles
+#' if the corresponding variable is continuous.
+#' 
+#' @name quantiles
+#' @rdname quantiles
+#' 
+#' @param x a list of vectors.
+#' 
+#' @return the list of quantiles of the \code{\link{BN}} of \code{\link{BNDataset}}.
+#' 
+#' @exportMethod quantiles
+setGeneric("quantiles", function(x) { standardGeneric("quantiles") } )
 
 ###############################################################################
 
@@ -1885,52 +1902,20 @@ setGeneric("observations<-", function(x, value) { standardGeneric("observations<
 #' @exportMethod add.observations<-
 setGeneric("add.observations<-", function(x, value) { standardGeneric("add.observations<-") } )
 
+#' set the list of quantiles of an object.
+#' 
+#' Set the list of quantiles of a \code{\link{BN}} or a \code{\link{BNDataset}}.
+#'
+#' It is used when a discretization needs to be performed.
+#' 
+#' @name quantiles<-
+#' @rdname quantiles-set
+#' 
+#' @param x a \code{\link{BN}} or \code{\link{BNDataset}}.
+#' @param value a list of vectors.
+#' 
+#' @seealso \code{\link{quantiles}}
+#' 
+#' @exportMethod quantiles<-
+setGeneric("quantiles<-", function(x, value) { standardGeneric("quantiles<-") } )
 
-###############################################################################
-###############################################################################
-
-# other common generics
-
-###############################################################################
-
-# ' print a \code{\link{BNDataset}} to \code{stdout}.
-# ' 
-# ' @title print
-# ' @name print.BNDataset
-# ' 
-# ' @param x a \code{\link{BNDataset}}.
-# ' @param show.raw.data print also raw dataset, if available.
-# ' @param show.imputed.data print also imputed dataset, if available.
-# ' @param ... potential other arguments.
-# '
-# ' @usage print(x)
-# ' 
-# ' @exportMethod print.BNDataset
-# setGeneric("print.BNDataset", function(x, ...) { standardGeneric("print.BNDataset") } )
-
-# ' print a \code{\link{BN}} to \code{stdout}.
-# ' 
-# ' @title print
-# ' @name print.BN
-# ' 
-# ' @param x a \code{\link{BN}}.
-# ' @param ... potential other arguments.
-# '
-# ' @usage print(x)
-# ' 
-# ' @exportMethod print.BN
-# setGeneric("print.BN", function(x, ...) { standardGeneric("print.BN") } )
-
-# ' print a \code{\link{InferenceEngine}} to \code{stdout}.
-# '
-# ' @title print
-# ' @name print.InferenceEngine
-# ' 
-# ' @param x an \code{\link{InferenceEngine}}.
-# ' @param engine specify the inference engine to be shown. Currently only \code{engine = 'jt'} is supported.
-# ' @param ... potential other arguments.
-# '
-# ' @usage print(x)
-# ' 
-# ' @exportMethod print.InferenceEngine
-# setGeneric("print.InferenceEngine", function(x, ...) { standardGeneric("print.InferenceEngine") } )

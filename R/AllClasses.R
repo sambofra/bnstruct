@@ -4,6 +4,7 @@ setClassUnion("missingOrInteger", c("missing","integer"))
 setClassUnion("missingOrCharacter", c("missing","character"))
 setClassUnion("missingOrNULL", c("missing", "NULL"))
 setClassUnion("vectorOrNULL", c("vector", "NULL"))
+setClassUnion("listOrNULL", c("list", "NULL"))
 
 ###############################################################################
 #
@@ -27,6 +28,7 @@ setClassUnion("vectorOrNULL", c("vector", "NULL"))
 #'   \item{\code{scoring.func}:}{scoring function used in structure learning (when performed)}
 #'   \item{\code{struct.algo}:}{algorithm used in structure learning (when performed)}
 #'   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a Dynamic Bayesian Network)}
+#'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
 #' }
 #' 
 #' @name BN-class
@@ -47,7 +49,8 @@ setClass("BN",
            wpdag          = "matrix",
            scoring.func   = "character",
            struct.algo    = "character",
-           num.time.steps = "numeric"
+           num.time.steps = "numeric",
+           quantiles      = "listOrNULL"
          ),
          prototype(
            name           = "",
@@ -60,7 +63,8 @@ setClass("BN",
            wpdag          = matrix(),
            scoring.func   = "",
            struct.algo    = "",
-           num.time.steps = 1
+           num.time.steps = 1,
+           quantiles      = NULL
          )
         )
 
@@ -156,6 +160,7 @@ setClassUnion("BNOrNULL", members=c("BN", "NULL"))
 #'   \item{\code{node.sizes}:}{cardinality of each variable of the network}
 #'   \item{\code{num.variables}:}{number of variables (columns) in the dataset}
 #'   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
+#'   \item{\code{quantiles}:}{list of vectors containing the quantiles, one vector per variable. Each vector is \code{NULL} if the variable is discrete, and contains the quantiles if it is continuous}
 #'   \item{\code{num.items}:}{number of observations (rows) in the dataset}
 #'   \item{\code{has.raw.data}:}{TRUE if the dataset contains data read from a file}
 #'   \item{\code{has.imputed.data}:}{TRUE if the dataset contains imputed data (computed from raw data)}
@@ -199,6 +204,7 @@ setClass("BNDataset",
            node.sizes        = "numeric",
            num.variables     = "numeric",
            discreteness      = "logical",
+           quantiles         = "listOrNULL",
            num.items         = "numeric",
            has.raw.data      = "logical",
            has.imputed.data  = "logical",
@@ -219,6 +225,7 @@ setClass("BNDataset",
            node.sizes        = c(0),
            num.variables     = 0,
            discreteness      = c(TRUE),
+           quantiles         = NULL,
            num.items         = 0,
            has.raw.data      = FALSE,
            has.imputed.data  = FALSE,

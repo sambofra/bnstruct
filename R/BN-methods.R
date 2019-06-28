@@ -125,6 +125,9 @@ setValidity("BN",
               if (num.time.steps(object) < 1) {
                 retval <- c(retval, "impossible number of time steps in the network")
               }
+              if (!is.null(quantiles(object)) && length(quantiles(object)) != num.nodes(object)) {
+                retval <- c(retval, "incorrect list of quantiles")
+              }
               
               if (is.null(retval)) return (TRUE)
               return(retval)
@@ -152,6 +155,15 @@ setMethod("discreteness",
           function(x)
           {
             return(slot(x, "discreteness"))
+          })
+
+#' @aliases quantiles,BN
+#' @rdname quantiles
+setMethod("quantiles",
+          "BN",
+          function(x)
+          {
+            return(slot(x, "quantiles"))
           })
 
 #' @aliases node.sizes,BN
@@ -254,6 +266,18 @@ setReplaceMethod("discreteness",
                    return(x)
                  })
 
+#' @name quantiles<-
+#' @aliases quantiles<-,BN-method
+#' @docType methods
+#' @rdname quantiles-set
+setReplaceMethod("quantiles",
+                 "BN",
+                 function(x, value)
+                 {
+                   slot(x, "quantiles") <- value
+                   validObject(x)
+                   return(x)
+                 })
 
 #' @name node.sizes<-
 #' @aliases node.sizes<-,BN-method
@@ -457,6 +481,7 @@ setMethod("get.most.probable.values",
 # redefition of print() for BN objects
 #' print a \code{\link{BN}}, \code{\link{BNDataset}} or \code{\link{InferenceEngine}} to \code{stdout}.
 #' 
+#' @method print BN
 #' @name print
 #' 
 #' @param x a \code{\link{BN}}, \code{\link{BNDataset}} or \code{\link{InferenceEngine}}.

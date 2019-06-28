@@ -207,6 +207,10 @@ setValidity("BNDataset",
               if (object@num.time.steps < 1) {
                 retval <- c(retval, "impossible number of time steps in the dataset")
               }
+
+              if (length(object@quantiles) > 1 && length(object@quantiles) != length(object@variables)) {
+                retval <- c(retval, "incorrect list of quantiles")
+              }
               
               if (is.null(retval)) return (TRUE)
               return(retval)
@@ -232,6 +236,15 @@ setMethod("discreteness",
           function(x)
           {
             return(slot(x, "discreteness"))
+          })
+
+#' @aliases quantiles,BNDataset
+#' @rdname quantiles
+setMethod("quantiles",
+          "BNDataset",
+          function(x)
+          {
+            return(slot(x, "quantiles"))
           })
 
 #' @rdname node.sizes
@@ -332,6 +345,18 @@ setReplaceMethod("discreteness",
                    return(x)
                  })
 
+#' @name quantiles<-
+#' @aliases quantiles<-,BNDataset-method
+#' @docType methods
+#' @rdname quantiles-set
+setReplaceMethod("quantiles",
+                 "BNDataset",
+                 function(x, value)
+                 {
+                   slot(x, "quantiles") <- value
+                   validObject(x)
+                   return(x)
+                 })
 
 #' @name node.sizes<-
 #' @aliases node.sizes<-,BNDataset-method
@@ -560,7 +585,8 @@ setMethod("complete",
 
 # redefinition of print() for BNDataset objects
 # ' print a \code{\link{BNDataset}} to \code{stdout}.
-#' 
+#'
+#' @method print BNDataset 
 #' @name print
 #' 
 # ' @param x a \code{\link{BNDataset}}.

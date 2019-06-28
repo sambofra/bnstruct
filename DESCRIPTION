@@ -8,8 +8,8 @@ Description: Bayesian Network Structure Learning from Data with Missing Values.
     bootstrap samples, imputed data, inference.
 Type: Package
 Title: Bayesian Network Structure Learning from Data with Missing Values
-Version: 1.0.4
-Date: 2018-08-31
+Version: 1.0.5
+Date: 2019-06-28
 Depends:
     R (>= 2.10),
     bitops,
@@ -27,5 +27,5 @@ Authors@R: c(person("Francesco", "Sambo", role=c("aut"),
     email="afranzin@ulb.ac.be"))
 License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

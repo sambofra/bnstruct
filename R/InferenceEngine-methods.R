@@ -484,6 +484,7 @@ setMethod("marginals",
 # redefition of print() for InferenceEngine objects
 # ' print a \code{\link{InferenceEngine}} to \code{stdout}.
 #'
+#' @method print InferenceEngine
 #' @name print
 #' 
 # ' @param x an \code{\link{InferenceEngine}}.

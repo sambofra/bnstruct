@@ -88,6 +88,29 @@ asia <- function()
   return(get("asia_10000", envir=environment()))
 }
 
+#' load a two-layers dataset derived from the \code{Asia} dataset.
+#' 
+#' Wrapper for a loader for a 2-layers dataset derived from the \code{Asia} dataset, with only raw data.
+#' 
+#' The dataset has 100 items, no missing data, so no imputation needs to be performed.
+#' 
+#' @name asia_2_layers
+#' @rdname asia_2_layers
+#' 
+#' @return a BNDataset containing the \code{Child} dataset.
+#' 
+#' @examples
+#' dataset <- asia_2_layers()
+#' print(dataset)
+#' 
+#' @seealso \code{\link{asia_10000}}
+#' 
+#' @export
+asia_2_layers <- function()
+{
+  data("asia_2_layers", envir=environment())
+  return(get("asia_2_layers", envir=environment()))
+}
 
 #' load \code{Child} dataset.
 #' 
