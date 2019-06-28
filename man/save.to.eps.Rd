@@ -3,8 +3,8 @@
 \docType{methods}
 \name{save.to.eps}
 \alias{save.to.eps}
-\alias{save.to.eps,BN,character}
 \alias{save.to.eps,BN,character-method}
+\alias{save.to.eps,BN,character}
 \title{save a \code{\link{BN}} picture as \code{.eps} file.}
 \usage{
 save.to.eps(x, filename, ...)
@@ -30,4 +30,3 @@ save.to.eps(x, "out.eps")
 \seealso{
 \code{\link{plot}}
 }
-

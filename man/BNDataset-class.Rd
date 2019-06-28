@@ -2,9 +2,9 @@
 % Please edit documentation in R/AllClasses.R, R/BNDataset-methods.R
 \docType{class}
 \name{BNDataset-class}
-\alias{BNDataset}
-\alias{BNDataset,BNDataset-class}
 \alias{BNDataset-class}
+\alias{BNDataset,BNDataset-class}
+\alias{BNDataset}
 \alias{initialize,BNDataset-method}
 \title{BNDataset class.}
 \usage{
@@ -35,8 +35,6 @@ a BNDataset object.
 \description{
 Contains the all of the data that can be extracted from a given dataset:
 raw data, imputed data, raw and imputed data with bootstrap.
-
-initialize a \code{\link{BNDataset}} object.
 }
 \details{
 There are two ways to build a BNDataset: using two files containing respectively header informations
@@ -103,6 +101,7 @@ the name of the variables will be edited to include the instant. In case of an e
   \item{\code{node.sizes}:}{cardinality of each variable of the network}
   \item{\code{num.variables}:}{number of variables (columns) in the dataset}
   \item{\code{discreteness}:}{\code{TRUE} if variable is discrete, \code{FALSE} if variable is continue}
+  \item{\code{quantiles}:}{list of vectors containing the quantiles, one vector per variable. Each vector is \code{NULL} if the variable is discrete, and contains the quantiles if it is continuous}
   \item{\code{num.items}:}{number of observations (rows) in the dataset}
   \item{\code{has.raw.data}:}{TRUE if the dataset contains data read from a file}
   \item{\code{has.imputed.data}:}{TRUE if the dataset contains imputed data (computed from raw data)}
@@ -116,6 +115,7 @@ the name of the variables will be edited to include the instant. In case of an e
   \item{\code{num.time.steps}:}{number of instants in which the network is observed (1, unless it is a dynamic system)}
 }
 }
+
 \examples{
 \dontrun{
 # create from files
@@ -133,4 +133,3 @@ dataset <- BNDataset(data = data,
 \seealso{
 read.dataset, impute, bootstrap
 }
-

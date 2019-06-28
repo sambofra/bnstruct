@@ -18,4 +18,3 @@ junction.tree(x) <- value
 \description{
 Set the adjacency matrix of the junction tree computed for a network.
 }
-

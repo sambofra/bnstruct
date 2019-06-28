@@ -3,8 +3,8 @@
 \docType{methods}
 \name{bootstrap}
 \alias{bootstrap}
-\alias{bootstrap,BNDataset}
 \alias{bootstrap,BNDataset-method}
+\alias{bootstrap,BNDataset}
 \title{Perform bootstrap.}
 \usage{
 bootstrap(object, num.boots = 100, seed = 0, imputation = FALSE,
@@ -34,4 +34,3 @@ dataset <- bootstrap(dataset, num.boots = 1000)
 }
 
 }
-

@@ -18,4 +18,3 @@ jt.cliques(x) <- value
 \description{
 Add to the InferenceEngine a list containing the cliques of variables composing the nodes of the junction tree.
 }
-

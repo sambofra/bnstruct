@@ -18,4 +18,3 @@ num.variables(x) <- value
 \description{
 Set the number of variables observed in a dataset.
 }
-

@@ -28,4 +28,3 @@ Further rows are ignored.
 \seealso{
 \code{\link{data.file<-}}
 }
-

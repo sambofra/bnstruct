@@ -3,8 +3,8 @@
 \docType{methods}
 \name{junction.tree}
 \alias{junction.tree}
-\alias{junction.tree,InferenceEngine}
 \alias{junction.tree,InferenceEngine-method}
+\alias{junction.tree,InferenceEngine}
 \title{get the junction tree of an \code{\link{InferenceEngine}}.}
 \usage{
 junction.tree(x)
@@ -26,4 +26,3 @@ Rows and columns are named after the (variables in the) cliques that each node o
 \seealso{
 \code{\link{build.junction.tree}}
 }
-

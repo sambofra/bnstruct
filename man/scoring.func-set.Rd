@@ -21,4 +21,3 @@ updated BN.
 \description{
 Set the scoring function used in the \code{\link{learn.structure}} method.
 }
-

@@ -18,4 +18,3 @@ num.boots(x) <- value
 \description{
 Set the length of the list of samples of a dataset computed using bootstrap.
 }
-

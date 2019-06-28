@@ -3,13 +3,14 @@
 \docType{methods}
 \name{boot}
 \alias{boot}
-\alias{boot,BNDataset}
 \alias{boot,BNDataset,numeric-method}
+\alias{boot,BNDataset}
 \title{get selected element of bootstrap list.}
 \usage{
 boot(dataset, index, use.imputed.data = FALSE)
 
-\S4method{boot}{BNDataset,numeric}(dataset, index, use.imputed.data = FALSE)
+\S4method{boot}{BNDataset,numeric}(dataset, index,
+  use.imputed.data = FALSE)
 }
 \arguments{
 \item{dataset}{a \code{\link{BNDataset}} object.}
@@ -36,4 +37,3 @@ bootstrap
 
 \code{\link{bootstrap}}
 }
-

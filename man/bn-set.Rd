@@ -18,4 +18,3 @@ bn(x) <- value
 \description{
 Add an original network to an InferenceEngine.
 }
-

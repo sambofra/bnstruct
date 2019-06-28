@@ -16,4 +16,3 @@ Compute the Structural Hamming Distance between two adjacency matrices, that is,
 the distance, in terms of edges, between two network structures. The lower the \code{shd},
 the more similar are the two network structures.
 }
-

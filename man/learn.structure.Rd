@@ -3,8 +3,8 @@
 \docType{methods}
 \name{learn.structure}
 \alias{learn.structure}
-\alias{learn.structure,BN,BNDataset}
 \alias{learn.structure,BN,BNDataset-method}
+\alias{learn.structure,BN,BNDataset}
 \title{learn the structure of a network.}
 \usage{
 learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
@@ -12,14 +12,16 @@ learn.structure(bn, dataset, algo = "mmhc", scoring.func = "BDeu",
   layering = c(), max.fanin = num.variables(dataset),
   max.fanin.layers = NULL, max.parents = num.variables(dataset),
   max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
+  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL,
+  ...)
 
 \S4method{learn.structure}{BN,BNDataset}(bn, dataset, algo = "mmhc",
-  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin = num.variables(dataset) -
-  1, max.fanin.layers = NULL, max.parents = num.variables(dataset) - 1,
-  max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05,
+  ess = 1, bootstrap = FALSE, layering = c(),
+  max.fanin = num.variables(dataset) - 1, max.fanin.layers = NULL,
+  max.parents = num.variables(dataset) - 1, max.parents.layers = NULL,
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, mandatory.edges = NULL, ...)
 }
 \arguments{
 \item{bn}{a \code{\link{BN}} object.}
@@ -141,4 +143,3 @@ bn <- learn.structure(bn, dataset, algo='sm', max.fanin=3, cont.nodes=c(),
 \seealso{
 learn.network learn.dynamic.network
 }
-

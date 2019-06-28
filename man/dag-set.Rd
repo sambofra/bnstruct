@@ -19,4 +19,3 @@ the structure of the object.}
 \description{
 Set the adjacency matrix of the directed acyclic graph representing the structure of a network.
 }
-

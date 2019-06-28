@@ -24,4 +24,3 @@ After the header, if present, the file contains a data.frame with the observatio
 \seealso{
 \code{\link{header.file<-}}
 }
-

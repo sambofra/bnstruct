@@ -18,4 +18,3 @@ wpdag(x) <- value
 \description{
 Set the weighted partially directed acyclic graph of a network (e.g. in case bootstrap on dataset is performed).
 }
-

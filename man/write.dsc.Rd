@@ -3,8 +3,8 @@
 \docType{methods}
 \name{write.dsc}
 \alias{write.dsc}
-\alias{write.dsc,BN}
 \alias{write.dsc,BN-method}
+\alias{write.dsc,BN}
 \title{Write a network saving it in a \code{.dsc} file.}
 \usage{
 write.dsc(x, path = "./")
@@ -19,4 +19,3 @@ write.dsc(x, path = "./")
 \description{
 Write a network on disk, saving it in a \code{.dsc}-formatted file.
 }
-

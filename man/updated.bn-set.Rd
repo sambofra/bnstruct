@@ -18,4 +18,3 @@ updated.bn(x) <- value
 \description{
 Add an updated network to an InferenceEngine.
 }
-

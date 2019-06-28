@@ -3,8 +3,8 @@
 \docType{methods}
 \name{has.raw.data}
 \alias{has.raw.data}
-\alias{has.raw.data,BNDataset}
 \alias{has.raw.data,BNDataset-method}
+\alias{has.raw.data,BNDataset}
 \title{check if a BNDataset contains raw data.}
 \usage{
 has.raw.data(x)
@@ -30,4 +30,3 @@ has.raw.data(x) # TRUE, since read.dataset() actually reads raw data.
 \seealso{
 \code{\link{has.imputed.data}}, \code{\link{raw.data}}, \code{\link{imputed.data}}
 }
-

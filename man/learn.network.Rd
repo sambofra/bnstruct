@@ -3,27 +3,29 @@
 \docType{methods}
 \name{learn.network}
 \alias{learn.network}
-\alias{learn.network,BN}
 \alias{learn.network,BN-method}
-\alias{learn.network,BNDataset}
+\alias{learn.network,BN}
 \alias{learn.network,BNDataset-method}
+\alias{learn.network,BNDataset}
 \title{learn a network (structure and parameters) of a \link{BN} from a \link{BNDataset}.}
 \usage{
 learn.network(x, ...)
 
 \S4method{learn.network}{BN}(x, y = NULL, algo = "mmhc",
-  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05, ess = 1,
-  bootstrap = FALSE, layering = c(), max.fanin = num.variables(y) - 1,
-  max.fanin.layers = NULL, max.parents = num.variables(y) - 1,
-  max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05,
+  ess = 1, bootstrap = FALSE, layering = c(),
+  max.fanin = num.variables(y) - 1, max.fanin.layers = NULL,
+  max.parents = num.variables(y) - 1, max.parents.layers = NULL,
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, mandatory.edges = NULL, ...)
 
-\S4method{learn.network}{BNDataset}(x, algo = "mmhc", scoring.func = "BDeu",
-  initial.network = NULL, alpha = 0.05, ess = 1, bootstrap = FALSE,
-  layering = c(), max.fanin = num.variables(x) - 1,
-  max.fanin.layers = NULL, max.parents = num.variables(x) - 1,
-  max.parents.layers = NULL, layer.struct = NULL, cont.nodes = c(),
-  use.imputed.data = FALSE, use.cpc = TRUE, mandatory.edges = NULL, ...)
+\S4method{learn.network}{BNDataset}(x, algo = "mmhc",
+  scoring.func = "BDeu", initial.network = NULL, alpha = 0.05,
+  ess = 1, bootstrap = FALSE, layering = c(),
+  max.fanin = num.variables(x) - 1, max.fanin.layers = NULL,
+  max.parents = num.variables(x) - 1, max.parents.layers = NULL,
+  layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE,
+  use.cpc = TRUE, mandatory.edges = NULL, ...)
 }
 \arguments{
 \item{x}{can be a \code{\link{BN}} or a \code{\link{BNDataset}}. If \code{x} is a \code{\link{BN}},
@@ -150,4 +152,3 @@ net <- learn.network(mydataset)
 \seealso{
 learn.structure learn.params learn.dynamic.network
 }
-

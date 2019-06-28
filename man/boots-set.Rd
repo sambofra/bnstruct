@@ -18,4 +18,3 @@ boots(x) <- value
 \description{
 Add to a dataset a list of samples from raw data computed using bootstrap.
 }
-

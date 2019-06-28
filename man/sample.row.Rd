@@ -3,8 +3,8 @@
 \docType{methods}
 \name{sample.row}
 \alias{sample.row}
-\alias{sample.row,BN}
 \alias{sample.row,BN-method}
+\alias{sample.row,BN}
 \title{sample a row vector of values for a network.}
 \usage{
 sample.row(x, mar = 0)
@@ -23,4 +23,3 @@ a vector of values.
 \description{
 sample a row vector of values for a network.
 }
-

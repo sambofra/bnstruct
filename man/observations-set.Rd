@@ -31,4 +31,3 @@ In case of multiple observations of the same variable, the last observation is t
 \seealso{
 \code{\link{add.observations<-}}
 }
-

@@ -22,4 +22,3 @@ Set the list of conditional probability tables of a \code{\link{BN}} object.
 Each conditional probability table is represented as a multidimensional array. 
 To retrieve single dimensions (e.g. to compute marginals), users should provide dimensions names.
 }
-

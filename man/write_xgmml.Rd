@@ -33,4 +33,3 @@ structure algorithm, instead of the normaldag (default FALSE).}
 Write a network on disk, saving it in an \code{XGMML} file,
 for importing it in Cytoscape.
 }
-

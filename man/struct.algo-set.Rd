@@ -21,4 +21,3 @@ updated BN.
 \description{
 Set the algorithm used in the \code{\link{learn.structure}} method.
 }
-

@@ -22,4 +22,3 @@ Add a list of joint probability tables for the cliques of the junction tree.
 Each joint probability table is represented as a multidimensional array. 
 To retrieve single dimensions (e.g. to compute marginals), users should provide dimension names.
 }
-

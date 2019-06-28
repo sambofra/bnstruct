@@ -19,4 +19,3 @@ D. J. Spiegelhalter, R. G. Cowell (1992). Learning in probabilistic expert syste
 \seealso{
 \code{\link{child}}
 }
-

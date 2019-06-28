@@ -18,4 +18,3 @@ num.items(x) <- value
 \description{
 Set the number of observed items (rows) in a dataset.
 }
-

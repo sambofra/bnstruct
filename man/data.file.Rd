@@ -3,8 +3,8 @@
 \docType{methods}
 \name{data.file}
 \alias{data.file}
-\alias{data.file,BNDataset}
 \alias{data.file,BNDataset-method}
+\alias{data.file,BNDataset}
 \title{get data file of a \code{\link{BNDataset}}.}
 \usage{
 data.file(x)
@@ -26,4 +26,3 @@ After the header, if present, the file contains a data.frame with the observatio
 \seealso{
 \code{\link{data.file}}
 }
-
