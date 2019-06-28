@@ -11,6 +11,20 @@ setMethod("sem",
                    cont.nodes = c(), use.imputed.data = FALSE,
                    use.cpc = TRUE, mandatory.edges = NULL, ...)
           {
+
+            # fallback in case there is no missing data: learn the network and return
+            if (sum(is.na(raw.data(dataset))) == 0) {
+              bnstruct.log("no missing values found, learning the network once")
+              net <- learn.network(x, dataset, algo = "mmhc", scoring.func = scoring.func,
+                                       initial.network = initial.network,
+                                       alpha = alpha, ess = ess, bootstrap = bootstrap,
+                                       layering = layering, max.fanin.layers = max.fanin.layers,
+                                       max.fanin = max.fanin, max.parents = max.parents,
+                                       cont.nodes = cont.nodes, use.imputed.data = FALSE, use.cpc = use.cpc,
+                                       mandatory.edges = mandatory.edges, ...)
+              return(net)
+            }
+
             net <- x
             
             num.nodes <- num.nodes(net)
@@ -30,19 +44,11 @@ setMethod("sem",
             }
             else
               scoring.func <- scoring.func - 1
-            # scoring.func(bn) <- c("BDeu", "AIC", "BIC")[scoring.func + 1]
 
             # starting from an empty network: learn a starting point using MMHC
             if (is.null(initial.network) || is.na(sum(dag(net))) || sum(dag(net)) == 0)
             {
-              #w.net <- net
-              #w.net <- learn.network(w.net, dataset, "mmhc", c("bdeu", "aic", "bic")[scoring.func+1],
-              #                       alpha=alpha, ess = ess, bootstrap = bootstrap,
-              #                       layering = layering, max.fanin.layers = max.fanin.layers,
-              #                       max.fanin = max.fanin, cont.nodes = cont.nodes,
-              #                       use.imputed.data = F, use.cpc = use.cpc, ...)
               w.net <- sample.chain(dataset)
-              
             }
             else
             {
