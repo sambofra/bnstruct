@@ -125,7 +125,7 @@ setValidity("BN",
               if (num.time.steps(object) < 1) {
                 retval <- c(retval, "impossible number of time steps in the network")
               }
-              if (!is.null(quantiles(object)) && length(quantiles(object)) != num.nodes(object)) {
+              if (length(object@quantiles) > 1 && length(object@quantiles) != length(object@variables)) {
                 retval <- c(retval, "incorrect list of quantiles")
               }
               
@@ -389,7 +389,7 @@ setMethod("layering",
 #' @rdname get.most.probable.values
 setMethod("get.most.probable.values",
           "BN",
-          function(x)
+          function(x, prev.values = NULL)
           {
             bn   <- x
             dag  <- dag(bn)
@@ -417,31 +417,36 @@ setMethod("get.most.probable.values",
             
             for (node in sorted.nodes)
             {
-              pot  <- cpts[[node]]
-              vars <- c(unlist(dim.vars[[node]]))
+              if (length(prev.values) == 0 || is.na(prev.values[node]))
+              {
+                pot  <- cpts[[node]]
+                vars <- c(unlist(dim.vars[[node]]))
 
-              # sum out parent variables
-              if (length(dim.vars[[node]]) > 1)
-              {
-                # find the dimensions corresponding to the current variable
-                for (parent in setdiff(vars, node))
+                # sum out parent variables
+                if (length(dim.vars[[node]]) > 1)
                 {
-                  out  <- marginalize(pot, vars, parent)
-                  pot  <- out$potential
-                  vars <- out$vars
-                  pot <- pot / sum(pot)
+                  # find the dimensions corresponding to the current variable
+                  for (parent in setdiff(vars, node))
+                  {
+                    out  <- marginalize(pot, vars, parent)
+                    pot  <- out$potential
+                    vars <- out$vars
+                    pot <- pot / sum(pot)
+                  }
                 }
-              }
-              
-              # print(pot)
-              wm <- which(!is.na(match(c(pot),max(pot))))
-              if (length(wm) == 1)
-              {
-                mpv[node] <- wm # pot[wm]
-              }
-              else
-              {
-                mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
+                
+                # print(pot)
+                wm <- which(!is.na(match(c(pot),max(pot))))
+                if (length(wm) == 1)
+                {
+                  mpv[node] <- wm # pot[wm]
+                }
+                else
+                {
+                  mpv[node] <- sample(1:node.sizes[node], 1, replace=TRUE, prob=pot)
+                }
+              } else {
+                  mpv[node] <- prev.values[node]
               }
               
               # propagate information from parent nodes to children

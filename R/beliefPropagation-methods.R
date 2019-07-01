@@ -75,6 +75,8 @@ setMethod("belief.propagation",
 
               
               node.sizes <- node.sizes(net)
+
+              quantiles <- quantiles(net)
               
               # potentials is a list containing the probability tables of each clique
               potentials <- as.list(rep(as.list(c(1)), num.cliqs))
@@ -170,12 +172,27 @@ setMethod("belief.propagation",
                 
                 if (class(observed.vars) == "character") # hope that the user gives coherent input...
                   observed.vars <- sapply(observed.vars, function(x) which(x == variables))
-                
+               
                 for (var in 1:length(observed.vars))
                 {
-                  if (observed.vals[var] <= 0 || observed.vals[var] > node.sizes[observed.vars[var]])
+                  obs.var <- observed.vars[var]
+                  obs.val <- observed.vals[var]
+
+                  # preliminary: continuous observations need to be discretized 
+                  if (length(quantiles) > 0 && length(quantiles[[obs.var]] > 0)) {
+                    # check for values outside the quantiles -- probably a horrible workaround, though
+                    if (obs.val <= quantiles[[obs.var]][1]) {
+                      obs.val <- 1
+                    } else if (obs.val >= quantiles[[obs.var]][node.sizes[obs.var]]) {
+                      obs.val <- node.sizes[obs.var]
+                    } else {
+                      obs.val <- cut( obs.val, quantiles[[obs.var]], labels=FALSE, include.lowest=TRUE)
+                    }
+                  }
+
+                  if (obs.val <= 0 || obs.val > node.sizes[obs.var])
                   {
-                    message(cat("Variable", observed.vars[var], "cannot take value", observed.vals[var], ", skipping..."))
+                    message(cat("Variable", obs.var, "cannot take value", obs.val, ", skipping..."))
                   }
                   else
                   {
@@ -184,17 +201,17 @@ setMethod("belief.propagation",
                                                       function(x) {
                                                         which(is.element(
                                                           unlist(dimensions.contained[[x]]),
-                                                          observed.vars[var]
+                                                          obs.var
                                                         ) == TRUE)
                                                       }
                     ))
 
-                    tmp <- rep(0, node.sizes[observed.vars[var]])
-                    tmp[observed.vals[var]] <- 1
+                    tmp <- rep(0, node.sizes[obs.var])
+                    tmp[obs.val] <- 1
                     out <- mult(potentials[[target.clique]],
                                 dimensions.contained[[target.clique]],
                                 tmp,
-                                observed.vars[var],
+                                obs.var,
                                 node.sizes)
                     potentials[[target.clique]]           <- out$potential
                     dimensions.contained[[target.clique]] <- out$vars
@@ -206,94 +223,111 @@ setMethod("belief.propagation",
               # compute processing order from leaves to root
               process.order <- c()
               parents.list  <- c()
-              proc.order(root, c(), ctree)              
+              proc.order(root, c(), ctree)
+              #print("PROCESS ORDER")
+              #print(process.order)
+              #print("PARENTS LIST")
+              #print(parents.list)
+              #print("network")
+              #print(net)
               
-              # MESSAGE PASSING FROM LEAVES TO ROOT
+              # check whether message passing can be performed
+              if (length(process.order) > 1) {
+
+                # MESSAGE PASSING FROM LEAVES TO ROOT
               
-              # msg.pots contains the prob.tables for the messages,
-              # while msg.vars contains the corresponding variables
-              msg.pots <- NULL
-              msg.vars <- NULL
-              for (i in 1:num.cliqs)
-              {
-                msg.pots[[i]] <- as.list(c(NULL))
-                msg.vars[[i]] <- as.list(c(NULL))
-              }
-              
-              # For each clique (excluding the root) compute the message by marginalizing
-              # the variables not in the separator, then store the message and multiply it
-              # for the cpt contained in the neighbour clique, overwriting the corresponding
-              # potential and associated variables.
-              for (clique in 1:(length(process.order)-1))
-              {
-                out <- compute.message(potentials[[process.order[clique]]],
-                                       dimensions.contained[[process.order[clique]]],
-                                       cliques[[process.order[clique]]],
-                                       cliques[[parents.list[clique]]],
-                                       node.sizes)
-                msg.pots[[process.order[clique]]] <- out$potential
-                msg.vars[[process.order[clique]]] <- out$vars
+                # msg.pots contains the prob.tables for the messages,
+                # while msg.vars contains the corresponding variables
+                msg.pots <- NULL
+                msg.vars <- NULL
+                for (i in 1:num.cliqs)
+                {
+                  msg.pots[[i]] <- as.list(c(NULL))
+                  msg.vars[[i]] <- as.list(c(NULL))
+                }
+ 
+                # For each clique (excluding the root) compute the message by marginalizing
+                # the variables not in the separator, then store the message and multiply it
+                # for the cpt contained in the neighbour clique, overwriting the corresponding
+                # potential and associated variables.
+                for (clique in 1:(length(process.order)-1))
+                {
+                  #print("clique")
+                  #print(clique)
+                  #print("parents.list[clique]")
+                  #print(parents.list[clique])
+                  #print("cliques[[parents.list[clique]]]")
+                  #print(cliques[[parents.list[clique]]])
+                  out <- compute.message(potentials[[process.order[clique]]],
+                                         dimensions.contained[[process.order[clique]]],
+                                         cliques[[process.order[clique]]],
+                                         cliques[[parents.list[clique]]],
+                                         node.sizes)
+                  msg.pots[[process.order[clique]]] <- out$potential
+                  msg.vars[[process.order[clique]]] <- out$vars
                 
-                bk <- potentials[[parents.list[clique]]]
-                bkd <- dimensions.contained[[parents.list[clique]]]
-                out <- mult(potentials[[parents.list[clique]]],
-                            dimensions.contained[[parents.list[clique]]],
-                            msg.pots[[process.order[clique]]],
-                            msg.vars[[process.order[clique]]],
-                            node.sizes)
-                potentials[[parents.list[clique]]]           <- out$potential
-                dimensions.contained[[parents.list[clique]]] <- out$vars
-                
-              }
-                            
-              # Upward step is thus completed. Now go backward from root to leaves.
-              # This step is done by taking the CPT of the root node and dividing it (for each child)
-              # by the message received from the corresponding child, then marginalize the variables
-              # not in the separator and pass the new nessage to the child. As the messages computed
-              # in the upward step are not needed anymore after the division, they can be overwritten.
-              # Then multiply the cpt of the child for the message computed, and iterate by treating
-              # each (internal) node as root.
-              for (clique in (length(process.order)-1):1)
-              {                
-                out <- divide(potentials[[parents.list[clique]]],
+                  bk <- potentials[[parents.list[clique]]]
+                  bkd <- dimensions.contained[[parents.list[clique]]]
+                  out <- mult(potentials[[parents.list[clique]]],
                               dimensions.contained[[parents.list[clique]]],
                               msg.pots[[process.order[clique]]],
                               msg.vars[[process.order[clique]]],
                               node.sizes)
-                msg.pots[[process.order[clique]]] <- out$potential
-                msg.vars[[process.order[clique]]] <- out$vars
+                  potentials[[parents.list[clique]]]           <- out$potential
+                  dimensions.contained[[parents.list[clique]]] <- out$vars
                 
-                out  <- compute.message(msg.pots[[process.order[clique]]],
-                                        msg.vars[[process.order[clique]]],
-                                        cliques[[parents.list[clique]]],
-                                        cliques[[process.order[clique]]],
-                                        node.sizes
-                )
-                msg.pots[[process.order[clique]]] <- out$potential
-                msg.vars[[process.order[clique]]] <- out$vars
-                
-                out <- mult(potentials[[process.order[clique]]],
-                            dimensions.contained[[process.order[clique]]],
-                            msg.pots[[process.order[clique]]],
-                            msg.vars[[process.order[clique]]],
-                            node.sizes)
-                potentials[[process.order[clique]]] <- out$potential
-                dimensions.contained[[process.order[clique]]] <- out$vars
-              }
-              
-              # Finally, normalize and add dimension names and return the potentials computed (will be all JPTs).
-              for (x in 1:num.cliqs) {
-                s <- sum(potentials[[x]])
-                potentials[[x]] <- potentials[[x]] / s
-                dmns <- list(NULL)
-                for (i in length(dimensions.contained[[x]]))
-                {
-                  dmns[[i]] <- c(1:node.sizes[dimensions.contained[[x]][[i]]])
                 }
-                dimnames(potentials[[x]])        <- dmns
-                names(dimnames(potentials[[x]])) <- as.list(variables[c(unlist(dimensions.contained[[x]]))])
-              }
+                            
+                # Upward step is thus completed. Now go backward from root to leaves.
+                # This step is done by taking the CPT of the root node and dividing it (for each child)
+                # by the message received from the corresponding child, then marginalize the variables
+                # not in the separator and pass the new nessage to the child. As the messages computed
+                # in the upward step are not needed anymore after the division, they can be overwritten.
+                # Then multiply the cpt of the child for the message computed, and iterate by treating
+                # each (internal) node as root.
+                for (clique in (length(process.order)-1):1)
+                {                
+                  out <- divide(potentials[[parents.list[clique]]],
+                                dimensions.contained[[parents.list[clique]]],
+                                msg.pots[[process.order[clique]]],
+                                msg.vars[[process.order[clique]]],
+                                node.sizes)
+                  msg.pots[[process.order[clique]]] <- out$potential
+                  msg.vars[[process.order[clique]]] <- out$vars
+                
+                  out  <- compute.message(msg.pots[[process.order[clique]]],
+                                          msg.vars[[process.order[clique]]],
+                                          cliques[[parents.list[clique]]],
+                                          cliques[[process.order[clique]]],
+                                          node.sizes
+                  )
+                  msg.pots[[process.order[clique]]] <- out$potential
+                  msg.vars[[process.order[clique]]] <- out$vars
+                
+                  out <- mult(potentials[[process.order[clique]]],
+                              dimensions.contained[[process.order[clique]]],
+                              msg.pots[[process.order[clique]]],
+                              msg.vars[[process.order[clique]]],
+                              node.sizes)
+                  potentials[[process.order[clique]]] <- out$potential
+                  dimensions.contained[[process.order[clique]]] <- out$vars
+                }
               
+                # Finally, normalize and add dimension names and return the potentials computed (will be all JPTs).
+                for (x in 1:num.cliqs) {
+                  s <- sum(potentials[[x]])
+                  potentials[[x]] <- potentials[[x]] / s
+                  dmns <- list(NULL)
+                  for (i in length(dimensions.contained[[x]]))
+                  {
+                    dmns[[i]] <- c(1:node.sizes[dimensions.contained[[x]][[i]]])
+                  }
+                  dimnames(potentials[[x]])        <- dmns
+                  names(dimnames(potentials[[x]])) <- as.list(variables[c(unlist(dimensions.contained[[x]]))])
+                }
+              
+              } # end if (length(process.order) > 1)
+
               if (return.potentials)
                 return(potentials)
               
@@ -327,6 +361,7 @@ setMethod("belief.propagation",
               wpdag(nbn)        <- wpdag(net)
               scoring.func(nbn) <- scoring.func(net)
               struct.algo(nbn)  <- struct.algo(net)
+              quantiles(nbn)    <- quantiles(net)
 
               ncpts <- NULL # lapply(1:num.nodes, function(x) as.list(c(NULL)))
               

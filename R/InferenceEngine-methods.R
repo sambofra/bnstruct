@@ -295,16 +295,19 @@ setMethod("test.updated.bn",
 #' @aliases get.most.probable.values,InferenceEngine
 setMethod("get.most.probable.values",
           "InferenceEngine",
-          function(x)
+          function(x, prev.values = NULL)
           {
 #             if (is.null(jpts(x))) # don't know if this works...
 #               return(get.most.probable.values(bn(x)))
-            jpts       <- jpts(x)
-            num.nodes  <- num.nodes(bn(x))
-            cliques    <- jt.cliques(x)
-            num.cliqs  <- length(cliques)
-            variables  <- variables(bn(x))
-            node.sizes <- node.sizes(bn(x))
+            jpts         <- jpts(x)
+            num.nodes    <- num.nodes(bn(x))
+            cliques      <- jt.cliques(x)
+            num.cliqs    <- length(cliques)
+            variables    <- variables(bn(x))
+            node.sizes   <- node.sizes(bn(x))
+            discreteness <- discreteness(bn(x))
+            quantiles    <- quantiles(bn(x))
+            
             
             mpv <- array(rep(0, num.nodes), dim=c(num.nodes), dimnames=list(variables))
 
@@ -323,32 +326,48 @@ setMethod("get.most.probable.values",
 
             for (i in 1:num.nodes)
             {
-              target.clique <- which(sapply(1:num.cliqs,
-                                                function(index){
-                                                    is.element(
-                                                        i,
-                                                        unlist(dim.vars[[index]])
-                                                    )
-                                                }
-                                            ) == TRUE)[1]
-              pot  <- jpts[[target.clique]]
-              vars <- c(unlist(dim.vars[[target.clique]]))
+              if (length(prev.values) == 0 || is.na(prev.values[i]))
+              {
+                target.clique <- which(sapply(1:num.cliqs,
+                                                  function(index){
+                                                      is.element(
+                                                          i,
+                                                          unlist(dim.vars[[index]])
+                                                      )
+                                                  }
+                                              ) == TRUE)[1]
+                pot  <- jpts[[target.clique]]
+                vars <- c(unlist(dim.vars[[target.clique]]))
+  
+                for (v in c(unlist(setdiff(vars,i))))
+                {
+                  out  <- marginalize(pot, vars, v)
+                  pot  <- out$potential
+                  vars <- out$vars
+                  pot  <- pot / sum(pot)
+                }
+                wm <- which(!is.na(match(c(pot),max(pot))))
+                if (length(wm) == 1)
+                {
+                  mpv[i] <- wm # pot[wm]
+                }
+                else
+                {
+                  mpv[i] <- sample(1:node.sizes[i], 1, replace=T, prob=pot) #,replace=TRUE
+                }
 
-              for (v in c(unlist(setdiff(vars,i))))
-              {
-                out  <- marginalize(pot, vars, v)
-                pot  <- out$potential
-                vars <- out$vars
-                pot  <- pot / sum(pot)
-              }
-              wm <- which(!is.na(match(c(pot),max(pot))))
-              if (length(wm) == 1)
-              {
-                mpv[i] <- wm # pot[wm]
-              }
-              else
-              {
-                mpv[i] <- sample(1:node.sizes[i], 1, replace=T, prob=pot) #,replace=TRUE
+                # check if the variable was continuous;
+                # sample a uniform value in the quantile if it's the case
+                if (discreteness[i] == FALSE) {
+                  if (is.null(quantiles) || length(quantiles[[i]]) < 1) {
+                    stop("error: no quantization available")
+                  }
+                  lb <- quantiles[[i]][mpv[i]]
+                  ub <- quantiles[[i]][mpv[i]+1]
+                  mpv[i] <- runif(1, lb, ub)
+                }
+              } else {
+                mpv[i] <- prev.values[i]
               }
             }
             

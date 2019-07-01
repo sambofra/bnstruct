@@ -363,6 +363,7 @@ setGeneric("layering", function(x) { standardGeneric("layering") } )
 #' @rdname get.most.probable.values
 #' 
 #' @param x a \code{\link{BN}} or \code{\link{InferenceEngine}} object.
+#' @param prev.values vector of size \code{\link{num.nodes}} containing an existing observation to complete (NULL if none).
 #' 
 #' @return array containing, in each position, the most probable value for the corresponding variable.
 #' 
@@ -377,7 +378,7 @@ setGeneric("layering", function(x) { standardGeneric("layering") } )
 #' }
 #'  
 #' @exportMethod get.most.probable.values
-setGeneric("get.most.probable.values", function(x) { standardGeneric("get.most.probable.values") } )
+setGeneric("get.most.probable.values", function(x, prev.values=NULL) { standardGeneric("get.most.probable.values") } )
 
 
 #' sample a row vector of values for a network.

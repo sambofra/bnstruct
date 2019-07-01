@@ -103,15 +103,20 @@ quantize.matrix <- function(data, levels)
   
   quant <- matrix(0,nr,nc)
   
+  quantiles.list <- list()
   # print(levels)
   
   for( i in 1:nc )
   {
-    if( levels[i] == 0 )  # already discrete
+    if( levels[i] == 0 )  {
+      # already discrete
       quant[,i] <- as.matrix(data[,i],nr,1)
+      quantiles.list[[i]] <- c() 
+    }
     else
     {
       quantiles <- unique(quantile( data[,i], probs = (0:levels[i])/levels[i], na.rm = TRUE ))
+      quantiles.list[[i]] <- quantiles
       # cut the range using the quantiles as break points.
       quant[,i] <- as.matrix( cut( data[,i], quantiles, labels=FALSE, include.lowest=TRUE),nr,1 )
     }
@@ -120,7 +125,7 @@ quantize.matrix <- function(data, levels)
   storage.mode(quant) <- "integer"
   # print(sapply(1:nc,function(x)max(quant[,x])))
   colnames(quant) <- colnames(data)
-  return(quant)
+  return(list("quant"=quant, "quantiles"=quantiles.list))
 }
 
 # Compute quantiles for each column i of the continuous matrix data, 

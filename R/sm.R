@@ -17,7 +17,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	n.nodes <- ncol(x)
 	
 	storage.mode(node.sizes) <- "integer" # just to be sure
-  storage.mode(scoring.func) <- "integer"
+        storage.mode(scoring.func) <- "integer"
 	
 	# if no max.fanin is given, assume maximum possible
 	if( is.null(max.fanin) )
@@ -66,7 +66,11 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	levels <- rep( 0, n.nodes )
 	levels[cont.nodes] <- node.sizes[cont.nodes]
 	# data <- quantize.with.na.matrix( x, levels )
-	data <- quantize.matrix( x, levels )	
+	# data <- quantize.matrix( x, levels )
+        out.data <- quantize.matrix( data, levels )
+        data <- out.data$quant
+        # quantiles(bn) <- out.data$quantiles
+        # quantiles(dataset) <- out.data$quantiles
   
 	ifm <- impossible.family.mask( n.nodes, layering, max.fanin.layers )
   

@@ -261,7 +261,10 @@ setMethod("learn.params",
             levels[cont.nodes] <- node.sizes[cont.nodes]
             
             # data <- quantize.with.na.matrix( data, levels )
-            data <- quantize.matrix( data, levels )
+            out.data <- quantize.matrix( data, levels )
+            data <- out.data$quant
+            quantiles(bn) <- out.data$quantiles
+            quantiles(dataset) <- out.data$quantiles
 
             #n.nodes <- dataset@num.items #dim(data)[2]
             cpts <- list("list",n.nodes)

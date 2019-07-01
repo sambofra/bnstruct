@@ -172,14 +172,14 @@ setMethod("em",
                 for (bis.row in still.has.NAs)
                 {
                   bis.ie <- InferenceEngine(bis.net)
-                  ov     <- which(!is.na(imp.data[bis.row]))
+                  ov     <- which(!is.na(imp.data[bis.row,]))
                   bis.ie.1 <- belief.propagation(bis.ie, list("observed.vars" = ov,
-                                                              "observed.vals" = (imp.data[bis.row])[ov]))
-                  imp.data[bis.row,] <- get.most.probable.values(bis.ie.1)
+                                                              "observed.vals" = (imp.data[bis.row,])[ov]))
+                  imp.data[bis.row,] <- get.most.probable.values(bis.ie.1, imp.data[bis.row,])
                 }
               }
               
-              storage.mode(imp.data) <- "integer"
+              # storage.mode(imp.data) <- "integer"
               imputed.data(dataset)  <- imp.data
               
               bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
@@ -187,7 +187,7 @@ setMethod("em",
               no.iterations <- no.iterations + 1
               curr.log.lik  <- log.likelihood(dataset, bn, use.imputed.data = T)
               difference    <- prev.log.lik - curr.log.lik
-              
+             
               orig.bn      <- bn
               prev.log.lik <- curr.log.lik
             }
@@ -225,6 +225,15 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
     data <- imputed.data(dataset)
   else
     data <- raw.data(dataset)
+
+  # discretize continuous variables
+  cont.nodes <- which(!discreteness(net))
+  levels <- rep( 0, n.nodes )
+  levels[cont.nodes] <- node.sizes[cont.nodes]
+  out.data <- quantize.matrix( data, levels )
+  data <- out.data$quant
+  quantiles(net) <- out.data$quantiles
+  quantiles(dataset) <- out.data$quantiles
   
   sorted.nodes <- topological.sort(dag)
   vals         <- rep(0, n.nodes)

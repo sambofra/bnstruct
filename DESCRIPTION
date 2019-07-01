@@ -11,7 +11,7 @@ Title: Bayesian Network Structure Learning from Data with Missing Values
 Version: 1.0.5
 Date: 2019-06-28
 Depends:
-    R (>= 2.10),
+    R (>= 3.5.0),
     bitops,
     Matrix,
     igraph,

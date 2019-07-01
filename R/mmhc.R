@@ -14,7 +14,11 @@ hc <- function( data, node.sizes, scoring.func = 0, cpc, cont.nodes = c(), ess =
   levels[cont.nodes] <- node.sizes[cont.nodes]
   
   # data <- quantize.with.na.matrix( data, levels )
-  data <- quantize.matrix( data, levels )
+  # data <- quantize.matrix( data, levels )
+  out.data <- quantize.matrix( data, levels )
+  data <- out.data$quant
+  # quantiles(bn) <- out.data$quantiles
+  # quantiles(dataset) <- out.data$quantiles
 
   # apply mandatory edges (if present)
   m.edges <- matrix(0L, n.nodes, n.nodes)
@@ -210,7 +214,11 @@ mmpc <- function( data, node.sizes, cont.nodes = NULL, chi.th = 0.05,
   levels[cont.nodes] <- node.sizes[cont.nodes]
   
   # data <- quantize.with.na.matrix( data, levels )
-  data <- quantize.matrix( data, levels )
+  #data <- quantize.matrix( data, levels )
+  out.data <- quantize.matrix( data, levels )
+  data <- out.data$quant
+  #quantiles(bn) <- out.data$quantiles
+  #quantiles(dataset) <- out.data$quantiles
     
   # default values for layering
   if( is.null(layering) )
