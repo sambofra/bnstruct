@@ -9,7 +9,7 @@ Description: Bayesian Network Structure Learning from Data with Missing Values.
 Type: Package
 Title: Bayesian Network Structure Learning from Data with Missing Values
 Version: 1.0.5
-Date: 2019-06-28
+Date: 2019-07-02
 Depends:
     R (>= 3.5.0),
     bitops,

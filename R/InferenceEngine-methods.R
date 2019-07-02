@@ -359,7 +359,7 @@ setMethod("get.most.probable.values",
                 # check if the variable was continuous;
                 # sample a uniform value in the quantile if it's the case
                 if (discreteness[i] == FALSE) {
-                  if (is.null(quantiles) || length(quantiles[[i]]) < 1) {
+                  if (length(quantiles) <= 0 || length(quantiles[[i]]) < 1) {
                     stop("error: no quantization available")
                   }
                   lb <- quantiles[[i]][mpv[i]]

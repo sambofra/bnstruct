@@ -731,9 +731,11 @@ setMethod("sample.row", "BN",
             bn   <- x
             dag  <- dag(bn)
             cpts <- cpts(bn)
-            num.nodes  <- num.nodes(bn)
-            variables  <- variables(bn)
-            node.sizes <- node.sizes(bn)
+            num.nodes    <- num.nodes(bn)
+            variables    <- variables(bn)
+            node.sizes   <- node.sizes(bn)
+            discreteness <- discreteness(bn)
+            quantiles    <- quantiles(bn)
             
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
             
@@ -768,6 +770,17 @@ setMethod("sample.row", "BN",
                 mpv[node] <- sample(1:node.sizes[node], 1, replace=T, prob=cpt)
               }
             }
+
+            # sample continuous values, if possible
+            if (length(quantiles) > 0) {
+              for (node in sorted.nodes) {
+                if (discreteness[node] == FALSE && length(quantiles[[node]]) > 1) {
+                  lb <- quantiles[[node]][mpv[node]]
+                  ub <- quantiles[[node]][mpv[node]+1]
+                  mpv[node] <- runif(1, lb, ub)
+                }
+              }
+            }
             
             if (mar > 0) {            
               missing.prob <- runif(num.nodes, 0, 1)
@@ -794,7 +807,7 @@ setMethod("sample.dataset",c("BN"),
             for (i in 1:n)
               obs[i,] <- sample.row(x, mar)
             
-            storage.mode(obs) <- "integer"
+            #storage.mode(obs) <- "integer"
             
             bnd <- BNDataset(obs, discreteness(x), variables(x), node.sizes(x))
            

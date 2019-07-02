@@ -1,3 +1,10 @@
+bnstruct v1.0.5 (Release date: 2019-02-07)
+===============
+
+* Bugfix in EM algorithm (found by Anne Helby Petersen)
+* Correction in vignette example
+* Regenerated example data, now it requires R 3.5+
+
 bnstruct v1.0.4 (Release date: 2018-08-31)
 ===============
 
@@ -6,6 +13,7 @@ bnstruct v1.0.4 (Release date: 2018-08-31)
 * Layering added to HC
 * Mandatory edges can be specified to learn.network
 * Modified way of imposing a maximum number of parent nodes for the different algorithms
+* Bugfix in discretization (thanks to Amy Willis)
 
 bnstruct v1.0.2 (Release date: 2016-12-13)
 ===============
