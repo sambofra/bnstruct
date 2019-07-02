@@ -53,7 +53,7 @@ install_github("sambofra/bnstruct")
 For Windows platforms, a binary executable of the latest stable version is available
 [on CRAN](https://CRAN.R-project.org/package=bnstruct).
 
-`bnstruct` requires R `>= 2.10`, and depends on
+`bnstruct` requires R `>= 3.5`, and depends on
 `bitops`, `igraph`, `Matrix`, `graph` and
 `methods`. Package `Rgraphviz` is requested in
 order to plot graphs, but is not mandatory.
