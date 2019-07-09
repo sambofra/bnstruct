@@ -100,7 +100,7 @@ quantize.matrix <- function(data, levels)
 {
   nr <- nrow(data)
   nc <- ncol(data)
-  
+
   quant <- matrix(0,nr,nc)
   
   quantiles.list <- list()

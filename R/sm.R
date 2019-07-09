@@ -67,7 +67,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	levels[cont.nodes] <- node.sizes[cont.nodes]
 	# data <- quantize.with.na.matrix( x, levels )
 	# data <- quantize.matrix( x, levels )
-        out.data <- quantize.matrix( data, levels )
+        out.data <- quantize.matrix( x, levels )
         data <- out.data$quant
         # quantiles(bn) <- out.data$quantiles
         # quantiles(dataset) <- out.data$quantiles

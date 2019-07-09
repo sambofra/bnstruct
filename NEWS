@@ -1,4 +1,9 @@
-bnstruct v1.0.5 (Release date: 2019-02-07)
+bnstruct v1.0.5 (Release date: 2019-07-09)
+===============
+
+* Bugfix in SM
+
+bnstruct v1.0.5 (Release date: 2019-07-02)
 ===============
 
 * Bugfix in EM algorithm (found by Anne Helby Petersen)
