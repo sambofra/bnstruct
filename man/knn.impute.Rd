@@ -8,7 +8,7 @@ knn.impute(data, k = 10, cat.var = 1:ncol(data),
   to.impute = 1:nrow(data), using = 1:nrow(data))
 }
 \arguments{
-\item{data}{a data frame}
+\item{data}{a numerical matrix.}
 
 \item{k}{number of neighbours to be used; for categorical variables 
 the mode of the neighbours is used, for continuous variables 
@@ -24,7 +24,7 @@ Default: impute all rows.}
 to search for neighbours. Default: use all rows.}
 }
 \value{
-imputed data frame.
+imputed matrix.
 }
 \description{
 Perform imputation of missing data in a data frame using the k-Nearest Neighbour algorithm.

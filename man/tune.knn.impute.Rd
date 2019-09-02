@@ -8,7 +8,7 @@ tune.knn.impute(data, cat.var = 1:ncol(data), k.min = 1, k.max = 20,
   frac.miss = 0.1, n.iter = 20, seed = 0)
 }
 \arguments{
-\item{data}{a data frame}
+\item{data}{a numerical matrix.}
 
 \item{cat.var}{vector containing the categorical variables}
 

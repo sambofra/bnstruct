@@ -6,7 +6,7 @@
 #' @name knn.impute
 #' @rdname knn.impute
 #' 
-#' @param data a data frame
+#' @param data a numerical matrix.
 #' @param k number of neighbours to be used; for categorical variables 
 #'        the mode of the neighbours is used, for continuous variables 
 #'        the median value is used instead. Default: 10.
@@ -17,7 +17,7 @@
 #' @param using vector indicating which rows of the dataset are to be used 
 #'        to search for neighbours. Default: use all rows.
 #'      
-#' @return imputed data frame.
+#' @return imputed matrix.
 #' 
 #' @export knn.impute
 knn.impute <- function( data, k = 10, cat.var = 1:ncol(data), 
@@ -133,7 +133,7 @@ stat.mode <- function(x)
 
 #' tune the parameter k of the knn algorithm used in imputation.
 #' 
-#' @param data a data frame
+#' @param data a numerical matrix.
 #' @param cat.var vector containing the categorical variables
 #' @param k.min minimum value for k
 #' @param k.max maximum value for k
