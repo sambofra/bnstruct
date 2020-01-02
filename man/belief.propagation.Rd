@@ -16,7 +16,7 @@ belief.propagation(ie, observations = NULL, return.potentials = FALSE)
 \item{ie}{an \code{\link{InferenceEngine}} object.}
 
 \item{observations}{list of observations, consisting in two vector, \code{observed.vars} for the observed variables,
-and \code{observed.vals} for the values taken by variables listed in \code{observed.vars}. If no observations
+and \code{observed.vals} for the values taken by the variables listed in \code{observed.vars}. If no observations
 are provided, the \code{InferenceEngine} will use the ones it already contains.}
 
 \item{return.potentials}{if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.}
@@ -25,7 +25,7 @@ are provided, the \code{InferenceEngine} will use the ones it already contains.}
 updated \code{\link{InferenceEngine}} object.
 }
 \description{
-Perform belief propagation for the network of an InferenceEngine, given a set of observations when present.
+Perform belief propagation for the network of an InferenceEngine, given a set of observations.
 In the current version of \code{bnstruct}, belief propagation can be computed only over a junction tree.
 }
 \examples{

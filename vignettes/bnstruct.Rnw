@@ -844,6 +844,32 @@ updated.engine  <- results$InferenceEngine
 updated.dataset <- results$BNDataset
 @
 
+\subsection{Intervention}\label{sec:intervention}
+Intervention is an operation that consists in specifying the value of some variables, independently of their
+parent nodes. It follows the rules of do-calculus.
+In practice, on a Bayesian Network, to perform intervention on a node it means to ``cut away'' the node
+from its parents and set it to a certain value.
+
+In \Rpackage(bnstruct) intervention can be done by building an \Robject{InferenceEngine} for a specific set
+of interventions. Similarly to the observations in the previous case, interventions are defined using a list
+that takes two vectors, one for the variables to manipulate, and one for the corresponding values.
+When building an \Robject{InferenceEngine} for a set of observations, the engine will contain an updated
+network, with altered structure (following the rules of do-calculus) and updated conditional probabilities,
+reflecting the manipulation.
+
+For example, in the Asia example, we might want to test how Smoke influences Dyspnea, regardless of whether the
+patient has been in Asia; we can do so by intervening on the relative variable and checking the outcome.
+
+<<infeng5,eval=FALSE>>=
+dataset       <- asia()
+net           <- learn.network(dataset)
+interventions <- list(intervention.vars=c(3),
+                      intervention.vals=c(1))
+engine        <- InferenceEngine(net, interventions = interventions)
+test.updated.bn(engine) # TRUE
+get.most.probable.values(updated.bn(engine))
+@
+
 
 \section{Three small but complete examples}
 Here we show two small but complete examples, in order to highlight how the package can provide significant results

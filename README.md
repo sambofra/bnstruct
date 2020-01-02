@@ -17,7 +17,7 @@ which it is possible to perform *imputation* (guessing the missing
 values, by looking at the data). The package also contains methods for
 learning using the Bootstrap technique. Finally,
 `bnstruct`, has a set of additional tools to use Bayesian
-Networks, such as methods to perform belief propagation.
+Networks, such as methods to perform inference and interventions.
 
 In particular, the absence of some observations in the dataset is a very
 common situation in real-life applications such as biology or medicine,

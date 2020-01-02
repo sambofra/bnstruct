@@ -10,7 +10,8 @@
 \usage{
 \S4method{initialize}{InferenceEngine}(.Object, ...)
 
-InferenceEngine(bn = NULL, observations = NULL, ...)
+InferenceEngine(bn = NULL, observations = NULL, interventions = NULL,
+  ...)
 }
 \arguments{
 \item{.Object}{an empty InferenceEngine object.}
@@ -23,6 +24,12 @@ InferenceEngine(bn = NULL, observations = NULL, ...)
 \itemize{
 \item{\code{observed.vars}:}{vector of observed variables;}
 \item{\code{observed.vals}:}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
+}}
+
+\item{interventions}{a list of interventions composed of the following two vectors:
+\itemize{
+\item{\code{intervention.vars}:}{vector of variables for which an intervention has been performed;}
+\item{\code{intervention.vals}:}{vector of values chosen for the variables in \code{intervention.vals} in the corresponding position.}
 }}
 }
 \value{
@@ -51,6 +58,8 @@ constructor for \code{\link{InferenceEngine}} object
          it will have different conditional probability tables with respect to its original version. \code{NULL} if missing.}
   \item{\code{observed.vars}:}{list of observed variables, by name or number.}
   \item{\code{observed.vals}:}{list of observed values for the corresponding variables in \code{observed.vars}.}
+  \item{\code{intervention.vars}:}{list of manipulated variables, by name or number.}
+  \item{\code{intervention.vals}:}{list of specified values for the corresponding variables in \code{intervention.vars}.}
 }
 }
 
