@@ -263,6 +263,8 @@ setClass("BNDataset",
 #'          it will have different conditional probability tables with respect to its original version. \code{NULL} if missing.}
 #'   \item{\code{observed.vars}:}{list of observed variables, by name or number.}
 #'   \item{\code{observed.vals}:}{list of observed values for the corresponding variables in \code{observed.vars}.}
+#'   \item{\code{intervention.vars}:}{list of manipulated variables, by name or number.}
+#'   \item{\code{intervention.vals}:}{list of specified values for the corresponding variables in \code{intervention.vars}.}
 #' }
 #' 
 #' 
@@ -282,7 +284,9 @@ setClass("InferenceEngine",
            bn                 = "BNOrNULL",
            updated.bn         = "BNOrNULL",
            observed.vars      = "vectorOrNULL",
-           observed.vals      = "vectorOrNULL"
+           observed.vals      = "vectorOrNULL",
+           intervention.vars  = "vectorOrNULL",
+           intervention.vals  = "vectorOrNULL"
          ),
          prototype(
            junction.tree      = matrix(),
@@ -293,7 +297,9 @@ setClass("InferenceEngine",
            bn                 = NULL,
            updated.bn         = NULL,
            observed.vars      = NULL,
-           observed.vals      = NULL
+           observed.vals      = NULL,
+           intervention.vars  = NULL,
+           intervention.vals  = NULL
          )
         )
 

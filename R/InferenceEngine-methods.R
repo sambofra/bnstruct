@@ -27,6 +27,11 @@ setMethod("initialize",
 #' \item{\code{observed.vars}:}{vector of observed variables;}
 #' \item{\code{observed.vals}:}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 #' }
+#' @param interventions a list of interventions composed of the following two vectors:
+#' \itemize{
+#' \item{\code{intervention.vars}:}{vector of variables for which an intervention has been performed;}
+#' \item{\code{intervention.vals}:}{vector of values chosen for the variables in \code{intervention.vals} in the corresponding position.}
+#' }
 #' @param ... potential further arguments of methods.
 #' 
 #' @return InferenceEngine object.
@@ -43,19 +48,42 @@ setMethod("initialize",
 #' }
 #' 
 #' @export 
-InferenceEngine <- function(bn = NULL, observations = NULL, ...)
+InferenceEngine <- function(bn = NULL, observations = NULL, interventions = NULL, ...)
 {
-  object <- new("InferenceEngine", bn, observations, ...)
+  object <- new("InferenceEngine", bn, observations, interventions, ...)
   
   if (!is.null(bn))
     bn(object) <- bn
   
   if (!is.null(observations))
     observations(object) <- observations
+
+  if (!is.null(interventions))
+    interventions(object) <- interventions
   
   if (!is.null(bn))
   {
-    object <- build.junction.tree(object, dag(bn))
+    dag <- dag(bn)
+    if (!is.null(interventions)) {
+      intervention.vars <- interventions[[1]]
+      intervention.vals <- interventions[[2]]
+      intervs <- unique.observations(intervention.vars, intervention.vals)
+      intervs.vars <- intervs$observed.vars
+      for (i in intervs.vars) {
+        dag[,i] <- 0
+      }
+      b <- bn(object)
+      dag(b) <- dag
+      bn(object) <- b
+    }
+
+    object <- build.junction.tree(object, dag)
+
+    if (!is.null(interventions)) {
+      object <- belief.propagation(object, interventions)
+      u <- updated.bn(object)
+      bn(object) <- u
+    }
   }
   return(object)
 }
@@ -82,6 +110,12 @@ setValidity("InferenceEngine",
               if (length(obs[[1]]) != length(obs[[2]]))
               {
                 retval <- c(retval, "incoherent number of observed variables and values")
+              }
+
+              ints <- interventions(object)
+              if (length(ints[[1]]) != length(ints[[2]]))
+              {
+                retval <- c(retval, "incoherent number of variables and values for the intervention.")
               }
 
               if (is.null(retval)) return (TRUE)
@@ -143,6 +177,17 @@ setMethod("observations",
           {
             return(list("observed.vars" = slot(x, "observed.vars"), "observed.vals" = slot(x, "observed.vals")))
           })
+
+
+#' @rdname interventions
+#' @aliases interventions,InferenceEngine
+setMethod("interventions",
+          "InferenceEngine",
+          function(x)
+          {
+            return(list("intervention.vars" = slot(x, "intervention.vars"), "intervention.vals" = slot(x, "intervention.vals")))
+          })
+
 
 
 #' @name num.nodes<-
@@ -245,6 +290,25 @@ setReplaceMethod("observations",
                    obs  <- unique.observations(ovrs, ovls)
                    slot(x, "observed.vars") <- obs$observed.vars
                    slot(x, "observed.vals") <- obs$observed.vals
+                   validObject(x)
+                   x
+                 })
+
+
+# Should never be used outside...
+#' @name interventions<-
+#' @aliases interventions<-,InferenceEngine-method
+#' @docType methods
+#' @rdname interventions-set
+setReplaceMethod("interventions",
+                 "InferenceEngine",
+                 function(x, value)
+                 {
+                   ivrs <- c(unlist(value[[1]]))
+                   ivls <- c(unlist(value[[2]]))
+                   ivs  <- unique.observations(ivrs, ivls)
+                   slot(x, "intervention.vars") <- ivs$observed.vars
+                   slot(x, "intervention.vals") <- ivs$observed.vals
                    validObject(x)
                    x
                  })

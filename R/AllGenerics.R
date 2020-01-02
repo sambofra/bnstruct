@@ -976,7 +976,7 @@ setGeneric("build.junction.tree", function(object, ...) { standardGeneric("build
 
 #' perform belief propagation.
 #' 
-#' Perform belief propagation for the network of an InferenceEngine, given a set of observations when present.
+#' Perform belief propagation for the network of an InferenceEngine, given a set of observations.
 #' In the current version of \code{bnstruct}, belief propagation can be computed only over a junction tree.
 #' 
 #' @name belief.propagation
@@ -984,7 +984,7 @@ setGeneric("build.junction.tree", function(object, ...) { standardGeneric("build
 #' 
 #' @param ie an \code{\link{InferenceEngine}} object.
 #' @param observations list of observations, consisting in two vector, \code{observed.vars} for the observed variables,
-#' and \code{observed.vals} for the values taken by variables listed in \code{observed.vars}. If no observations
+#' and \code{observed.vals} for the values taken by the variables listed in \code{observed.vars}. If no observations
 #' are provided, the \code{InferenceEngine} will use the ones it already contains.
 #' @param return.potentials if TRUE only the potentials are returned, instead of the default \code{\link{BN}}.
 #' 
@@ -1010,6 +1010,9 @@ setGeneric("belief.propagation", function(ie, observations = NULL,
 #' 
 #' Check if an InferenceEngine actually contains an updated network, in order to provide the chance of
 #' a fallback and use the original network if no belief propagation has been performed.
+#' An \code{\link{InferenceEngine}} built specifying a set of interventions will contain
+#' an updated \code{\link{BN}} with altered structure and no conditional probability tables
+#' (unless they are computed by a belief propagation operation.)
 #' 
 #' @name test.updated.bn
 #' @rdname test.updated.bn
@@ -1028,6 +1031,10 @@ setGeneric("belief.propagation", function(ie, observations = NULL,
 #' observations(ie) <- list("observed.vars"=("A","G","X"), "observed.vals"=c(1,2,1))
 #' ie <- belief.propagation(ie)
 #' test.updated.bn(ie) # TRUE
+#'
+#' interventions <- list("intervention.vars"=("A","G","X"), "intervention.vals"=c(1,2,1))
+#' ie2 <- InferenceEngine(bn, interventions = interventions)
+#' test.updated.bn(ie2) # TRUE
 #' }
 #' 
 #' @exportMethod test.updated.bn
@@ -1516,6 +1523,26 @@ setGeneric("updated.bn", function(x) { standardGeneric("updated.bn") } )
 #' @exportMethod observations
 setGeneric("observations", function(x) { standardGeneric("observations") } )
 
+#' get the list of interventions of an \code{\link{InferenceEngine}}.
+#' 
+#' Return the list of interventions added to an InferenceEngine.
+#' 
+#' Output is a list in the following format:
+#' \itemize{
+#' \item{\code{intervention.vars}}{vector of manipulated variables;}
+#' \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
+#' }
+#' 
+#' @name interventions
+#' @rdname interventions
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' 
+#' @return the list of interventions of the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod interventions
+setGeneric("interventions", function(x) { standardGeneric("interventions") } )
+
 #' get the list of quantiles of an object.
 #' 
 #' Return the list of quantiles of a \code{\link{BN}} or a \code{\link{BNDataset}}. It is set when a discretization needs to be performed.
@@ -1853,6 +1880,28 @@ setGeneric("bn<-", function(x, value) { standardGeneric("bn<-") } )
 #'         
 #' @exportMethod updated.bn<-
 setGeneric("updated.bn<-", function(x, value) { standardGeneric("updated.bn<-") } )
+
+
+#' set the list of interventions for an \code{\link{InferenceEngine}}.
+#' 
+#' Add a list of interventions to an InferenceEngine, using a list composed by the two following vectors:
+#' \itemize{
+#' \item{\code{intervention.vars}}{vector of the variables we manipulate;}
+#' \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
+#' }
+#' 
+#' An intervention can be applied only when building an \code{\link{InferenceEngine}}.
+#' 
+#' In case of multiple interventions of the same variable, the last intervention is the one used.
+#' 
+#' @name interventions<-
+#' @rdname interventions-set
+#' 
+#' @param x an \code{\link{InferenceEngine}}.
+#' @param value the list of interventions of the \code{\link{InferenceEngine}}.
+#' 
+#' @exportMethod observations<-
+setGeneric("interventions<-", function(x, value) { standardGeneric("interventions<-") } )
 
 
 

@@ -368,18 +368,18 @@ setMethod("belief.propagation",
               for (node in 1:num.nodes)
               {
                 # faster, but result does not change. While debugging, better keep this out...
-#                 mpos <- match(node, observed.vars)
-#                 if (!is.na(mpos))
-#                 # works also when observed.vars == c()
-#                 # in that case, the `else` branch will be the chosen one for every variable
-#                 {
-#                   ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
-#                                          c(node.sizes[observed.vars[mpos]]))
-#                   ncpts[[node]][observed.vals[mpos]] <- 1
-#                   dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
-#                   names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
-#                 }
-#                 else
+                mpos <- match(node, observed.vars)
+                if (!is.na(mpos))
+                # works also when observed.vars == c()
+                # in that case, the `else` branch will be the chosen one for every variable
+                {
+                  ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
+                                         c(node.sizes[observed.vars[mpos]]))
+                  ncpts[[node]][observed.vals[mpos]] <- 1
+                  dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
+                  names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
+                }
+                else
                 {
                   dnode <- unlist(dim.vars[[node]], F, F)
 #                   target.clique <- which.min(lapply(1:num.cliqs,

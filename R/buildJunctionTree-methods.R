@@ -8,7 +8,7 @@ setMethod("build.junction.tree",
             # Input parameter is the adjacency matrix of a directed graph.
             
             dgraph <- dag(bn(object))
-            
+
             graph <- moralization(dgraph)    # adj. matrix
             graph <- directed.to.undirected.graph(graph)   # adj. matrix
             graph <- triangulation(graph)   # adj. matrix
