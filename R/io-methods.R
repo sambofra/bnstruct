@@ -4,19 +4,25 @@
 setMethod("read.dataset",
           c("BNDataset", "character", "character"),
           function(object, data.file, header.file, data.with.header = FALSE,
-                   na.string.symbol = '?', sep.symbol = '', starts.from = 1,
+                   na.string.symbol = '?', sep.symbol = "", starts.from = 1,
                    num.time.steps = 1)
           {
             header.file(object)  <- header.file
             data.file(object)    <- data.file
 
-            a <- read.delim(data.file, na.strings = na.string.symbol,
+            a <- read.table(data.file, na.strings = na.string.symbol,
                             header = data.with.header, sep = sep.symbol) + (1 - starts.from)
             a <- as.matrix(a)
             
             ls                   <- readLines(header.file)
 
-            vars <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
+            #vars <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
+            # modified to keep spaces in variable names
+            # hat tip to https://stat.ethz.ch/pipermail/r-help/2012-November/342314.html
+            res<-unlist(strsplit(ls[1],"[\"]"))
+            res1<-res[res!=" "]
+            res1<-res1[res1!=""]
+            vars<-c(unlist(strsplit(res1[grepl("\\s+$",res1)]," ")),res1[!grepl("\\s+$",res1)])
             if (length(vars) == ncol(a)) {
               variables(object) <- vars
             } else if (num.time.steps > 1 && length(vars) * num.time.steps == ncol(a)) {
