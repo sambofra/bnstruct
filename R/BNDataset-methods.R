@@ -83,6 +83,14 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
   }
   
   if (length(discreteness) > 1) {
+    for (d in 1:length(discreteness)) {
+      if (discreteness[d] %in% c("d","D","T","TRUE")) discreteness[d] <- 'D'
+      else if (discreteness[d] %in% c("c","C","F","FALSE")) discreteness[d] <- 'C'
+      else {
+        bnstruct.log("Unrecognized status for variable ",variables(object)[d],", converting it to discrete.")
+        discreteness[d] <- 'D'
+      }
+    }
     if (length(discreteness) == ncol(as.matrix(data))) {
       discreteness(dataset) <- discreteness
     } else if (num.time.steps > 1 && length(discreteness) * num.time.steps == ncol(as.matrix(data))) {

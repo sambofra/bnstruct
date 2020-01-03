@@ -34,25 +34,33 @@ setMethod("read.dataset",
               }
               variables(object) <- copyvars
             } else {
-              stop("Incoherent number of variables in the dataset header.")
+              stop("Incoherent number of variable names in the dataset header (mismatch between header and data).")
             }
             
-            lns                  <- c(unlist(strsplit(ls[2], split = " ")))
+            lns                  <- c(unlist(strsplit(ls[2], split = "\\s+")))
             if (length(lns) == ncol(a)) {
               node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
             } else if (num.time.steps > 1 && length(lns) * num.time.steps == ncol(a)) {
               node.sizes(object)   <- rep(sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) }), num.time.steps)
             } else {
-              stop("Incoherent number of variables in the dataset header.")
+              stop("Incoherent number of variable cardinalities in the dataset header (mismatch between header and data).")
             }
             
-            disc <- c(unlist(strsplit(ls[3], split = " ")))
+            disc <- c(unlist(strsplit(ls[3], split = "\\s+")))
+            for (d in 1:length(disc)) {
+              if (disc[d] %in% c("d","D","T","TRUE")) disc[d] <- 'D'
+              else if (disc[d] %in% c("c","C","F","FALSE")) disc[d] <- 'C'
+              else {
+                bnstruct.log("Unrecognized status for variable ",variables(object)[d],", converting it to discrete.")
+                disc[d] <- 'D'
+              }
+            }
             if (length(disc) == ncol(a)) {
               discreteness(object) <- disc
             } else if (num.time.steps > 1 && length(disc) * num.time.steps == ncol(a)) {
               discreteness(object) <-rep(disc, num.time.steps)
             } else {
-              stop("Incoherent number of variables in the dataset header.")
+              stop("Incoherent number of variable status in the dataset header (mismatch between header and data).")
             }
             
             
