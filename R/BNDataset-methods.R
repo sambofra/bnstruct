@@ -69,7 +69,7 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
     } else {
       stop("Incoherent number of variables in the dataset header.")
     }
-    num.variables(dataset) <- length(variables)
+    num.variables(dataset) <- length(variables(dataset))
   }
   
   if (length(node.sizes) > 1) {
