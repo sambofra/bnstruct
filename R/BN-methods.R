@@ -417,10 +417,12 @@ setMethod("get.most.probable.values",
             
             for (node in sorted.nodes)
             {
+              pot  <- cpts[[node]]
+              vars <- c(unlist(dim.vars[[node]]))
               if (length(prev.values) == 0 || is.na(prev.values[node]))
               {
-                pot  <- cpts[[node]]
-                vars <- c(unlist(dim.vars[[node]]))
+                #pot  <- cpts[[node]]
+                #vars <- c(unlist(dim.vars[[node]]))
 
                 # sum out parent variables
                 if (length(dim.vars[[node]]) > 1)
