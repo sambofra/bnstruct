@@ -77,6 +77,22 @@ setMethod("belief.propagation",
               node.sizes <- node.sizes(net)
 
               quantiles <- quantiles(net)
+
+              # discretize continuous observed variables
+              observed.vals.disc <- c()
+              if (length(observed.vars) > 0) {
+                for (i in 1:length(observed.vars)) {
+                   ovr <- observed.vars[i]
+                   ovl <- observed.vals[i]
+                   q <- quantiles[[ovr]]
+                   cv <- cut(ovl, q, labels=FALSE, include.lowest=TRUE)
+                   if (is.na(cv)) {
+                     if (ovl <= q[1]) cv <- 1
+                     else cv <- node.sizes[ovr]
+                   }
+                   observed.vals.disc <- c(observed.vals.disc, cv)
+                }
+              }
               
               # potentials is a list containing the probability tables of each clique
               potentials <- as.list(rep(as.list(c(1)), num.cliqs))
@@ -176,19 +192,19 @@ setMethod("belief.propagation",
                 for (var in 1:length(observed.vars))
                 {
                   obs.var <- observed.vars[var]
-                  obs.val <- observed.vals[var]
+                  obs.val <- observed.vals.disc[var]
 
-                  # preliminary: continuous observations need to be discretized 
-                  if (length(quantiles) > 0 && length(quantiles[[obs.var]] > 0)) {
-                    # check for values outside the quantiles -- probably a horrible workaround, though
-                    if (obs.val <= quantiles[[obs.var]][1]) {
-                      obs.val <- 1
-                    } else if (obs.val >= quantiles[[obs.var]][node.sizes[obs.var]]) {
-                      obs.val <- node.sizes[obs.var]
-                    } else {
-                      obs.val <- cut( obs.val, quantiles[[obs.var]], labels=FALSE, include.lowest=TRUE)
-                    }
-                  }
+                  ## preliminary: continuous observations need to be discretized 
+                  #if (length(quantiles) > 0 && length(quantiles[[obs.var]] > 0)) {
+                  #  # check for values outside the quantiles -- probably a horrible workaround, though
+                  #  if (obs.val <= quantiles[[obs.var]][1]) {
+                  #    obs.val <- 1
+                  #  } else if (obs.val >= quantiles[[obs.var]][node.sizes[obs.var]]) {
+                  #    obs.val <- node.sizes[obs.var]
+                  #  } else {
+                  #    obs.val <- cut( obs.val, quantiles[[obs.var]], labels=FALSE, include.lowest=TRUE)
+                  #  }
+                  #}
 
                   if (obs.val <= 0 || obs.val > node.sizes[obs.var])
                   {
@@ -375,7 +391,7 @@ setMethod("belief.propagation",
                 {
                   ncpts[[node]] <- array(rep(0, node.sizes[observed.vars[mpos]]),
                                          c(node.sizes[observed.vars[mpos]]))
-                  ncpts[[node]][observed.vals[mpos]] <- 1
+                  ncpts[[node]][observed.vals.disc[mpos]] <- 1
                   dimnames(ncpts[[node]]) <- list(c(1:node.sizes[observed.vars[mpos]]))
                   names(dimnames(ncpts[[node]])) <- as.list(variables[observed.vars[mpos]])
                 }

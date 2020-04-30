@@ -95,7 +95,7 @@ setMethod("learn.dynamic.network",
             if (is.null(layering)) {
               nl <- rep(1,nv)
             } else {
-              if (length(layering) != nv && length(layering) != num.variables(x)) {
+              if (length(layering) != nv && length(layering) != num.variables(y)) {
                 stop("If a layering is provided, it should be either as long as the number of variables in each time step, or as the total number of variables in all the time steps.")
               }
             }
@@ -103,7 +103,7 @@ setMethod("learn.dynamic.network",
             num.layers <- length(unique(nl))
             
             copynl <- nl
-            while (length(nl) < num.variables(x)) {
+            while (length(nl) < num.variables(y)) {
               nl <- c(nl, copynl+max(nl))
             }
             
