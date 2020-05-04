@@ -4,7 +4,9 @@
 \name{child_NA_5000}
 \alias{child_NA_5000}
 \title{\code{Child} dataset.}
-\format{a \code{\link{BNDataset}} with a raw and imputed data slow filled with 5000 items.}
+\format{
+a \code{\link{BNDataset}} with a raw and imputed data slow filled with 5000 items.
+}
 \description{
 The \code{Child} dataset contains 5000 randomly generated items with missing data (no latent variables) of the \code{Child} Bayesian Network.
 Imputation is performed, so both raw and imputed data is present.

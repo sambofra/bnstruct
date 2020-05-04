@@ -4,7 +4,9 @@
 \name{asia_10000}
 \alias{asia_10000}
 \title{\code{Asia} dataset.}
-\format{a \code{\link{BNDataset}} with raw data slow filled.}
+\format{
+a \code{\link{BNDataset}} with raw data slow filled.
+}
 \description{
 The \code{Asia} dataset contains 10000 complete (no missing data, no latent variables) randomly generated items of the \code{Asia} Bayesian Network.
 No imputation needs to be performed, so only raw data is present.

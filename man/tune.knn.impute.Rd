@@ -4,8 +4,15 @@
 \alias{tune.knn.impute}
 \title{tune the parameter k of the knn algorithm used in imputation.}
 \usage{
-tune.knn.impute(data, cat.var = 1:ncol(data), k.min = 1, k.max = 20,
-  frac.miss = 0.1, n.iter = 20, seed = 0)
+tune.knn.impute(
+  data,
+  cat.var = 1:ncol(data),
+  k.min = 1,
+  k.max = 20,
+  frac.miss = 0.1,
+  n.iter = 20,
+  seed = 0
+)
 }
 \arguments{
 \item{data}{a numerical matrix.}

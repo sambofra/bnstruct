@@ -4,8 +4,13 @@
 \alias{knn.impute}
 \title{Perform imputation of a data frame using k-NN.}
 \usage{
-knn.impute(data, k = 10, cat.var = 1:ncol(data),
-  to.impute = 1:nrow(data), using = 1:nrow(data))
+knn.impute(
+  data,
+  k = 10,
+  cat.var = 1:ncol(data),
+  to.impute = 1:nrow(data),
+  using = 1:nrow(data)
+)
 }
 \arguments{
 \item{data}{a numerical matrix.}

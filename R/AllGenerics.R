@@ -670,6 +670,8 @@ setGeneric("wpdag.from.dag", function(x, layering=NULL) { standardGeneric("wpdag
 #' @rdname has.raw.data
 #' 
 #' @param x a \code{\link{BNDataset}}.
+#'
+#' @importFrom utils read.table
 #' 
 #' @examples
 #' \dontrun{
@@ -1344,7 +1346,7 @@ setGeneric("has.boots", function(x) { standardGeneric("has.boots") } )
 #' Return \code{TRUE} if the given dataset contains samples for bootstrap from inputed dataset, \code{FALSE} otherwise.
 #' 
 #' @name has.imputed.boots
-#' @name has.imputed.boots
+#' @rdname has.imputed.boots
 #'
 #' @param x a \code{\link{BNDataset}} object.
 #' 

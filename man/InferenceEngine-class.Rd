@@ -10,8 +10,7 @@
 \usage{
 \S4method{initialize}{InferenceEngine}(.Object, ...)
 
-InferenceEngine(bn = NULL, observations = NULL, interventions = NULL,
-  ...)
+InferenceEngine(bn = NULL, observations = NULL, interventions = NULL, ...)
 }
 \arguments{
 \item{.Object}{an empty InferenceEngine object.}

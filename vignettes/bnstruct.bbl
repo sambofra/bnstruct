@@ -1,0 +1,86 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Dempster et~al.(1977)Dempster, Laird, and Rubin]{dempster1977maximum}
+Arthur~P Dempster, Nan~M Laird, and Donald~B Rubin.
+\newblock Maximum likelihood from incomplete data via the em algorithm.
+\newblock \emph{Journal of the Royal Statistical Society. Series B
+  (Methodological)}, pages 1--38, 1977.
+
+\bibitem[Efron and Tibshirani(1994)]{efron1994introduction}
+Bradley Efron and Robert~J Tibshirani.
+\newblock \emph{An introduction to the bootstrap}.
+\newblock CRC press, 1994.
+
+\bibitem[Epskamp et~al.(2012)Epskamp, Cramer, Waldorp, Schmittmann, and
+  Borsboom]{epskampqgraph}
+Sacha Epskamp, Ang{\'e}lique~OJ Cramer, Lourens~J Waldorp, Verena~D
+  Schmittmann, and Denny Borsboom.
+\newblock qgraph: Network visualizations of relationships in psychometric data.
+\newblock \emph{Journal of Statistical Software}, 48\penalty0 (4):\penalty0
+  1--18, 2012.
+
+\bibitem[Friedman(1997)]{friedman1997learning}
+Nir Friedman.
+\newblock Learning belief networks in the presence of missing values and hidden
+  variables.
+\newblock In \emph{ICML}, volume~97, pages 125--133, 1997.
+
+\bibitem[Friedman(1998)]{friedman1998bayesian}
+Nir Friedman.
+\newblock The bayesian structural em algorithm.
+\newblock In \emph{Proceedings of the Fourteenth conference on Uncertainty in
+  artificial intelligence}, pages 129--138. Morgan Kaufmann Publishers Inc.,
+  1998.
+
+\bibitem[Friedman et~al.(1999)Friedman, Goldszmidt, and
+  Wyner]{friedman1999data}
+Nir Friedman, Moises Goldszmidt, and Abraham Wyner.
+\newblock Data analysis with bayesian networks: A bootstrap approach.
+\newblock In \emph{Proceedings of the Fifteenth conference on Uncertainty in
+  artificial intelligence}, pages 196--205. Morgan Kaufmann Publishers Inc.,
+  1999.
+
+\bibitem[Koller and Friedman(2009)]{koller2009probabilistic}
+Daphne Koller and Nir Friedman.
+\newblock \emph{Probabilistic graphical models: principles and techniques}.
+\newblock MIT press, 2009.
+
+\bibitem[Lauritzen and Spiegelhalter(1988)]{lauritzen1988local}
+Steffen~L Lauritzen and David~J Spiegelhalter.
+\newblock Local computations with probabilities on graphical structures and
+  their application to expert systems.
+\newblock \emph{Journal of the Royal Statistical Society. Series B
+  (Methodological)}, pages 157--224, 1988.
+
+\bibitem[Pearl(1988)]{pearl1988probabilistic}
+Judea Pearl.
+\newblock \emph{Probabilistic reasoning in intelligent systems: networks of
+  plausible inference}.
+\newblock Morgan Kaufmann, 1988.
+
+\bibitem[Silander and Myllymaki(2012)]{silander2012simple}
+Tomi Silander and Petri Myllymaki.
+\newblock A simple approach for finding the globally optimal bayesian network
+  structure.
+\newblock \emph{arXiv preprint arXiv:1206.6875}, 2012.
+
+\bibitem[Spiegelhalter et~al.(1993)Spiegelhalter, Dawid, Lauritzen, and
+  Cowell]{spiegelhalter1993bayesian}
+David~J Spiegelhalter, A~Philip Dawid, Steffen~L Lauritzen, and Robert~G
+  Cowell.
+\newblock Bayesian analysis in expert systems.
+\newblock \emph{Statistical science}, pages 219--247, 1993.
+
+\bibitem[Tsamardinos et~al.(2006)Tsamardinos, Brown, and
+  Aliferis]{tsamardinos2006max}
+Ioannis Tsamardinos, Laura~E Brown, and Constantin~F Aliferis.
+\newblock The max-min hill-climbing bayesian network structure learning
+  algorithm.
+\newblock \emph{Machine learning}, 65\penalty0 (1):\penalty0 31--78, 2006.
+
+\end{thebibliography}

@@ -7,9 +7,17 @@
 \alias{plot.BN,BN}
 \title{plot a \code{\link{BN}} as a picture.}
 \usage{
-\method{plot}{BN}(x, method = "default", use.node.names = TRUE,
-  frac = 0.2, max.weight = max(dag(x)), node.size.lab = 14,
-  node.col = rep("white", num.nodes(x)), plot.wpdag = FALSE, ...)
+\method{plot}{BN}(
+  x,
+  method = "default",
+  use.node.names = TRUE,
+  frac = 0.2,
+  max.weight = max(dag(x)),
+  node.size.lab = 14,
+  node.col = rep("white", num.nodes(x)),
+  plot.wpdag = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object.}

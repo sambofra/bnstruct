@@ -87,7 +87,7 @@ BNDataset <- function(data, discreteness, variables = NULL, node.sizes = NULL, .
       if (discreteness[d] %in% c("d","D","T","TRUE")) discreteness[d] <- 'D'
       else if (discreteness[d] %in% c("c","C","F","FALSE")) discreteness[d] <- 'C'
       else {
-        bnstruct.log("Unrecognized status for variable ",variables(object)[d],", converting it to discrete.")
+        bnstruct.log("Unrecognized status for variable ",variables(dataset)[d],", converting it to discrete.")
         discreteness[d] <- 'D'
       }
     }

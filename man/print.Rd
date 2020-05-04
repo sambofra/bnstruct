@@ -16,8 +16,7 @@
 \usage{
 \method{print}{BN}(x, ...)
 
-\method{print}{BNDataset}(x, show.raw.data = FALSE,
-  show.imputed.data = FALSE, ...)
+\method{print}{BNDataset}(x, show.raw.data = FALSE, show.imputed.data = FALSE, ...)
 
 \method{print}{InferenceEngine}(x, engine = "jt", ...)
 }
