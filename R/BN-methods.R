@@ -397,6 +397,8 @@ setMethod("get.most.probable.values",
             num.nodes <- num.nodes(bn)
             variables <- variables(bn)
             node.sizes <- node.sizes(bn)
+            discrete   <- discreteness(bn)
+            quantiles  <- quantiles(bn)
 
             mpv  <- array(rep(0,num.nodes), dim=c(num.nodes), dimnames=list(variables))
 
@@ -465,6 +467,18 @@ setMethod("get.most.probable.values",
                 }
               }
             }
+
+            # sample continuous values, if possible
+            if (length(quantiles) > 0) {
+              for (node in sorted.nodes) {
+                if (discrete[node] == FALSE && length(quantiles[[node]]) > 1) {
+                  lb <- quantiles[[node]][mpv[node]]
+                  ub <- quantiles[[node]][mpv[node]+1]
+                  mpv[node] <- runif(1, lb, ub)
+                }
+              }
+            }
+
             return(mpv)
           })
 

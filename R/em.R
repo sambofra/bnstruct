@@ -39,6 +39,8 @@ setMethod("em",
             num.nodes  <- num.nodes(orig.bn)
             node.sizes <- node.sizes(orig.bn)
             var.names  <- variables(orig.bn)
+            discrete   <- discreteness(orig.bn)
+            quantiles  <- quantiles(orig.bn)
             
             cliques    <- jt.cliques(x)
             
@@ -131,6 +133,11 @@ setMethod("em",
                           {
                             mpv[i] <- sample(wm,1) #,replace=TRUE
                           }
+                          if (discrete[i] == FALSE && length(quantiles[[i]]) > 1) {
+                            lb <- quantiles[[i]][mpv[i]]
+                            ub <- quantiles[[i]][mpv[i]+1]
+                            mpv[i] <- runif(1, lb, ub)
+                          }
                           overall.obsd.vars <- sort(c(overall.obsd.vars,i))
                         }
                       }
@@ -155,7 +162,7 @@ setMethod("em",
                     still.has.NAs <- c(still.has.NAs, row)
                   }
                 }
-  
+
                 imp.data[row,] <- mpv
               }
               
