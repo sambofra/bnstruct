@@ -445,8 +445,8 @@ setMethod("learn.structure",
                 {
                   data <- boot(dataset, i, use.imputed.data = use.imputed.data)
                   
-                  dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.fanin, layering,
-                            max.fanin.layers, ess, initial.cpc, mandatory.edges)
+                  dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.parents, layering,
+                            max.parents.layers, ess, initial.cpc, mandatory.edges)
                   
                   finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
                 }
@@ -455,7 +455,7 @@ setMethod("learn.structure",
               else
               {     
                 dag(bn)  <- sm(data, node.sizes, scoring.func, cont.nodes,
-                               max.fanin, layering, max.fanin.layers, ess,
+                               max.parents, layering, max.parents.layers, ess,
                                initial.cpc, mandatory.edges)
               }
               bnstruct.end.log("learning using SM completed.")
