@@ -660,11 +660,18 @@ bngzplot <- function(x, mat, num.nodes, variables, use.node.names, frac, max.wei
             g <- new("graphAM", adjMat=mat.th, edgemode="directed")
 
             en <- Rgraphviz::edgeNames(g,recipEdges="distinct")
-            g <- Rgraphviz::layoutGraph(g)
+            if (sum(mat) == 0) {
+              g <- Rgraphviz::layoutGraph(g, layoutType="neato")
+            } else {
+              g <- Rgraphviz::layoutGraph(g)
+            }
 
             # set edge darkness proportional to confidence
             conf <- mat.th*pmax(mat,t(mat)) # both values to the maximum for edges with 2 directions
             col <- colors()[253-100*(t(conf)[t(conf) >= frac*max.weight]/max.weight)]
+            if (sum(mat) == 0) {
+              col <- rep(colors()[1], length(en))
+            }
             names(col) <- en
             
             # remove arrowheads from undirected edges
