@@ -13,6 +13,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	layering = NULL, max.fanin.layers = NULL, ess = 1, cpc.mat = NULL,
         mandatory.edges = NULL ) 
 {
+
 	n.cases <- nrow(x)
 	n.nodes <- ncol(x)
 	
@@ -38,15 +39,15 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 		n.layers <- length(unique(layering))
 		if( is.null(max.fanin.layers) )
 		{
-      # derive max.fanin.layers from layering
-		  max.fanin.layers <- array(cumsum(table(layering)))
-      max.fanin.layers[1] <- 0 # default, no parents for nodes at layer 1
+      			# derive max.fanin.layers from layering
+		  	max.fanin.layers <- array(cumsum(table(layering)))
+      			max.fanin.layers[1] <- 0 # default, no parents for nodes at layer 1
 		}
 	}
 
-  if( ( !is.array(max.fanin.layers) ) || 
-        ( dim(max.fanin.layers)[1] != n.layers ) || 
-        ( is.matrix(max.fanin.layers) && dim(max.fanin.layers)[2] != n.layers) )
+  	if( ( !is.array(max.fanin.layers) ) || 
+        	( dim(max.fanin.layers)[1] != n.layers ) || 
+        	( is.matrix(max.fanin.layers) && dim(max.fanin.layers)[2] != n.layers) )
 	  stop("max.fanin.layers must be either an array of #layers elements or a #layers x #layers squared matrix")
 	
 	# get matrix from 1D array
@@ -74,7 +75,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
   
 	ifm <- impossible.family.mask( n.nodes, layering, max.fanin.layers )
   
-  # remove parents not in cpc, if cpc.matrix is given
+        # remove parents not in cpc, if cpc.matrix is given
 	if( !is.null(cpc.mat) )
             for( i in 1:n.nodes )
                 ifm[ i, (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
@@ -84,7 +85,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
         # The idea is to transform this matrix in something similar to
         # the CPC matrix: the idea is to leave only candidate parent sets
         # that contain the mandatory edge(s).
-        if ( !is.null(mandatory.edges) ) {
+        if (!is.null(mandatory.edges) ) {
             for ( i in 1:n.nodes ) {
                 if ( sum(mandatory.edges[i,]) > 0 || sum(mandatory.edges[,i] > 0)) {
                     ifm[ i, (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = which(mandatory.edges[i,]==1),
