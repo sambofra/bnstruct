@@ -1,3 +1,8 @@
+bnstruct v1.0.8 (Release date: 2020-05-022)
+===============
+
+* Bugfix in EM
+
 bnstruct v1.0.7 (Release date: 2020-05-04)
 ===============
 
