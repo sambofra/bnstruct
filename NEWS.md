@@ -1,4 +1,9 @@
-bnstruct v1.0.8 (Release date: 2020-05-022)
+bnstruct v1.0.9 (Release date: 2020-)
+===============
+
+* Speedup EM by computing log-likelihood only for observations that change
+
+bnstruct v1.0.8 (Release date: 2020-05-22)
 ===============
 
 * Bugfix in EM

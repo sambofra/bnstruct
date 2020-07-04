@@ -373,7 +373,7 @@ setMethod("get.most.probable.values",
             quantiles    <- quantiles(bn(x))
             
             
-            mpv <- array(rep(0, num.nodes), dim=c(num.nodes), dimnames=list(variables))
+            mpv <- array(rep(NA, num.nodes), dim=c(num.nodes), dimnames=list(variables))
 
             dim.vars   <- lapply(1:num.cliqs,
                                  function(index)
@@ -402,7 +402,7 @@ setMethod("get.most.probable.values",
                                               ) == TRUE)[1]
                 pot  <- jpts[[target.clique]]
                 vars <- c(unlist(dim.vars[[target.clique]]))
-  
+ 
                 for (v in c(unlist(setdiff(vars,i))))
                 {
                   out  <- marginalize(pot, vars, v)
@@ -434,7 +434,7 @@ setMethod("get.most.probable.values",
                 mpv[i] <- prev.values[i]
               }
             }
-            
+           
             return(mpv)
           })
 

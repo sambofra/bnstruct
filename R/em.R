@@ -192,7 +192,7 @@ setMethod("em",
               bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
 
               no.iterations <- no.iterations + 1
-              curr.log.lik  <- log.likelihood(dataset, bn, use.imputed.data = T)
+              curr.log.lik  <- imputed.log.likelihood(dataset, bn, use.imputed.data = T)
               difference    <- prev.log.lik - curr.log.lik
              
               orig.bn      <- bn
@@ -207,9 +207,12 @@ setMethod("em",
           })
 
 
-# Compute log likelihood of the dataset given the network.
+# Compute log likelihood of the imputed part of a dataset given the network.
+# Since it is used only as convergence criterion for EM, there is no need to compute
+# it over the whole dataset, but only on the imputed observations
+# (those that change after imputation).
 # Takes a BNDataset and a BN as input.
-log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
+imputed.log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
 {
   dag        <- dag(net)
   node.sizes <- node.sizes(net)
@@ -246,7 +249,10 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
   vals         <- rep(0, n.nodes)
   ll           <- 0
   
-  for (row in 1:nrow(data))
+  # select only rows that originally contained NAs
+  target.rows <- which(sapply(1:nrow(data), function(x) any(is.na(raw.data(dataset)[x,]))))
+
+  for (row in target.rows) {
     for (node in sorted.nodes)
     {
       if (length(parents[[node]]) == 0) {
@@ -267,6 +273,7 @@ log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
         ll <- ll + log(jpt[data[row,node]])
       }
     }
+  }
   
   return(ll)
 }
