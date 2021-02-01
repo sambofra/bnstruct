@@ -1,6 +1,7 @@
-bnstruct v1.0.9 (Release date: 2020-)
-===============
+bnstruct v1.0.9 (Release date: 2021-02- )
+================
 
+* Bugfix in BP (found by Fritz Bayer)
 * Speedup EM by computing log-likelihood only for observations that change
 
 bnstruct v1.0.8 (Release date: 2020-05-22)

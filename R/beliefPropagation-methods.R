@@ -108,9 +108,22 @@ setMethod("belief.propagation",
               # After last round it will match corresponding clique.
               dimensions.contained <- lapply(1:num.cliqs, function(x) as.list(c(NULL)))
               
-              
-              # choose as root (one among) the clique(s) whose connected edges have the highest overall sum
-              root <- which.max(rowSums(ctree))
+              # necessary in case of disconnected subDAGs
+              #print(ctree)
+              subgraphs <- identify.subgraphs(ctree)
+              n.subgraphs <- length(subgraphs)
+              subroots <- c()
+              for (srs in 1:n.subgraphs) {
+                  srs.vars <- subgraphs[[srs]]
+                  subctree <- ctree
+                  sv.mask <- matrix(0, num.cliqs, num.cliqs)
+                  sv.mask[,srs.vars] <- 1
+                  sv.mask[srs.vars,] <- 1
+                  subctree <- subctree * sv.mask
+                  # choose as root (one among) the clique(s) whose connected edges have the highest overall sum
+                  root <- which.max(rowSums(subctree))
+                  subroots <- c(subroots, root)
+              }
               
               # Assign factors to a cluster graph
               # Construct initial potentials:
@@ -233,7 +246,11 @@ setMethod("belief.propagation",
               # compute processing order from leaves to root
               process.order <- c()
               parents.list  <- c()
-              proc.order(root, c(), ctree)
+              #print(subroots)
+              for (sg in 1:n.subgraphs) {
+                proc.order(subroots[sg], c(), ctree)
+                #print(process.order)
+              }
               #print("PROCESS ORDER")
               #print(process.order)
               #print("PARENTS LIST")
