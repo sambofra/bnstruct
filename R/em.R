@@ -104,7 +104,12 @@ setMethod("em",
                           #dmnms <- dimnames(jpt)
                           #nms   <- names(dimnames(jpt))
                           cpt         <- rep(0, node.sizes[v])
-                          cpt[mpv[v]] <- 1
+                          if (discrete[v] == FALSE && length(quantiles[[v]]) > 1) {
+                            tmp.idx <- cut( mpv[v], quantiles[[v]], labels=FALSE, include.lowest=TRUE)
+                            cpt[tmp.idx] <- 1
+                          } else {
+                            cpt[mpv[v]] <- 1                            
+                          }
                           out         <- mult(jpt, dd, cpt, c(v), node.sizes)
                           jpt         <- out$potential
                           dd          <- out$vars
