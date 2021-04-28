@@ -1039,8 +1039,8 @@ topological.sort <- function(dgraph)
   i <- 1
   while( length(fringe) > 0 )
   {
-    ind <- head(fringe,1) # pop
-    fringe <- tail(fringe,-1)
+    ind <- utils::head(fringe,1) # pop
+    fringe <- utils::tail(fringe,-1)
     order[i] <- ind
     i <- i + 1 
     

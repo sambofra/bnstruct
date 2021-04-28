@@ -1,6 +1,6 @@
 #' @rdname build.junction.tree
 #' @aliases build.junction.tree,InferenceEngine
-#' @import igraph Matrix bitops methods
+#' @import igraph bitops methods
 setMethod("build.junction.tree",
           c("InferenceEngine"),
           function(object, ...) {

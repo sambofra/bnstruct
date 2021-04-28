@@ -54,7 +54,7 @@ For Windows platforms, a binary executable of the latest stable version is avail
 [on CRAN](https://CRAN.R-project.org/package=bnstruct).
 
 `bnstruct` requires R `>= 3.5`, and depends on
-`bitops`, `igraph`, `Matrix`, `graph` and
+`bitops`, `igraph`, `graph` and
 `methods`. Package `Rgraphviz` is requested in
 order to plot graphs, but is not mandatory.
 
