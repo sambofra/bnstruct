@@ -649,7 +649,8 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - if the cpts share no common variables, we can multiply them with an outer product;
   if (length(common.vars) == 0)
   {
-    cpt1 <- as.vector(cpt1) %o% as.vector(cpt2)
+    #cpt1 <- as.vector(cpt1) %o% as.vector(cpt2)
+    cpt1 <- outer(as.vector(cpt1),as.vector(cpt2))
   }
   else
     # otherwise, we have to manage the shared variables: consider P(C|A) x P(AB); unlisting the cpts we obtain
