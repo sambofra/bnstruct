@@ -1,3 +1,7 @@
+bnstruct v1.0.9 (Release date: 2021-05-06 )
+================
+* Removed direct dependency from Matrix package
+
 bnstruct v1.0.9 (Release date: 2021-02- )
 ================
 
