@@ -199,12 +199,12 @@ setMethod("num.time.steps", "BN", function(x) { return(slot(x, "num.time.steps")
 setMethod("wpdag.from.dag",
           "BN",
           function(x, layering=NULL) {
-            if (class(x) != "BN" || class(dag(x)) != "matrix")
+            if (!inherits(x, "BN") || !inherits(dag(x),"matrix"))
               stop("The first parameter must be a 'BN' object containing a valid adjacency matrix.")
             if (!any(!is.na(dag(x))))
               stop("The adjacency matrix of the network must have at least one non-null value.")
             net <- x
-            wpdag(net) <- dag.to.cpdag(dag(x), layering)
+            wpdag(net) <- dag.to.cpdag(dag(x), layering, layer.struct)
             return(net)
           } )
 
@@ -258,7 +258,7 @@ setReplaceMethod("discreteness",
                  "BN",
                  function(x, value)
                  {
-                   if (class(value) == "character")
+                   if (inherits(value, "character"))
                     slot(x, "discreteness") <- sapply(1:length(value), FUN=function(i){ !is.na(match(value[i],c('d',"D"))) })
                    else # is logical
                      slot(x, "discreteness") <- value
@@ -846,7 +846,9 @@ setMethod("sample.dataset",c("BN"),
 #' @rdname dag.to.cpdag
 #' 
 #' @param dag.adj.matrix the adjacency matrix representing the DAG of a \code{\link{BN}}.
-#' @param layering vector containing the layers each node belongs to.
+#' @param layering vector containing the layers where each node belongs.
+#' @param layer.struct layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' 
 #' @return the adjacency matrix representing a CPDAG for the network.
 #' 
@@ -854,19 +856,19 @@ setMethod("sample.dataset",c("BN"),
 #' 
 #' @examples
 #' \dontrun{
-#' net <- learn.network(dataset, layering=layering)
-#' pdag <- dag.to.cpdag(dag(net), layering)
+#' net <- learn.network(dataset, layering=layering, layer.struct=layer.struct)
+#' pdag <- dag.to.cpdag(dag(net), layering, layer.struct)
 #' wpdag(net) <- pdag
 #' }
 #' 
 #' @export
-dag.to.cpdag <- function(dag.adj.matrix, layering = NULL)
+dag.to.cpdag <- function(dag.adj.matrix, layering = NULL, layer.struct = NULL)
 {
-  if (class(dag.adj.matrix) != "matrix")
+  if (!inherits(dag.adj.matrix, "matrix"))
     stop("The first parameter must be a 'matrix' representing the adjacency matrix of a network.")
   if (!any(!is.na(dag.adj.matrix)))
     stop("The adjacency matrix must have at least one non-null value.")
-  return(abs(label.edges(dag.adj.matrix, layering)))
+  return(abs(label.edges(dag.adj.matrix, layering, layer.struct)))
 }
 
 
@@ -941,12 +943,12 @@ edge.dir.wpdag <- function (x, use.node.names = TRUE)
 
 
 
-label.edges <- function(dgraph, layering = NULL)
+label.edges <- function(dgraph, layering = NULL, layer.struct = NULL)
 {
   # LABEL-EDGES produce a N*N matrix which values are
   # 	+1 if the edge is compelled or
   #	-1 if the edge is reversible.
-  N<-nrow(dgraph)
+  n.nodes <- nrow(dgraph)
   o <- order.edges(dgraph)
   order <- o$order
   xedge <- o$x
@@ -958,10 +960,11 @@ label.edges <- function(dgraph, layering = NULL)
   # edges between layers are compelled
   if( !is.null(layering) )
   {
-    layers = length(unique(layering))
-    for( l in 1:(layers-1) )
+    n.layers = length(unique(layering))
+    for( l in 1:(n.layers-1) ) {
       label[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ] <- 
       dgraph[ intersect(xedge,which(layering==l)), intersect(yedge,which(layering>l)) ]
+    }    
   } 
   
   for( Edge in 1:NbEdges)
@@ -1002,6 +1005,19 @@ label.edges <- function(dgraph, layering = NULL)
       }
     }
   }
+
+  # enforce layer.struct, if present
+  if (!is.null(layering) && !is.null(layer.struct)) {
+    layers <- matrix(1L, n.nodes, n.nodes)
+    for (i in 1:n.layers) {
+        for (j in 1:n.layers) {
+            layers[which(layering == i), which(layering == j)] <- layer.struct[i, j]
+        }
+    }
+    diag(layers) <- 0
+    label <- label & layers
+  }
+
   return(label)
 }
 

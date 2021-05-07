@@ -9,7 +9,10 @@ dag.to.cpdag(dag.adj.matrix, layering = NULL)
 \arguments{
 \item{dag.adj.matrix}{the adjacency matrix representing the DAG of a \code{\link{BN}}.}
 
-\item{layering}{vector containing the layers each node belongs to.}
+\item{layering}{vector containing the layers where each node belongs.}
+
+\item{layer.struct}{layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+for nodes in a layer (only for \code{mmhc}, \code{mmpc}).}
 }
 \value{
 the adjacency matrix representing a CPDAG for the network.
@@ -20,8 +23,8 @@ into the adjacency matrix representing a CPDAG for the network.
 }
 \examples{
 \dontrun{
-net <- learn.network(dataset, layering=layering)
-pdag <- dag.to.cpdag(dag(net), layering)
+net <- learn.network(dataset, layering=layering, layer.struct=layer.struct)
+pdag <- dag.to.cpdag(dag(net), layering, layer.struct)
 wpdag(net) <- pdag
 }
 

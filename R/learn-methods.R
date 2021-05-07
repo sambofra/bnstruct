@@ -9,7 +9,7 @@ setMethod("learn.network",
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE, 
                    mandatory.edges = NULL, ...)
           {
-            if (is.null(y) || class(y) != "BNDataset")
+            if (is.null(y) || !inherits(y, "BNDataset"))
               stop("A BNDataset must be provided in order to learn a network from it. ",
                    "Please take a look at the documentation of the method: > ?learn.network")
             
@@ -76,7 +76,7 @@ setMethod("learn.dynamic.network",
                    layer.struct = NULL, cont.nodes = c(), use.imputed.data = FALSE, use.cpc = TRUE,
                    mandatory.edges = NULL, ...)
           {
-            if (is.null(y) || class(y) != "BNDataset")
+            if (is.null(y) || !inherits(y, "BNDataset"))
               stop("A BNDataset must be provided in order to learn a network from it. ",
                    "Please take a look at the documentation of the method: > ?learn.dynamic.network")
             
@@ -375,15 +375,15 @@ setMethod("learn.structure",
             # get initial.network
             if (!is.null(initial.network))
             {
-              if (class(initial.network) == "BN")
+              if (inherits(initial.network, "BN"))
                 init.net <- initial.network
-              else if (class(initial.network) == "matrix")
+              else if (inherits(initial.network, "matrix"))
               {
                 init.net      <- BN(dataset)
                 dag(init.net) <- initial.network
                 init.net      <- learn.params(init.net, dataset)
               }
-              else if (class(initial.network) == "character" &&
+              else if (inherits(initial.network, "character") &&
                        tolower(initial.network) == "random.chain")
                 init.net <- sample.chain(dataset)
               else # string != "random.chain"
@@ -448,7 +448,7 @@ setMethod("learn.structure",
                   dag <- sm(data, node.sizes, scoring.func, cont.nodes, max.parents, layering,
                             max.parents.layers, ess, initial.cpc, mandatory.edges)
                   
-                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
                 }
                 wpdag(bn) <- finalPDAG
               }
@@ -550,7 +550,7 @@ setMethod("learn.structure",
                              tabu.tenure = tabu.tenure, max.parents = max.parents, init.net = in.dag,
                              wm.max=wm.max, layering=layering, layer.struct=layer.struct,
                              mandatory.edges = mandatory.edges)
-                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
                 }
                 wpdag(bn) <- finalPDAG
               }
@@ -608,7 +608,7 @@ setMethod("learn.structure",
                              tabu.tenure = tabu.tenure, max.parents = max.parents,
                              init.net = in.dag, wm.max=wm.max, layering=layering, layer.struct=layer.struct,
                              mandatory.edges = mandatory.edges )
-                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering )
+                  finalPDAG <- finalPDAG + dag.to.cpdag( dag, layering, layer.struct )
                 }
                 wpdag(bn) <- finalPDAG
               }
