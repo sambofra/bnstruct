@@ -1,6 +1,6 @@
-bnstruct v1.0.11 (Release date: 2021-05-06 )
+bnstruct v1.0.11 (Release date: 2021-05-19 )
 ================
-* dag.to.cpdag() now takes into account layer.struct
+* dag.to.cpdag() now takes into account layer.struct (thanks to Erica Tavazzi)
 * class(x)==y ported to inherits(x,y)
 * bugfix in BP in case of disconnected single nodes
 

@@ -198,7 +198,7 @@ setMethod("num.time.steps", "BN", function(x) { return(slot(x, "num.time.steps")
 #' @rdname wpdag.from.dag
 setMethod("wpdag.from.dag",
           "BN",
-          function(x, layering=NULL) {
+          function(x, layering=NULL, layer.struct=NULL) {
             if (!inherits(x, "BN") || !inherits(dag(x),"matrix"))
               stop("The first parameter must be a 'BN' object containing a valid adjacency matrix.")
             if (!any(!is.na(dag(x))))

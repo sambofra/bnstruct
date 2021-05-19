@@ -6,14 +6,17 @@
 \alias{wpdag.from.dag,BN}
 \title{Initialize a WPDAG from a DAG.}
 \usage{
-wpdag.from.dag(x, layering = NULL)
+wpdag.from.dag(x, layering = NULL, layer.struct = NULL)
 
-\S4method{wpdag.from.dag}{BN}(x, layering = NULL)
+\S4method{wpdag.from.dag}{BN}(x, layering = NULL, layer.struct = NULL)
 }
 \arguments{
 \item{x}{a \code{\link{BN}} object.}
 
 \item{layering}{vector containing the layers each node belongs to.}
+
+\item{layer.struct}{\code{0/1} matrix for indicating which layers can contain parent nodes
+for nodes in a layer (only for \code{mmhc}, \code{mmpc}).}
 }
 \value{
 a \code{\link{BN}} object with an initialized \code{wpdag}.
@@ -24,8 +27,8 @@ with its \code{wpdag} set as the CPDAG computed starting from the \code{dag}.
 }
 \examples{
 \dontrun{
-net <- learn.network(dataset, layering=layering)
-wp.net <- wpdag.from.dag(net, layering)
+net <- learn.network(dataset, layering=layering, layer.struct=layer.struct)
+wp.net <- wpdag.from.dag(net, layering, layer.struct=layer.struct)
 }
 
 }

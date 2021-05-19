@@ -639,19 +639,21 @@ setGeneric("struct.algo<-", function(x, value) { standardGeneric("struct.algo<-"
 #' 
 #' @param x a \code{\link{BN}} object.
 #' @param layering vector containing the layers each node belongs to.
+#' @param layer.struct \code{0/1} matrix for indicating which layers can contain parent nodes
+#'        for nodes in a layer (only for \code{mmhc}, \code{mmpc}).
 #' 
 #' @return a \code{\link{BN}} object with an initialized \code{wpdag}.
 #' 
 #' @examples
 #' \dontrun{
-#' net <- learn.network(dataset, layering=layering)
-#' wp.net <- wpdag.from.dag(net, layering)
+#' net <- learn.network(dataset, layering=layering, layer.struct=layer.struct)
+#' wp.net <- wpdag.from.dag(net, layering, layer.struct=layer.struct)
 #' }
 #' 
 #' @seealso \code{\link{dag.to.cpdag}}
 #' 
 #' @exportMethod wpdag.from.dag
-setGeneric("wpdag.from.dag", function(x, layering=NULL) { standardGeneric("wpdag.from.dag") } )
+setGeneric("wpdag.from.dag", function(x, layering=NULL, layer.struct=NULL) { standardGeneric("wpdag.from.dag") } )
 
 
 ###############################################################################

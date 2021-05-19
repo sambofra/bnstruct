@@ -4,7 +4,7 @@
 \alias{dag.to.cpdag}
 \title{convert a DAG to a CPDAG}
 \usage{
-dag.to.cpdag(dag.adj.matrix, layering = NULL)
+dag.to.cpdag(dag.adj.matrix, layering = NULL, layer.struct = NULL)
 }
 \arguments{
 \item{dag.adj.matrix}{the adjacency matrix representing the DAG of a \code{\link{BN}}.}
