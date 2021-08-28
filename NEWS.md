@@ -1,3 +1,7 @@
+bnstruct v1.0.12
+================
+* Bugfix in belief propagation when processing the observed variables
+
 bnstruct v1.0.11 (Release date: 2021-05-19 )
 ================
 * dag.to.cpdag() now takes into account layer.struct (thanks to Erica Tavazzi)
