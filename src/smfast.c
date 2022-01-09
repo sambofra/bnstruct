@@ -1,5 +1,6 @@
 #include "smfast.h"
 
+
 SEXP bnstruct_fbp( SEXP aflml )
 {
 	R_len_t ni, si, bi, pos, pos2; 
@@ -151,11 +152,11 @@ SEXP bnstruct_all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mas
 	unsigned int i,j,n_pa,pos;
 	
 	// get inputs
-	unsigned int * d = INTEGER(data);
+	unsigned int * d = (unsigned int *)INTEGER(data);
 	unsigned int n_nodes = ncols(data);
 	unsigned int n_ex = nrows(data);	 
-	unsigned int * ns = INTEGER(node_sizes);
-	unsigned int * ifm = INTEGER(imp_fam_mask);
+	unsigned int * ns = (unsigned int *)INTEGER(node_sizes);
+	unsigned int * ifm = (unsigned int *)INTEGER(imp_fam_mask);
 	unsigned int pow_nodes = ncols(imp_fam_mask);
 	double alpha = *(REAL(iss));
   unsigned int scoring_func = *INTEGER(func);
@@ -178,7 +179,7 @@ SEXP bnstruct_all_fam_log_marg_lik( SEXP data, SEXP node_sizes, SEXP imp_fam_mas
 				// Rprintf("get bits\n");
 				n_pa = get_bits( j, pa, n_nodes );
 				// Rprintf("log lik, node %d, n parents %d\n",i,n_pa);
-				aflml[pos] = score_node_1(d, n_nodes, n_ex, ns, i, pa, n_pa, scoring_func, alpha);
+				aflml[pos] = score_node_1((unsigned int *)d, n_nodes, n_ex, (unsigned int *)ns, i, (unsigned int *)pa, n_pa, scoring_func, alpha);
         // bdeu_score( d, n_nodes, n_ex, ns, i, pa, n_pa, alpha );
 				// Rprintf("end\n");
 			}

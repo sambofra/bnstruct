@@ -1,5 +1,6 @@
 #include "mmhcfast.h"
 
+
 SEXP bnstruct_next_comb( SEXP sexp_comb, SEXP sexp_n )
 {
 	R_len_t m, i, j, finished;

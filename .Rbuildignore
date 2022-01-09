@@ -24,4 +24,5 @@ vignettes/bnstruct.bbl
 vignettes/bnstruct.blg
 ^.*converted-to\.pdf
 bnstruct.so
+src/Makevars
 Makefile

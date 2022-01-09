@@ -1,5 +1,6 @@
 #include "util.h"
 
+
 SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP func, SEXP ess )
 {
   SEXP score;
@@ -7,16 +8,16 @@ SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP f
   
   switch ((int)(*REAL(func)))
   {
-    case 0 : *REAL(score) = bdeu_score( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
-                                          *INTEGER(ni), INTEGER(pars), length(pars), *REAL(ess) );
+    case 0 : *REAL(score) = bdeu_score( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
+                                          *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), *REAL(ess) );
              break;
                 
-    case 1 : *REAL(score) = log_likelihood( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
-                                              *INTEGER(ni), INTEGER(pars), length(pars), 0.5*log(nrows(data)) );
+    case 1 : *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
+                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 0.5*log(nrows(data)) );
              break;
     
-    case 2 : *REAL(score) = log_likelihood( INTEGER(data), ncols(data), nrows(data), INTEGER(node_sizes),
-                                              *INTEGER(ni), INTEGER(pars), length(pars), 1.0 );
+    case 2 : *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
+                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 1.0 );
              break;
   }
   
@@ -29,22 +30,22 @@ SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP f
 }
 
 
-double score_node_1( int* data, int ncols_data, int nrows_data, int* node_sizes, unsigned int ni, int* pars, int length_pars, int func, double ess )
+double score_node_1( unsigned int* data, int ncols_data, int nrows_data, unsigned int* node_sizes, unsigned int ni, unsigned int* pars, int length_pars, int func, double ess )
 {
   double score;
   
   switch (func)
   {
-    case 0 : score = bdeu_score( data, ncols_data, nrows_data, node_sizes,
-                                 ni, pars, length_pars, ess );
+    case 0 : score = bdeu_score( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
+                                 ni, (unsigned int *)pars, length_pars, ess );
              break;
                 
-    case 1 : score = log_likelihood( data, ncols_data, nrows_data, node_sizes,
-                                     ni, pars, length_pars, 0.5*log(nrows_data) );
+    case 1 : score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
+                                     ni, (unsigned int *)pars, length_pars, 0.5*log(nrows_data) );
              break;
     
-    case 2 : score = log_likelihood( data, ncols_data, nrows_data, node_sizes,
-                                     ni, pars, length_pars, 1.0 );
+    case 2 : score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
+                                     ni, (unsigned int *)pars, length_pars, 1.0 );
              break;
   }
 
