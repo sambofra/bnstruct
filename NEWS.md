@@ -1,6 +1,7 @@
-bnstruct v1.0.12
+bnstruct v1.0.12 (release date: 2022-01-09)
 ================
 * Bugfix in belief propagation when processing the observed variables
+* fix -Wpointer-sign warnings in c code for CRAN
 
 bnstruct v1.0.11 (Release date: 2021-05-19 )
 ================
