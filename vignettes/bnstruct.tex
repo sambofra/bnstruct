@@ -12,6 +12,9 @@
 \makeatother
 
 \definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\makeatletter
+\@ifundefined{AddToHook}{}{\AddToHook{package/xcolor/after}{\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}}}
+\makeatother
 \newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
 \newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
 \newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
@@ -46,6 +49,14 @@
 \definecolor{messagecolor}{rgb}{0, 0, 0}
 \definecolor{warningcolor}{rgb}{1, 0, 1}
 \definecolor{errorcolor}{rgb}{1, 0, 0}
+\makeatletter
+\@ifundefined{AddToHook}{}{\AddToHook{package/xcolor/after}{
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+}}
+\makeatother
 \newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
 
 \usepackage{alltt}
@@ -202,11 +213,10 @@ and can therefore be installed from an R session using
 
 The latest development version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
 
-In order to install the package, it suffices to open a shell and run
+In order to install the package, it suffices to open a shell, clone the repository and run
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-git clone https://github.com/sambofra/bnstruct.git
 cd bnstruct
 make install
 \end{alltt}
@@ -479,7 +489,7 @@ the presence of data before attempting to retrieve it, using the tester methods 
    [8,]   1   1  NA   4  NA
    [9,]  NA   1   1   2   2
   [10,]   1   1   2   2  NA
- [ reached getOption("max.print") -- omitted 4990 rows ]
+ [ raggiunto getOption("max.print") -- omesse 4990 righe ]
 \end{verbatim}
 \begin{alltt}
 \hlstd{> }\hlcom{# if we want imputed dataset: this raises an error}
@@ -552,7 +562,7 @@ NULL
    [8,]   1   1   1   4   2
    [9,]   1   1   1   2   2
   [10,]   1   1   2   2   2
- [ reached getOption("max.print") -- omitted 4990 rows ]
+ [ raggiunto getOption("max.print") -- omesse 4990 righe ]
 \end{verbatim}
 \end{kframe}
 \end{knitrout}

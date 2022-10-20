@@ -154,9 +154,8 @@ install.packages("bnstruct")
 
 The latest development version of \Rpackage{bnstruct} can be found at \url{http://github.com/sambofra/bnstruct}.
 
-In order to install the package, it suffices to open a shell and run
+In order to install the package, it suffices to open a shell, clone the repository and run
 <<installmake,engine='bash',eval=FALSE>>=
-git clone https://github.com/sambofra/bnstruct.git
 cd bnstruct
 make install
 @

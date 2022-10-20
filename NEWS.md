@@ -1,3 +1,7 @@
+bnstruct v1.0.13 (release date: 2022-10-20)
+================
+* Edit vignette to silence CRAN NOTE/Warning
+
 bnstruct v1.0.12 (release date: 2022-01-09)
 ================
 * Bugfix in belief propagation when processing the observed variables
