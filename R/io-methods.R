@@ -19,10 +19,15 @@ setMethod("read.dataset",
             #vars <- gsub('"', '', c(unlist(strsplit(ls[1], split = " "))))
             # modified to keep spaces in variable names
             # hat tip to https://stat.ethz.ch/pipermail/r-help/2012-November/342314.html
-            res<-unlist(strsplit(ls[1],"[\"]"))
+            if (sep.symbol == '') {
+              res<-unlist(strsplit(ls[1],"[\"]"))
+            } else {
+              res <- unlist(strsplit(ls[1], split = sep.symbol))
+            }
             res1<-res[res!=" "]
             res1<-res1[res1!=""]
             vars<-c(unlist(strsplit(res1[grepl("\\s+$",res1)]," ")),res1[!grepl("\\s+$",res1)])
+            
             if (length(vars) == ncol(a)) {
               variables(object) <- vars
             } else if (num.time.steps > 1 && length(vars) * num.time.steps == ncol(a)) {
@@ -36,8 +41,12 @@ setMethod("read.dataset",
             } else {
               stop("Incoherent number of variable names in the dataset header (mismatch between header and data).")
             }
-            
-            lns                  <- c(unlist(strsplit(ls[2], split = "\\s+")))
+           
+            if (sep.symbol == '') {
+              lns <- c(unlist(strsplit(ls[2], split = "\\s+")))
+            } else {
+              lns <- unlist(strsplit(ls[2], split = sep.symbol))
+            } 
             if (length(lns) == ncol(a)) {
               node.sizes(object)   <- sapply(1:length(lns), FUN=function(x){ as.numeric(lns[x]) })
             } else if (num.time.steps > 1 && length(lns) * num.time.steps == ncol(a)) {
@@ -45,8 +54,12 @@ setMethod("read.dataset",
             } else {
               stop("Incoherent number of variable cardinalities in the dataset header (mismatch between header and data).")
             }
-            
-            disc <- c(unlist(strsplit(ls[3], split = "\\s+")))
+           
+            if (sep.symbol == '') {
+              disc <- c(unlist(strsplit(ls[3], split = "\\s+")))
+            } else {
+              disc <- unlist(strsplit(ls[3], split = sep.symbol))
+            } 
             for (d in 1:length(disc)) {
               if (disc[d] %in% c("d","D","T","TRUE")) disc[d] <- 'D'
               else if (disc[d] %in% c("c","C","F","FALSE")) disc[d] <- 'C'
