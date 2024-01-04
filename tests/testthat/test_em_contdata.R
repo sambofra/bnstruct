@@ -1,5 +1,4 @@
 library(bnstruct)
-context("Testing EM with continuous data")
 
 skip_on_cran()
 

@@ -1,5 +1,4 @@
 library(bnstruct)
-context("Testing CPTs")
 
 dataset <- child()
 dataset <- impute(dataset)

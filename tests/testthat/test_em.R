@@ -1,5 +1,4 @@
 library(bnstruct)
-context("Testing EM")
 
 dataset <- asia()
 network <- learn.network(dataset, algo="sm")
