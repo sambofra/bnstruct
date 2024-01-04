@@ -114,7 +114,7 @@ triangulation <- function(graph)
   # connecting two nodes that are not adjacent in the cycle.
   
   # create igraph object from adjacency matrix
-  ig <- graph.adjacency(graph, "undirected", weighted=NULL, diag=TRUE,
+  ig <- graph_from_adjacency_matrix(graph, "undirected", weighted=NULL, diag=TRUE,
                         add.colnames=NULL, add.rownames=NA)
   
   # All of the following could be replaced (I hope) with
@@ -150,11 +150,12 @@ clique.tree <- function(graph)
   # Returns the clique tree and the cliques.
   
   # create igraph object from adjacency list
-  ig <- graph.adjacency(graph, "undirected", weighted=NULL, diag=TRUE,
+  ig <- graph_from_adjacency_matrix(graph, "undirected", weighted=NULL, diag=TRUE,
                         add.colnames=NULL, add.rownames=NA)  
   
   # get list containing all the maximal cliques in the graph
-  igraph::cliques(ig, min=NULL, max=NULL)
+  #igraph::cliques(ig, min=NULL, max=NULL)
+  igraph::cliques(ig, min=0, max=0)
   cs <- maximal.cliques(ig)
   # print("---")
   # print(cs)
@@ -188,11 +189,11 @@ clique.tree <- function(graph)
     }
   #print(ctree)
   #print(compl)
-  ig <- graph.adjacency(compl, "undirected", weighted=TRUE, diag=FALSE,
+  ig <- graph_from_adjacency_matrix(compl, "undirected", weighted=TRUE, diag=FALSE,
                         add.colnames=NULL, add.rownames=NA)  
   # compute max-spanning tree using the complementary graph, and get adjacency matrix
   ig.mst <- minimum.spanning.tree(ig)
-  mst <- get.adjacency(ig.mst, type="both", attr=NULL, edges=FALSE)#, names=TRUE,)
+  mst <- as_adjacency_matrix(ig.mst, type="both", attr=NULL)#, names=TRUE,)
   #sparse=getIgraphOpt("sparsematrices"))  
   # 'edges=TRUE' + get.edgelist may help with order...
   # print(mst)
