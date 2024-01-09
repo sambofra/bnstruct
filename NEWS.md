@@ -1,3 +1,7 @@
+bnstruct v1.0.16 (release date: )
+================
+
+
 bnstruct v1.0.15 (release date: 2024-01-09)
 ================
 * Update test files
