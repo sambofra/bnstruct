@@ -46,7 +46,7 @@ setMethod("belief.propagation",
               {
                 observed.vars <- observations[[1]]
                 observed.vals <- observations[[2]]
-                obs <- unique.observations(observed.vars, observed.vals)
+                obs <- unique_observations(observed.vars, observed.vals)
                 observed.vars <- obs$observed.vars
                 if (inherits(observed.vars,"character")) {
                    observed.vars <- which(observed.vars %in% variables(net))

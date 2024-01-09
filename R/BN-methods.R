@@ -489,7 +489,7 @@ setMethod("get.most.probable.values",
 #           "BN",
 #           function(x, observed.vars, observed.vals)
 #           {
-# #             obs <- unique.observations(observed.vars, observed.vals)
+# #             obs <- unique_observations(observed.vars, observed.vals)
 # #             observed.vars <- obs$observed.vars
 # #             observed.vals <- obs$observed.vals
 # #             cpts <- cpts(x)
