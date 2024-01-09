@@ -47,7 +47,7 @@ setMethod("em",
             # ndataset <- dataset
             no.iterations <- 1
             difference    <- threshold + 1
-            prev.log.lik  <- 0
+            prev.log_lik  <- 0
             while((difference > threshold && no.iterations <= max.em.iterations) || no.iterations < 2)
             {
               observations(eng) <- list(NULL, NULL) # clean observations, if needed
@@ -197,11 +197,11 @@ setMethod("em",
               bn <- learn.params(bn, dataset, ess=ess, use.imputed.data=T)
 
               no.iterations <- no.iterations + 1
-              curr.log.lik  <- imputed.log.likelihood(dataset, bn, use.imputed.data = T)
-              difference    <- prev.log.lik - curr.log.lik
+              curr.log_lik  <- imputed.log_likelihood(dataset, bn, use.imputed.data = T)
+              difference    <- prev.log_lik - curr.log_lik
              
               orig.bn      <- bn
-              prev.log.lik <- curr.log.lik
+              prev.log_lik <- curr.log_lik
             }
             
             updated.bn(x) <- bn
@@ -212,12 +212,12 @@ setMethod("em",
           })
 
 
-# Compute log likelihood of the imputed part of a dataset given the network.
+# Compute log_likelihood of the imputed part of a dataset given the network.
 # Since it is used only as convergence criterion for EM, there is no need to compute
 # it over the whole dataset, but only on the imputed observations
 # (those that change after imputation).
 # Takes a BNDataset and a BN as input.
-imputed.log.likelihood <- function(dataset, net, use.imputed.data = FALSE)
+imputed.log_likelihood <- function(dataset, net, use.imputed.data = FALSE)
 {
   dag        <- dag(net)
   node.sizes <- node.sizes(net)

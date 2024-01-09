@@ -198,7 +198,7 @@ double bdeu_score( unsigned int * d, unsigned int n_nodes, unsigned int n_cases,
 
 SEXP bnstruct_compute_counts_nas( SEXP data, SEXP node_sizes )
 {
-	long int i,j,index,elmt,stride;
+	long int i,j,index,elmt;
 	// inputs
 	int * d = INTEGER(data);
 	int n_nodes = ncols(data);
@@ -251,7 +251,7 @@ SEXP bnstruct_compute_counts_nas( SEXP data, SEXP node_sizes )
 
 SEXP bnstruct_compute_counts( SEXP data, SEXP node_sizes )
 {
-  int i,j,index,elmt;
+  int i,j,index;
 	// inputs
 	int * d = INTEGER(data);
 	int n_nodes = ncols(data);

@@ -1512,7 +1512,7 @@ setGeneric("updated.bn", function(x) { standardGeneric("updated.bn") } )
 #' Return the list of observations added to an InferenceEngine.
 #' 
 #' Output is a list in the following format:
-#' \itemize{
+#' \describe{
 #' \item{\code{observed.vars}}{vector of observed variables;}
 #' \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 #' }
@@ -1532,7 +1532,7 @@ setGeneric("observations", function(x) { standardGeneric("observations") } )
 #' Return the list of interventions added to an InferenceEngine.
 #' 
 #' Output is a list in the following format:
-#' \itemize{
+#' \describe{
 #' \item{\code{intervention.vars}}{vector of manipulated variables;}
 #' \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
 #' }
@@ -1889,7 +1889,7 @@ setGeneric("updated.bn<-", function(x, value) { standardGeneric("updated.bn<-") 
 #' set the list of interventions for an \code{\link{InferenceEngine}}.
 #' 
 #' Add a list of interventions to an InferenceEngine, using a list composed by the two following vectors:
-#' \itemize{
+#' \describe{
 #' \item{\code{intervention.vars}}{vector of the variables we manipulate;}
 #' \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
 #' }
@@ -1912,7 +1912,7 @@ setGeneric("interventions<-", function(x, value) { standardGeneric("intervention
 #' set the list of observations of an \code{\link{InferenceEngine}}.
 #' 
 #' Add a list of observations to an InferenceEngine, using a list of observations composed by the two following vectors:
-#' \itemize{
+#' \describe{
 #' \item{\code{observed.vars}}{vector of observed variables;}
 #' \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 #' }
@@ -1938,7 +1938,7 @@ setGeneric("observations<-", function(x, value) { standardGeneric("observations<
 #' 
 #' Add a list of observations to an InferenceEngine that already has observations,
 #' using a list composed by the two following vectors:
-#' \itemize{
+#' \describe{
 #' \item{\code{observed.vars}}{vector of observed variables;}
 #' \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 #' }

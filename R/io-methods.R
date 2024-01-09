@@ -293,7 +293,7 @@ setMethod("read.dsc", c("character"),
               ps <- array(as.numeric(ps), dim=node.sizes[family])
               print(ps)
               cpts[[i]] <- ps
-              #             cpts[[i]] <- sort.dimensions(ps, c(length(family):1))$potential
+              #             cpts[[i]] <- sort_dimensions(ps, c(length(family):1))$potential
               print(cpts[[i]])
               
               dms <- NULL

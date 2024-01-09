@@ -21,7 +21,7 @@ Return the list of interventions added to an InferenceEngine.
 }
 \details{
 Output is a list in the following format:
-\itemize{
+\describe{
 \item{\code{intervention.vars}}{vector of manipulated variables;}
 \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
 }

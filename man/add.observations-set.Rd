@@ -18,7 +18,7 @@ add.observations(x) <- value
 \description{
 Add a list of observations to an InferenceEngine that already has observations,
 using a list composed by the two following vectors:
-\itemize{
+\describe{
 \item{\code{observed.vars}}{vector of observed variables;}
 \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 }

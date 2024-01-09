@@ -260,20 +260,20 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 # 	
 # 	for( i in 1:n.nodes )
 # 	{
-# 		# select possible parent sets and compute log-likelihood
+# 		# select possible parent sets and compute log_likelihood
 # 		possible.families <- which(ifm[i,])
 # 		for( k in possible.families )
 # 		{
 # 			pa <- which( bitAnd(k-1,bitmask) > 0 )
-# 			# LM[i,k] <- log.likelihood.na( pa, i, node.sizes, ess, data)
-# 			LM[i,k] <- log.lik.na( node.sizes[c(i,pa)], ess, data[,c(i,pa)] ) 
+# 			# LM[i,k] <- log_likelihood.na( pa, i, node.sizes, ess, data)
+# 			LM[i,k] <- log_lik.na( node.sizes[c(i,pa)], ess, data[,c(i,pa)] ) 
 # 		}
 # 	}
 # 	
 # 	return(LM)
 # }
 
-# log.lik.na <- function( node.sizes, ess, data )
+# log_lik.na <- function( node.sizes, ess, data )
 # {
 # 	n.nodes <- length(node.sizes)
 # 	
@@ -319,7 +319,7 @@ impossible.family.mask <- function( n.nodes, layering, max.fanin.layers)
 # 	}
 # }
 
-log.lik <- function( node.sizes, ess, data )
+log_lik <- function( node.sizes, ess, data )
 {
   n.nodes <- length(node.sizes)
   
@@ -368,7 +368,7 @@ log.lik <- function( node.sizes, ess, data )
 }
 
 
-# log.likelihood.na <- function( pa, ni, node.sizes, ess, data )
+# log_likelihood.na <- function( pa, ni, node.sizes, ess, data )
 # {
 # 	n.pa <- length(pa)
 # 	prod.sizes.pa <- prod(node.sizes[pa])
@@ -403,7 +403,7 @@ log.lik <- function( node.sizes, ess, data )
 # 	}
 # }
 
-# log.likelihood.na.rows <- function( pa, ni, node.sizes, ess, data )
+# log_likelihood.na.rows <- function( pa, ni, node.sizes, ess, data )
 # {
 # 	n.pa <- length(pa)
 # 	prod.sizes.pa <- prod(node.sizes[pa])

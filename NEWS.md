@@ -1,7 +1,8 @@
-bnstruct v1.0.15
+bnstruct v1.0.15 (release date: 2024-01-09)
 ================
 * Update test files
 * Update igraph function calls
+* Edited citation file, documentation and some internal function names to comply with CRAN notifications
 
 bnstruct v1.0.14 (release date: 2022-11-30)
 ================

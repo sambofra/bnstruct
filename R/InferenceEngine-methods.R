@@ -23,12 +23,12 @@ setMethod("initialize",
 #' 
 #' @param bn a \code{\link{BN}} object.
 #' @param observations a list of observations composed by the two following vectors:
-#' \itemize{
+#' \describe{
 #' \item{\code{observed.vars}:}{vector of observed variables;}
 #' \item{\code{observed.vals}:}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 #' }
 #' @param interventions a list of interventions composed of the following two vectors:
-#' \itemize{
+#' \describe{
 #' \item{\code{intervention.vars}:}{vector of variables for which an intervention has been performed;}
 #' \item{\code{intervention.vals}:}{vector of values chosen for the variables in \code{intervention.vals} in the corresponding position.}
 #' }

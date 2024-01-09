@@ -21,7 +21,7 @@ Return the list of observations added to an InferenceEngine.
 }
 \details{
 Output is a list in the following format:
-\itemize{
+\describe{
 \item{\code{observed.vars}}{vector of observed variables;}
 \item{\code{observed.vals}}{vector of values observed for the variables in \code{observed.vars} in the corresponding position.}
 }

@@ -187,7 +187,7 @@ setMethod("belief.propagation",
                 if (length(ds) == 0)
                 {
                   # if current clique is empty, just insert the cpt
-                  out <- sort.dimensions(cpts[[cpt]], dim.vars[[cpt]])
+                  out <- sort_dimensions(cpts[[cpt]], dim.vars[[cpt]])
                   potentials[[target.clique]]           <- out$potential
                   dimensions.contained[[target.clique]] <- out$vars
                 }
@@ -645,11 +645,11 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   
   # For (my) simplicity, cpts are managed with the variables (and therefore dimensions) in ascending order.
   # Check this requirement, and take action if it is not met.
-  out   <- sort.dimensions(cpt1, vars1)
+  out   <- sort_dimensions(cpt1, vars1)
   cpt1  <- out$potential
   vars1 <- out$vars
   
-  out   <- sort.dimensions(cpt2, vars2)
+  out   <- sort_dimensions(cpt2, vars2)
   cpt2  <- out$potential
   vars2 <- out$vars
   
@@ -754,7 +754,7 @@ mult <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   
   cpt1 <- array(c(cpt1), c(node.sizes[vars1]))
 
-  out  <- sort.dimensions(cpt1, vars1)
+  out  <- sort_dimensions(cpt1, vars1)
 
  return(list("potential"=out$potential, "vars"=out$vars))
 }
@@ -795,11 +795,11 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   
   # For (my) simplicity, cpts are managed with the variables (and therefore dimensions) in ascending order.
   # Check this requirement, and take action if it is not met.
-  out   <- sort.dimensions(cpt1, vars1)
+  out   <- sort_dimensions(cpt1, vars1)
   cpt1  <- out$potential
   vars1 <- out$vars
   
-  out   <- sort.dimensions(cpt2, vars2)
+  out   <- sort_dimensions(cpt2, vars2)
   cpt2  <- out$potential
   vars2 <- out$vars
   
@@ -851,12 +851,12 @@ divide <- function(cpt1, vars1, cpt2, vars2, node.sizes)
   # - rebuild array with corresponding dimensions, and permute dimensions to reconstruct order
   #print(cpt1)
   cpt1 <- array(c(cpt1), node.sizes[vars1])
-  out  <- sort.dimensions(cpt1, vars1)
+  out  <- sort_dimensions(cpt1, vars1)
   
   return(list("potential"=out$potential, "vars"=out$vars))
 }
 
-sort.dimensions <- function(cpt, new.ordering)
+sort_dimensions <- function(cpt, new.ordering)
 {
   # Permute array dimensions of the cpt accoring to the dimension names.
   # Dimensions (each corresponding to a variable) will be sorted in numerical order.

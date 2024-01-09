@@ -17,7 +17,7 @@ interventions(x) <- value
 }
 \description{
 Add a list of interventions to an InferenceEngine, using a list composed by the two following vectors:
-\itemize{
+\describe{
 \item{\code{intervention.vars}}{vector of the variables we manipulate;}
 \item{\code{intervention.vals}}{vector of values for the variables in \code{observed.vars} in the corresponding position.}
 }
