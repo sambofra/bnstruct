@@ -16,7 +16,7 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 
 	n.cases <- nrow(x)
 	n.nodes <- ncol(x)
-	
+
 	storage.mode(node.sizes) <- "integer" # just to be sure
         storage.mode(scoring.func) <- "integer"
 	
@@ -76,10 +76,14 @@ sm <- function(x, node.sizes, scoring.func = 0, cont.nodes = NULL, max.fanin = N
 	ifm <- impossible.family.mask( n.nodes, layering, max.fanin.layers )
   
         # remove parents not in cpc, if cpc.matrix is given
-	if( !is.null(cpc.mat) )
-            for( i in 1:n.nodes )
+	if( !is.null(cpc.mat) ) {
+	    # transpose initial CPC matrix.
+ 	    # cpc.mat has 0 for forbidden edges, while the procedure here forbids parent nodes.
+	    cpc.mat <- t(cpc.mat)
+            for( i in 1:n.nodes ) 
                 ifm[ i, (.Call("bnstruct_fumt_mask", n_elements = n.nodes, pattern = which(cpc.mat[i,]==0), 
                          PACKAGE = "bnstruct") > 0) ] <- FALSE
+	}
 
         # remove candidate parents not consistent with mandatory edges.
         # The idea is to transform this matrix in something similar to
