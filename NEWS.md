@@ -1,6 +1,6 @@
 bnstruct v1.0.16 (release date: )
 ================
-
+* Bugfix in learn.network when providing an initial CPC
 
 bnstruct v1.0.15 (release date: 2024-01-09)
 ================

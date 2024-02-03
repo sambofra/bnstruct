@@ -416,10 +416,10 @@ setMethod("learn.structure",
             else
               wm.max <- 15
             if ("initial.cpc" %in% names(other.args))
-              initial.cpc <- as.numeric(other.args$initial.cpc)
+              initial.cpc <- matrix(as.numeric(other.args$initial.cpc), ncol=ncol(other.args$initial.cpc))
             else
               initial.cpc <- NULL
-            
+
             #if ("struct.threshold" %in% names(other.args))
               #struct.threshold <- as.numeric(other.args$struct.threshold)
             #else
