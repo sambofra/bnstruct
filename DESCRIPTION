@@ -28,3 +28,5 @@ License: GPL (>=2) | file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+URL: https://github.com/sambofra/bnstruct
+BugReports: https://github.com/sambofra/bnstruct/issues
