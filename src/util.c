@@ -12,12 +12,14 @@ SEXP bnstruct_score_node( SEXP data, SEXP node_sizes, SEXP ni, SEXP pars, SEXP f
                                           *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), *REAL(ess) );
              break;
                 
-    case 1 : *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
-                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 0.5*log(nrows(data)) );
+    case 1 : // AIC
+             *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
+                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 1.0 );
              break;
     
-    case 2 : *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
-                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 1.0 );
+    case 2 : // BIC
+             *REAL(score) = log_likelihood( (unsigned int *)INTEGER(data), ncols(data), nrows(data), (unsigned int *)INTEGER(node_sizes),
+                                              *INTEGER(ni), (unsigned int *)INTEGER(pars), length(pars), 0.5*log(nrows(data)) );
              break;
   }
   
@@ -40,12 +42,14 @@ double score_node_1( unsigned int* data, int ncols_data, int nrows_data, unsigne
                                  ni, (unsigned int *)pars, length_pars, ess );
              break;
                 
-    case 1 : score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
-                                     ni, (unsigned int *)pars, length_pars, 0.5*log(nrows_data) );
+    case 1 : // AIC
+             score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
+                                     ni, (unsigned int *)pars, length_pars, 1.0 );
              break;
     
-    case 2 : score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
-                                     ni, (unsigned int *)pars, length_pars, 1.0 );
+    case 2 : // BIC
+             score = log_likelihood( (unsigned int *)data, ncols_data, nrows_data, (unsigned int *)node_sizes,
+                                     ni, (unsigned int *)pars, length_pars, 0.5*log(nrows_data) );
              break;
   }
 
@@ -340,7 +344,8 @@ double log_likelihood ( unsigned int * d, unsigned int n_nodes, unsigned int n_c
 	//for( i = 0; i < prod_sizes; i++ )
 	//	counts[i] += n_na * (counts[i] + prior) / ( n_cases - n_na + alpha );
 		
-	// compute log likelihood
+	// compute log likelihood: sum_{j,k} n_ijk * log( n_ijk / n_ij ) over the rows
+	// with no missing value in the family, with the 0 * log 0 = 0 convention
   logl = 0.0;
 	
 	for( i = 0; i < prod_sizes_pa; i++ )
@@ -353,11 +358,15 @@ double log_likelihood ( unsigned int * d, unsigned int n_nodes, unsigned int n_c
 			acc  += counts[stride + j];
     }
     
-    acc = log(acc + 1);
+    if( acc < 1.0 )
+      continue;
     
-    for ( j = 1 ; j < ns[ni] ; j++ )
+    acc = log(acc);
+    
+    for ( j = 0 ; j < ns[ni] ; j++ )
     {
-      logl += counts[stride + j] * (log(counts[stride + j] + 1) - acc);
+      if( counts[stride + j] >= 1.0 )
+        logl += counts[stride + j] * (log(counts[stride + j]) - acc);
     }
 
 	}
